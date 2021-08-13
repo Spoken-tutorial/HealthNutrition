@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head th:replace="common/trail :: common-trail">
+
+	<meta charset="utf-8"/>
+		 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+		 <link rel="stylesheet" th:href="@{css/style3.css}"/>
+ 	 	<link rel="stylesheet" th:href="@{css/bootstrap.min.css}"/> 
+
+</head>
+  <body>
+  		<div th:replace="common/trail :: navbar1"/>
+  		
+  		<div class="container" style="padding-top: 150px">
+
+	    <div class="row">
+	      <div class="col-lg-10 col-xl-9 mx-auto">
+	        <div class="card card-signin flex-row my-5">
+	       
+	          <div class="card-body">
+	           <h5 class="card-title text-center" style="color:maroon; font-size: 20px">
+    			<div class="">    
+                                <div th:if="${msg}">
+   								 <span th:text="${msg}"></span>
+ 									 </div> </div></h5>
+	            <h5 class="card-title text-center" style="color:maroon; font-size: 30px">  District </h5>
+	            
+	         
+	         
+	       	   <form class="form-horizontal"  th:action="@{/addDistrictCityName}" method="post"  enctype="multipart/form-data" >
+ 
+				    	 <div class="form-group">
+								 	  
+									   <label for="stateDistrictId">Select State </label>
+									    
+									
+                                  <select id="stateDistrictId" class="form-control" name="stateNameDistrict"  required="required" >
+								               
+								                        <option selected="selected" >Select State</option>   
+								                           
+								                     <span th:each="distName :  ${state}">
+								                     
+								  								<option th:value="${distName.getId()}"><span  th:text="${distName.stateName}"></span></option>		
+								  				    </span>
+									</select>
+						
+							 </div>	
+							 
+							 
+							 
+							  <div class="form-group">
+								 	  
+									   <label for="districtCityId">Select District </label>
+									    
+									
+                                  <select id="districtCityId" class="form-control" name="districtNameCity"  required="required" >
+								               
+								                        <option selected="selected" >Select District</option>   
+								                           
+								                     
+									</select>
+						
+							 </div>
+						
+						<div class="form-group">  
+	 
+	                        <label for="cityId">City Name</label> 
+	 						 <input type="text" class="form-control" id="cityId" name="cityName" required="required"/>
+							
+							<span style="color: red;" th:if="${msgCity}" >City already exists. Choose a different one.</span>
+						</div>
+                          <button type="submit" value="showAlert"  class="btn btn-success">Submit</button>
+                     </form>
+					<script>
+					function submitForm() {
+						  return confirm('Do you really want to submit the form?');
+						  
+						  alert("Submit form succefully");
+						}
+					</script>
+  				 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+			<div th:fragment="body-bottom-scripts">
+
+        	 <script th:src="@{static/js/bootstrap.bundle.min.js}"></script>
+       		 <script th:src="@{static/js/jquery.slim.min}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+			
+			
+					
+				<script th:src="@{/js/jquery.min.js}"></script>
+			    <script th:src="@{/s/js/jquery-3.2.1.min.js}"></script>
+			    <script th:src="@{/s/js/popper.min.js}"></script>
+			    <script th:src="@{/s/js/bootstrap.min.js}"></script>
+			    <script th:src="@{/s/js/owl.carousel.min.js}"></script>
+			    <script th:src="@{/s/js/bootstrap-datepicker.js}"></script>
+			    <script th:src="@{/s/js/jquery.timepicker.min.js}"></script>
+			    <script th:src="@{/s/js/jquery.waypoints.min.js}"></script>
+			    <script th:src="@{/s/js/main.js}"></script>
+			     <script th:src="@{/js/ajaxSupport.js}"></script>
+			
+			</div>
+			
+			<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+ </body>
+</html>
+ 
+ 

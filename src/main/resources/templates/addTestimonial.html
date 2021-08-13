@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-testimonials{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-testimonials a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="alert alert-success" id="Success" style="display: none;">Changes
+					Updated Successfully</div>
+				<div id="Failure" style="display: none;" class="alert alert-danger">Please
+					Try Again</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">View</a></li>
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Testimonial</h4>
+							</div>
+
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-lg-6">
+									<form th:action="@{/addTestimonial}" method="post"
+										enctype="multipart/form-data">
+
+										<div class="form-group"
+											sec:authorize="hasAnyAuthority('MASTER_TRAINER')">
+											<label for="trainingName">Select Training</label> <select
+												class="form-control" name="trainingName" required="required">
+
+												<option>Select Training</option>
+
+												<option th:each="event: ${events}"
+													th:value="${event.getEventId()}"
+													th:text="${event.getEventName()}"></option>
+
+											</select>
+										</div>
+
+										<div class="form-group">
+											<label for="testimonialName">Name of Person giving the Testimonial *</label> <input type="text"
+												class="form-control" id="testimonialName"
+												name="testimonialName" required="required" />
+										</div>
+										<div class="form-group">
+											<label for="testimonialDescription">Testimonial * <span class="text-muted">(Text to display with video)</span></label>
+											<textarea class="form-control" rows="5"
+												id="testimoniaqlDescription" name="description"
+												required="required" placeholder="Testimonial text" maxlength="1500"></textarea>
+												<small>Character limit : 1500</small>
+										</div>
+										<div class="form-group">
+											<label for="testimonialVideo" style="padding-top: 8px">Add
+												Video <span class="text-muted">(Only mp4 format of max filesize 20Mb)</span> </label> <input type="file" class="form-control-file"
+												id="testimonialVideo" name="uploadTestimonial" accept=".mp4"
+												placeholder="uploadFile" />
+										</div>
+										
+										<div class="form-group">
+											<label for="testimonialConsent" style="padding-top: 8px">Upload Consent document * <span class="text-muted"> (Only PDF format)</span></label> <input type="file" class="form-control-file"
+												id="testimonialConsent" name="consent"
+												placeholder="uploadFile" required/>
+										</div>
+										<button type="submit" value="showAlert" onclick="showAlert();"
+											class="btn a-btn">Submit</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable">
+
+							</div>
+							<thead>
+								<tr>
+									<th>Sr.#</th>
+									<th>Name</th>
+									<th>Text to display with video</th>
+									<th>Video</th>
+									<div sec:authorize="hasAnyAuthority('SUPER_USER')">
+										<th>Approve/Reject</th>
+									</div>
+									<th>Consent Document</th>
+									<th>Action</th>
+									<!-- <th>Disable</th> -->
+								</tr>
+							</thead>
+							<tbody>
+								<div sec:authorize="hasAnyAuthority('SUPER_USER')">
+									<tr th:each="testimonial : ${testimonials}" style="">
+
+										<td th:text="${testimonial.getTestimonialId()}"></td>
+										<td th:text="${testimonial.getName()}"></td>
+
+										<td th:text="${testimonial.getDescription()}"></td>
+										<td>
+											<div th:if="${testimonial.getFilePath() != 'null'}"
+												style="width: 400px;">
+												<video controls="controls" style="width: 100%;">
+													<source th:src="@{/files/}+@{${testimonial.getFilePath()}}"
+														type="video/mp4" />
+													Your browser does not support HTML video.
+												</video>
+											</div>
+										</td>
+										
+
+										<div sec:authorize="hasAnyAuthority('SUPER_USER')">
+											<td>
+
+												<div th:if="${testimonial.isApproved()}">
+													<a class="disableTest"
+														th:value="${testimonial.getTestimonialId()}"
+														title="Click to Disable Testimonial"><i
+														class="fas fa-times-circle"
+														th:id="${testimonial.getTestimonialId()}"
+														style="color: red"></i></a>
+												</div>
+												<div th:unless="${testimonial.isApproved()}">
+													<a class="enableTest"
+														th:value="${testimonial.getTestimonialId()}"
+														title="Click to Enable Testimonial"><i
+														class="fas fa-check-circle"
+														th:id="${testimonial.getTestimonialId()}"
+														style="color: green"></i> </a>
+												</div>
+
+											</td>
+										</div>
+										<td>
+											<div th:if="${testimonial.getConsentLetter() != null}"
+												style="width: 400px;">
+												<a th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
+													target="_blank" class="pdfclass"><img id="pdfsource"
+													th:src="${testimonial.getConsentLetter()}" alt="Click here"></img></a>
+											</div>
+										</td>
+										<td><a
+											th:href="@{${'/testimonial/edit/' + testimonial.getTestimonialId()}}">Edit</a></td>
+
+
+									</tr>
+								</div>
+
+								<div sec:authorize="hasAnyAuthority('MASTER_TRAINER')">
+									<tr th:each="testimonial : ${testimonials}"
+										th:if="${testimonial.getUser().getId() == userInfo.getId()}">
+										<!-- <div th:if="${testimonial.getUser().getId() == userInfo.getId()}"> -->
+										<td th:text="${testimonial.getTestimonialId()}"></td>
+										<td th:text="${testimonial.getName()}"></td>
+
+										<td th:text="${testimonial.getDescription()}"></td>
+										<td>
+											<div th:if="${testimonial.getFilePath() != 'null'}" style="width:400px;">
+												<video controls="controls" style="width: 100%;">
+													<source th:src="@{/files/}+@{${testimonial.getFilePath()}}"
+														type="video/mp4" />
+													Your browser does not support HTML video.
+												</video>
+											</div>
+										</td>
+
+										<div sec:authorize="hasAnyAuthority('SUPER_USER')">
+											<td>
+
+												<div th:if="${testimonial.isApproved()}">
+													<a class="disableTest"
+														th:value="${testimonial.getTestimonialId()}"
+														title="Click to Disable Testimonial"><i
+														class="fas fa-times-circle"
+														th:id="${testimonial.getTestimonialId()}"
+														style="color: red"></i></a>
+												</div>
+												<div th:unless="${testimonial.isApproved()}">
+													<a class="enableTest"
+														th:value="${testimonial.getTestimonialId()}"
+														title="Click to Enable Testimonial"><i
+														class="fas fa-check-circle"
+														th:id="${testimonial.getTestimonialId()}"
+														style="color: green"></i> </a>
+												</div>
+
+											</td>
+										</div>
+										<td>
+											<div th:if="${testimonial.getConsentLetter() != null}"
+												style="width: 400px;">
+												<a th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
+													target="_blank" class="pdfclass"><img id="pdfsource"
+													th:src="${testimonial.getConsentLetter()}" alt="Click here"></img></a>
+											</div>
+										</td>
+										<td><a
+											th:href="@{${'/testimonial/edit/' + testimonial.getTestimonialId()}}">Edit</a></td>
+
+										<!-- </div> -->
+									</tr>
+								</div>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#myTable').DataTable();
+		});
+	</script>
+
+	<script th:inline="javascript">
+		var projectPath = '[(@{/})]';
+	</script>
+</body>
+</html>
+

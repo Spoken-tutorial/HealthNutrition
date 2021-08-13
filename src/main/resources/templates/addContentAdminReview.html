@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+	<link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+  <div th:replace="common/sidebar :: top_header"></div>
+  <div class="container-fluid">
+  <div class="row">
+  <div class="col-md-3 col-lg-2 pr-0">
+  <div th:replace="common/sidebar :: contributor_sidebar"></div>
+  </div>
+  <div class="col-md-9 col-lg-10 p-md-5">
+  <div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span id="success_msg"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span  id="error_msg"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+  <div class="card">
+					<div class="card-header">
+						<h4>Review video</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-6">
+									                  <form th:action="@{/submitTutorial}" method="post">
+
+			               <table class="table table-bordered">
+                                    <thead>
+                                      <tr>
+                                        <th>Category</th>
+                                    <td>
+										  		<input class="form-control"  id="categoryId"  name="categoryName"  th:value="${category}" readonly="readonly"></input>		
+										 
+
+                                     </td> 
+                         
+
+													
+                                      </tr>
+                                    </thead>
+
+                                     <thead>
+                                      <tr>
+                                      
+                                        <th>Topic</th>
+                                        <td>
+			                                            
+			   										<input class="form-control"  id="topicId" name="categoryName"  th:value="${topic}" readonly="readonly"></input>		
+			                                        
+                                        </td>
+                                      </tr>	 		
+ 
+ 	 	
+						      
+                                    </thead>
+                                 <thead>
+                                      <tr>
+                                        <th>Language</th>
+                                        <td>
+			                                   
+			                         					 <input class="form-control" id="lanId" name="languageName"  th:value="${language}" readonly="readonly"></input>		
+			                                   
+													
+										</td>
+										 <input type="hidden" id="tutorialId" th:value="${tutorial.getTutorialId()}"/>
+                                      </tr>
+                                   </thead>
+
+                             <!--   <thead>
+                                          <tr>
+   
+                                <th> Date</th>               
+  
+                                <td>
+                                	date remaining
+                                ${tutorialComponenet}
+			                                  <span id="lan" th:each="language : ${inputLanguage}">  
+			                         					 <input class="form-control" id="lanId" name="languageName"   readonly="readonly"></input>		
+			                                   
+												</span>		
+										</td>
+                              						</tr>
+                                    </thead> -->
+               
+                            </table>
+                            
+                            <form  class="form-horizontal"  th:action="@{/addkeyword}" onsubmit="return submitForm(this);" method="post" >
+
+				<div class="form-group">
+		
+								<!-- <div id="videoDiv" class="row" scrolling="auto" autoplay="autoplay">
+								   
+								   <div class="col-sm-12" >
+								   	<video id='storedVideoId' height="240" width="320" controls="controls">
+								    </video>
+								    <video id='storedVideoId' height="240" width="320"
+														controls="controls" style="width:100%!important;">
+													<source src="movie.mp4" type="video/mp4">
+													<source th:src="${tutorial.getVideo()}" type="video/mp4"></source>
+													<source th:src="${tutorialComponenet.getVideo()}" type="video/mp4"></source>
+													</video>
+								   </div>
+								</div> -->
+								
+								<div class="embed-responsive embed-responsive-16by9 mb-5">
+  <video id='storedVideoId' 
+														controls="controls" style="width:100%!important;">
+													<!-- <source src="movie.mp4" type="video/mp4"> -->
+													<!-- <source th:src="${tutorial.getVideo()}" type="video/mp4"></source> -->
+													<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
+													</video>
+</div>
+													<div> Video Duration : <span th:text="${FileDurationInSecond}"/> Seconds </div> 
+													<div> Video File Size : <span th:text="${fileSizeInMB}"/> MB </div>
+													<div> Video Width : <span th:text="${FileWidth}"/> </div> 
+													<div> Video Height : <span th:text="${FileHeight}"/>  </div>
+								<div class="row">
+								<div class="col-md-12">
+								<form  class="form-horizontal"  th:action="@{/addkeyword}" onsubmit="return submitForm(this);" method="post" >
+
+						          <div class="form-group">
+						 
+				                      <select id="VideoAcceptAdmin"  class="form-control" > 
+				                      
+									     <option value="0">Select</option>
+									     <option value="1">Accept</option>
+									     <option value="2">Need Improvement</option>
+									    
+									  </select>  
+				                    
+						          </div>
+						          
+				 <div id="videoNeedImprovement" style="display: none;">
+				 
+				 	<label for="msgVideoCommentByAdmin">Comments : </label>
+								 <textarea class="form-control"  name="msgVideoCommentByAdmin" 
+								 id="msgVideoCommentByAdmin" rows="10" required="required" ></textarea>
+							
+				</div>
+				
+				<hr/> 
+				<div th:if="${tutorial}">
+											<div
+												th:if="${tutorial.getVideoStatus() == 1}">
+													<button id="videoAcceptOrNeedToImprovemenetByAdmin"  type="button" class="btn btn-success">Submit</button>
+											</div>
+											<div
+												th:unless="${tutorial.getVideoStatus() == 1}">
+												<button id="videoAcceptOrNeedToImprovemenetByAdmin"  type="button" class="btn btn-success" disabled="disabled">Submit</button>
+												
+													
+											</div>
+										</div>
+										<div th:unless="${tutorial}">
+											<button id="videoAcceptOrNeedToImprovemenetByAdmin"  type="button" class="btn btn-success">Submit</button>
+										</div>
+				             
+				 	   
+
+		</form>	
+								</div>
+								</div>
+		
+	            </div>
+						
+						     
+					</form>
+                            
+                                
+                        
+							    
+	<!-- 	Here is code for comment View -->  
+	
+	
+			<span th:each="mesComment : ${comVideo}">  
+				               
+					
+				                  
+				       <div class="alert alert-info">
+				                  
+				               <strong style="color:green; text-transform:uppercase;"> <span style="color:green;" th:text="${mesComment.getUser().getUsername()}"></span></strong>
+				                  
+				                     <span style="color:green;" th:text="${mesComment.getComment()}">
+				                   
+				                   	</span>
+				                   	
+				             	</div>      	
+				    	</span>
+				             	
+				             
+	
+						    
+							    
+			     				            
+			          </form>
+							</div>
+						</div>
+
+						<!-- <h5 class="card-title">Special title treatment</h5>
+						<p class="card-text">With supporting text below as a natural
+							lead-in to additional content.</p>
+						<a href="#" class="btn btn-primary">Go somewhere</a> -->
+					</div>
+				</div>
+  </div>
+  </div>
+  </div>
+	<div style="display:flex;">
+  		<!-- <div th:replace="common/sidebar :: contributor_sidebar"></div> -->
+
+
+
+ 		<script type="text/javascript">
+ 		
+
+ 		</script>
+
+	   
+    </div>
+  </div>
+
+			<div th:fragment="body-bottom-scripts">
+			
+
+			    <script th:src="@{js/moment.min.js}"></script> 
+			    <script th:src="@{js/combodate.js}"></script> 
+			    <script th:src="@{js/jquery-3.3.1.js}"></script> 
+			    
+			    
+			
+        		 <script th:src="@{static/js/bootstrap.bundle.min.js}"></script>
+       			 <script th:src="@{static/js/jquery.slim.min}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>			
+				<script th:src="@{/fontawesome-free-5.10.1-web/js/all.js}"></script>
+			    <script th:src="@{/s/js/jquery-3.2.1.min.js}"></script>
+			    <script th:src="@{/s/js/popper.min.js}"></script> 
+			    <script th:src="@{/s/js/bootstrap.min.js}"></script>
+			
+			 <script th:src="@{/s/js/main.js}"></script>
+			  <script th:src="@{/js/ajaxSupport.js}"></script>
+			 <script th:src="@{js/jquery-3.3.1.js}"></script>    
+			     
+				
+			</div>
+			
+ </body>
+ 
+ <script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+</html>
+ 
+ 

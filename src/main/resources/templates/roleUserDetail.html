@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<!-- <head th:replace="common/header :: common-header" /> -->
+
+
+<head>	
+
+	<meta charset="utf-8"/> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300, 400, 700" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/s/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/animate.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/owl.carousel.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/bootstrap-datepicker.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/jquery.timepicker.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/ionicons/css/ionicons.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/flaticon/font/flaticon.css}"/>
+    <!-- Theme Style-->
+    <link rel="stylesheet" th:href="@{/s/css/style.css}"/>     
+    
+      
+</head>
+<body>
+<!-- 
+<div th:replace="common/header :: navbar" /> -->
+
+    <header role="banner">
+      <div class="top-bar">
+        <div class="container">              
+          <div class="row">
+            <div class="col-md-6 col-sm-6 col-5">
+              <ul class="social list-unstyled">      
+   
+              </ul>
+            </div>
+            <div class="col-md-6 col-sm-6 col-7 text-right">
+  
+  
+<!--   
+  
+            	<ul class="  navbar-right">
+						<li><a href="#"> </a></li>
+						<li><a sec:authorize="isAnonymous()" th:href="@{/login}">Login|New User</a></li>
+						<li><a sec:authorize="isAuthenticated()" th:href="@{/myProfile}">MY ACCOUNT</a></li>
+						<li><a sec:authorize="isAuthenticated()" th:href="@{/logout}">LOGOUT</a></li>
+				</ul> -->
+				
+						<div sec:authorize="isAuthenticated()"> 
+						  
+						   Logged user: Welcome Admin <span sec:authentication="name"></span> |
+							 Roles: <span sec:authentication="principal.authorities"></span>
+					
+							 
+							 
+						 
+						</div>
+							
+				<div class="row">
+
+						<div class="col">
+						<a sec:authorize="isAnonymous()" th:href="@{/login}">Login|New User</a>
+						<a sec:authorize="isAuthenticated()" th:href="@{/myProfile}">MY ACCOUNT</a>
+						<a sec:authorize="isAuthenticated()" th:href="@{/logout}">LOGOUT</a>
+				</div>
+		
+			</div>
+            </div>
+              <marquee direction="left">1800 180 0101</marquee>
+  
+          </div><!--
+            Herwe we write login button -->
+       
+          <!--  <a class="btn btn-success float-right" th:href="@{/login}">Login</a>  -->
+   
+        </div>
+      </div>
+     
+  
+</header>
+
+<!-- <div class="container-fluid" style="padding:50px" th:if="${LoggedUserRole}=='ROLE_USER' or ${LoggedUserRole}=='ROLE_DOMAIN_REVIEWER' or  ${LoggedUserRole}=='ROLE_QUALITY_REVIEWER'">  
+ -->	
+ 
+ <security:authorize access="hasRole('ADMIN')">
+   	<div class="container">
+   		
+   		<div class="row" style="padding-top: 160px">
+   			
+   			
+   		<div class="col-4 shadow p-3 mb-5 bg-white rounded" >
+	   		
+	   		 <div>
+	 
+	   		 			     	<ul>	 
+					     		<!-- <a  th:href="@{/addMeAsAdmin}">Add me as Admin</a> -->
+								<li><span>	<a  th:href="@{/approveMeAsDomainRevieweer}"> Approve  me as Domain Reviewer</a>	</span>	</li>	
+								<li><span>	<a  th:href="@{/approveMeAsQualityRevieweer}">Approve  as as Quality Reviewer</a> </span></li>
+								<li>	<span>	<a  th:href="@{/approveMeAsMasterTrainer}">Approve me as as Master Trainer</a> </span>  </li>
+							</ul>
+		
+	    	</div>
+
+   			</div>
+   			
+   			<div class="col-4 ">
+   			
+
+   			</div>
+			   			<div class="col-4">
+			   			
+			   			</div>
+   			
+   	
+   			</div>
+   		
+   		</div>
+    
+    </security:authorize>
+  <!--   </div> -->
+    
+
+    	 <div class="container-fluid" style="padding:50px" th:if="${LoggedUserRole}=='' or ${LoggedUserRole}=='Parent' or  ${LoggedUserRole}=='Parent'">  
+	
+   		<div class="container">
+   		
+   		
+   			<div class="row" style="padding-top: 160px">
+   			
+   			
+   		<div class="col-4 shadow p-3 mb-5 bg-white rounded" >
+	   		
+	   		 <div>
+	   
+					     	<ul>	 
+					     				<!-- <a  th:href="@{/addMeAsAdmin}">Add me as Admin</a> -->
+								<li>	<span>	<a  th:href="@{/addMeAsDomainRevieweer}"> Add me as Domain Reviewer</a>	</span>	</li>	
+								<li>	<span>	<a  th:href="@{/addMeAsQualityRevieweer}">Add me as as Quality Reviewer</a> </span></li>
+								<li>	<span>	<a  th:href="@{/addMeAsMasterTrainer}">Add me as as Master Trainer</a> </span>  </li>
+							</ul>
+	    	</div>
+   		
+   			
+   			</div>
+   			
+   			<div class="col-4 ">
+   			
+   			</div>
+			   			<div class="col-4">
+			   			
+			   			</div>
+   			
+   	
+   			</div>
+   		
+   		</div>
+    
+    
+    </div>
+    
+    
+
+    <script th:src="@{/s/js/jquery-3.2.1.min.js}"></script>
+    <script th:src="@{/s/js/popper.min.js}"></script>
+    <script th:src="@{/s/js/bootstrap.min.js}"></script>
+    <script th:src="@{/s/js/owl.carousel.min.js}"></script>
+    <script th:src="@{/s/js/bootstrap-datepicker.js}"></script>
+    <script th:src="@{/s/js/jquery.timepicker.min.js}"></script>
+    <script th:src="@{/s/js/jquery.waypoints.min.js}"></script>
+    <script th:src="@{/s/js/main.js}"></script>
+    
+    	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+ 
+	<!-- <div th:replace="common/header :: body-bottom-scripts" /> -->
+</body>
+</html>

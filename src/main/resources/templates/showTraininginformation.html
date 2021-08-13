@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head th:replace="common/trail :: common-trail">
+
+
+		
+		<meta charset="utf-8"/>
+		 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+		 <link rel="stylesheet" th:href="@{/css/style3.css}"/>
+ 	 	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/> 
+		<link rel="stylesheet" type="text/css" th:href="@{/datatables.css}"/>
+</head>
+  <body>
+  
+  		<div th:replace="common/trail :: navbar1"/>
+  		
+			  <div class="#">
+          
+        
+          <div class="row" style="padding-top: 150px">
+
+              <div class="col-2">                 
+              </div> 
+              <div class="col-8">
+          
+                     <div>
+					         <h2>Training Information</h2>
+					        
+					        <table id="tableId" class="table table-striped">
+					        
+					       <thead>
+					        
+					            <tr>
+					              
+					                <th>Start Date</th>
+					                <th>End Date</th>
+					                <th>Category</th>
+					                <th>Training Information</th>
+					                <th>State</th>
+					                <th>District</th>	
+					                <th>City</th>	
+					          	    <th>Address Information</th>
+					                <th>Pin Code</th>
+					                <th>Participants Photo</th>
+					            <!--     <th>Edit</th> -->
+					                
+					            </tr>
+					            </thead>
+					            <tbody>
+					            	<tr th:each="traInfo : ${traInformation}">
+						              
+						                <td th:text="${traInfo.date}">description</td>
+						                <td th:text="${traInfo.endDate}">description</td>
+						                 <td th:text="${traInfo.categoryname}">description</td>
+						                <td th:text="${traInfo.traingDetail}">description</td>  
+						                <td th:text="${traInfo.state}">description</td>
+						                <td th:text="${traInfo.districit}">description</td>
+						                <td th:text="${traInfo.city}">description</td>
+									   <td th:text="${traInfo.addressInformation}">description</td>
+									   <td th:text="${traInfo.pincode}">description</td>
+								<td>
+										<a  th:href="${traInfo.photo}"><i style="padding-left: 30px" class="fa fa-download" aria-hidden="true"></i></a>  
+											
+								</td>	
+						
+					         <!--      <td><a onclick="submitForm()" th:href="${'event/edit/' + traInfo.pincode}">Edit</a></td>  --> 
+   
+					             <!--    <td><a th:href="${'/event/delete/' + event.id}">Disable</a></td> -->
+    
+					            </tr>
+					            
+					            </tbody>
+					        </table>
+					    </div>
+              </div>
+              
+              
+ 	<script>
+					function submitForm() {
+						  return confirm('Do you really want to Delete Recored');
+						  
+						  alert("Delete Recored succefully");
+						}
+					</script>
+              
+              <div class="col-2">
+                  
+              </div>
+ 
+<!--footer --> 
+     </div>
+    
+         
+ 			<script th:src="@{/js/jquery.min.js}"></script>
+		 	<script type="text/javascript" charset="utf8" th:src="@{/datatables.js}"></script>
+		 
+			<script>
+			
+			
+			$(document).ready( function () {
+			    $('#tableId').DataTable();
+			} );
+			
+			</script> 
+          
+          
+          
+      </div>
+ 
+			<div th:fragment="body-bottom-scripts">
+
+        	 <script th:src="@{/static/js/bootstrap.bundle.min.js}"></script>
+       		 <script th:src="@{/static/js/jquery.slim.min}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+			
+			
+			
+			</div>
+			
+				<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+ </body>
+</html>
+ 
+ 

@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head th:replace="common/trail :: common-trail" >
+
+
+ <link rel="stylesheet" type="text/css" th:href="@{/datatables.css}"/>
+ 
+</head>
+
+  <body>
+  
+  		<div th:replace="common/trail :: navbar1"/>
+
+          	<div class="container-fluid" style="padding-top: 120px">
+          	
+          		<div class="row">
+          	
+         			 	<div class="col">
+          	
+          	
+   			 	 <table id="tableId" class="table table-striped">
+					         <thead>
+					         
+					            <tr>
+					                <th>Id</th>
+					                <th>User Name</th> 
+					                <th>First Name</th>
+					                <th>Last Name</th>
+					                <th>Address</th>  
+					                
+ 	
+					                <th>Approve</th>
+					                <th>Reject</th>             
+					            </tr>
+					            
+					            </thead>
+					            
+					            <tbody>
+					            	<tr th:each="approve : ${statusByApprov}">
+					                <td th:text="${approve.id}">ID</td>  
+					                <td th:text="${approve.username}">User Name</td>
+					                <td th:text="${approve.firstName}">First Name</td>
+					                <td th:text="${approve.lastName}">Last name</td>
+					                <td th:text="${approve.address}">Address</td>
+	
+									 <td><a th:href="${'/addMasterTrainerRoleById/add/'+ approve.id}">Approve</a></td>
+								     <td><a th:href="${'/addmasterRoleRejectById/reject/' + approve.id}">Reject</a></td>  
+							
+	
+					            </tr>
+					            </tbody>
+					        </table>
+					</div>
+				</div>
+			</div>
+			
+			     
+			<script th:src="@{/js/jquery.min.js}"></script>
+		 	<script type="text/javascript" charset="utf8" th:src="@{/datatables.js}"></script>
+		 
+			<script>
+			
+			
+			$(document).ready( function () {
+			    $('#tableId').DataTable();
+			} );
+			
+			</script>
+			
+			
+			   
+		<div th:fragment="body-bottom-scripts"></div>
+			<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+ </body>
+</html>
+
+
+				
+

@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Update Training</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form class="form-horizontal" th:action="@{/updateTraining}"
+											method="post" enctype="multipart/form-data">
+											
+											
+												<div class="form-group">
+														<label for="titleName">Title Name</label> <input
+															type="text" class="form-control " name="titleName"
+															id="titleName" required="required" th:value="${training.getTrainingId()}" />
+													</div>
+
+													<span style="color: red;" th:if="${titleName}">Title
+														Name already exists. Choose a different one.</span>
+
+													
+													
+													<input type="hidden"  name="trainingId"  th:value="${training.getTrainingId()}"/>
+
+													<div class="form-group">
+
+														<label for="stateName">State</label> <select
+															id="stateNameId" class="form-control " name="stateName"
+															required="required">
+
+															<option selected="selected">Select State</option>
+															<option th:each="state: ${states}"
+																th:value="${state.getId()}"
+																th:text="${state.getStateName()}"></option>
+														</select>
+
+													</div>
+
+													<div class="form-group">
+
+														<label for="district">District</label> <select
+															id="districtId" class="form-control " name="districtName"
+															required="required">
+															<option selected="selected">Select District</option>
+														</select>
+
+													</div>
+
+													<div class="form-group">
+
+														<label for="cityName">City</label> <select id="cityId"
+															class="form-control" name="cityName" required="required">
+															<option selected="selected">Select City</option>
+														</select>
+
+													</div>
+
+													<div class="form-group">
+
+														<label for="addressInformationId">Address
+															Information</label>
+
+														<textarea class="form-control"
+															name="addressInformationName" rows="5"
+															id="addressInformationId" required="required" th:text="${training.getEvent().getAddress()}"></textarea>
+
+													</div>
+
+
+													<div class="form-group">
+														<label for="pinCodeId">PinCode</label> <input
+															type="number" class="form-control" name="pinCode"
+															pattern="[0-9]" id="pinCodeId" minlength="6"
+															maxlength="6" required="required" th:value="${training.getEvent().getPincode()}"/>
+													</div>
+
+
+													<div class="form-group">
+														<label for="totalParID">Total Participants</label> <input
+															type="number" class="form-control" name="totalPar"
+															pattern="[0-9]" id="totalParID" minlength="1"
+															required="required" th:value="${training.getTotalParticipant()}" />
+													</div>
+										
+
+											<button type="submit" class="btn a-btn">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+			
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+</html>
+
+ 
+
+ 

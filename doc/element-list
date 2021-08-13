@@ -1,0 +1,10 @@
+com.bookstore
+com.health
+com.health.config
+com.health.controller
+com.health.domain.security
+com.health.model
+com.health.repository
+com.health.service
+com.health.service.impl
+com.health.utility

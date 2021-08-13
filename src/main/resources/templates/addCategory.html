@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-category{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-category a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#add" role="tab" aria-controls="home" aria-selected="true">Add</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#view" role="tab" aria-controls="profile" aria-selected="false">View</a>
+  </li>
+				</ul>
+								<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Category</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form th:action="@{/addCategory}" method="post"
+											enctype="multipart/form-data">
+											<div class="form-group">
+												<label for="Category">Category Name * </label> <input
+													type="text" class="form-control " id="Category"
+													name="categoryname" required="required" /> <span
+													style="color: red;" th:if="${statusOutline}">Category
+													already exists. Choose a different one.</span>
+											</div>
+											<div class="form-group">
+												<label for="categoryImage" style="padding-top: 8px">Category
+													Logo * <span class="text-muted">(Only png/jpeg/jpg format)</span></label> <input type="file" style="padding-right: 50px"
+													class="form-control-file " id="categoryImage"
+													name="categoryImage" placeholder="uploadFile"
+													accept=".jpg, .jpeg ,.png" required="required" onchange="validate_file_size(this,500000)"/>
+													<small>Max file size : 500 kB</small>
+
+											</div>
+											<div class="form-group">
+												<label for="categoryDesc">Description *<span class="text-muted">(
+														 Character limit : 1000 )</span></label>
+												<textarea class="form-control" id="categoryDesc" rows="3"
+													name="categoryDesc" maxlength="1000" required="required"></textarea>
+											</div>
+											<button type="submit" class="btn  a-btn" onclick="">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
+
+							
+						</form>
+							</div>
+						</div>
+<div class="tab-pane fade py-3" id="view" role="tabpanel" aria-labelledby="profile-tab">
+  <table class="table table-striped" id="myTable">
+  <thead>
+    <tr>
+      <th scope="col">Category</th>
+      <th scope="col">Description</th>
+      <th scope="col">Logo</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="category : ${categories}">
+      <td scope="row"><span th:text = "${category.getCatName()}"></span></td>
+      <td><span th:text = "${category.getDescription()}"></span></td>
+      <td><img id="imagesource" th:src="@{/files/}+@{${category.getPosterPath()}}"
+			style="width: 150px; height: 100px" />
+	  </td>
+      <td><a th:href="@{${'/category/edit/' + category.getCatName()}}">Edit</a></td>
+    </tr>
+  
+  </tbody>
+</table>
+  </div>
+  	
+					</div>
+
+</div>
+
+
+				</div>
+  </div>
+  
+
+	
+		
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+
+</body>
+</html>
+

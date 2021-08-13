@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail">
+</head>
+<style>
+.nav-brochure{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-brochure a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#add" role="tab" aria-controls="home" aria-selected="true">Add</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#view" role="tab" aria-controls="profile" aria-selected="false">View</a>
+  </li>
+
+  
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active py-3" id="add" role="tabpanel" aria-labelledby="home-tab">
+  				<div class="card">
+					<div class="card-header">
+						<h4>Add Brochure</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-6">
+								<form th:action="@{/addBrochure}"
+									method="post" enctype="multipart/form-data">
+									<div class="form-group">
+										<label for="MasterCategoryId">Select Category *</label> <select
+											id="MasterCategoryId" class="form-control"
+											name="categoryName" required>
+
+											<option value="0">Select any one category</option>
+											
+												<option 
+												th:each="category: ${categories}"
+												th:value="${category.getCategoryId()}" th:text="${category.getCatName()}">
+														</option>
+										
+										</select>
+									</div>
+
+									<div class="form-group">
+										<label for="inputTopic">Select Topic *</label> <select
+											id="inputTopic" class="form-control" name="inputTopicName"
+											required="required">
+										</select>
+									</div>
+									<div class="form-group">
+										<label for="languageNameId">Select Language *</label> <select
+											id="languageNameId" class="form-control" name="languageyName"
+											required="required">
+												<option th:each="lan: ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option>
+										
+										</select>
+									</div>
+
+
+
+									<div class="form-group">
+
+										<label for="brouchure">Brochure *</label><small> (.jpg or .png Format Only)</small> <input type="file"
+											class="form-control" id="brouchure" name="brouchure"
+											accept=" .jpeg,.jpg,.png" required="required" onchange="validate_file_size(this,1024000)"/>
+										<small>Max file size : 1 MB</small>
+									</div>
+
+
+
+
+									&nbsp;&nbsp;&nbsp;
+									<button type="submit" class="btn  btn-success">Submit</button>
+								</form>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+  </div>
+  <div class="tab-pane fade py-3" id="view" role="tabpanel" aria-labelledby="profile-tab">
+  <table class="table table-striped" id="myTable">
+  	<div id="Success"
+										style="display: none; color: green; font-size: 16px; text-align: center">Changes Updated Successfully</div>
+								<div id="Failure"
+										style="display: none; color: green; font-size: 16px; text-align: center">Please Try Again</div>    
+                            	 </div>
+  <thead>
+    <tr>
+      <th scope="col">Category Name</th>
+      <th scope="col">Topic Name</th>
+      <th scope="col">Language</th>
+      <th scope="col">Brochure</th>
+      <th scope="col">Enable/Disable</th>
+    </tr>
+  </thead>
+  <tbody>
+     <tr th:each="bro : ${brouchures}">
+      <td scope="row"><span th:text = "${bro.getTopicCatId().getCat().getCatName()}"></span></td>
+      <td><span th:text = "${bro.getTopicCatId().getTopic().getTopicName()}"></span></td>
+      <td><span th:text = "${bro.getLan().getLangName()}"> </span>
+	  </td>
+      <td><img id="imagesource" th:src="@{/files/}+@{${bro.getPosterPath()}}"
+			style="width: 150px; height: 100px" />
+	  </td>
+	  <td>
+	  		
+	   			<div th:if="${bro.isShowOnHomepage()}">
+	   				<a class="disableBrouchure" th:value="${bro.getId()}" title="Click to Disable Brochure"><i class="fas fa-times-circle" th:id="${bro.getId()}" style="color:red"></i></a>
+	   			</div>
+	   			<div th:unless="${bro.isShowOnHomepage()}">
+	   				<a class="enableBrouchure" th:value="${bro.getId()}" title="Click to Enable Brochure"><i class="fas fa-check-circle" th:id="${bro.getId()}" style="color:green"></i> </a>
+	   			</div>
+	   		
+	  
+	  </td>
+    </tr>
+   
+  </tbody>
+</table>
+  </div>
+  
+
+  
+</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+<script>
+$(document).ready( function () {
+    $('#myTable').DataTable();
+    
+    
+} );
+</script>
+
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>
+

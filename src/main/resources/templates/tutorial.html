@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<html>
+<head th:replace="common/trail :: common-trail"></head>
+<body>
+	<section>
+		<div class="px-md-3">
+			<div class="row header-top pt-2">
+				<div
+					class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+					<div>
+						<p>
+							<a href="tel:1800-267-7782"> <span
+								class="contact-num top-banner p-2"><i
+									class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a>
+						</p>
+					</div>
+				</div>
+				<div
+					class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+					<div>
+						<p class="d-inline-block">
+							<span class="top-banner"> <a sec:authorize="isAnonymous()"
+								th:href="@{/login}">Login | New User</a> <a
+								sec:authorize="isAuthenticated()" th:href="@{/dashBoard}">My
+									Account</a>
+							</span>
+						</p>
+						<p class="d-inline-block">
+							<span class="top-banner"><a
+								sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a></span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light ">
+		<a th:href="@{/}"> <img th:src="@{/image/logo.png}"
+			href="www.google." alt="Smiley face" height="50" width="50"> </img></a> <span
+			style="color: black; font-size: 2rem;" class="ml-3">Spoken <span
+			style="color: orange; font-size: 2rem;">Tutorials</span>
+		</span>
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#mainNavBar" aria-controls="navbarNavAltMarkup"
+			aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="mainNavBar">
+			<div class="navbar-nav ml-auto">
+				<a class="nav-item nav-link active" href="#search-bar">Home <span
+					class="sr-only">(current)</span></a>
+				<div class="dropdown">
+					<button class="btn btn-secondary dropdown-toggle" type="button"
+						id="dropdownMenuButton" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false">About Us</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+						<a class="dropdown-item" href="#parallax-1">About</a> <a
+							class="dropdown-item" href="#parallax-2">Consultants</a> <a
+							class="dropdown-item" href="#events">Events</a> <a
+							class="dropdown-item" href="#testimonial">Testimonials</a>
+					</div>
+				</div>
+				<a class="nav-item nav-link " href="#contact" tabindex="-1">Contact
+					Us</a>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div id="search-bar" class="container-lg my-3">
+			<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
+<div class="row" style="width: 100%;">
+<div class="col-md-3 mb-3">
+            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
+              <option>Select Category</option>
+              <option th:each="category : ${categories}"><span th:text="${category}">Title ...</span></option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a valid foss.
+            </div>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
+              <option >Select Topic</option>
+              <option th:each="topic : ${topics}"><span th:text="${topic}">Title ...</span></option>
+            </select>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputL" name="lan">
+              <option >Select Language</option>
+              <option th:each="language : ${languages}"><span th:text="${language}">Title ...</span></option> 
+            </select>
+            <div class="invalid-feedback">
+              Please provide a valid language.
+            </div>
+</div>
+          <div class="col-md-3 mb-3" style="width: 100%;">
+           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
+          </div>
+</div>
+</form>
+
+		</div>
+	</div>
+	<main id="tutorialPage" class=" mx-5">
+		<section id="t-video">
+			<div class="my-2 title">
+				<h1>
+					<span
+						th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}">
+					</span> : <span
+						th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"
+						style="color: black;"> (Topic)</span>: <span
+						th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"
+						style="color: black;"> (Language)</span>
+				</h1>
+			</div>
+			<div class="row">
+				<div class="col-md-8 p-2">
+					<div style="width: 100%; margin: auto;">
+
+						<div class="embed-responsive embed-responsive-16by9">
+							<iframe width="966" height="543"
+								th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"
+								frameborder="0"
+								allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 px-5 d-none d-md-block">
+					<h5 class="main-color">Related Videos(<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
+					<div class="t-related">
+					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
+						
+							
+							<div class="col-md-4">
+								<!-- <iframe width="100%" height="80%"
+									th:src="@{/files/}+@{${tutorial.getVideo()}}" frameborder="0"
+									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+									allowfullscreen></iframe> -->
+							</div>
+							<div class="col-md-8">
+								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></span></h4>
+								<h6><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span></h6>
+								<!-- <p class="outline" th:utext="${tutorial.getOutline()}"></p> -->
+							</div>
+							
+						
+					</a>
+					</div>
+
+	
+					</div>
+				</div>
+			</div>
+		</section>
+		<section th:if="${tutorial.getPreRequistic() != null}"><p>Watch pre-requisite : <a th:href="@{'/tutorialView/'+ ${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getPreRequistic().getConAssignedTutorial().getLan().getLangName()}}">
+		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span> :
+		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span>
+		</a></p></section>
+		<section><p> User Visit : <span th:text="${tutorial.getUserVisit()}"/></p></section>
+		<section id="t-content" class="row">
+			<div id="resources" class="col-md-8">
+				<ul class="nav nav-pills mb-3 nav-justified  mx-1" id="pills-tab"
+					role="tablist">
+					<li class="nav-item link-style"><a class="nav-link active"
+						id="pills-home-tab" data-toggle="pill" href="#pills-home"
+						role="tab" aria-controls="pills-home" aria-selected="true"><i
+							class="far fa-newspaper mr-2 t-icon"></i> Outline</a></li>
+					<li class="nav-item link-style"><a class="nav-link"
+						id="pills-script-tab" data-toggle="pill" href="#pills-script"
+						role="tab" aria-controls="pills-script" aria-selected="false"><i
+							class="far fa-file-alt mr-2 t-icon"></i> Resources</a></li>
+					<!-- <li class="nav-item link-style">
+			    <a class="nav-link" id="pills-slides-tab" data-toggle="pill" href="#pills-slides" role="tab" aria-controls="pills-slides" aria-selected="false"><i class="far fa-folder-open mr-2 t-icon"></i> Slides</a>
+			  </li> -->
+				</ul>
+				<div class="tab-content px-5 py-3" id="pills-tabContent-tutorial"
+					style="height: 250px; overflow: auto;">
+					<div class="tab-pane fade show active px-5" id="pills-home" 
+						role="tabpanel" aria-labelledby="pills-home-tab">
+						<p th:utext="${tutorial.getOutline()}"></p>
+					</div>
+					<div class="tab-pane fade px-5" id="pills-script" role="tabpanel"
+						aria-labelledby="pills-script-tab">
+						<ul class="pl-0">
+							<li class="mb-3"><i class="fas fa-file-download mr-3"></i> <a
+								th:if="${tutorial.getScriptStatus() != 0}"
+								th:href="@{/files/}+@{${tutorial.getScript()}}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Original Script</a> <a
+								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
+								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a
+								th:if="${tutorial.getScriptStatus() != 0}"
+								th:href="@{/files/}+@{${tutorial.getTimeScript()}}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Timed Script</a> <a
+								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
+							<li class="mb-3" th:unless="${relatedContent}"><i class="fas fa-file-download mr-3"></i> 
+							<a name="sliedPdf" th:if="${tutorial.getSlideStatus() != 0}" target="_blank" th:href="@{/files/}+@{${tutorial.getSlide()}}"
+																	id="sliedPdf"> Slide</a>
+							</li>
+							<li class="mb-3" th:if="${relatedContent}"><i class="fas fa-file-download mr-3"> </i> 
+							<a name="sliedPdf" target="_blank" th:href="@{/files/}+@{${relatedContent.getSlide()}}"
+																	id="sliedPdf"> Slide</a>
+							</li>
+						</ul>
+					</div>
+					<div class="tab-pane fade px-5" id="pills-slides" role="tabpanel"
+						aria-labelledby="pills-slides-tab">
+						<div>
+							<a
+								href="http://spoken-tutorial.org/media/videos/100/1447/resources/Protein-rich-vegetarian-recipes-Slides.zip"
+								download="script"> <i class="fas fa-file-download mr-3"></i>
+								Slides
+							</a>
+						</div>
+					</div>
+
+				</div>
+				<div class="px-1 d-md-none">
+					<div style="border-bottom: 2px solid #0066A1;" class="mb-3">
+						<h5>Related Videos</h5>
+					</div>
+
+					<div class="row rel-vid-b" th:each="tutorial : ${tutorials}">
+						<div class="col-sm-4">
+							<iframe width="100%" height="80%"
+								src="https://www.youtube.com/embed/UmljXZIypDc" frameborder="0"
+								allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+						</div>
+						<div class="col-sm-8">
+							<h4>Topic Names</h4>
+							<h6>Category Name - Language</h6>
+							<p>Outline : Outline Text here</p>
+						</div>
+					</div>
+					<!-- <div class="row rel-vid-b">
+						<div class="col-sm-4">
+							<iframe width="100%" height="80%"
+								src="https://www.youtube.com/embed/UmljXZIypDc" frameborder="0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+						</div>
+						<div class="col-sm-8">
+							<h4>Topic Name</h4>
+							<h6>Category Name - Language</h6>
+							<p>Outline : Outline Text here</p>
+						</div>
+					</div> -->
+					<!-- <div class="row rel-vid-b">
+						<div class="col-sm-4">
+							<iframe width="100%" height="80%"
+								src="https://www.youtube.com/embed/UmljXZIypDc" frameborder="0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+						</div>
+						<div class="col-sm-8">
+							<h4>Topic Name</h4>
+							<h6>Category Name - Language</h6>
+							<p>Outline : Outline Text here</p>
+						</div>
+					</div>
+ -->
+
+				</div>
+			</div>
+			<div id="t-related" class="col-md-4"></div>
+		</section>
+
+	</main>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+		integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+		integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+		crossorigin="anonymous"></script>
+</body>
+</html>

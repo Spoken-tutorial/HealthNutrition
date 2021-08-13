@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-topic{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-topic a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+<div th:replace="common/sidebar :: top_header"></div>
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-3 col-lg-2 pr-0">
+<div th:replace="common/sidebar :: contributor_sidebar"></div>
+</div>
+<div class="col-md-9 col-lg-10 p-md-5">
+		<div>
+				<div class="alert alert-success" role="alert" th:if="${success_msg}">
+	 				<div id="#test" class="">
+						<div >
+							<span th:text="${success_msg}"></span>
+						</div>
+					</div>
+				</div>
+				<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+	 				<div id="#test" class="">
+						<div >
+							<span th:text="${error_msg}"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#add" role="tab" aria-controls="home" aria-selected="true">Add</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#view" role="tab" aria-controls="profile" aria-selected="false">View</a>
+  </li>
+
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active py-3" id="add" role="tabpanel" aria-labelledby="home-tab">
+  			<div class="card">
+					<div class="card-header">
+						<h4>Add Topic</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-6">
+								<form th:action="@{/addTopic}"
+							method="post" enctype="multipart/form-data">
+
+							<div class="form-group">
+								<label for="categoryId">Select Category</label> <select id="categoryId"
+									class="form-control" name="categoryName" required="required">
+
+									<option value='0'>Select Category</option>
+									
+										<option th:each="category: ${categories}" th:value="${category.getCategoryId()}" th:text="${category.getCatName()}">
+												</option>
+								
+								</select>
+
+							</div>
+
+							<div class="form-group">
+
+								<label for="topicId">Topic</label> <input type="text"
+									class="form-control" id="topicId" name="topicName"
+									required="required" placeholder="Enter topic name" />
+
+							</div>
+							
+							<div class="form-group">
+
+								<label for="topicId">Order</label> <input type="number"
+									class="form-control" id="orderValue" name="orderValue"
+									required="required" placeholder="Enter Order Value" />
+
+							</div>
+
+							<button type="submit" value="showAlert" class="btn a-btn">Submit</button>
+						</form>				
+						</div>
+						</div>
+					</div>
+				</div>
+  
+  </div>
+  <div class="tab-pane fade py-3" id="view" role="tabpanel" aria-labelledby="profile-tab">
+  <table class="table table-striped" id="myTable">
+  <thead>
+    <tr>
+      <th scope="col">Category</th>
+      <th scope="col">Topic Name</th>
+      <th scope="col">Order</th>
+      <th scope="col">Edit</th>
+
+    </tr>
+  </thead>
+  <tbody>
+      <div th:each="topic : ${topics}">
+      <tr th:each="topicTemp : ${topic.getTopicCategoryMap()}">
+      <td scope="row"><span th:text = "${topicTemp.getCat().getCatName()}"></span></td>
+	  <td><span th:text = "${topicTemp.getTopic().getTopicName()}"></span></td>
+      <td><span th:text = "${topicTemp.getOrder()}"></span></td>
+      <td><a th:href="@{${'/topic/edit/' + topicTemp.getTopic().getTopicName()}}">Edit</a></td>
+      </tr>
+    </div>
+   
+  </tbody>
+</table>
+  </div>
+  
+</div>
+
+
+</div>
+
+
+</div>
+
+</div>
+	
+<div th:replace="common/trail :: body-bottom-scripts"></div>		
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+
+	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+</body>
+</html>
+

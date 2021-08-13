@@ -1,0 +1,761 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="headerfiles">
+<meta charset="UTF-8" />
+<!-- <link href="/css/sidebar.css" rel="stylesheet" /> -->
+<link rel="stylesheet" type="text/css" href="/fontawesome-free-5.10.1-web/css/all.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+<style type="text/css">
+	.item{
+		/*border: 1px solid red;*/
+	}
+</style>
+</head>
+<body>
+<div th:fragment="top_header">
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Company name</a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <ul class="navbar-nav px-3">
+    <li class="nav-item text-nowrap">
+      <a class="nav-link" href="#">Sign out</a>
+    </li>
+  </ul>
+</nav>
+</div>
+
+<div th:fragment="contributor_sidebar">
+<style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+	<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="sidebar-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">
+              <span data-feather="home"></span>
+              Dashboard <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file"></span>
+              Orders
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="shopping-cart"></span>
+              Products
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="users"></span>
+              Customers
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="bar-chart-2"></span>
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="layers"></span>
+              Integrations
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Saved reports</span>
+          <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Current month
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Last quarter
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Social engagement
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Year-end sale
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+
+
+</div>
+<!-- Sidebar for contributor starts-->
+<div th:fragment="contributor_sidebar1">
+    	<style type="text/css">
+		*{
+			margin:0;
+			padding:0;
+			list-style: none;
+			text-decoration: none;
+			box-sizing: border-box;
+			font-family: "Roboto",sans-serif;
+		}
+		body{
+			background: #fff;
+		}
+		.sidebar{
+			border-right: 1px solid #0E3A37;
+		}
+		.wrapper .header{
+			z-index: 1;
+			/*background: rgba(78,182,172);*/
+			/*background: rgba(14,58,55);*/
+			background: #fff;
+			position: fixed;
+			width: calc(100% - 0%);
+			height: 70px;
+			display: flex;
+			top: 0;
+			border-bottom: 1px solid rgba(14,58,55);
+
+		}
+		.wrapper .header .header-menu{
+			width: calc(100% - 0%);
+			height: 100%;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 20px;
+		}
+		.wrapper .header .header-menu .title{
+			color: #fff;
+			font-size: 25px;
+			text-transform: uppercase;
+			font-weight: 900;
+		}
+		.wrapper .header .header-menu .title span{
+			color: #4CCEE8;
+		}
+		.wrapper .header .header-menu .sidebar-btn{
+			color: #fff;
+			position: absolute;
+			margin-left: 240px;
+			font-size: 22px;
+			font-weight: 900;
+			cursor: pointer;
+			transition: 0.3s;
+			transition-property: color;
+		}
+		.wrapper .header .header-menu .sidebar-btn:hover{
+			color: #4CCEE8;
+		}
+		.wrapper .header .header-menu ul{
+			display: flex;
+		}
+		.wrapper .header .header-menu ul li a{
+			background: #fff;
+			color: #000;
+			display: block;
+			margin: 0 10px;
+			font-size: 18px;
+			width: 34px;
+			height: 34px;
+			line-height: 35px;
+			text-align: center;
+			border-radius: 50%;
+			transition: 0.3s;
+			transition-property: background,color;
+		}
+
+		.wrapper .header .header-menu ul li a:hover{
+			background: #4CCEE8;
+			color: #fff;
+		}
+		.wrapper .sidebar{
+			z-index: 1;
+			background: #2F323A;
+			background: rgba(14,58,55);
+			position: fixed;
+			top: 70px;
+			width: 250px;
+			height: calc(100% - 9%);
+			transition: 0.3s;
+			transition-property: width;
+			overflow-y: auto;
+		}
+		.wrapper .sidebar .sidebar-menu{
+			overflow : hidden;
+		}
+		.wrapper .sidebar .sidebar-menu .profile img{
+			margin:20px 0;
+			width: 100px;
+			height: 100px;
+			border-radius: 50%;
+		}
+		.wrapper .sidebar .sidebar-menu .profile p{
+			color: #bbb;
+			font-weight: 700;
+			margin-bottom: 100px;
+		}
+		.wrapper .sidebar .sidebar-menu .item{
+			width: 250px;
+			overflow: hidden;
+		}
+		.wrapper .sidebar .sidebar-menu .item .menu-btn{
+			display: block;
+			color: #fff;
+			position: relative;
+			padding: 25px 20px;
+			transition: 0.3s;
+			transition-property: color;
+		}
+		.wrapper .sidebar .sidebar-menu .item .menu-btn:hover{
+			color: #4CCEE8;
+		}
+		.wrapper .sidebar .sidebar-menu .item .menu-btn i{
+			margin-right: 20px;
+		}
+		.wrapper .sidebar .sidebar-menu .item .menu-btn .drop-down{
+			float: right;
+			font-size: 12px;
+			margin-top: 3px;
+		}
+		.wrapper .sidebar .sidebar-menu .item .sub-menu{
+			background: #fff;
+			/*background: rgba(14,58,55,0.5);;*/
+			/*background: red;*/
+			background: #20B8B8;
+			overflow: hidden;
+			max-height: 0;
+			transition: 0.3s;
+			transition-property: background,max-height; 
+		}
+		.wrapper .sidebar .sidebar-menu .item .sub-menu a{
+			display: block;
+			position: relative;
+			color: #fff;
+			white-space: nowrap;
+			font-size: 15px;
+			padding: 20px;
+			border-bottom: 1px solid #8FC5E9; 
+			transition: 0.3s;
+			transition-property: background;
+			background: #fff;
+			color: #0E3A37;
+		}
+
+		.wrapper .sidebar .sidebar-menu .item .sub-menu a:hover{
+			background: #55B1F0;
+			background: #e0f2f1;
+		}
+		.wrapper .sidebar .sidebar-menu .item .sub-menu i{
+			padding-right: 20px;
+			font-size: 12px;
+		}
+		.wrapper .sidebar .sidebar-menu .item:target .sub-menu{
+			max-height: 1200px;
+		}
+		.wrapper .main-container{
+			width: (100% - 250px);
+			margin-top: 70px;
+			margin-left: 250px;
+			padding: 15px;
+			/*background: url(bk.jpg)no-repeat;*/
+			/*background-size: cover;*/
+			height: 100vh;
+			transition: 0.3s; 
+		}
+		/*.wrapper .c-collapse .sidebar{
+			width: 70px;
+		}*/
+		.c-collapse{
+			width: 70px!important;
+			/*border: 1px solid red;*/
+		}
+		.c-collapse .sidebar .profile img,
+		.c-collapse .sidebar .profile p,
+		.c-collapse  a span{
+			display: none;
+			/*border: 1px solid green;*/
+		}
+		.c-collapse .menu-btn{
+			font-size: 23px;
+		}
+		.c-collapse .sub-menu i{
+			font-size: 18px;
+			padding-left: 3px;
+		}
+		.c-collapse .main-container{
+			width: calc(100% - 70px);
+			margin-left: 70px;
+
+		}.h-nav{
+	color: #1C7871!important;
+    font-weight: bold!important;
+    font-size: 1rem!important;
+    border-bottom: 1px solid #1C7871!important;
+    margin-right:20px;
+	}
+	.h-nav:hover{
+		border: 1px solid #1C7871;
+		transition: 0.3s;
+	}
+	.profile{
+		display: flex;
+		flex-direction: column;
+		color: #fff;
+		justify-content: center;
+		align-items: center;
+		margin-top: 50px;
+	}
+	.user-img{
+	margin-bottom: 10px;
+    border: 1px solid white;
+    border-radius: 50%;
+    padding: 5% 5%;
+    margin-right: 0;
+    margin-bottom: 10px!important;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	}
+	.user-img i{
+		font-size: 1.5rem!important;
+		color: #1C7871;
+
+	}
+	.c-collapse .user-info1{
+		display: none;
+	}
+	.h-nav{
+		margin-top: 20px;
+		margin-right: 20px;
+		float: right;
+		text-decoration: none;
+		
+	}
+	.h-nav a{
+		color: #1C7871;
+	}
+	.fa-circle{
+		font-size: 10px;
+	}
+		</style>
+
+<div class="wrapper">
+<div class="header">
+<div class="row" style="z-index: 1;width: 100%;">
+<div class="col-md-6 col-sm-6 col-5">
+<div class="navbar-header" style='display:flex;'>
+	<div style="padding: 10px;"><a th:href="@{/}"> <img
+									th:src="@{/image/HandN-logo.jpg}" 
+									alt="Smiley face" height="50" width="50"> </img>
+								</a></div>
+	<div><span style="color: black;font-size: 2rem;" class="ml-3">Spoken <span style="color: orange;font-size: 2rem;">Tutorials</span> </span></div>						
+</div>
+</div>
+<div class="col-md-6 col-sm-6 col-7 text-right" style="display:flex;justify-content: flex-end;">
+
+
+		<div>
+		<a sec:authorize="isAnonymous()" th:href="@{/login}">Login|New User</a>
+		<!-- <a sec:authorize="isAuthenticated()" th:href="@{/adminDeatail}" class="h-nav">MY ACCOUNT</a> -->
+		<a sec:authorize="isAuthenticated()" th:href="@{/logout}" class="h-nav">LOGOUT</a>
+</div>
+
+            </div>
+          </div>
+</div>
+	<!-- header menu ends -->
+	<!-- sidebar starts -->
+	<div class="sidebar">
+		<div class="sidebar-menu">
+			<div class="col-sm sidebar-btn" style="float: left;color: #fff;">
+      <i class="fas fa-bars"></i>
+    </div>
+			<div class="profile" >
+				<!-- <img src="" ></img> -->
+				<p class="user-img"><i class="fas fa-user" style="color: #1C7871;"></i></p>
+				<div sec:authorize="isAuthenticated()" class='user-info1'> 
+   Logged User : <span sec:authentication="name"></span> 
+</div>
+			</div>
+			<li class="item">
+				<a th:href="@{/dashBoard}" class="menu-btn">
+					<i class="fas fa-home"></i>
+					<span>Home</span>
+				</a>
+				
+			</li>
+			<div sec:authorize="hasAnyAuthority('SUPER_USER')">
+			
+				<li class="item">
+				<a th:href="@{/approveRole}" class="menu-btn">
+					<i class="fas fa-users-cog"></i>
+					<span>Approve Role</span>
+				</a>
+				</li>
+				<li class="item" id="content">
+				<a href="#content" class="menu-btn">
+					<i class="fas fa-database"></i>
+					<span>Content<i class="fas fa-chevron-down drop-down"></i></span>
+				</a>
+				<div class="sub-menu">
+					<a th:href="@{/addConsultant}"><i class="fas fa-user-md"></i>
+						<span>Consultants</span>
+					</a>
+					<a th:href="@{/addEvent}"><i class="fas fa-calendar-week"></i>
+						<span>Events</span>
+					</a>
+					<a th:href="@{/addTestimonial}"><i class="fas fa-address-card"></i>
+						<span>Testimonials</span>
+					</a>
+				</div>
+			</li>
+			<li class="item" id="creation">
+				<a href="#creation" class="menu-btn">
+					<i class="far fa-newspaper"></i>
+					<span>
+						Creation<i class="fas fa-chevron-down drop-down"></i>
+					</span>
+				</a>
+				<div class="sub-menu">
+				<a th:href="@{/assignTutorialToContributor}"><i class="far fa-circle"></i>
+						<span>Assign Contributor</span>
+					</a>
+					<a th:href="@{/addCategory}"><i class="far fa-circle"></i>
+						<span>Category</span>
+					</a>
+					<a th:href="@{/addLanguage}"><i class="far fa-circle"></i>
+						<span>Language</span>
+					</a>
+					<a th:href="@{/addRole}"><i class="far fa-circle"></i>
+						<span>Role</span>
+					</a>
+					<a th:href="@{/addTopic}"><i class="far fa-circle"></i>
+						<span>Topic</span>
+					</a>
+					
+					<a th:href="@{/uploadQuestion}"><i class="far fa-circle"></i>
+						<span>Upload Question</span>
+					</a>
+					
+					
+				</div>
+			</li>
+			
+			<li class="item" id="View">
+				<a href="#View" class="menu-btn">
+					<i class="fas fa-clipboard-list"></i>
+					<span>View List<i class="fas fa-chevron-down drop-down"></i></span>
+				</a>
+				
+				<div class="sub-menu">
+					<a th:href="@{/category}"><i class="far fa-circle"></i>
+						<span>Category</span>
+					</a>
+					<a th:href="@{/domainReviewer}"><i class="far fa-circle"></i>
+						<span> Domain Reviewer</span>
+					</a>
+					
+					<a th:href="@{/event}"><i class="far fa-circle"></i>
+						<span>Event</span>
+					</a>
+					<a th:href="@{/show_feedbackMasterTrainer}"><i class="far fa-circle"></i>
+						<span>Feedback Master Trainer</span>
+					</a>
+					
+					<a th:href="@{/language}"><i class="far fa-circle"></i>
+						<span>Language</span>
+					</a>
+						<a th:href="@{/masterTrainer}"><i class="far fa-circle"></i>
+						<span>Master Trainer</span>
+					</a>
+					<a th:href="@{/listparicipant}"><i class="far fa-circle"></i>
+						<span>Participant Trainer</span>
+					</a>
+					
+					<a th:href="@{/qualityReviewer}"><i class="far fa-circle"></i>
+						<span>Quality Reviewer</span>
+					</a>
+					<a th:href="@{/testimonial}"><i class="far fa-circle"></i>
+						<span>Testimonial </span>
+					</a>
+					<a th:href="@{/viewTrainee}"><i class="far fa-circle"></i>
+						<span>View Trainee </span>
+					</a>	
+				
+					
+				</div>
+			</li>
+
+			</div>
+			<div sec:authorize="hasAnyAuthority('CONTRIBUTOR')">
+			<li class="item" id="content">
+				<a href="#content" class="menu-btn">
+					<i class="fas fa-user-circle"></i>
+					<span>Contributor<i class="fas fa-chevron-down drop-down"></i></span>
+				</a>
+				<div class="sub-menu">
+					<a th:href="@{/uploadTutorial}"><i class="fas fa-edit"></i>
+						<span>Upload/Update Tutorial</span>
+					</a>
+					<a th:href="@{/contributorComponenentStatus}"><i class="fas fa-address-card"></i>
+						<span>Tutorial Review Status</span>
+					</a>
+				</div>
+			</li>
+			</div>
+			<div sec:authorize="hasAnyAuthority('DOMAIN_REVIEWER')">
+			<li class="item" id="domain">
+				<a href="#domain" class="menu-btn">
+					<i class="fas fa-user-circle"></i>
+					<span>Domain Reviewer<i class="fas fa-chevron-down drop-down"></i></span>
+				</a>
+				<div class="sub-menu">
+					<a th:href="@{/listTutorialForDomainReview}"><i class="fas fa-image"></i>
+						<span> Tutorials waiting for Domain review</span>
+					</a>
+					<a th:href="@{/contributorComponenentStatus}"><i class="fas fa-address-card"></i>
+						<span>Tutorial Review Status</span>
+					</a>
+				</div>
+			</li>
+			</div>
+			<div sec:authorize="hasAnyAuthority('QUALITY_REVIEWER')">
+			<li class="item" id="view">
+				<a href="#view" class="menu-btn">
+					<i class="fas fa-envelope"></i>
+					<span> Quality Reviewer<i class="fas fa-chevron-down drop-down"></i></span>
+				</a>
+				<div class="sub-menu">
+					<a th:href="@{/listTutorialForQualityReview}"><i class="fas fa-image"></i>
+						<span>Tutorials pending for Quality Review</span>
+					</a>
+					<a th:href="@{/listQualityMarkAsPublicReviewTutorial}"><i class="fas fa-exclamation-circle"></i>
+						<span>Tutorials ready to publish</span>
+					</a>
+					<hr/>
+					<a th:href="@{/contributorComponenentStatus}"><i class="fas fa-exclamation-circle"></i>
+						<span>Tutorial Under Need To Improvement State</span>
+					</a>
+				</div>
+			</li>
+			</div>
+			<div sec:authorize="hasAnyAuthority('ADMIN_REVIEWER')">
+			<li class="item" id="admin_rev">
+				<a href="#admin_rev" class="menu-btn">
+					<i class="fas fa-envelope"></i>
+					<span> Admin Reviewer<i class="fas fa-chevron-down drop-down"></i></span>
+				</a>
+				<div class="sub-menu">
+					<a th:href="@{/listTutorialForAdminReview}"><i class="fas fa-image"></i>
+						<span>Tutorials pending for Admin Review</span>
+					</a>
+					<a th:href="@{/contributorComponenentStatus}"><i class="fas fa-exclamation-circle"></i>
+						<span>Tutorial Under Need To Improvement Status</span>
+					</a>
+					<hr/>
+				</div>
+			</li>
+			</div>
+			<div sec:authorize="hasAnyAuthority('MASTER_TRAINER')">
+			
+			<li class="item" id="master_trainer">
+				<a href="#master_trainer" class="menu-btn">
+					<i class="fas fa-envelope"></i>
+					<span>Master Trainer<i class="fas fa-chevron-down drop-down"></i></span>
+				</a>
+				<!-- <div class="sub-menu">
+					<a th:href="@{/profile}"><i class="fas fa-image"></i>
+						<span>Profile</span>
+					</a>
+				</div> -->
+				
+					<div class="sub-menu">
+					<a th:href="@{/viewTrainee}"><i class="fas fa-image"></i>
+						<span>View Trainee </span>
+					</a>
+					</div>
+				
+				
+				<div class="sub-menu">
+					<a th:href="@{/masterTrainerOperation}"><i class="fas fa-image"></i>
+						<span>Training Form</span>
+					</a>
+				</div>
+			</li>
+			</div>
+			
+			<li class="item" id="creation1">
+			<!-- <div sec:authorize="!hasAnyAuthority('Admin')"> -->
+			<div>
+			<a href="#creation1" class="menu-btn">
+					<i class="fas fa-user-tag"></i>
+					<span>
+						Role Management<i class="fas fa-chevron-down drop-down"></i>
+					</span>
+				</a>
+				<div class="sub-menu">
+					<!-- <div sec:authorize="!hasAnyAuthority('VideoReviwer','DomainReviweer','Admin','MasterTrainer','Contributer','QualityReviweer')">
+					<a th:href="@{/contributerSelectionLanguage}">Add me as Contributer</a>
+					<a th:href="@{/domainLanguage}">Add me as Domain Reviewer</a>
+					<a  onclick="return submitQ(this);" th:href="@{/qualityLanguage}">Add me as a Quality Reviewer</a>
+					<a  onclick="return submitM(this);"  th:href="@{/addMeAsMasterTrainer}">Add me as a Master Trainer</a>
+					<a  onclick="return submitA(this);"  th:href="@{/addMeAsAdminReviwer}">Add me as a Admin Reviewer</a>
+					</div>
+					
+					<div th:if="${#authorization.expression('hasAuthority(''Admin'')')}">
+					<a th:href="@{/contributerSelectionLanguage}">Add me as Contributer</a>
+					<a  th:href="@{/domainLanguage}">Add me as a Domain Reviewer Role</a>
+					<a  onclick="return submitQ(this);"  th:href="@{/qualityLanguage}">Add me as a Quality Reviewer</a>
+					<a  onclick="return submitA(this);"  th:href="@{/addMeAsAdminReviwer}">Add me as a Admin Reviewer</a>
+					<a  onclick="return submitM(this);"  th:href="@{/addMeAsMasterTrainer}">Add me as a Master Trainer</a>
+					</div>
+
+					<div sec:authorize="hasAnyAuthority('Contributer')">
+					<a th:href="@{/rovekeRequest}"> Revoke Contribution Role</a>
+					<a  th:href="@{/domainLanguage}"> Add me as a Domain Reviewer</a>
+					<a  onclick="return submitQ(this);" th:href="@{/qualityLanguage}">Add me as a Quality Reviewer</a>
+					<a  onclick="return submitM(this);"  th:href="@{/addMeAsMasterTrainer}">Add me as a Master Trainer</a>
+					</div>
+
+					<div sec:authorize="hasAnyAuthority('DomainReviweer')">
+					<a  onclick="return submitA(this);" th:href="@{/qualityLanguage}">Revoke Admin Reviewer Role</a>
+					<a  th:href="@{/addMeAsMasterTrainer}">Add me as as Domain reviewer Role</a>
+					<a  onclick="return submitQ(this);"  th:href="@{/addMeAsMasterTrainer}">Add me as a Quality Reviewer</a>
+					</div>
+					<div sec:authorize="hasAnyAuthority('QualityReviweer')">
+					<a  onclick="return submitA(this);" th:href="@{/qualityLanguage}">Revoke Admin Reviewer Role</a>
+					<a  th:href="@{/domainLanguage}">Add me as as Domain reviewer Role</a>
+					<a  onclick="return submitQ(this);"  th:href="@{/addMeAsMasterTrainer}">Add me as a Quality Reviewer</a>
+					</div>
+
+					<div sec:authorize="hasAnyAuthority('VideoReviwer')">
+					<a th:href="@{/rovekeRequest}">Add me as a Contributor </a>
+					<a  onclick="return submitA(this);" th:href="@{/qualityLanguage}">Revoke Admin Reviewer</a>
+					<a  th:href="@{/domainLanguage}">Add me as a Domain Reviewer Role</a>
+					<a  onclick="return submitQ(this);"  th:href="@{/qualityLanguage}">Add me as a Quality Reviewer</a>
+					</div>
+					<div sec:authorize="hasAnyAuthority('MasterTrainer')">
+					</div> -->
+					
+					<div th:if="!${#authorization.expression('hasAuthority(''SUPER_USER'')')}">
+					
+						<div th:if="${#authorization.expression('hasAuthority(''MASTER_TRAINER'')')}">
+							<a  th:href="@{/domainLanguage}"> Revoke Master Trainer Role</a>
+						</div>
+						<div th:unless="${#authorization.expression('hasAuthority(''MASTER_TRAINER'')')}">
+							<a  th:href="@{/addMasterTrainerRole}"> Add me as a Master Trainer</a>
+						</div>
+						
+						<div th:if="${#authorization.expression('hasAuthority(''ADMIN_REVIEWER'')')}">
+							<a  th:href="@{/domainLanguage}"> Revoke Admin Reviewer</a>
+						</div>
+						<div th:unless="${#authorization.expression('hasAuthority(''ADMIN_REVIEWER'')')}">
+							<a  th:href="@{/addAdminRole}"> Add me as a Admin Reviewer</a>
+						</div>
+						
+						<div th:if="${#authorization.expression('hasAuthority(''QUALITY_REVIEWER'')')}">
+							<a  th:href="@{/domainLanguage}"> Revoke Quality Reviewer</a>
+						</div>
+						<div th:unless="${#authorization.expression('hasAuthority(''QUALITY_REVIEWER'')')}">
+							<a  th:href="@{/addQualityRole}"> Add me as a Quality Reviewer</a>
+						</div>
+						
+						<div th:if="${#authorization.expression('hasAuthority(''CONTRIBUTOR'')')}">
+							<a  th:href="@{/domainLanguage}"> Revoke Contributor</a>
+						</div>
+						<div th:unless="${#authorization.expression('hasAuthority(''CONTRIBUTOR'')')}">
+							<a  th:href="@{/addContributorRole}">Add me as a Contributor</a>
+						</div>
+					 </div>
+					
+				</div>
+			</div>
+				
+			</li>
+		</div>
+	</div>
+	<!-- sidebar end -->
+	<!-- main container starts -->
+	<div class="main-container">
+		
+	</div>
+	<!-- main container ends -->
+</div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+	function submitA() {
+	  localStorage.setItem("admin_rev_req", "Request submitted successfully for Admin Reviewer role.");
+	  return confirm('Do you really want to Send Request ');
+	  alert("Request Send succefully");
+	}
+	function submitQ() {
+	  localStorage.setItem("quality_rev_req", "Request submitted successfully for Quality Reviewer role.");
+	  return confirm('Do you really want to Send Request ');
+	  alert("Request Send succefully");
+	}
+	function submitM() {
+	  localStorage.setItem("master_tr_req", "Request submitted successfully for Master Trainer role.");
+	  return confirm('Do you really want to Send Request ');
+	  alert("Request Send succefully");
+	}
+
+	$(document).ready(function(){
+		$('.sidebar-btn').click(function(){
+			$(".sidebar").toggleClass("c-collapse");
+		});
+
+		
+
+
+	});
+</script>
+</div>
+
+
+<!-- Sidebar for contributor ends -->
+
+</body>
+</html>

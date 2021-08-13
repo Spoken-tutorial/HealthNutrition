@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-consultants{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-consultants a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div class="alert alert-success" role="alert" th:if="${msg}">
+					<div id="#test" class="">
+						<div>
+							<span th:text="${msg}"></span>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">View</a></li>
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Consultant</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form th:action="@{/addConsultant}" method="post"
+											enctype="multipart/form-data">
+											
+											<div class="form-group">
+													<label for="categoryId">Select Category *</label> 
+													<select id="categoryId" class="form-control" name="categoryName" required="required">
+				
+													<option value="0">Select any one category</option>
+													
+														<option th:each="category: ${categories}" th:value="${category.getCategoryId()}" th:text="${category.getCatName()}">
+																</option>
+												
+													</select>
+
+											</div>
+											
+											<div class="form-group">
+													<label for="lanId">Select any one language *</label> 
+													<select id="lanId" class="form-control" name="lanName" required="required">
+				
+													<option value="0">Select Language</option>
+													
+														<option th:each="lan: ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}">
+																</option>
+												
+													</select>
+
+											</div>
+
+											<div class="form-group">
+												<label for="nameConsaltant">Name *<span class="text-muted">( Full Name with the official Title )</span></label> <input type="text"
+													class="form-control" id="nameConsaltant"
+													name="nameConsaltant" required="required"
+													placeholder="Name of the consultant" />
+
+											</div>
+											
+											<div class="form-group">
+												<label for="email" style="padding-top: 8px">Add
+													Email *</label> <!-- <input type="file" style="padding-right: 50px"
+													class="form-control-file" id="consaltantImage"
+													name="uploadConsaltantImage" placeholder="uploadFile"
+													accept=".jpg, .jpeg,.png" required="required" /> -->
+													
+													<input required="required" type="email" class="form-control" id="email" name="email" />
+											</div>
+											
+
+											<button type="submit" class="btn btn-success a-btn">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+					
+					<table class="table table-striped" id="myTable">
+					<div id="Success"
+										style="display: none; color: green; font-size: 16px; text-align: center">Changes Updated Successfully</div>
+								<div id="Failure"
+										style="display: none; color: green; font-size: 16px; text-align: center">Please Try Again</div>    
+                            	 </div>
+  <thead>
+    <tr>
+      <th scope="col">E-mail</th>
+      <th scope="col">Description</th>
+      <th scope="col">Poster</th>
+      <th scope="col">Enable/Disable on Homepage </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="consultant : ${consultants}" >
+       <td th:text="${consultant.getUser().getEmail()}"></td>
+       <td th:text="${consultant.getDescription()}"></td>
+       <td><img id="imagesource" th:src="@{/files/}+@{${consultant.getUser().getProfilePic()}}"
+			style="width: 150px; height: 100px" />
+	  </td>
+	   <td><div th:if="${consultant.getUser().getProfilePic() != null}">
+	   			<div th:if="${consultant.isOnHome()}">
+	   				<a class="disableConsult" th:value="${consultant.getConsultantId()}" title="Click to Disable Consultant"><i class="fas fa-times-circle" th:id="${consultant.getConsultantId()}" style="color:red"></i></a>
+	   			</div>
+	   			<div th:unless="${consultant.isOnHome()}">
+	   				<a class="enableConsult" th:value="${consultant.getConsultantId()}" title="Click to Enable Consultant"><i class="fas fa-check-circle" th:id="${consultant.getConsultantId()}" style="color:green"></i> </a>
+	   			</div>
+	   		</div>
+	  </td>
+      
+    </tr>
+    
+  </tbody>
+</table>	
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#myTable').DataTable();
+		});
+	</script>
+	<script type="text/javascript">
+		$(document)
+				.ready(
+						function() {
+
+							function submitForm() {
+								return confirm('Do you really want to Delete the record');
+								alert("Delete  Recored succefully");
+							}
+
+							$("#show_cons")
+									.click(
+											function() {
+												$('#tableId').DataTable();
+												$
+														.ajax({
+															type : "GET",
+															url : "/displayConsultants",
+															contentType : "application/json",
+															success : function(
+																	result) {
+																console
+																		.log(result);
+																$(
+																		'.cons_record')
+																		.show();
+																var id = result[0].id;
+																var name = result[0].nameConsaltant;
+																var desc = result[0].descriptionConsaltant;
+																var img = result[0].uploadConsaltantImage;
+																var editLink = 'productconsalantant/edit/'
+																		+ id;
+																var elink = '<a href="'+editLink+'">Edit</a>';
+																var deleteLink = '/consalantant/delete/'
+																		+ id;
+																var dlink = '<a onclick="submitForm()" href="'
+																		+ deleteLink
+																		+ '">Delete</a>';
+
+																var markup = "<tr><td>"
+																		+ id
+																		+ "</td><td>"
+																		+ name
+																		+ "</td><td>"
+																		+ desc
+																		+ "</td><td>"
+																		+ "image"
+																		+ "</td><td>"
+																		+ elink
+																		+ "</td><td>"
+																		+ dlink
+																		+ "</td></tr>";
+
+																console
+																		.log(elink);
+																console
+																		.log(dlink);
+																console
+																		.log(markup);
+																$("table tbody")
+																		.append(
+																				markup);
+
+															},
+
+															error : function(
+																	err) {
+																console
+																		.log("not working. ERROR: "
+																				+ JSON
+																						.stringify(err));
+															}
+														});
+
+											});
+						});
+	</script>
+	</div>
+
+	<script th:inline="javascript">
+		var projectPath = '[(@{/})]';
+	</script>
+</body>
+</html>
+

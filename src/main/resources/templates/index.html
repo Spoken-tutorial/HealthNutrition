@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spoken Tutorials</title>
+    <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
+    
+  <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+  <!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/> -->
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.9.1/css/OverlayScrollbars.min.css' />
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.0/css/bulma.min.css" integrity="sha512-ADrqa2PY1TZtb/MoLZIZu/Z/LlPaWQeDMBV73EMwjGam43/JJ5fqW38Rq8LJOVGCDfrJeOMS3Q/wRUVzW5DkjQ==" crossorigin="anonymous" /> -->
+  <link rel="stylesheet" th:href="@{/css/main.css}" /> 
+    <link rel="stylesheet" type="text/css" href="../css/hello-parallax.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
+    <link rel="stylesheet" th:href="@{/css/main-style.css}" />
+    <link rel="stylesheet" th:href="@{/VenoBox/venobox/venobox.css}" />
+  </head>
+  <body>
+  <div id="back-to-top">
+  <a href="#top-fixed-banner"><i class="fas fa-chevron-circle-up"></i></a>
+  </div>
+  <!-- Fixed Header And Menu Bar -->
+  <header class="mb-5" id="top-fixed-banner">
+	<section>
+	<div class="px-md-3">
+	<div class="row header-top pt-2">
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+	<div><p> <a href="tel:1800-267-7782"> <span class="contact-num top-banner p-2"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></p></div>
+	</div>
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+	<div><p class="d-inline-block"><span class="top-banner">
+		<a sec:authorize="isAnonymous()" th:href="@{/login}">Login | New
+		User</a> <a sec:authorize="isAuthenticated()"
+		th:href="@{/dashBoard}">My Account</a> 
+		</span></p>
+	    <p class="d-inline-block"><span class="top-banner"><a sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a></span></p></div>
+	</div>
+	</div>
+	</div>
+	</section>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light ">
+  <a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+								<span style="color: black;font-size: 2rem;" class="ml-3">Spoken <span style="color: orange;font-size: 2rem;">Tutorials</span> </span>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavBar">
+    <div class="navbar-nav ml-auto">
+      <a class="nav-item nav-link active" href="#search-bar">Home <span class="sr-only">(current)</span></a>
+      <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    About Us
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#about">About</a>
+    <a class="dropdown-item" href="#consultants">Consultants</a>
+    <a class="dropdown-item" href="#events">Events</a>
+    <a class="dropdown-item" href="#testimonial">Testimonials</a>
+  </div>
+</div>
+      <a class="nav-item nav-link " href="#contact" tabindex="-1">Contact Us</a>
+    </div>
+  </div>
+</nav>
+  </header>
+  <!-- Fixed Header And Menu Bar Ends-->
+    <main>
+    <section id="search-bar" class="container-lg my-5">
+<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
+<div class="row" style="width: 100%;">
+<div class="col-md-3 mb-3">
+            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
+              <option>Select Category</option>
+              <option th:each="category : ${categories}"><span th:text="${category}">Title ...</span></option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a valid foss.
+            </div>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
+              <option >Select Topic</option>
+              <option th:each="topic : ${topics}"><span th:text="${topic}">Title ...</span></option>
+            </select>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputL" name="lan">
+              <option >Select Language</option>
+              <option th:each="language : ${languages}"><span th:text="${language}">Title ...</span></option> 
+            </select>
+            <div class="invalid-feedback">
+              Please provide a valid language.
+            </div>
+</div>
+          <div class="col-md-3 mb-3" style="width: 100%;">
+           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
+          </div>
+</div>
+</form>
+          
+</section>
+<section>
+<div class="container-lg py-5">
+<div class="row">
+<div class="col-md-6" style="margin:auto;">
+<p style="line-height: 2rem;font-size:1.2rem;">Advice on <span class="highlighter">Maternal Nutrition</span>, <span class="highlighter">child's nutrition</span>,<span class="highlighter"> Covid</span> related videos And General Nutrition <br /> 
+          by a team of <span class="highlighter-green">doctors,nutritionists and field officers</span> with 10+ years of experience</p>
+</div>
+<div class="col-md-6" th:if="${carousel}">
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+  <ol class="carousel-indicators">
+    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+    <li th:each="c: ${carouselList}" data-target="#myCarousel" th:attr="data-slide-to=${cStat.count}"></li>
+    
+  </ol>
+  <div class="carousel-inner">
+     <div class="carousel-item active">
+      <img th:src="@{/files/}+@{${carousel.getPosterPath()}}" class="d-block w-100" alt="..." style="height:400px;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5 th:text="${carousel.getEventName()}"></h5>
+        <p th:text="${carousel.getDescription()}"></p>
+      </div>
+    </div> 
+ <div class="carousel-item " th:each="c: ${carouselList}">
+      <img th:src="@{/files/}+@{${c.getPosterPath()}}" class="d-block w-100" alt="..." style="height:400px;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5 th:text="${c.getEventName()}"></h5>
+        <p th:text="${c.getDescription()}"></p>
+      </div>
+    </div> 
+    
+  </div>
+  <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+
+</section>
+<section id="about">
+	<div class="container-lg py-5">
+		<div class="row">
+		<div class="col-md-6">
+		<h1>About Us</h1>
+		<hr style="border: 1px solid orange;" />
+		<p style="line-height: 2rem;">
+              	We are creating 40+ video tutorials of 10-12 minutes each on nourishing a mother and a child in the first 1000 days of an infant’s life, i.e, from day 1 of pregnancy till a child’s 2nd birthday.
+        Each video will be translated and dubbed in 22 officially recognized Indian languages to cover the entire Indian landscape.
+        Through this series, the Health Spoken Tutorial project at IIT Bombay aims to reach out to scores of people for spreading awareness on nutrition and improve the quality of life in India and globally as well.
+        <br>
+        <br>
+        <a href="https://script.spoken-tutorial.org/index.php/Health_and_Nutrition" class="button spk-btn" target="_blank">Know More</a>
+              </p>
+              
+		</div>
+		<div class="col-md-6"></div>
+		</div>
+	</div>
+    </section>
+	<section class="bg-light" id="stats">
+	<div class="container-lg sandbox px-3">
+		<div class="row">
+		<div class="col-md-4">
+			<div class="is-shady text-center p-3 stat-card">
+			    <p class="stat-num"><span th:text="${videoCount}"></span>+</p>
+				<p class="">Videos</p>
+				<p>
+		          10-12 minutes each on nourishing a mother and a child in the first 1000 days of an infant’s life
+		        </p>
+		    </div>
+		</div>
+		<div class="col-md-4">
+			<div class="is-shady text-center p-3 stat-card">
+			    <p class="stat-num"><span th:text="${languageCount}"></span>+</p>
+				<p class="">Languages</p>
+				 <p>
+		          translated videos and dubbed in officially recognized Indian languages
+		        </p>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="is-shady text-center p-3 w-100 stat-card">
+			    <p class="stat-num"><span th:text="${consultantCount}"></span>+</p>
+				<p class="">Consultants</p>
+				<p>
+		          Team of Experienced Doctors and Nutritionists<hr>
+		        </p>
+		    </div>
+		    <a th:href = "@{/statistics}">statistics</a>
+		</div>
+		</div>
+	</div>
+  </section>
+    
+  <section th:if="${listofCategories}">
+	<h1 class="text-center spk-title">Tutorial Categories</h1>
+    <div class="container-lg">
+    	<div class="row" >
+	    	<div class="col-md-4 col-lg-3 br-right br-bottom py-3" th:each="category : ${listofCategories}">
+	    	<div class="d-flex flex-column align-items-center ">
+	    		<div>
+	    		<!-- <img  th:src="@{/image/logo.png}" class="d-block"> -->
+	    		<img th:src="@{/files/}+@{${category.getPosterPath()}}" width="80px" style="max-width: 80px;height: auto;" class="d-block"/>
+	    		</div>
+	    		<hr style="border: 1px solid orange; width: 50%;">
+	    		<p class="mb-1"><span th:text="${category.getCatName()}"></span></p>
+	    		<small><p th:text="${#strings.abbreviate(category.getDescription(),150)} "></small>
+	    		<p><button type="button" class="btn btn-light" data-toggle="modal" th:attr="data-target='#detail_'+${category.getCategoryId() }" >
+  Details
+</button></p></p>
+	    		</div>
+	    	</div>
+   		 </div>
+   		 <br>
+   		 <div class="w-100 text-center"><a th:href="@{/categories}" target="_blank" class="button catBtn mb-5">View all Categories</a></div> 
+    </div>  
+  </section>
+  <!-- modal for displaying full category description -->
+<!-- Modal -->
+<div th:if="${listofCategories}">
+<div class="modal fade" th:each="category : ${listofCategories}" th:attrappend="id=${'detail'+'_'+category.getCategoryId()}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><span th:text="${category.getCatName()}"></span></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<small class="text-justify"><span th:text="${category.getDescription()}"></span></small>
+      </div>
+      
+    </div>
+  </div>
+</div>
+</div>
+<!-- modal for displaying full category description ends-->
+    
+    <section id="consultants" class="py-4" th:if="${listOfConsultant}">
+    <h1 class="text-center spk-title" style="color:#fff!important;">Consultants</h1>
+    <div class="container-lg">
+    	<div class="row" style="color: #fff;">
+    		<div class="col-sm-6 col-md-4 col-lg-3 br-right-wh br-bottom-wh py-3" th:each="consantant : ${listOfConsultant}">
+    		<div class="d-flex flex-column align-items-center ">
+    		<div>
+    		<img th:src="@{/files/}+@{${consantant.getUser().getProfilePic()}}" alt="image" class="d-block"/>
+    		</div>
+    		<hr style="border: 1px solid orange; width: 50%;">
+    		<p th:text="${consantant.getUser().getFullName()}">Consultant Name</p>
+    		<small class="text-justify" th:text="${#strings.abbreviate(consantant.getDescription(),150)}">Consultant Description</small>
+    		<hr>
+    		<button type="button" class="btn consaltant-btn" data-toggle="modal" th:attrappend="data-target=${'#detail'+'_'+consantant.getConsultantId()}">View Details</button>
+    		</div>
+    		</div>
+    	</div>
+    	<br>
+    	<div class="text-center"><a th:href="@{/showConsultant}" target="_blank" class="button is-link is-outlined is-fullwidth consBtn mb-5">View all consultants</a></div>
+    </div>
+    </section>
+    
+  <div><!-- Modal data for consulatants on homepage starts -->
+<div th:each="consantant : ${listOfConsultant}" class="modal fade consultant_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" th:attrappend="id=${'detail'+'_'+consantant.getConsultantId()}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel" th:text="${consantant.getUser().getFullName()}">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <small class="text-justify" th:text="${#strings.abbreviate(consantant.getDescription(),150)}">Consultant Description</small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+    </div> <!-- Modal data for consulatants on homepage ends -->
+    
+    <section id="events" th:if="${events != null}">
+    <h1 class="text-center spk-title">Events</h1>
+    <div class="container-lg px-6">
+    
+    	<div class="row px-md-6 event"  th:each="event : ${events}" >
+    		<div class="col-md-2 spk-date text-center" >
+    		<!-- <i class="far fa-calendar-alt"></i> -->
+    		<div class="mb-2">
+    		<p><i class="far fa-calendar-alt"></i></p>
+    		<div th:if="${#dates.format(event.getEndDate(), 'yyyy')} == ${#dates.format(event.getStartDate(), 'yyyy')} and
+     ${#dates.format(event.getEndDate(), 'MMM')} == ${#dates.format(event.getStartDate(), 'MMM')}"
+     th:text="${#dates.format(event.getStartDate(), 'dd')}+'-'+${#dates.format(event.getEndDate(), 'dd')}+' '+
+     ${#dates.format(event.getEndDate(), 'MMM')}+' '+${#dates.format(event.getEndDate(), 'YYYY')}"></div>
+     <div th:if="${#dates.format(event.getEndDate(), 'yyyy')} == ${#dates.format(event.getStartDate(), 'yyyy')} and
+     ${#dates.format(event.getEndDate(), 'MMM')} != ${#dates.format(event.getStartDate(), 'MMM')}"
+     th:text="${#dates.format(event.getStartDate(), 'dd')}+' '+${#dates.format(event.getStartDate(), 'MMM')}+
+     '-'+${#dates.format(event.getEndDate(), 'dd')}+' '+
+     ${#dates.format(event.getEndDate(), 'MMM')}+' '+${#dates.format(event.getEndDate(), 'YYYY')}"></div>
+    		</div>
+    		</div>
+    		<div class="col-md-10">
+    		<a th:href="@{'/eventDetails/'+${event.getEventId()}}" target="_blank">
+    		<h6 class="size-is-3 name" th:text="${event.getEventName()}">Event Name</h6></a>
+    		
+    		<p class="content mb-1 ml-0" th:text="${event.getDescription()}">Event Desc</p>
+    		<div><i class="fas fa-map-marker-alt"></i> <span th:text="${event.getLocation()}"></span></div>
+    		<hr/>
+    		<p class="mb-1 ml-0">Contact Details : </p>
+    		<div class="row">
+    		<div class="col-md-4"><p class="ml-0"><i class="fas fa-user"></i> <span th:text="${event.getContactPerson()}"></span></p></div>
+    		<div class="col-6 col-md-4"><p class="ml-0"><i class="fas fa-phone-square-alt"></i> <span th:text="${event.getContactNumber()}"></span></p></div>
+    		<div class="col-6 col-md-4"><p class="ml-0"><i class="fas fa-envelope"></i> <span th:text="${event.getEmail()}"></span></p></div>
+    		
+    		</div>
+    		</div>
+    	</div>	
+    	<br>
+    <div class=" text-center"><a th:href="@{/showEvent}" target="_blank" class="button catBtn mb-5 ">View all Events</a></div>
+    </div>
+    
+     
+    </section>
+   
+    <div id="modal-consultant" th:each="consantant : ${listofConsalatatnt}" class="modal" th:attrappend="id=${'_'+consantant.getId()}"  th:if="${listofConsalatatnt != null}">
+			<div class="modal-background"></div>
+			<div class="modal-card">
+				<header class="modal-card-head">
+					<p class="modal-card-title">
+					<span class="title has-text-weight-light" th:text="${consantant.getNameConsaltant()}">Name</span><br/>
+                <span class=" has-text-weight-light" ></span>
+					</p>
+				</header>
+				<section class="modal-card-body">
+					<div class="content">
+			                <p th:text="${consantant.getDescriptionConsaltant()}">Description</p>
+			                <div id="details"></div>
+					</div>
+				</section>
+				<footer class="modal-card-foot">
+					<button class="button is-info"><a th:href="@{/showConsultant}" target="_blank" >View all consultants</a></button>
+					 <button class="button c-modal-close">Cancel</button>
+					 <button class="modal-close is-large c-modal-close" aria-label="close">Close</button>
+					 
+				</footer>
+			</div>
+		</div>	
+  <section id="testimonial" th:if="${listofTestimonial != null}">
+    <h1 class="text-center spk-title">Testimonials</h1>
+    <div class="container-lg">
+    	<div class="row">
+    <div class="col-md-4 " th:each="testimonial : ${listofTestimonial}" th:if="${testimonial.getFilePath()!= 'null'}">
+    <div class="card is-shady pt-3" style="width: 100%;" >
+            <div class="card-image text-center">
+            <div style="width:100%;">
+            <video  controls="controls" >
+  <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
+ Your browser does not support HTML video.
+</video>
+            </div>
+           </div>
+            <div class="card-content  " >
+              <div class="content">
+                <h4 th:text="${testimonial.getName()}"> </h4>
+                
+                <p th:text="${#strings.abbreviate(testimonial.getDescription(),150)}"></p>
+                <!-- <span class="button is-link modal-button" data-target="modal-testimonial" th:attrappend="data-target=${'_'+testimonial.getTestimonialId()}">Details</span> -->
+                <button type="button" class="btn testimonial-btn" data-toggle="modal" th:attrappend="data-target=${'#_'+testimonial.getTestimonialId()}">View</button>
+                
+              </div>
+            </div>
+          </div>
+    </div>
+    </div>
+    <br>
+    <div class=" text-center"><a th:href="@{/testimonialList}" target="_blank" class="button catBtn mb-5 ">View all Testimonials</a></div>
+    </div>
+    </section>
+    <section id="testimonial" th:if="${listofTestimonial != null}">
+    <h1 class="text-center spk-title">Brochures</h1>
+    <div class="container-lg">
+    <div class="row">
+   	<div th:each="brochure : ${listofBrochures}" class="col-md-3" style="border-top: 1px solid #014F7A;">
+   		<a  class="venobox " data-gall="myGallery" th:href="@{/files/}+@{${brochure.getPosterPath()}}"><img style="width:100%;" th:src="@{/files/}+@{${brochure.getPosterPath()}}" /></a>
+   		<p class="mb-1" th:text="${brochure.getTopicCatId().getCat().getCatName()}" style="color: #1C7871;border-bottom: 1px solid #015686!important;"></p>
+   		<p class="mb-1" th:text="${brochure.getTopicCatId().getTopic().getTopicName()}" style="color: #015686;"></p>
+   		<p class="mb-1" th:text="${brochure.getLan().getLangName()}" style="color: rgba(0,0,0,0.6);"></p>
+   	</div>
+    </div>
+    <br>
+    <div class=" text-center"><a th:href="@{/brochure}" target="_blank" class="button catBtn mb-5 ">View all Brochures</a></div>
+    </div>
+    </section>
+    <section> 
+    	<div th:each="testimonial : ${listofTestimonial}" class="modal fade" th:attrappend="id=${'_'+testimonial.getTestimonialId()}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel" th:text="${testimonial.getName()}">Modal title</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      <div class="card-image text-center">
+				          <video  controls="controls" style="width:100%;">
+				  <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
+				 Your browser does not support HTML video.
+				</video> </div>
+		       <span th:text="${testimonial.getDescription()}"></span>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background: #014F7A;">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+    </section>
+   
+    <section style="background: #F8F9FA;" class="p-5" id="contact">
+    <div class="container-md">
+    	<div class="row">
+    	<div class="col-lg-6 mb-3" >
+    	<div class="is-shady  py-5 " style="height: 100%;">	
+    		<h1 class="text-center spk-title" style="font-size: 1.5rem;">Contact</h1>
+    		 <div class="row px-3">
+		    	<div class="col-1 justify-content-end "><i class="fas fa-map-marker-alt contact-icon" ></i></div>
+		    	<div class="col-11"><p >Spoken Tutorial Project,TCS Lab,Behind CAD Centre, IIT Bombay, Powai, Mumbai - 400076</p></div>
+		    </div>
+		    <br>
+		    <hr>
+		    <div class="row px-3">
+		    <div class="col-sm-6"><p class="contact-text mx-0"><a href="mailto:someone@example.com"><i class="fas fa-envelope contact-icon mr-2"></i> contact@spoken-tutorial.org</a></p></div>
+		    <div class="col-sm-6"><p class="contact-text mx-0"><a href="tel:+6494461709"><i class="fas fa-phone-alt contact-icon mr-2"></i> + 91 22 25764229</a></p></div>
+		    </div>
+    	</div>
+    	</div>
+    	<div class="col-lg-6 py-3 is-shady" style="height: 100%;">
+    	<div>
+    		<h1 class="text-center spk-title" style="font-size: 1.5rem;">Feedback Form</h1>
+  
+        <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="firstName">Name</label>
+              <input type="text" class="form-control" id="name" name= "name" placeholder="" value="" />
+							   </div>         
+            <div class="col-md-6 mb-3">
+              <label for="email">Email </label>
+              <input type="email" class="form-control" id="email"  name= "email" />
+              
+            </div>
+        </div>
+        
+          <div class="form-group">
+          <label for="exampleFormControlTextarea1">Message</label>
+          <textarea class="form-control"  id="message" rows="3"></textarea>
+          </div>
+          
+          <div id="statusOnContactForm" style="color: red; display: none; margin-top: 10px;">Provide Correct E-mail</div>
+		 <div id="statusOnContactFormAfterAjaxCallSucess" style="color: green; display: none; margin-top: 10px;">Query has been recorded,Soon you will be contacted.
+		 </div>
+		 <div id="statusOnContactFormAfterAjaxCallFailure" style="color: red; display: none; margin-top: 10px;">Please
+						Try Again
+		 </div>
+          <input type="submit" id="contactForm" name="submit" class="btn" disabled></input>
+         
+    	</div>
+    	</div>
+    </div>
+    </div>
+    <br>
+   
+    </section>
+        </main>
+    
+    <footer class="footer">
+    <div class="text-center">	<p>Developed at IIT-Bombay</p>
+    </div>
+	
+    </footer>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script> 
+<script src="/js/ajaxSupport.js"></script>
+<script src="/VenoBox/venobox/venobox.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#myCarousel").carousel();
+	$('.venobox').venobox(); 
+	$('.consultant_modal').on('shown.bs.modal', function () {
+		
+		id = $(this).attr('id');
+		var consultant_id = id.substring(7);
+		
+		$.ajax({
+
+			type : "GET",
+			url  : projectPath+"getConsultantDetails",
+
+			data : {
+
+				"id" : consultant_id
+
+			},
+			contentType : "application/json",
+			success : function(result) {
+				
+				$('#details').html(result);
+				/* console.log(result); */
+			},
+
+			error : function(err) {
+				console.log("not working. ERROR: "+ JSON.stringify(err));
+			}
+		});
+		
+		})
+	
+	$(document).on('click', 'a[href^="#"]', function (event) {
+	    event.preventDefault();
+	  /*   alert("1"); */
+	    $('html, body').animate({
+	        scrollTop: $($.attr(this, 'href')).offset().top - 200
+	    }, 500);
+	});
+	
+	  $('.your-class').slick({
+		  slidesToShow: 4,
+		  slidesToScroll:2
+      
+	  });
+
+     $(".slick-prev").html('<i class="fas fa-chevron-left"></i>');
+     $(".slick-next").html('<i class="fas fa-chevron-right"></i>');
+
+     $('.testimonials-wrapper').slick({
+      slidesToShow: 2,
+      slidesToScroll:2,
+      arrows: false,
+      dots:true,
+    });
+     
+     $(".slick-dots li").html('');
+     
+     $(".modalBtn").html('');
+     
+     $(".c-modal-close").click(function(){
+    	   
+    	  $('html').css({overflow: 'scroll'});
+    	  $(".modal").removeClass("is-active");
+    	});
+     
+	});
+</script>
+
+	
+	<script th:inline="javascript">
+    	
+		var projectPath='[(@{/})]';
+		
+	</script>
+    
+  </body>
+
+</html>

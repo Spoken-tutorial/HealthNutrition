@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head>
+	<meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spoken Tutorials</title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;800&display=swap" rel="stylesheet" /> -->
+    <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
+    
+  <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+  <!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/> -->
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.9.1/css/OverlayScrollbars.min.css' />
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.0/css/bulma.min.css" integrity="sha512-ADrqa2PY1TZtb/MoLZIZu/Z/LlPaWQeDMBV73EMwjGam43/JJ5fqW38Rq8LJOVGCDfrJeOMS3Q/wRUVzW5DkjQ==" crossorigin="anonymous" /> -->
+  <link rel="stylesheet" th:href="@{/css/main.css}" /> 
+  <!--  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" /> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/bulma-modal-fx/dist/css/modal-fx.min.css" /> -->
+    <link rel="stylesheet" type="text/css" href="../css/hello-parallax.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
+    
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
+  
+  <link rel="stylesheet" th:href="@{/s/css/style.css}"/>  
+	<link rel="stylesheet" th:href="@{/css/style.css}"/>
+	<link rel="stylesheet" th:href="@{/s/css/style_content.css}"/>  
+	<link rel="stylesheet" th:href="@{/css/main-style.css}" />
+	<link rel="stylesheet" th:href="@{/css/main-style.css}" />
+</head>
+<body>
+<header class="mb-5" id="top-fixed-banner">
+	<section>
+	<div class="px-md-3">
+	<div class="row header-top pt-2">
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+	<div><p> <a href="tel:1800-267-7782"> <span class="contact-num top-banner p-2"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></p></div>
+	</div>
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+	<div><p class="d-inline-block"><span class="top-banner">
+		<a sec:authorize="isAnonymous()" th:href="@{/login}">Login | New
+		User</a> <a sec:authorize="isAuthenticated()"
+		th:href="@{/dashBoard}">My Account</a> 
+		</span></p>
+	    <p class="d-inline-block"><span class="top-banner"><a sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a></span></p></div>
+	</div>
+	</div>
+	</div>
+	</section>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light ">
+  <a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+								<span style="color: black;font-size: 2rem;" class="ml-3">Spoken <span style="color: orange;font-size: 2rem;">Tutorials</span> </span>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavBar">
+    <div class="navbar-nav ml-auto">
+      <a class="nav-item nav-link active" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
+      <!--<div class="dropdown">
+   <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    About Us
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#parallax-1">About</a>
+    <a class="dropdown-item" href="#parallax-2">Consultants</a>
+    <a class="dropdown-item" href="#events">Events</a>
+    <a class="dropdown-item" href="#testimonial">Testimonials</a>
+  </div> 
+</div>-->
+     <!--  <a class="nav-item nav-link " href="#contact" tabindex="-1">Contact Us</a> -->
+    </div>
+  </div>
+</nav>
+  </header>
+<main id="event_page" class="p-5">
+	<div class="move-top">
+		<a href="#"><i class="fas fa-chevron-circle-up"></i></a>
+		
+	</div>
+	<div>
+		<h1 class="text-center" th:text="${event.getEventName()}" style="font-size: 1.5rem;text-decoration: underline;"></h1>
+		<div class="row">
+			<div class="col-md-8 offset-md-2 text-center">
+			<img th:src="@{/files/}+@{${event.getPosterPath()}}" style="max-height:400px;">
+			</div>
+			<div class="col-md-8 offset-md-2 " style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+			<div class="row my-2">
+			<div class="col-md-3 text-center"><i class="fas fa-calendar-alt mr-2 e-icon"></i><span th:text="${event.getStartDate()}"></span></div>
+			<div class="col-md-3 text-center"><i class="fas fa-user mr-2 e-icon"></i><span th:text="${event.getContactPerson()}"></span></div>
+			<div class="col-md-3 text-center"><i class="fas fa-phone-alt mr-2 e-icon"></i><span th:text="${event.getContactNumber()}"></span></div>
+			<div class="col-md-3 text-center"><i class="fas fa-envelope mr-2 e-icon"></i><span th:text="${event.getEmail()}"></span></div>
+		</div>
+</div>
+
+			<div  class="col-md-8 offset-md-2 my-2">
+				<div class="text-center"><i class="fas fa-map-marker-alt mr-2 e-icon"></i>
+				<span th:text="${event.getLocation()}"></span>
+				</div>
+			</div>
+			<div class="col-md-8 offset-md-2">
+				<h1>Description : </h1>
+				<p th:text="${event.getDescription()}"></p>
+			</div>	
+		</div>
+		
+		
+	</div>
+
+	<!-- ======= Portfolio Section ======= -->
+    <!-- <section id="portfolio" class="portfolio">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h1 class="text-center">Image Gallery</h1>
+        </div>
+        <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="200">
+
+          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+            <div class="portfolio-wrap">
+              <img src="assets/img/portfolio/portfolio-1.jpg" class="img-fluid" alt="">
+              <div class="portfolio-info">
+                <div class="portfolio-links">
+                  <a href="assets/img/portfolio/portfolio-1.jpg" data-gall="portfolioGallery" class="venobox" title="workshop name or any title"><i class="fas fa-expand-arrows-alt"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+            <div class="portfolio-wrap">
+              <img src="assets/img/portfolio/portfolio-1.jpg" class="img-fluid" alt="">
+              <div class="portfolio-info">
+                <div class="portfolio-links">
+                  <a href="assets/img/portfolio/portfolio-1.jpg" data-gall="portfolioGallery" class="venobox" title="workshop name or any title 1"><i class="fas fa-expand-arrows-alt"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+            <div class="portfolio-wrap">
+              <img src="assets/img/portfolio/portfolio-1.jpg" class="img-fluid" alt="">
+              <div class="portfolio-info">
+                <div class="portfolio-links">
+                  <a href="assets/img/portfolio/portfolio-1.jpg" data-gall="portfolioGallery" class="venobox" title="workshop name or any title 2"><i class="fas fa-expand-arrows-alt"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+            <div class="portfolio-wrap">
+              <img src="assets/img/portfolio/portfolio-2.jpg" class="img-fluid" alt="">
+              <div class="portfolio-info">
+                <h4>Web 3</h4>
+                <p>Web</p>
+                <div class="portfolio-links">
+                  <a href="assets/img/portfolio/portfolio-2.jpg" data-gall="portfolioGallery" class="venobox" title="Web 3"><i class="bx bx-plus"></i></a>
+                  <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+            <div class="portfolio-wrap">
+              <img src="assets/img/portfolio/portfolio-3.jpg" class="img-fluid" alt="">
+              <div class="portfolio-info">
+                <h4>App 2</h4>
+                <p>App</p>
+                <div class="portfolio-links">
+                  <a href="assets/img/portfolio/portfolio-3.jpg" data-gall="portfolioGallery" class="venobox" title="App 2"><i class="bx bx-plus"></i></a>
+                  <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+
+         
+        </div>
+
+      </div>
+    </section> -->
+    
+    <!-- End Portfolio Section -->
+	
+</main>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="assets/vendor/jquery/jquery.min.js"></script>
+  <script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/venobox/venobox.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

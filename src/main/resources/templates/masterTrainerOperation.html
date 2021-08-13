@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header">
+						<h4>Training Information</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-12">
+								<ul class="nav nav-tabs" id="myTab" role="tablist">
+									<li class="nav-item" role="presentation"><a
+										class="nav-link active" id="home-tab" data-toggle="tab"
+										href="#addTrainingInfo" role="tab" aria-controls="home"
+										aria-selected="true">Add Training Information</a></li>
+									<li class="nav-item" role="presentation"><a
+										class="nav-link" id="profile-tab" data-toggle="tab"
+										href="#questionnaire" role="tab" aria-controls="profile"
+										aria-selected="false">Download Questionnaire</a></li>
+									<li class="nav-item" role="presentation"><a
+										class="nav-link" id="contact-tab" data-toggle="tab"
+										href="#feedbackForm" role="tab" aria-controls="contact"
+										aria-selected="false">Feedback Form</a></li>
+									<li class="nav-item" role="presentation"><a
+										class="nav-link" id="post1" data-toggle="tab"
+										href="#post" role="tab" aria-controls="post"
+										aria-selected="false">Upload Questionnaire</a></li>
+								</ul>
+								<div class="tab-content" id="myTabContent">
+									<div class="tab-pane fade show active" id="addTrainingInfo"
+										role="tabpanel" aria-labelledby="home-tab">
+										<div class="row  py-3 ">
+											<div class=" col-lg-6">
+												<form action="/addTrainingInfo" method="post"
+													enctype="multipart/form-data">
+
+													<div class="form-group ">
+														<label for="date">Start Event </label>  <select class="form-control"
+															name="event" required="required">
+
+															<option>Select Event</option>
+															<option th:each="event: ${events}"
+																th:value="${event.getEventId()}"
+																th:text="${event.getEventName()}"></option>
+														</select>
+													</div>
+
+													<!-- <div class="form-group">
+
+														<label for="categoryName">Select category </label> <select
+															id="MasterCategoryId" class="form-control"
+															name="categoryName" required="required">
+
+															<option>Select Category</option>
+															<option th:each="category: ${categories}"
+																th:value="${category.getCategoryId()}"
+																th:text="${category.getCatName()}"></option>
+														</select>
+													</div>
+													<div class="form-group ">
+														<div class="form-group">
+															<label for="catgoryByContributor">Select Topic</label> <select
+																id="inputTopic" class="form-control select selectpicker"
+																name="inputTopic" required="required"
+																multiple="multiple">
+															</select>
+
+														</div>
+													</div> -->
+
+
+												<!-- 	<div class="form-group ">
+
+														<label>Select Language</label> <select
+															id="selectLanguageId" class="form-control "
+															name="language" required="required">
+
+															<option>Select Language</option>
+															<option th:each="lan: ${lans}"
+																th:value="${lan.getLangName()}"
+																th:text="${lan.getLangName()}"></option>
+														</select>
+													</div> -->
+													<!-- <div class="form-group">
+														<label for="titleName">Title Name</label> <input
+															type="text" class="form-control " name="titleName"
+															id="titleName" required="required" />
+													</div>
+ -->
+													<!-- <span style="color: red;" th:if="${titleName}">Title
+														Name already exists. Choose a different one.</span>
+ -->
+													<div class="form-group">
+														<label for="traningInformationMasterId">Training
+															Information</label>
+														<textarea class="form-control " name="traningInfo"
+															rows="5" id="traningInformationMasterId"
+															required="required"></textarea>
+
+													</div>
+
+													<!-- <div class="form-group">
+
+														<label for="addressInformationId">Address
+															Information</label>
+
+														<textarea class="form-control"
+															name="addressInformationName" rows="5"
+															id="addressInformationId" required="required"></textarea>
+
+													</div> -->
+
+													<div class="form-group">
+														<label for="totalParID">Total Participants</label> <input
+															type="number" class="form-control" name="totalPar"
+															pattern="[0-9]" id="totalParID" minlength="1"
+															required="required" />
+													</div>
+
+
+													<div class="form-group">
+
+														<label for="ParticipantsPhoto">Participants Photo</label>
+														<input type="file" class="form-control"
+															id="ParticipantsPhotoId" accept=".zip"
+															name="ParticipantsPhoto" required="required" />
+
+													</div>
+
+													<div class="form-group">
+
+														<label for="traineeInformation">Trainee
+															Information</label> <input type="file" class="form-control"
+															id="traineeInformation" accept=".csv"
+															name="traineeInformation" required="required" />
+													</div>
+													<button type="submit" class="btn  btn-success"
+														data-toggle="modal" onclick="myFunction()">Submit</button>
+												</form>
+
+											</div>
+
+										</div>
+
+									</div>
+									<div class="tab-pane fade" id="questionnaire" role="tabpanel"
+										aria-labelledby="profile-tab">
+										<div class="container">
+											<div class="row py-3">
+												<div class=" col-lg-6">
+
+
+													<form action="/downloadQuestion" method="post">
+
+														<div class="form-group">
+
+															<label for="categoryName">Select category </label> <select
+																id="catMasterId" class="form-control "
+																name="catMasterId" required="required">
+
+																<option>Select Category</option>
+
+																<option th:each="category: ${categories}"
+																	th:value="${category.getCategoryId()}"
+																	th:text="${category.getCatName()}"></option>
+
+															</select>
+														</div>
+
+														<div class="form-group ">
+
+															<label for="lanMasterTrId">Select Topic</label> <select
+																id="lanMasterTrId" class="form-control "
+																name="lanMasterTrId" required="required">
+
+
+															</select>
+														</div>
+
+
+														<div class="form-group">
+
+															<label for="languageNameId">Select Language </label> <select
+																id="dwnByLanguageId" class="form-control "
+																name="dwnByLanguageId" required="required">
+
+																<option selected="selected">Select Language</option>
+
+																<option th:each="lan: ${lans}"
+																	th:value="${lan.getLangName()}"
+																	th:text="${lan.getLangName()}"></option>
+
+															</select>
+														</div>
+
+
+														<button type="submit" class="btn  btn-success"
+															id="fetch_questions">Download</button>
+													</form>
+												</div>
+												<div class="col-12">
+													<div th:if="${post == 'true'}">
+													<div th:if="${#lists.isEmpty(Questions)}">
+													No data for selected criteria
+														</div>
+													</div>
+													
+
+													<div th:unless="${#lists.isEmpty(Questions)}">
+														<span th:each="quest : ${Questions}">
+															<div>
+																<a target="_blank"
+																	th:href="@{/files/}+@{${quest.getQuestionPath()}}">
+																	click to open</a>
+															</div>
+														</span>
+													</div>
+
+												</div>
+											</div>
+
+										</div>
+
+
+									</div>
+									<div class="tab-pane fade py-3" id="feedbackForm"
+										role="tabpanel" aria-labelledby="contact-tab">
+
+										<div class="container">
+
+											<div class="row">
+
+												<div class=" col-lg-6">
+
+
+
+													<form class="form-horizontal"
+														th:action="@{/uploadfeedback}" method="post"
+														enctype="multipart/form-data">
+
+
+
+														<div class="form-group">
+
+															<label for="categoryId">Select Category </label> <select
+																id="catMasId" class="form-control " name="catMasId"
+																required="required">
+																<option>Select Category</option>
+
+																<option th:each="category: ${categories}"
+																	th:value="${category.getCategoryId()}"
+																	th:text="${category.getCatName()}"></option>
+															</select>
+														</div>
+
+														<div class="form-group">
+
+															<label for="feedbackmasterId">Select Training</label> <select
+																id="feedbackmasterId" class="form-control "
+																name="feedbackmasterId" required="required">
+																<option selected="selected">Select Training</option>
+
+															</select>
+														</div>
+
+						
+
+														<div class="form-group">
+
+															<label for="messageId">Enter Message</label>
+
+															<textarea class="form-control " name="traningInformation"
+																rows="5" id="messageId" required="required"></textarea>
+
+														</div>
+
+
+														<div class="form-group">
+
+															<label for="fileId">Upload Feedbacks</label> <input
+																type="file" class="form-control " name="feedbackForm"
+																id="fileId" accept=".zip" required="required"></input>
+																<small>Upload .zip file</small>
+
+														</div>
+
+
+														<button type="submit" class="btn  btn-success">Submit</button>
+													</form>
+
+												</div>
+
+											</div>
+
+
+										</div>
+
+									</div>
+									
+									<div class="tab-pane fade py-3" id="post"
+										role="tabpanel" aria-labelledby="post">
+
+										<div class="container">
+
+											<div class="row">
+
+												<div class=" col-lg-6">
+
+
+
+													<form class="form-horizontal"
+														th:action="@{/uploadPostQuestionaire}" method="post"
+														enctype="multipart/form-data">
+
+
+
+														<div class="form-group">
+
+															<label for="catMasPostId">Select Category </label> <select
+																id="catMasPostId" class="form-control " name="catMasPostId"
+																required="required">
+																<option>Select Category</option>
+
+																<option th:each="category: ${categories}"
+																	th:value="${category.getCategoryId()}"
+																	th:text="${category.getCatName()}"></option>
+															</select>
+														</div>
+
+														<div class="form-group">
+
+															<label for="postTrainingdataId">Select Training</label> <select
+																id="postTrainingdataId" class="form-control "
+																name="postTraining" required="required">
+																<option selected="selected">Select Training</option>
+
+															</select>
+														</div>
+
+						
+
+
+
+														<div class="form-group">
+
+															<label for="fileId">Upload Questionnaire</label> <input
+																type="file" class="form-control " name="postQuestions"
+																id="fileId" accept=".zip" required="required"></input>
+																<small id="emailHelp" class="form-text text-muted">Upload .zip file</small>
+  
+
+														</div>
+
+
+														<button type="submit" class="btn  btn-success">Submit</button>
+													</form>
+
+												</div>
+
+											</div>
+
+
+										</div>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+
+	<script th:inline="javascript">
+		var projectPath = '[(@{/})]';
+		//save the tab data to show after page reloads
+		$('#myTab a').on('click', function(e) {
+			e.preventDefault();
+			$(this).tab('show');
+			localStorage.setItem("master_tab", this.id);
+		})
+		$(document).ready(function() {
+			var x = localStorage.getItem("master_tab");
+			var x_id = '#'+x;
+			$(x_id).tab('show');
+		});
+	</script>
+</body>
+</html>

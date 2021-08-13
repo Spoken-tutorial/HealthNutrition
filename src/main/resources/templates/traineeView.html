@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+<style>
+.nav-view-trainee{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-view-trainee a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item" role="presentation"><a
+						class="nav-link active" id="home-tab" data-toggle="tab"
+						href="#viewAllParticipants" role="tab" aria-controls="home"
+						aria-selected="true">All participants</a></li>
+					<li class="nav-item" role="presentation"><a class="nav-link"
+						id="profile-tab" data-toggle="tab" href="#searchParticipants"
+						role="tab" aria-controls="profile" aria-selected="false">Search
+							participants</a></li>
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3"
+						id="viewAllParticipants" role="tabpanel"
+						aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Trainee Detail</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-12">
+										<div
+											sec:authorize="hasAnyAuthority('MASTER_TRAINER','SUPER_USER')">
+											<div>
+												<span th:text="${msg}"></span>
+											</div>
+											<div>
+												<table id="tableId" class="table table-striped">
+													<thead>
+
+														<tr>
+
+															<th>Name</th>
+															<th>Age</th>
+															<th>Aadhar no</th>
+															<th>Mobile Number</th>
+															<th>Organization</th>
+															<th>email</th>
+															<th>Gender</th>
+															<th>Workshop Name </th>
+															<th>Edit</th>
+
+
+														</tr>
+
+													</thead>
+													<tbody>
+														<tr th:each="traineeInformation : ${TraineesData}" th:if="${traineeInformation.getTraineeInfos().getUser().getId() == userInfo.getId()}">
+															<td th:text="${traineeInformation.getName()}">ID</td>
+															<td th:text="${traineeInformation.getAge()}">Name</td>
+															<td th:text="${traineeInformation.getAadhar()}">description</td>
+															<td th:text="${traineeInformation.getPhone()}">description</td>
+															<td th:text="${traineeInformation.getOrganization()}">description</td>
+															<td th:text="${traineeInformation. getEmail()}">description</td>
+															<td th:text="${traineeInformation. getGender()}">description</td>
+															<td th:text="${traineeInformation. getTraineeInfos().getEvent().getEventName()}">description</td>
+															<td><a th:href="@{${'/trainee/edit/' + traineeInformation.getTrainingId()}}">Edit</a></td>
+
+
+														</tr>
+
+													</tbody>
+												</table>
+											</div>
+
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<div class="tab-pane fade py-3" id="searchParticipants" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<div class="container">
+						<div class="row">
+						<div class="col-md-6">
+						<form>
+							<div class="form-group">
+								<label for="exampleFormControlSelect1">Select Category</label> <select
+									class="form-control" id="eventCategory">
+									<option >Select Category</option> 
+									<option th:each="category: ${categories}"
+												th:value="${category.getCategoryId()}" th:text="${category.getCatName()}"></option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="exampleFormControlSelect1">Select Event</label> <select
+									class="form-control" id="eventName">
+								</select>
+							</div>
+							<button type="button" class="btn btn-success" id="searchTrainees">Submit</button>
+						</form>
+						</div>
+						
+						</div>
+						<hr>
+						<div class="row">
+						<div class="col-md-12">
+						<table id="tableSearch" class="table table-striped">
+													<thead>
+
+														<tr>
+
+															<th>Name</th>
+															<th>Age</th>
+															<th>Aadhar no</th>
+															<th>Mobile Number</th>
+															<th>Organization</th>
+															<th>email</th>
+															<th>Gender</th>
+														</tr>
+
+													</thead>
+													<tbody id="tableBody">
+													</tbody>
+												</table>
+						
+						</div>
+						</div>
+						
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+		<div th:replace="common/trail :: body-bottom-scripts"></div>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#tableId').DataTable();
+				$('#tableSearch').DataTable();
+			});
+		</script>
+
+	<script th:inline="javascript">
+		var projectPath = '[(@{/})]';
+	</script>
+</body>
+</html>

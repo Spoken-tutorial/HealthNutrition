@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+<style>
+.nav-download-ques{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-download-ques a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header">
+						<h4>Training Information</h4>
+					</div>
+					<div class="card-body">
+						<div class=row>
+							<div class="col"></div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+								<ul class="nav nav-tabs" id="myTab" role="tablist">
+									<li class="nav-item" role="presentation"><a
+										class="nav-link active" id="home-tab" data-toggle="tab"
+										href="#trainingInfo" role="tab" aria-controls="home"
+										aria-selected="true">Training Details</a></li>
+									<li class="nav-item" role="presentation"><a
+										class="nav-link" id="profile-tab" data-toggle="tab"
+										href="#questionnaire" role="tab" aria-controls="profile"
+										aria-selected="false">Questionnaire uploads</a></li>
+									<li class="nav-item" role="presentation"><a
+										class="nav-link" id="contact-tab" data-toggle="tab"
+										href="#trainerFeedback" role="tab" aria-controls="contact"
+										aria-selected="false">Trainer Feedback</a></li>
+									<li class="nav-item" role="presentation"><a
+										class="nav-link" id="post1" data-toggle="tab"
+										href="#participantFeedback" role="tab" aria-controls="post"
+										aria-selected="false">Participants Feedback</a></li>
+								</ul>
+								<div class="tab-content" id="myTabContent">
+									<div class="tab-pane fade show active" id="trainingInfo"
+										role="tabpanel" aria-labelledby="home-tab">
+										<div class="row  py-3 ">
+											<div class=" col">
+												<table id="trainingInfo_table" class="table table-striped">
+
+													<thead>
+														<tr>
+															<th>Id</th>
+															<!-- <th>Training Name</th> -->
+															<th>Training Date</th>
+															<th>Location</th>
+															<th>Category</th>
+															<th>Language</th>
+															<th>Edit</th>
+
+
+														</tr>
+													</thead>
+													<tbody>
+														<tr th:each="t : ${trainingInfo}">
+															<td th:text="${t.getTrainingId()}">ID</td>
+															<!-- <td th:text="${t.getTitleName()}">Training Name</td> -->
+															<td th:text="${t.getEvent().getStartDate()}">Date</td>
+															<td><span th:text="${t.getEvent().getState().getStateName()}"></span>(
+																<span th:text="${t.getEvent().getCity().getCityName()}"></span> )</td>
+
+															<td>
+																<div th:each="item: ${t.getTrainingTopicId()}">
+																	<span style="font-weight: bold;"
+																		th:text="${item.getTopicCatId().getCat().getCatName()}"></span><br>
+																	<span
+																		th:text="${item.getTopicCatId().getTopic().getTopicName()}"></span>
+																</div>
+
+															</td>
+
+															<td th:text="${t.getEvent().getLan().getLangName()}">Language</td>
+															<td><a th:href="@{${'/training/edit/' + t.getTrainingId()}}">Edit</a></td>
+
+
+
+
+
+
+														</tr>
+
+													</tbody>
+												</table>
+											</div>
+
+										</div>
+
+									</div>
+									<div class="tab-pane fade" id="questionnaire" role="tabpanel"
+										aria-labelledby="profile-tab">
+										<div class="container">
+											<div class="row py-3">
+												<div class="col-12">
+													<table id="questionnaire_table" class="table table-striped">
+														<thead>
+															<tr>
+																<th>Id</th>
+																<!-- <th>Training Name</th> -->
+																<th>Category</th>
+																<th>Training Date</th>
+																<th>Language</th>
+																<th>Questionnaire</th>
+																<th>Location</th> 
+
+															</tr>
+														</thead>
+														<tbody>
+															<tr th:each="q : ${postQuestionnaire}">
+																<td th:text="${q.getId()}">ID</td>
+																<!-- <td th:text="${q.getTraineeInfos().getTitleName()}">Training</td> -->
+																<td>
+																	<div
+																		th:each="item: ${q.getTraineeInfos().getTrainingTopicId()}">
+																		<span style="font-weight: bold;"
+																			th:text="${item.getTopicCatId().getCat().getCatName()}"></span><br>
+																		<span
+																			th:text="${item.getTopicCatId().getTopic().getTopicName()}"></span>
+																	</div>
+
+																</td>
+																<td
+																	th:text="${q.getTraineeInfos().getEvent().getStartDate()}">Workshop
+																	Date</td>
+																<td
+																	th:text="${q.getTraineeInfos().getEvent().getLan().getLangName()}">Language</td>
+																<td class="text-center"><a
+																	th:href="@{/files/}+@{${q.getQuestionPath()}}"
+																	target="_blank" class="pdfclass"><i
+																		class="fas fa-file-archive"></i></a></td>
+																 <td><span
+																	th:text="${q.getTraineeInfos().getEvent().getState().getStateName()}"></span>(
+																	<span
+																	th:text="${q.getTraineeInfos().getEvent().getCity().getCityName()}"></span>
+																	)</td> 
+															</tr>
+
+														</tbody>
+													</table>
+												</div>
+											</div>
+
+										</div>
+
+
+									</div>
+									<div class="tab-pane fade py-3" id="trainerFeedback"
+										role="tabpanel" aria-labelledby="contact-tab">
+
+										<div class="container">
+
+											<div class="row">
+
+												<div class=" col">
+													<table id="trainerFeedback_table" class="table table-striped">
+														<thead>
+															<tr>
+																<th>Id</th>
+																<!-- <th>Training Name</th> -->
+																<th>Category</th>
+																<th>Training Date</th>
+																<th>Feedback</th>
+																<th>Location</th>
+
+															</tr>
+														</thead>
+														<tbody>
+															<tr th:each="ft : ${feedbackMasterTrainer}">
+																<td th:text="${ft.getId()}">ID</td>
+																<!-- <td th:text="${ft.getTraineeInfos().getTitleName()}">ID</td> -->
+																<td>
+																	<div
+																		th:each="item: ${ft.getTraineeInfos().getTrainingTopicId()}">
+																		<span style="font-weight: bold;"
+																			th:text="${item.getTopicCatId().getCat().getCatName()}"></span><br>
+																		<span
+																			th:text="${item.getTopicCatId().getTopic().getTopicName()}"></span>
+																	</div>
+																</td>
+																<td
+																	th:text="${ft.getTraineeInfos().getEvent().getStartDate()}">Workshop
+																	Date</td>
+
+																<td th:text="${ft.getDescription()}">Training</td>
+																<td><span
+																	th:text="${ft.getTraineeInfos().getEvent().getState().getStateName()}"></span>(
+																	<span
+																	th:text="${ft.getTraineeInfos().getEvent().getCity().getCityName()}"></span>
+																	)</td>
+																
+															</tr>
+														</tbody>
+													</table>
+
+
+
+												</div>
+
+											</div>
+
+
+										</div>
+
+									</div>
+
+									<div class="tab-pane fade py-3" id="participantFeedback"
+										role="tabpanel" aria-labelledby="post">
+
+										<div class="container">
+
+											<div class="row">
+
+												<div class=" col">
+												<table id="participantFeedback_table" class="table table-striped">
+														<thead>
+															<tr>
+																<th>Id</th>
+																<!-- <th>Training Name</th> -->
+																<th>Category</th>
+																<th>Training Date</th>
+																<th>Feedback</th>
+																<th>Location</th>
+
+															</tr>
+														</thead>
+														<tbody>
+															<tr th:each="ft : ${feedbackMasterTrainer}">
+																<td th:text="${ft.getId()}">ID</td>
+																<!-- <td th:text="${ft.getTraineeInfos().getTitleName()}">ID</td> -->
+																<td>
+																	<div
+																		th:each="item: ${ft.getTraineeInfos().getTrainingTopicId()}">
+																		<span style="font-weight: bold;"
+																			th:text="${item.getTopicCatId().getCat().getCatName()}"></span><br>
+																		<span
+																			th:text="${item.getTopicCatId().getTopic().getTopicName()}"></span>
+																	</div>
+																</td>
+																<td
+																	th:text="${ft.getTraineeInfos().getEvent().getStartDate()}">Workshop
+																	Date</td>
+
+																<td class="text-center"><a
+																	th:href="@{/files/}+@{${ft.getPath()}}"
+																	target="_blank" class="pdfclass"><i
+																		class="fas fa-file-archive"></i></a></td>
+																<td><span
+																	th:text="${ft.getTraineeInfos().getEvent().getState().getStateName()}"></span>(
+																	<span
+																	th:text="${ft.getTraineeInfos().getEvent().getCity().getCityName()}"></span>
+																	)</td>
+																
+															</tr>
+														</tbody>
+													</table>
+												</div>
+
+											</div>
+
+
+										</div>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#questionnaire_table').DataTable();
+			$('#trainingInfo_table').DataTable();
+			$('#participantFeedback_table').DataTable();
+			$('#trainerFeedback_table').DataTable();
+			});
+	</script>
+	<script th:inline="javascript">
+		var projectPath = '[(@{/})]';
+		//save the tab data to show after page reloads
+		$('#myTab a').on('click', function(e) {
+			e.preventDefault();
+			$(this).tab('show');
+			localStorage.setItem("master_tab", this.id);
+		})
+		$(document).ready(function() {
+			var x = localStorage.getItem("master_tab");
+			var x_id = '#' + x;
+			$(x_id).tab('show');
+		});
+	</script>
+</body>
+</html>

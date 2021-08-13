@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+
+<head th:replace="common/trail :: common-trail">
+
+
+
+		<meta charset="utf-8"/>
+		 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+		 <link rel="stylesheet" th:href="@{/css/style3.css}"/>
+ 	 	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/> 
+		<link rel="stylesheet" type="text/css" th:href="@{/datatables.css}"/>
+ 
+	
+</head>
+
+ 
+<body>
+	<div style="display: flex;">
+		<div th:replace="common/sidebar :: contributor_sidebar"></div>
+
+		<div class="row" style='width: 100%;'>
+			<div class="col-lg-10 col-xl-9 mx-auto">
+				<div class="card card-signin flex-row a-card">
+
+					<div class="card-body">
+					
+					
+
+						<form class="form-horizontal" th:action="@{/addConsaltant}"
+							method="post" enctype="multipart/form-data"
+							onsubmit="return submitForm(this);">
+  <body>
+  
+
+
+
+          	<div class="container" style="padding-top: 120px">
+          	
+          		<div class="row">
+          	
+         			 	<div class="col">
+          	
+          	
+   				 <table id="tableId"  class="table table-striped">
+					           
+					           	  <thead class="">
+					           <tr>
+					          
+					                <th>Id</th>				               
+					                <th>First Name</th>
+					                <th>Last Name</th>
+					                 <th>Email</th> 
+					                <th>Aadhar Number</th>  
+					                <th>Gender</th> 
+					                <th>Language</th> 
+					 
+					            </tr>
+					            
+					            </thead>
+					             <tbody>
+					            	
+					            	<tr th:each="approve : ${parcipantDeatails}">
+					                <td th:text="${approve.participantId}">ID</td>  
+					                <td th:text="${approve.firstname}">First Name</td>
+					                <td th:text="${approve.lastname}">Last Name</td>
+					                <td th:text="${approve.email}">Email</td>
+					                <td th:text="${approve.adharNumber}">Aad paricipanthar Number</td>
+									 <td th:text="${approve.gender}">Gender</td>
+ 									<td th:text="${approve.language}">Language</td>
+					            </tr>
+					            </tbody>
+					        </table>
+					</div>
+				</div>
+			</div>   
+			
+			
+			<script th:src="@{/js/jquery.min.js}"></script>
+		 	<script type="text/javascript" charset="utf8" th:src="@{/datatables.js}"></script>
+		 
+			<script>
+			
+			
+			$(document).ready( function () {
+			    $('#tableId').DataTable();
+			} );
+			
+			</script>
+				
+			<div th:fragment="body-bottom-scripts">
+
+     
+        	
+        </div>
+ </body>
+				</form>
+					</div>
+				</div>
+			<div th:fragment="body-bottom-scripts">
+
+		<script th:src="@{static/js/bootstrap.bundle.min.js}"></script>
+		<script src="https://code.jquery.com/jquery-3.5.1.js"
+			integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+			crossorigin="anonymous"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+			integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+			crossorigin="anonymous"></script>
+		<script
+			src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+			crossorigin="anonymous"></script>
+		<script
+			src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+		<script
+			src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+
+
+	</div>
+			</div>
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+</body>
+ 
+</html>
+ 
+ 

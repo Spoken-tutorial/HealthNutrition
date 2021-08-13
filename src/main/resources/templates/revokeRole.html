@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-super-remove{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-super-remove a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+								
+	<div class="card-header">
+			<h4>Revoke Role</h4>
+	</div> 
+	<div class="card-body"> 
+	<table class="table table-striped" id="myTable">
+  	<thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Role</th>
+      <th scope="col">Category</th>
+      <th scope="col">Language</th>
+      <th scope="col">Revoke</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="userRole : ${userRoles}">
+      <td scope="row"><span th:text = "${userRole.getUser().getFullName()}"></span></td>
+      <td><span th:text = "${userRole.getRole().getName()}"></span></td>
+      <td><div th:if="${userRole.getCat()!=null}"><span th:text = "${userRole.getCat().getCatName()}"></span></div></td>
+	  </td>
+      <td><div th:if="${userRole.getLan()!=null}"><span th:text = "${userRole.getLan().getLangName()}"></span></div></td>
+      <td><a th:href="@{${'/revokeRole/'+ userRole.getUserRoleId()}}">Revoke</a></td>
+    </tr>
+  
+  </tbody>
+</table>
+  </div>
+  	
+					</div>
+
+</div>
+
+
+				</div>
+  </div>
+  
+
+	
+		
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+
+</body>
+</html>
+

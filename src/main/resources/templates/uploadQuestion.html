@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-upload-ques{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-upload-ques a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#add" role="tab" aria-controls="home" aria-selected="true">Add</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#view" role="tab" aria-controls="profile" aria-selected="false">View</a>
+  </li>
+  
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active py-3" id="add" role="tabpanel" aria-labelledby="home-tab">
+  				<div class="card">
+					<div class="card-header">
+						<h4>Upload Question</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-6">
+								<form th:action="@{/uploadQuestion}"
+									method="post" enctype="multipart/form-data">
+									<div class="form-group">
+										<label for="MasterCategoryId">Select category </label> <select
+											id="MasterCategoryId" class="form-control"
+											name="categoryName" required="required">
+
+											<option value="0">Select Category</option>
+												<option 
+												th:each="category: ${categories}"
+												th:value="${category.getCategoryId()}" th:text="${category.getCatName()}">
+														</option>
+										
+										</select>
+									</div>
+
+									<div class="form-group">
+										<label for="inputTopic">Select Topic</label> <select
+											id="inputTopic" class="form-control" name="inputTopicName"
+											required="required">
+										</select>
+									</div>
+									<div class="form-group">
+										<label for="languageNameId">Select Language </label> <select
+											id="languageNameId" class="form-control" name="languageyName"
+											required="required">
+												<option th:each="lan: ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option>
+										
+										</select>
+									</div>
+
+
+
+									<div class="form-group">
+
+										<label for="questionId">Question</label> <input type="file"
+											class="form-control" id="questionId" name="questionName"
+											accept=".pdf" required="required" />
+
+									</div>
+
+
+
+
+									&nbsp;&nbsp;&nbsp;
+									<button type="submit" class="btn  btn-success">Submit</button>
+									&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+								</form>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+  </div>
+  <div class="tab-pane fade py-3" id="view" role="tabpanel" aria-labelledby="profile-tab">
+  <table class="table table-striped" id="myTable">
+  <thead>
+    <tr>
+      <th scope="col">Category Name</th>
+      <th scope="col">Topic Name</th>
+      <th scope="col">Language</th>
+      <th scope="col">Question</th>
+      <th scope="col">Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+     <tr th:each="question : ${questions}">
+      <td scope="row"><span th:text = "${question.getTopicCatId().getCat().getCatName()}"></span></td>
+      <td><span th:text = "${question.getTopicCatId().getTopic().getTopicName()}"></span></td>
+      <td><span th:text = "${question.getLan().getLangName()}"> </span>
+	  </td>
+      <td><a th:href="@{/files/}+@{${question.getQuestionPath()}}"
+			target="_blank" class="pdfclass"><img id="pdfsource"
+			th:src="${question.getQuestionPath()}" alt="Click here"></img></a></td>
+	  <td><a th:href="@{${'/question/edit/' + question.getTopicCatId().getCat().getCatName() + '/' + question.getTopicCatId().getTopic().getTopicName() + '/' + question.getLan().getLangName()}}">Edit</a></td>
+    </tr>
+   
+  </tbody>
+</table>
+  </div>
+  
+</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>
+

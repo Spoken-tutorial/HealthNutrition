@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+
+<body>
+<div th:replace="common/sidebar :: top_header"></div>
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+			<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+							<div class="card-header">
+								<h4>Edit Testimonial</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form class="form-horizontal"  th:action="@{/updateTestimonial}" method="post"  enctype="multipart/form-data">
+ 
+ 						<div th:each="testimonial : ${testimonials}">    
+						<input type="hidden"  name="testimonialId"  th:value="${testimonial.getTestimonialId()}"/>
+  
+				     <div class="form-group">  
+ 
+ 			    		 <label for="testimonialName">Enter Name:</label> 
+                   		 <input type="text" class="form-control" id="testimonialName" name="testimonialName"  th:value="${testimonial.getName()}"/>
+                                  
+ 					</div>
+ 
+ 						 <div class="form-group">  
+ 						 
+ 						   <label for="testimonialDescription">Enter Description:</label> 
+ 						 <textarea class="form-control" rows="5" id="testimoniaqlDescription" name="desc"  th:text="${testimonial.getDescription()}"></textarea>
+ 						 
+ 						 
+ 						 </div>
+ 						 	 <div class="form-group">  
+ 						 
+ 						          <label for="testimonialVideo" >Add  Video:</label> 
+ 						 		<input type="file" style="padding-right: 50px" class="form-control-file" id="testimonialVideo"  name="TestiVideo" placeholder="uploadFile"/>
+ 						 
+ 							</div>
+ 
+                          <div class="row" >
+                
+     
+                                                     <div class=""    style="padding-left: 20px; padding-top: 20px">
+                                                            <button type="submit" class="btn btn-success">Submit</button>&nbsp;&nbsp;&nbsp;
+                                                             <button type="submit" class="btn btn-success">Cancel</button>
+                                                  </div>
+                                     
+                			  </div>
+                  
+                
+            
+                  </div>
+                  
+                      </form>
+									</div>
+								</div>
+							</div>
+
+							
+						</form>
+							</div>
+			
+			
+			</div>
+</div>
+</div>
+	<div style="display: flex;">
+		<div th:replace="common/sidebar :: contributor_sidebar"></div>
+
+		<div class="row" style='width: 100%;'>
+			<div class="col-lg-10 col-xl-9 mx-auto">
+				<div class="card card-signin flex-row a-card">
+
+					<div class="card-body">
+					
+					
+
+<body>
+  
+  	
+  		
+	<div class="container" style="padding-top: 150px">
+	
+	
+	    <div class="row">
+	      <div class="col-lg-10 col-xl-9 mx-auto">
+	        <div class="card card-signin flex-row my-5">
+	       
+	          <div class="card-body">
+	           <h5 class="card-title text-center" style="color:maroon; font-size: 20px">
+    			<div class="">    
+                                <div th:if="${msg}">
+   								 <span th:text="${msg}"></span>
+ 											 </div> </div></h5>
+	            <h5 class="card-title text-center" style="color:maroon; font-size: 30px">Update Testimonial</h5>
+	            
+	
+            
+  				 
+  				 	
+					<script>
+					function submitForm() {
+						  return confirm('Do you really want to submit the form?');
+						  
+						  alert("Submit form succefully");
+						}
+					</script>
+  				 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+			
+ </body>
+
+					
+					</div>
+				</div>
+							
+					</div>
+		</div>
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+
+</body>
+ 
+</html>
+ 
+ 

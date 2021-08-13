@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org" xmlns:sec="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-super-master{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-super-master a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0" style="background-color: #F8F9FA;">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header">
+						<h4>Profile Info</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-6">
+								<form th:action="@{/profile}" method="post"
+									enctype="multipart/form-data">
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group ">
+												<label for="firstName">First Name </label> <input
+													type="text" class="form-control" name="firstName"
+													id="userFirstName" th:value="${userInfo.getFirstName()}"
+													required="required" />
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group ">
+												<label for="lastName">Last Name </label> <input type="text"
+													class="form-control" name="lastName" id="userLastName"
+													th:value="${userInfo.getLastName()}" required="required" />
+											</div>
+
+										</div>
+									</div>
+
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group ">
+												<div class="form-group ">
+													<label for="textMasterName">Date of birth </label> <input
+														type="date" id="birthday" name="birthday" th:value="${userInfo.getDob()}"
+														class="form-control">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group ">
+												<label for="textMobile">Mobile Number</label> <input
+													type="Number" class="form-control" name="phone"
+													id="textMobile" th:value="${userInfo.getPhone()}"
+													required="required" />
+											</div>
+										</div>
+
+									</div>
+
+									<div class="form-group ">
+										<label for="textAddress">Postal Address</label>
+										<textarea class="form-control" name="address" id="textAddress"
+											rows="3" th:text="${userInfo.getAddress()}"
+											required="required"></textarea>
+									</div>
+									<div sec:authorize="hasAnyAuthority('DOMAIN_REVIEWER')">
+									<div id="cons_info">
+										<div class="form-group">
+											<label for="textAddress">Description <small
+												id="emailHelp" class="form-text text-muted d-inline">(Maximum
+													250 characters)</small></label>
+											<textarea class="form-control" name="description"
+												id="description" rows="3"
+												th:value="${userInfo.getConsults()[0].getDescription()}"
+												required="required"
+												placeholder="Enter description - Years of experience, speciality & hospital associated with"></textarea>
+										</div>
+									</div>
+									</div>
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+										<label for="existingEmail">Email address</label> <input
+											type="email" class="form-control" id="existingEmail"
+											aria-describedby="emailHelp" placeholder="Enter email" th:value="${userInfo.getEmail()}" readonly>
+										
+									</div>
+										</div>
+										<div class="col-md-6">
+										<div class="form-group ">
+												<div class="form-group ">
+													<label for="registrtionDate">Registration date</label> <input
+														type="text" id="registrtionDate" name="registrtionDate"
+														class="form-control" th:value="${userInfo.getDateAdded()}" readonly>
+												</div>
+											</div>
+										</div>
+									</div>
+									
+									<button type="submit" class="btn  btn-success"
+										data-toggle="modal" onclick="myFunction()">Submit</button>
+								</form>
+								<div class = "col-md-12" style="padding:20px">
+								<div id="Success"
+										style="display: none; color: green; font-size: 18px; text-align: center">Data
+										Updated Successfully</div>
+										<div id="FailurePassMismatch"
+										style="display: none; color: red; font-size: 18px; text-align: center">New
+										Password and Confirm Password aren't same</div>
+										<div id="FailureCurPassWrong"
+										style="display: none; color: red; font-size: 18px; text-align: center">Current
+										Password is Wrong</div>
+										<div id="lengthIncorrect"
+										style="display: none; color: red; font-size: 18px; text-align: center">Password must be atleast 6 character</div>
+                                 </div>   
+                                        
+                                         <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>Current Password</label>
+                                                    <input type="password" class="form-control" placeholder="Current Password" name="currentPasswordTeacher" id="currentPasswordTeacher" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                         <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>New Password</label>
+                                                    <input type="password" class="form-control" placeholder="New Password" name="newPasswordTeacher" id="newPassTeacher" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                         <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>Confirm New Password</label>
+                                                    <input type="password" class="form-control" placeholder="Confirm Password" name="confPasswordTeacher" id="confPassTeacher" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                        <button type="button" class="btn btn-success" id="updatePasswordTeacher" disabled>Update Password</button>
+                                        <div class="clearfix"></div>
+							</div>
+							
+							
+							
+							<div class="col-lg-4" style="padding-left:10px">
+								  <div class="card card-user" >
+                                
+                                <div class="card-body" style="text-align:center">
+                                    <div class="author">
+                                    
+                                        <a href="#" data-toggle="modal" data-target="#ProfilePictureModal">
+                                        
+                                        	<span th:if="${userInfo.getProfilePic()}" >
+                                        		<img class="avatar border-gray" th:src="@{files/}+@{${userInfo.getProfilePic()}}" th:alt="@{/img/default-avatar.png}"
+                                        		style="width:100%;">
+                                        	</span> 
+                                        	<span th:unless="${userInfo.getProfilePic()}">
+                                        		<img class="avatar border-gray" th:src="@{/image/default-avatar.png}">
+                                        	</span>
+                                            
+                                            <p class="profile-title"><span th:text="${userInfo.getFirstName()}"></span></p>
+                                        </a>
+                                    
+                                    </div>
+                
+                                </div>
+                            </div>
+                                        
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script th:inline="javascript">
+		var projectPath = '[(@{/})]';
+		$('#checkbox').change(function() {
+			var x = document.getElementById("cons_info");
+			if (x.style.display === "none") {
+				x.style.display = "block";
+			} else {
+				x.style.display = "none";
+			}
+		});
+	</script>
+	
+		<!-- Central Modal Small -->
+	<div class="modal fade" id="ProfilePictureModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+ 	 aria-hidden="true">
+
+  <!-- Change class .modal-sm to change the size of the modal -->
+  <div class="modal-dialog modal-lg" role="document">
+
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title w-100" id="myModalLabel">Change Profile Picture</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      	<h4 style="text-align:center;color:green;display:none;font-size: 1rem;" id="profileText">Profile Picture Updated Successfully</h4>
+      	<form action="" method="post" enctype="multipart/form-data" id="uploadProfilePic">
+      		<span th:if="${userInfo.getProfilePic()}">
+                <img class="avatar border-gray" id="pictureShow" th:src="@{files/}+@{${userInfo.getProfilePic()}}" width="100%" height="auto" /><br/>
+            </span>
+            <div th:unless="${userInfo.getProfilePic()}" class="text-center">
+                <img class="avatar border-gray" id="pictureShow" th:src="@{/image/default-avatar.png}" width="400px" height="auto"/><br/>
+            </div>
+            <hr>
+	      	
+	        <input type="file" id="profilePicture" name="profilePicture"/>
+	    </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-sm" id="chngProfilePic" disabled>Change Photo</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Central Modal Small -->
+</body>
+</html>

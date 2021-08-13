@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0" style="border: 1px solid red;background-color: #F8F9FA;">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header">
+						<h4>Add Master Trainer</h4>
+					</div>
+					<div class="card-body" th:if="${alredaySubmittedFlag != true}">
+						<div class="row">
+							<div class="col-lg-6">
+								<form action="@{/addMasterTrainerRole}" method="post"
+									enctype="multipart/form-data">
+									<div class="form-group ">
+										<label for="textMasterName">Name </label> <input type="text"
+											class="form-control w-75" name="name" id="textMasterName"
+											th:value="${userInfo.getFirstName()}" required="required" />
+									</div>
+									<div class="form-group ">
+										<label for="textAge">Age</label> <input type="text"
+											class="form-control w-75" name="age" id="textAge"
+											required="required" />
+									</div>
+									<div class="form-group ">
+										<label for="textMobile">Mobile Number</label> <input
+											type="Number" class="form-control w-75" name="phone"
+											id="textMobile" th:value="${userInfo.getPhone()}"
+											required="required" />
+									</div>
+									<div class="form-group ">
+										<label for="textAddress">Postal Address</label> <input
+											type="text" class="form-control w-75" name="address"
+											id="textAddress" th:value="${userInfo.getAddress()}"
+											required="required" />
+									</div>
+									<div class="form-group">
+										<label for="textOrganization">Associated Organization</label>
+										<input type="text" class="form-control w-75" name="org"
+											id="textOrganization" required="required" />
+									</div>
+									<div class="row w-75">
+									<div class="col-6">
+									 <div class="form-group">
+										<label for="exampleFormControlSelect1">Role in Organization</label>
+										<select class="form-control " id="roleSelector">
+											<option th:each="role : ${org_roles}" th:text="${role.getRole()}">
+											
+											</option>
+										</select>
+									</div>
+									</div>
+									<div class="col-6" id="customRole" style="display:none;">
+									<label for="exampleFormControlSelect1">Role in Organization</label>
+									<input class="form-control" type="text" placeholder="Add your role in organization" id="customRoleVal">
+									<input type="hidden" id="newRole" name="newRole"
+										value="">
+									</div>
+									</div>
+									
+									
+									<div class="form-group ">
+										<label for="textExpNumber">Experience in Year</label> <input
+											type="number" class="form-control w-75" name="experience"
+											id="textExpNumber" required="required" />
+									</div>
+									<div class="form-group ">
+										<label for="textAadharNumber">Aadhaar Number</label> <input
+											type="number" class="form-control w-75" name="aadharNumber"
+											id="textAadharNumber" required="required" />
+									</div>
+									<div data-duplicate="demo">
+										<div class="row">
+											<div class="col-md-1">
+												<button data-duplicate-remove="demo">-</button>
+											</div>
+											<div class="col-md-5">
+												<select class="form-control select_language sl"
+													name="language" onload="addEL()">
+													<option th:each="language : ${languages}"
+														th:text="${language.getLanName()}"></option>
+												</select>
+												<div class="form-check"></div>
+											</div>
+											<!-- <div class="col-md-2 p-6">
+												<input class="form-check-input w_check" type="checkbox"
+													value="w" name="write"> <label
+													class="form-check-label" for="defaultCheck2"> Write
+												</label>
+											</div> -->
+											<div class="col-md-2 p-6">
+												<input class="form-check-input r_check" type="checkbox"
+													value="r" name="read"> <label
+													class="form-check-label" for="defaultCheck1"> Read & Write
+												</label>
+											</div>
+											<div class="col-md-2">
+												<input class="form-check-input s_check" type="checkbox"
+													value="s" name="speak"> <label
+													class="form-check-label" for="defaultCheck3"> Speak
+												</label>
+											</div>
+
+										</div>
+										<br>
+
+									</div>
+									<div>
+										<!-- <span class="btn btn-sm btn-info" data-duplicate-add="demo" id="addLangSelect">+ add</span>
+									<span class="btn btn-sm btn-danger" data-duplicate-remove="demo">- remove</span> -->
+
+										<button type="button" class="btn btn-sm btn-info"
+											data-duplicate-add="demo" id="addLangSelect">+ add</button>
+										<button type="button" class="btn btn-sm btn-danger"
+											data-duplicate-remove="demo">- remove</button>
+
+									</div>
+
+									<br> <input type="hidden" id="custId" name="languages"
+										value="">
+									<button type="submit" class="btn  btn-success"
+										data-toggle="modal" id="addMaster">Submit</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script th:inline="javascript">
+	
+	
+	$(document).ready(function(){
+		  $("#roleSelector").change(function(){
+			var role = $('#roleSelector :selected').text();
+			/* alert(role); */
+		    if(role=="Other"){
+		    	$("#customRole").css("display", "block");
+		    	
+		    }else{
+		    	$("#customRole").css("display", "none");
+		    }
+		  });
+		});
+		var projectPath = '[(@{/})]';
+		$("#addMaster").click(
+				function() {
+					var form = document.forms[0];
+					out = '';
+
+					lang_length = form.language.length;
+					for (i = 0; i < lang_length; i++) {
+						r = '';
+						/* w = ''; */
+						s = '';
+						lang = form.language[i].value;
+						var elem_r = form.read[i];
+						if ($(elem_r).is(":checked")) {
+							r = form.read[i].value;
+						}
+						/* var elem_w = form.write[i]; */
+						/* if ($(elem_w).is(":checked")) {
+							w = form.write[i].value;
+						} */
+						if ($('.s_check').is(":checked")) {
+							s = form.speak[i].value;
+						}
+						/* out += lang + "_" + r + w + s + "&"; */
+						out += lang + "_" + r  + s + "&";
+						
+					}
+					console.log("**************** out : ", out);
+					form.languages.value = out;
+					var role = $('#roleSelector :selected').text();
+					console.log("************** role",role);
+					if(role=="Other"){
+						newRole.value = $("#customRoleVal").val(); 
+					}else{
+						newRole.value = $("#roleSelector").val();
+					}
+					console.log(newRole.value)
+					
+
+				});
+
+		/* $(".sl").on('click',function(){
+		 console.log("select_language.......",this);
+		 component = this;
+		 $.ajax({
+		 type : "GET",
+		 url : projectPath+"loadLanguages",
+		 data : {
+		 //					"id" :tutorialId
+		 },
+		 contentType : "application/json",
+		 success : function(result) {
+		 $(component).html('');
+		 for (lang in result){
+		 $(component).append("<option>"+result[lang]+"</option>");
+		 }
+		 },
+
+		 error : function(err) {
+		 alert('error');
+		 console.log("not working. ERROR: "+ JSON.stringify(err));
+
+		 }
+		 });
+		 }); */
+	</script>
+</body>
+</html>

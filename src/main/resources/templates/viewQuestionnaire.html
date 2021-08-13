@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+
+
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">View</a></li>
+
+
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Questionnaire</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col">
+										<table id="tableId" class="table table-striped">
+
+											<thead>
+												<tr>
+													<th>Id</th>
+													<th>Category</th>
+													<th>Training</th>
+													<th>State (City)</th>
+													<th>Language</th>
+													<th>Questionnaire</th>
+													<th>Workshop Date</th>
+
+												</tr>
+											</thead>
+											<tbody>
+												<tr th:each="q : ${postQuestionnaires}">
+													<td th:text="${q.getId()}">ID</td>
+													<td>
+													<div th:each="item: ${q.getTraineeInfos().getTrainingTopicId()}">
+													<span style="font-weight:bold; "th:text="${item.getTopicCatId().getCat().getCatName()}"></span><br>
+													<span th:text="${item.getTopicCatId().getTopic().getTopicName()}"></span>
+													</div>
+													
+													</td>
+													<td th:text="${q.getTraineeInfos().getTitleName()}">Training</td>
+													<td><span
+														th:text="${q.getTraineeInfos().getState().getStateName()}"></span>(
+														<span
+														th:text="${q.getTraineeInfos().getCity().getCityName()}"></span>
+														)</td>
+													<td th:text="${q.getTraineeInfos().getLan().getLangName()}">Language</td>
+													<td class="text-center"><a th:href="@{/files/}+@{${q.getQuestionPath()}}"
+														target="_blank" class="pdfclass"><i
+															class="fas fa-file-archive"></i></a></td>
+													<td th:text="${q.getTraineeInfos().getEvent().getStartDate()}">Workshop
+														Date</td>
+
+												</tr>
+
+											</tbody>
+										</table>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+
+			</div>
+
+
+		</div>
+
+
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		$(document).ready( function () {
+		    $('#tableId').DataTable();
+		} );
+		
+	</script>
+
+</body>
+
+</html>
+

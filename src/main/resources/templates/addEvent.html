@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+.nav-events{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-events a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">View</a></li>
+
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Event</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form class="form-horizontal" th:action="@{/addEvent}"
+											method="post" enctype="multipart/form-data">
+											<div class="form-group">
+
+												<label for="event">Event Name *</label> <input type="text"
+													class="form-control" id="event" name="eventname"
+													required="required" />
+											</div>
+											<div class="row">
+											<div class="col-md-6">
+											<div class="form-group">
+
+												<label for="eventdate">Start Date *</label> <input type="date"
+													class="form-control" id="eventdate" name="date"
+													required="required" />
+
+											</div>
+											</div>
+											<div class="col-md-6">
+											<div class="form-group">
+
+												<label for="endDate">End Date *</label> <input type="date"
+													class="form-control" id="endDatee" name="endDate"
+													required="required" />
+
+											</div>
+											</div>
+											</div>
+											<div class="form-group">
+												<label for="eventDescription">Event
+													Description *</label>
+												<textarea class="form-control" rows="10"
+													id="eventDescription" name="description"
+													required="required" placeholder="Description of the event" maxlength="5000"></textarea>
+													<small>Character limit : 5000</small>
+											</div>
+											<div style="border-bottom: 2px solid #014F7A;" class="mb-2"><span style="font-size: 1rem; color: #014F7A;">Venue Details : </span></div>
+											<div class="form-group">
+												<label for="venue">Venue Name *</label> <input type="text"
+													class="form-control" id="venue" name="venuename"
+													required="required" />
+											</div>
+											<div class="row">
+											<div class="col-md-6">
+											<div class="form-group">
+
+														<label for="stateName">State *</label> <select
+															id="stateNameId" class="form-control " name="stateName"
+															required="required">
+
+															<option selected="selected" value="0">Select State</option>
+															<option th:each="state: ${states}"
+																th:value="${state.getId()}"
+																th:text="${state.getStateName()}"></option>
+														</select>
+
+													</div>
+											</div>
+											<div class="col-md-6">
+											<div class="form-group">
+
+														<label for="district">District *</label> <select
+															id="districtId" class="form-control " name="districtName"
+															required="required">
+															<option selected="selected" value="0">Select District</option>
+														</select>
+
+													</div></div>
+											</div>
+											<div class="row">
+											<div class="col-md-6">
+											<div class="form-group">
+
+														<label for="cityName">City *</label> <select id="cityId"
+															class="form-control" name="cityName" required="required">
+															<option selected="selected" value="0">Select City</option>
+														</select>
+
+													</div>
+											</div>
+											<div class="col-md-6">
+											<div class="form-group">
+														<label for="pinCodeId">PinCode *</label> <input
+															type="number" class="form-control" name="pinCode"
+															pattern="[0-9]" id="pinCodeId" minlength="6"
+															maxlength="6" required="required" />
+													</div>
+											</div>
+											</div>
+													<div class="form-group">
+
+														<label for="addressInformationId">Address
+															Details *</label>
+
+														<textarea class="form-control"
+															name="addressInformationName" rows="5"
+															id="addressInformationId" required="required" maxlength="200"></textarea>
+															<small>Character limit : 200</small>
+
+													</div>
+													<div style="border-bottom: 2px solid #014F7A;" class="mb-2"><span style="font-size: 1rem; color: #014F7A;">Content for the Event : </span></div>
+													<div class="row">
+													<div class="col-md-6">
+													<div class="form-group ">
+
+														<label>Select Language *</label> <select
+															id="selectLanguageId" class="form-control "
+															name="language" required="required">
+
+															<option value="0">Select Language</option>
+															<option th:each="lan: ${lans}"
+																th:value="${lan.getLangName()}"
+																th:text="${lan.getLangName()}"></option>
+														</select>
+													</div>
+													</div>
+													<div class="col-md-6">
+													<div class="form-group">
+
+														<label for="categoryName">Select Category *</label> <select
+															id="MasterCategoryId" class="form-control"
+															name="categoryName" required="required">
+
+															<option value="0">Select Category</option>
+															<option th:each="category: ${categories}"
+																th:value="${category.getCategoryId()}"
+																th:text="${category.getCatName()}"></option>
+														</select>
+													</div>
+													</div>
+													</div>
+													
+													
+													<div class="form-group ">
+														<div class="form-group">
+															<label for="catgoryByContributor">Select Topic *<span class="text-muted">(For multiple topic selection, press Ctrl key)</span></label> <select
+																id="inputTopic" class="form-control select selectpicker"
+																name="inputTopic" required="required"
+																multiple="multiple">
+															</select>
+
+														</div>
+													</div>
+													<div class="form-group">
+												<label for="Image" style="padding-top: 8px">Poster of the Event *</label> <input type="file" style="padding-right: 50px"
+													class="form-control-file " id="Image"
+													name="Image" placeholder="uploadFile"
+													accept=".jpg, .jpeg ,.png" onchange="validate_file_size(this,500000)" required="required"/>
+													<small>Max file size : 500 kB <br>Suggested Dimension : 600 x 400</small>
+
+											</div>
+													<div style="border-bottom: 2px solid #014F7A;" class="mb-2"><span style="font-size: 1rem; color: #014F7A;">Details of Contact Person for the Event : </span></div>
+											<div class="row">
+											<div class="col-12">
+											<div class="form-group">
+												<label for="contactperson">Contact Person Name *</label> <input
+													type="text" class="form-control" id="contactperson"
+													name="contactperson" required="required" />
+											</div>
+											</div>
+											</div>
+											<div class="row">
+											<div class="col-md-5">
+											<div class="form-group">
+												<label for="contactnumber">Phone Number *</label> <input
+													type="number" class="form-control" id="conatctNumber"
+													name="contactnumber" required="required" />
+											</div>
+											</div>
+											<div class="col-md-7">
+											<div class="form-group">
+
+												<label for="email">Email Id *</label> <input type="email"
+													class="form-control" id="email" name="email"
+													required="required" />
+											</div>
+											</div>
+											</div>
+											
+											
+											
+											
+											
+
+											<button type="submit" class="btn a-btn">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable">
+
+  <thead>
+    <tr>
+      <th scope="col">Event Name</th>
+       <th scope="col">Event Description</th>
+      <th scope="col">Event Location</th>
+      <th scope="col">Name of Contact Person</th>
+      <th scope="col">Phone Number</th>
+      <th scope="col">Email Id</th>
+      <th scope="col">Start Date</th>
+      <th scope="col">End Date</th>
+      <th scope="col">Poster</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr th:each="event : ${events}" >
+  
+  <td th:text = "${event.getEventName()}"></td> 
+      <td th:text = "${event.getDescription()}"></td>
+      <td th:text = "${event.getLocation()}"></td>
+      <td th:text = "${event.getContactPerson()}"></td>
+      <td th:text = "${event.getContactNumber()}"></td>
+      <td th:text = "${event.getEmail()}"></td>
+      <td th:text = "${event.getStartDate()}"></td>
+      <td th:text = "${event.getEndDate()}"></td>
+      <td><img id="imagesource" th:src="@{/files/}+@{${event.getPosterPath()}}"
+			style="width: 150px; height: 100px" />
+	  </td>
+	  <td><a th:href="@{${'/event/edit/' + event.getEventId()}}">Edit</a></td>
+	  <!-- </div> -->
+    </tr>
+   
+  </tbody>
+</table>
+						
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+</html>

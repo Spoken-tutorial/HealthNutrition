@@ -1,0 +1,546 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<!-- <link rel="stylesheet" th:href="@{/css/dashboard.css}"/> -->
+
+</head>
+<body>
+<div th:fragment="top_header">
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Spoken Tutorials</a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <ul class="navbar-nav px-3">
+    <li class="nav-item text-nowrap">
+    <a sec:authorize="isAnonymous()" th:href="@{/login}">Login|New User</a>
+		<!-- <a sec:authorize="isAuthenticated()" th:href="@{/adminDeatail}" class="h-nav">MY ACCOUNT</a> -->
+		<a sec:authorize="isAuthenticated()" th:href="@{/logout}" class="h-nav" style="color: #fff;">LOGOUT</a>
+      <!-- <a class="nav-link" href="#">Sign out</a> -->
+    </li>
+  </ul>
+</nav>
+</div>
+<div th:fragment="contributor_sidebar" class="test">
+<style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      
+      body {
+  font-size: .875rem;
+}
+
+.feather {
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+}
+
+/*
+ * Sidebar
+ */
+
+.sidebar {
+  /* position: fixed; */\\
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100; /* Behind the navbar */
+  /* padding: 48px 0 0;  *//* Height of navbar */
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+@media (max-width: 767.98px) {
+  .sidebar {
+    top: 5rem;
+  }
+}
+
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  height: calc(100vh - 48px);
+  padding-top: .5rem;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+@supports ((position: -webkit-sticky) or (position: sticky)) {
+  .sidebar-sticky {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+}
+
+.sidebar .nav-link {
+  font-weight: 500;
+  color: #333;
+}
+
+.sidebar .nav-link .feather {
+  margin-right: 4px;
+  color: #999;
+}
+
+.sidebar .nav-link.active {
+  color: #007bff;
+}
+
+.sidebar .nav-link:hover .feather,
+.sidebar .nav-link.active .feather {
+  color: inherit;
+}
+
+.sidebar-heading {
+  font-size: .75rem;
+  text-transform: uppercase;
+}
+
+/*
+ * Navbar
+ */
+
+.navbar-brand {
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+  font-size: 1rem;
+  background-color: rgba(0, 0, 0, .25);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+}
+
+.navbar .navbar-toggler {
+  top: .25rem;
+  right: 1rem;
+}
+
+.navbar .form-control {
+  padding: .75rem 1rem;
+  border-width: 0;
+  border-radius: 0;
+}
+
+.form-control-dark {
+  color: #fff;
+  background-color: rgba(255, 255, 255, .1);
+  border-color: rgba(255, 255, 255, .1);
+}
+
+.form-control-dark:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+}
+      
+.border-lt{
+	border-left: 1px solid rgba(0,0,0,0.2);
+	margin-left: 16px;
+}
+.sidebar-icon{
+	font-size: 1.2rem!important;
+	margin-right:6px;
+	color: #014F7A;
+}
+.sidebar-icon-sm{
+	color: rgba(0,0,0,0.4);
+	margin-right: 16px;
+}
+
+a:hover {
+  background: white; 
+  /* font-weight: bold; */
+  /* color: red; */
+}
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+    </style>
+ <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse pt-4 pb-5">
+      <div class="sidebar-sticky pt-3">
+      <ul class="nav flex-column">
+      <li class="nav-item">
+            <a class="nav-link " th:href="@{/profile}" style="border-bottom: 1px solid orange;">
+              <i class="fas fa-user sidebar-icon"></i>
+              <span th:text="${userInfo.getFirstName()}"></span>
+            </a>
+          </li>
+          <li class="nav-item nav-db">
+            <a class="nav-link " th:href="@{/dashBoard}">
+              <span data-feather="home"></span>
+             <i class="fas fa-home sidebar-icon"></i> Dashboard <span class="sr-only">(current)</span>
+            </a>
+          </li>
+      </ul>
+        <ul class="nav flex-column" sec:authorize="hasAnyAuthority('SUPER_USER')">
+        
+          <li class="nav-item nav-approve-role">
+            <a class="nav-link" th:href="@{/approveRole}">
+              
+              <i class="fas fa-user-tag sidebar-icon"></i>Approve Role
+            </a>
+          </li>
+          <li class="nav-item nav-users">
+            <a class="nav-link" th:href="@{/users}">
+              
+              <i class="fas fa-user-tag sidebar-icon"></i>Users 
+            </a>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" >
+              
+              <i class="fas fa-database sidebar-icon"></i>Content
+            </span>
+          </li>
+          <li class="nav-item border-lt nav-brochure">
+            <a class="nav-link" th:href="@{/addBrochure}">
+              <span data-feather="bar-chart-2"></span>
+              Brochure
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-carousel">
+            <a class="nav-link" th:href="@{/addCarousel}">
+              <span data-feather="bar-chart-2"></span>
+              Carousel
+            </a>
+          </li>
+           
+          <li class="nav-item border-lt nav-consultants">
+            <a class="nav-link" th:href="@{/addConsultant}">
+              <span data-feather="shopping-cart"></span>
+              Consultants
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-events">
+            <a class="nav-link" th:href="@{/addEvent}">
+              <span data-feather="users"></span>
+              Events
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-testimonials">
+            <a class="nav-link" th:href="@{/addTestimonial}">
+              <span data-feather="bar-chart-2"></span>
+              Testimonials
+            </a>
+          </li>
+          <li class="nav-item ">
+            <span class="nav-link" >
+              <i class="far fa-newspaper sidebar-icon"></i>
+              Creation
+            </span>
+          </li>
+          <li class="nav-item border-lt nav-category">
+            <a class="nav-link" th:href="@{/addCategory}">
+              <span data-feather="shopping-cart"></span>
+              Add Category
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-language">
+            <a class="nav-link" th:href="@{/addLanguage}">
+              <span data-feather="users"></span>
+              Add Language
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-topic">
+            <a class="nav-link" th:href="@{/addTopic}">
+              <span data-feather="bar-chart-2"></span>
+              Add Topic
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-role">
+            <a class="nav-link" th:href="@{/addRole}">
+              <span data-feather="bar-chart-2"></span>
+              Add Role
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-org-role">
+            <a class="nav-link" th:href="@{/addOrganizationRole}">
+              <span data-feather="users"></span>
+              Add Organization Roles
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-assign-contri">
+            <a class="nav-link" th:href="@{/assignTutorialToContributor}">
+              
+              Assign Contributor
+            </a>
+          </li>
+          <li class="nav-item nav-training">
+            <span class="nav-link">
+              <i class="far fa-newspaper sidebar-icon"></i>
+              Training
+            </span>
+          </li>
+           <li class="nav-item border-lt nav-tut-list">
+            <a class="nav-link" th:href="@{/tutorialStatus}">
+              <span data-feather="bar-chart-2"></span>
+              Tutorial List
+            </a>
+          </li>
+           <li class="nav-item border-lt nav-upload-ques">
+            <a class="nav-link" th:href="@{/uploadQuestion}">
+              <span data-feather="bar-chart-2"></span>
+              Upload Questionnaire
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-download-ques">
+            <a class="nav-link" th:href="@{/details}">
+              <span data-feather="bar-chart-2"></span>
+              Download Questionnaire
+            </a>
+          </li>
+          
+           
+           <li class="nav-item border-lt nav-master-trainer">
+            <a class="nav-link" th:href="@{/masterTrainer}">
+              <span data-feather="bar-chart-2"></span>
+              Master Trainer
+            </a>
+          </li>
+         <!--  <li class="nav-item border-lt">
+            <a class="nav-link" th:href="@{/listparicipant}">
+              <span data-feather="bar-chart-2"></span>
+              Participant Trainer
+            </a>
+          </li> -->
+        <!--    <li class="nav-item border-lt">
+            <a class="nav-link" th:href="@{/qualityReviewer}">
+              <span data-feather="bar-chart-2"></span>
+              Quality Reviewer
+            </a>
+          </li> -->
+          <!-- <li class="nav-item border-lt">
+            <a class="nav-link" th:href="@{/testimonial}">
+              <span data-feather="bar-chart-2"></span>
+              Testimonial
+            </a>
+          </li> -->
+           <li class="nav-item border-lt nav-view-trainee">
+            <a class="nav-link" th:href="@{/viewTrainee}">
+              <span data-feather="bar-chart-2"></span>
+              View Trainee
+            </a>
+          </li>
+        </ul>
+        
+        <ul class="nav flex-column" sec:authorize="hasAnyAuthority('CONTRIBUTOR','EXTERNAL_CONTRIBUTOR')">
+        	<li class="nav-item ">
+            <span class="nav-link" href="#View">
+              <span data-feather="bar-chart-2"></span>
+             <i class="fas fa-tag"></i> Contributor
+            </span>
+          </li>
+          <li class="nav-item border-lt nav-con-upload">
+            <a class="nav-link" th:href="@{/uploadTutorial}">
+              Upload/Update Tutorial
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-con-status">
+            <a class="nav-link" th:href="@{/listTutorialForContributorReview}">
+              <span data-feather="shopping-cart"></span>
+              Tutorial Review Status
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-con-timescript">
+            <a class="nav-link" th:href="@{/uploadTimescript}">
+              Upload Timescript
+            </a>
+          </li>
+        </ul>
+         <ul class="nav flex-column" sec:authorize="hasAnyAuthority('DOMAIN_REVIEWER')">
+        	<li class="nav-item ">
+            <span class="nav-link" href="#View">
+              <span data-feather="bar-chart-2"></span>
+              <i class="fas fa-tag"></i> Domain Reviewer
+            </span>
+          </li>
+          <li class="nav-item border-lt nav-dom-review">
+            <a class="nav-link" th:href="@{/listTutorialForDomainReview}">
+              
+              Tutorials waiting for Domain review
+            </a>
+          </li>
+          
+        </ul>
+        <ul class="nav flex-column" sec:authorize="hasAnyAuthority('QUALITY_REVIEWER')">
+        	<li class="nav-item">
+            <span class="nav-link" href="#View">
+              <span data-feather="bar-chart-2"></span>
+              <i class="fas fa-tag"></i> Quality Reviewer
+            </span>
+          </li>
+          <li class="nav-item border-lt nav-quality-pending">
+            <a class="nav-link" th:href="@{/listTutorialForQualityReview}">
+              
+              Tutorials pending for Quality Review
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-quality-publish">
+            <a class="nav-link" th:href="@{/tutorialToPublish}">
+              <span data-feather="shopping-cart"></span>
+              Tutorials ready to publish
+            </a>
+          </li>
+          
+        </ul>
+        <ul class="nav flex-column" sec:authorize="hasAnyAuthority('ADMIN_REVIEWER')">
+        	<li class="nav-item nav-admin-rev">
+            <span class="nav-link" href="#View">
+              <span data-feather="bar-chart-2"></span>
+             <i class="fas fa-tag"></i> Admin Reviewer
+            </span>
+          </li>
+          <li class="nav-item border-lt nav-admin-pending">
+            <a class="nav-link" th:href="@{/listTutorialForAdminReview}">
+              
+              Tutorials pending for Admin Review
+            </a>
+          </li>
+         
+        </ul>
+        <ul class="nav flex-column" sec:authorize="hasAnyAuthority('MASTER_TRAINER')">
+        	<li class="nav-item nav-master-trainer">
+            <a class="nav-link" href="#View">
+              <span data-feather="bar-chart-2"></span>
+              <i class="fas fa-user-tag sidebar-icon"></i> Master Trainer
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-master-testimonial">
+            <a class="nav-link" th:href="@{/addTestimonial}">
+              <i class="far fa-comment-alt sidebar-icon-sm"></i>
+              Testimonials
+            </a>
+          </li>
+           <li class="nav-item border-lt nav-master-events">
+            <a class="nav-link" th:href="@{/addEvent}">
+              <i class="fas fa-calendar-day sidebar-icon-sm"></i>Events
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-master-view-trainee">
+            <a class="nav-link" th:href="@{/viewTrainee}">
+              <i class="fas fa-users sidebar-icon-sm"></i>View Trainee
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-master-form">
+            <a class="nav-link" th:href="@{/masterTrainerOperation}">
+              <i class="far fa-file-alt sidebar-icon-sm"></i>Training Form
+            </a>
+          </li>
+           <li class="nav-item border-lt nav-master-workshop">
+            <a class="nav-link" th:href="@{/details}">
+              <i class="far fa-file-alt sidebar-icon-sm"></i>Workshop Details
+            </a>
+          </li>
+        </ul>
+        <ul class="nav flex-column" th:if="!${#authorization.expression('hasAuthority(''SUPER_USER'')')}">
+        	<li class="nav-item nav-super-add-role" >
+            <span class="nav-link" href="#View">
+              <i class="fas fa-user-plus sidebar-icon"></i>Add Role
+            </span>
+          </li>
+         <!--  <li class="nav-item border-lt" th:unless="${#authorization.expression('hasAuthority(''ADMIN_REVIEWER'')')}">
+            <a class="nav-link" th:href="@{/addAdminRole}">
+              <span data-feather="shopping-cart"></span>
+             Admin Reviewer
+            </a>
+          </li> -->
+          <li class="nav-item border-lt nav-super-contri">
+            <a class="nav-link" th:href="@{/addContributorRole}">
+              <span data-feather="shopping-cart"></span>
+             Contributor
+            </a>
+          </li>
+
+           <li class="nav-item border-lt nav-super-Econtri">
+            <a class="nav-link" th:href="@{/addExternalContributorRole}">
+              <span data-feather="shopping-cart"></span>
+             External Contributor
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-super-admin-rev">
+            <a class="nav-link" th:href="@{/assignRoleToAdmin}">
+              <span data-feather="shopping-cart"></span>
+              Admin Reviewer
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-super-master">
+            <a class="nav-link" th:href="@{/addMasterTrainerRole}">
+              <span data-feather="shopping-cart"></span>
+              Master Trainer
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-super-quality">
+            <a class="nav-link" th:href="@{/addQualityRole}">
+              <span data-feather="shopping-cart"></span>
+              Quality Reviewer
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-super-domain">
+            <a class="nav-link" th:href="@{/addDomainRole}">
+              <span data-feather="shopping-cart"></span>
+              Domain Reviewer
+            </a>
+          </li>
+          
+        </ul>
+        <ul class="nav flex-column" th:if="!${#authorization.expression('hasAuthority(''SUPER_USER'')')}">
+        	<li class="nav-item nav-super-remove" >
+            <span class="nav-link revoke_role" href="#View">
+              <i class="fas fa-user-minus sidebar-icon"></i>Remove Role
+            </span>
+          </li>
+           <li class="nav-item border-lt nav-super-revoke-admin" th:if="${#authorization.expression('hasAuthority(''ADMIN_REVIEWER'')')}">
+            <a class="nav-link revoke_role" th:href="@{/}">
+              
+               Admin Reviewer
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-super-revoke-contri" th:if="${#authorization.expression('hasAuthority(''CONTRIBUTOR'')')}">
+            <a class="nav-link revoke_role" th:href="@{/revokeRoleContributor}">
+              
+               Contributor
+            </a>
+          </li>
+            <li class="nav-item border-lt nav-super-revoke-domain" th:if="${#authorization.expression('hasAuthority(''DOMAIN_REVIEWER'')')}">
+            <a class="nav-link revoke_role" th:href="@{/revokeRoleDomain}">
+              
+               Domain Reviewer
+            </a>
+          </li>
+          <li class="nav-item border-lt" th:if="${#authorization.expression('hasAuthority(''MASTER_TRAINER'')')}">
+            <a class="nav-link revoke_role" th:href="@{/revokeRoleMaster}">
+              
+               Master Trainer 
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-super-revoke-quality" th:if="${#authorization.expression('hasAuthority(''QUALITY_REVIEWER'')')}">
+            <a class="nav-link revoke_role" th:href="@{/revokeRoleQuality}">
+              
+               Quality Reviewer
+            </a>
+          </li>
+        </ul>
+        
+      </div>
+    </nav>
+	
+</div>
+</body>
+</html>

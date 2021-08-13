@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+
+ 
+<body>
+<div th:replace="common/sidebar :: top_header"></div>
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+			<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+							<div class="card-header">
+								<h4>Edit Organizational Role</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form class="form-horizontal" th:action="@{/update_organization_role}"
+											method="post" enctype="multipart/form-data">
+											<div class="form-group">
+
+												<label for="languageId">Organizational Role</label> <input type="text"
+													class="form-control" id="languageId" name="role" th:value="${role.getRole()}"
+													required="required" /> <span style="color: red;"
+													th:if="${msg}"> Please enter organizational role.</span> <span
+													style="color: red;" th:if="${msg1}"> Choose another
+													language.</span>
+
+											</div>
+											
+											<input type="hidden"  name="roleId"  th:value="${role.getRoleId()}"/>
+											<button type="submit" value="showAlert" class="btn a-btn">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
+
+					</div>
+			
+			</div>
+</div>
+</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+
+</body>
+ 
+</html>
+ 
+ 

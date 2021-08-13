@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+<head>	
+
+	<meta charset="utf-8"/> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    
+
+    <link rel="stylesheet" th:href="@{/s/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/animate.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/owl.carousel.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/bootstrap-datepicker.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/jquery.timepicker.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/ionicons/css/ionicons.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/flaticon/font/flaticon.css}"/>
+    <!-- Theme Style-->
+    <link rel="stylesheet" th:href="@{/s/css/style.css}"/>
+  
+</head>
+<body>
+
+    <header role="banner">
+      <div class="top-bar">
+        <div class="container">              
+          <div class="row">
+            <div class="col-md-6 col-sm-6 col-5">
+              <ul class="social list-unstyled">      
+   
+              </ul>
+            </div>
+            <div class="col-md-6 col-sm-6 col-7 text-right">
+  
+  
+  
+						<div sec:authorize="isAuthenticated()"> 
+						  
+				  Logged user: Welcome Admin <span sec:authentication="name"></span> |
+		 
+						</div>
+							
+				<div class="row">
+
+						<div class="col">
+						<a sec:authorize="isAnonymous()" th:href="@{/login}">Login|New User</a>
+						<a sec:authorize="isAuthenticated()" th:href="@{/myProfile}">MY ACCOUNT</a>
+						<a sec:authorize="isAuthenticated()" th:href="@{/logout}">LOGOUT</a>
+				</div>
+		
+			</div>
+            </div>
+              <marquee direction="left">1800 180 0101</marquee>
+  
+          </div><!--
+            Herwe we write login button -->
+       
+          <!--  <a class="btn btn-success float-right" th:href="@{/login}">Login</a>  -->
+   
+        </div>
+      </div>
+     
+  
+</header>
+
+	<br/>
+	<hr/>
+		<div class="container" style="padding-top: 130px" > 
+
+		  <div th:each="product : ${cat_Tu}">
+		  
+				  <div class="row" style="padding-left: 150px">
+				  
+				  		<div class="col-4">
+				  		 	
+					<!-- 	<iframe   style="position:fixed; height: 200px; width=200px" th:src="${product.getTutorial().getVideo()}" frameborder="0" scrolling="no"
+						 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="true">
+						 	</iframe> -->
+	
+		<img th:src="${product.getTutorial().getVideo()}"    style="position:fixed; height: 200px; width=200px"/>
+							                
+					
+				  		</div>
+				  		<div class="col-8">
+				  			<div class="row" style="">
+				  					
+				  					
+				  			<p style="font-style:oblique;padding-top:5px; font-variant: small-caps">Topic :</p><div class=""  style="font-size: 20px;padding-left: 10px"  th:text="${product.getTutorial().getTopicname()}">        </div>
+				
+				  			</div>
+				  			<div class="row">
+				  			<p style="font-style:oblique; ">Category :</p><div class="" style="font-size: 17px;padding-left: 10px"  th:text="${product.getCat().getCategoryname()}">        </div>
+				  				
+				  			</div>
+				  		
+				  		</div>
+				  
+				  
+				  </div>
+	 </div>
+
+		  
+		  <!-- 
+		     
+					        <table class="table table-striped">
+					            <tr>
+            </div>
+					                <th>Description</th>
+					            </tr>	
+						           <tr>
+						                <td th:text="${product.getTutorial().getLanguage()}">description</td>
+					            </tr>
+					        </table> -->
+		 </div>
+
+    
+      
+        <script th:src="@{/static/s/css/all.css}"></script>
+         <script th:src="@{/static/s/js/all.js}"></script>
+        <script th:src="@{/static/s/css/bootstrap.min.css}" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script th:src="@{/static/s/js/bootstrap.min.js}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    
+    	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+    
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

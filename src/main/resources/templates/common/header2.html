@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+
+
+<head th:fragment="common-trail">
+
+	<meta charset="utf-8"/> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans:300, 400, 700" rel="stylesheet"/> -->
+    <!-- <link rel="stylesheet" th:href="@{/s/css/bootstrap.min.css}"/> -->
+    <!-- <link rel="stylesheet" th:href="@{/s/css/animate.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/owl.carousel.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/bootstrap-datepicker.css}"/>
+    <link rel="stylesheet" th:href="@{/s/css/jquery.timepicker.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/ionicons/css/ionicons.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/font-awesome.min.css}"/>
+    <link rel="stylesheet" th:href="@{/s/fonts/flaticon/font/flaticon.css}"/> -->
+    <!-- Theme Style-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+    <!-- <link rel="stylesheet" th:href="{/s/css/style.css}"/> -->
+   <!--  <link rel="stylesheet" type="text/css" th:href="@{/css/datatables.css}"> </link> -->
+
+	
+		<script type="text/javascript">
+		
+				
+			    $(document).ready( function () {
+			        $('#domain').DataTable();
+			    } );
+
+		
+		</script>
+
+</head>
+
+  <body>
+    <div th:fragment="navbar2">
+    
+			        <header role="banner">
+			      <div class="top-bar">
+			        <div class="#">              
+			          <div class="row">
+			            <div class="col-md-6 col-sm-6 col-5">
+			              <ul class="social list-unstyled">      
+			   
+			              </ul>
+			            </div>
+			            <div class="col-md-6 col-sm-6 col-7 text-right">
+			  
+			  				<div sec:authorize="isAuthenticated()"> 
+									  
+									  	Welcome <span style="color: lime;" sec:authentication="name"></span> |
+									
+								
+									</div>
+										
+							<div class="row">
+			
+									<div class="col">
+									<a sec:authorize="isAnonymous()" th:href="@{/login}">Login|New User</a>
+									<a sec:authorize="isAuthenticated()" th:href="@{/adminDeatail}">MY ACCOUNT</a>|
+									<a sec:authorize="isAuthenticated()" th:href="@{/logout}">LOGOUT</a>
+							</div>
+					
+						</div>
+			            </div>
+			              <marquee direction="left">1800 180 0101</marquee>
+			  
+			          </div>
+			   
+			        </div>
+			      </div>
+			  
+			</header>
+    			   	  
+	</div>
+  
+	<div th:fragment="body-bottom-scripts">
+	
+ 	    	<script th:src="@{/js/jquery.min.js}"></script>
+		    <script th:src="@{/s/js/jquery-3.2.1.min.js}"></script>
+		    <script th:src="@{/s/js/popper.min.js}"></script>
+		    <script th:src="@{/s/js/bootstrap.min.js}"></script>
+		    <script th:src="@{/s/js/owl.carousel.min.js}"></script>
+		    <script th:src="@{/s/js/bootstrap-datepicker.js}"></script>
+		    <script th:src="@{/s/js/jquery.timepicker.min.js}"></script>
+		    <script th:src="@{/s/js/jquery.waypoints.min.js}"></script>
+		    <script th:src="@{/s/js/main.js}"></script>
+		 	<script th:type="text/javascript" charset="utf8" th:src="@{/js/datatables.js}"></script>
+		
+		
+        	 <script th:src="@{/static/js/bootstrap.bundle.min.js}"></script>
+       		 <script th:src="@{/static/js/jquery.slim.min}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+			
+			
+		
+		    
+  </div>
+  
+  </body>
+</html>

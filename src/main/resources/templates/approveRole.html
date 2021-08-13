@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<style>
+body {
+	background: #fff !important;
+}
+.nav-approve-role{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-approve-role a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active"
+						id="admin-rev-tab" data-toggle="tab" href="#Admin" role="tab"
+						aria-controls="home" aria-selected="true">Admin Reviewer</a></li>
+					<li class="nav-item"><a class="nav-link" id="contri-tab"
+						data-toggle="tab" href="#Contributer" role="tab"
+						aria-controls="profile" aria-selected="false">Contributor</a></li>
+					<li class="nav-item"><a class="nav-link" id="Econtri-tab"
+						data-toggle="tab" href="#EContributer" role="tab"
+						aria-controls="profile" aria-selected="false">External Contributor</a></li>
+					<li class="nav-item"><a class="nav-link" id="domain-tab"
+						data-toggle="tab" href="#domain" role="tab"
+						aria-controls="profile" aria-selected="false">Domain Reviewer</a></li>
+					
+					<li class="nav-item"><a class="nav-link" id="quality-tab"
+						data-toggle="tab" href="#Quality" role="tab"
+						aria-controls="contact" aria-selected="false">Quality Reviewer</a>
+					</li>
+					
+					<li class="nav-item"><a class="nav-link"
+						id="master-trainer-tab" data-toggle="tab" href="#MasterTrainer"
+						role="tab" aria-controls="contact" aria-selected="false">Master
+							Trainer</a></li>
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="Admin"
+						role="tabpanel" aria-labelledby="admin-rev-tab">
+						<div class="row">
+							<div class="col-12">
+								<table id="tableId" class="table table-striped a-table-font dynamicTable">
+									<thead>
+										<tr>
+											<th>User Name</th>
+											<th>First Name</th>
+											<th>Last Name</th>
+											<th>Category</th>
+											<th>Langauge</th>
+											<th>Approve</th>
+											<th>Reject</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="admin : ${userInfoAdmin}">
+											<td th:text="${admin.getUser().getUsername()}">User Name</td>
+											<td th:text="${admin.getUser().getFirstName()}">First
+												Name</td>
+											<td th:text="${admin.getUser().getLastName()}">Last name</td>
+											<td th:text="${admin.getCategory().getCatName()}">Category</td>
+											<td th:text="${admin.getLanguage().getLangName()}">Langauge</td>
+											<td>
+												<button id="approveAdminId" type="button"
+													th:value="${admin.getUserRoleId()}"
+													class="btn btn-info approveAdmin approveRole">Approve</button>
+											</td>
+											<td>
+												<button id="disaapro" type="button"
+													th:value="${admin.getUserRoleId()}"
+													class="btn btn-danger btn-sm rejectRole">Reject</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="Contributer" role="tabpanel"
+						aria-labelledby="contri-tab">
+						<div class="row">
+							<div class="col-sm-12">
+								<table id="tableIdContributor"
+									class="table table-striped a-table-font dynamicTable">
+									<thead>
+										<tr>
+											<th>User Name</th>
+											<th>First Name</th>
+											<th>Last Name</th>
+											<th>Language</th>
+											<th>Approve</th>
+											<th>Reject</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="approve : ${userInfoContributor}" th:id="'contri_' + ${approve.getUserRoleId()}">
+											<td th:text="${approve.getUser().getUsername()}">User
+												Name</td>
+											<td th:text="${approve.getUser().getFirstName()}">First
+												Name</td>
+											<td th:text="${approve.getUser().getLastName()}">Last
+												name</td>
+											<td th:text="${approve.getLanguage().getLangName()}">Language
+												Name</td>
+											<td>
+												<button id="approveContributorId" type="button"
+													th:value="${approve.getUserRoleId()}"
+													class="btn btn-info approveContributor approveRole">Approve</button>
+											</td>
+											<td>
+												<button id="disaapr" type="button"
+													th:value="${approve.getUserRoleId()}"
+													class="btn btn-danger btn-sm rejectRole">Reject</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+						<div class="tab-pane fade py-3" id="EContributer" role="tabpanel"
+						aria-labelledby="Econtri-tab">
+						<div class="row">
+							<div class="col-sm-12">
+								<table id="tableIdEContributor"
+									class="table table-striped a-table-font dynamicTable">
+									<thead>
+										<tr>
+											<th>User Name</th>
+											<th>First Name</th>
+											<th>Last Name</th>
+											<th>Language</th>
+											<th>Approve</th>
+											<th>Reject</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="approve : ${userInfoExternal}" th:id="'contri_' + ${approve.getUserRoleId()}">
+											<td th:text="${approve.getUser().getUsername()}">User
+												Name</td>
+											<td th:text="${approve.getUser().getFirstName()}">First
+												Name</td>
+											<td th:text="${approve.getUser().getLastName()}">Last
+												name</td>
+											<td th:text="${approve.getLanguage().getLangName()}">Language
+												Name</td>
+											<td>
+												<button id="approveContributorId" type="button"
+													th:value="${approve.getUserRoleId()}"
+													class="btn btn-info approveContributor approveRole">Approve</button>
+											</td>
+											<td>
+												<button id="disaapr" type="button"
+													th:value="${approve.getUserRoleId()}"
+													class="btn btn-danger btn-sm rejectRole">Reject</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="domain" role="tabpanel"
+						aria-labelledby="domain-tab">
+						<div class="row">
+							<div class="col-sm-12">
+								<table id="tableIdDomain"
+									class="table table-striped a-table-font dynamicTable">
+									<thead>
+										<tr>
+											<th>User Name</th>
+											<th>First Name</th>
+											<th>Last Name</th>
+											<th>Language</th>
+											<th>Category</th>
+											<th>Approve</th>
+											<th>Reject</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="approve : ${userInfoDomain}">
+											<td th:text="${approve.getUser().getUsername()}">User
+												Name</td>
+											<td th:text="${approve.getUser().getFirstName()}">First
+												Name</td>
+											<td th:text="${approve.getUser().getLastName()}">Last
+												name</td>
+											<td th:text="${approve.getLanguage().getLangName()}">Language</td>
+											<td th:text="${approve.getCategory().getCatName()}">Category</td>
+											<td>
+												<button id="approveContributorId" type="button"
+													th:value="${approve.getUserRoleId()}"
+													class="btn btn-info approveContributor approveRole">Approve</button>
+											</td>
+											<td>
+												<button id="disaaprovemaste" type="button"
+													th:value="${approve.getUserRoleId()}"
+													class="btn btn-danger btn-sm rejectRole">Reject</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="MasterTrainer" role="tabpanel"
+						aria-labelledby="master-trainer-tab">
+						<div class="row">
+							<div class="col-12">
+								<table id="tableIdMaster"
+									class="table table-striped a-table-font dynamicTable">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Age</th>
+											<th>Organization (Role)</th>
+											<th>Aadhaar Number</th>
+											<th>Experience</th>
+											<th>Contact Info</th>
+											<th>Approve</th>
+											<th>Reject</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="master : ${userInfoMaster}">
+											<td th:text="${master.getUser().getFirstName()}">First
+												Name</td>
+											<td th:text="${master.getUser().getAge()}"></td>
+											<td>
+											<span th:text="${master.getUser().getOrganization()}"></span>
+											(<span th:text="${master.getUser().getOrgRolev().getRole()}"></span> )
+											</td>
+											<td th:text="${master.getUser().getAadharNumber()}"></td>
+											<td th:text="${master.getUser().getExperience()}"></td>
+											<td th:text="${master.getUser().getPhone()}"></td>
+											<td>
+												<button id="approvemasterId" type="button"
+													th:value="${master.getUserRoleId()}"
+													class="btn btn-info approvemaster btn-sm approveRole">Approve</button>
+											</td>
+											
+											<td>
+												<button id="disaaprovemasterId" type="button"
+													th:value="${master.getUserRoleId()}"
+													class="btn btn-danger btn-sm rejectRole">Reject</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="Quality" role="tabpanel"
+						aria-labelledby="quality-tab">
+						<div class="row">
+							<div class="col">
+								<table id="tableIdQuality"
+									class="table table-striped a-table-font dynamicTable">
+									<thead>
+										<tr>
+											<th>User Name</th>
+											<th>First Name</th>
+											<th>Last Name</th>
+											<th>Category</th>
+											<th>Langauge</th>
+											<th>Approve</th>
+											<th>Reject</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="quality : ${userInfoQuality}">
+
+											<td th:text="${quality.getUser().getUsername()}">User
+												Name</td>
+											<td th:text="${quality.getUser().getFirstName()}">First
+												Name</td>
+											<td th:text="${quality.getUser().getLastName()}">Last
+												name</td>
+											<td th:text="${quality.getCategory().getCatName()}">Category</td>
+											<td th:text="${quality.getLanguage().getLangName()}">Langauge</td>
+											<td>
+												<button id="approveQualityId" type="button"
+													th:value="${quality.getUserRoleId()}"
+													class="btn btn-info approveQuality approveRole">Approve</button>
+											</td>
+											<td>
+												<button id="disaaprovemas" type="button"
+													th:value="${quality.getUserRoleId()}"
+													class="btn btn-danger btn-sm rejectRole">Reject</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+	<div style="display: flex;">
+		<div th:replace="common/sidebar :: contributor_sidebar"></div>
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#myTable').DataTable();
+		});
+	</script>
+
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$(document).ready(function() {
+				$('#tableId').DataTable();
+				$('#tableIds').DataTable();
+				/* $('#tableIdContributor').DataTable(); */
+				$('#tableIdMaster').DataTable();
+				$('#tableIdQuality').DataTable();
+				$('#tableIdDomain').DataTable();
+				$('#tableIdEContributor').DataTable({
+					columnDefs : [ {
+						targets : -1,
+						className : 'dt-center'
+					} ]
+				});
+				$('#tableIdContributor').DataTable({
+					columnDefs : [ {
+						targets : -1,
+						className : 'dt-center'
+					} ]
+				});
+
+			});
+		});
+	</script>
+
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+</html>

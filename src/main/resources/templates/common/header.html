@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head th:fragment="common-header">
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	
+
+<title>Health And Nutrition</title>
+
+<!-- Bootstrap core CSS -->
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+
+<link th:href="@{/css/non-responsive.css}" rel="stylesheet" />
+
+<!-- Custom styles for this template -->
+<link th:href="@{/css/style.css}" rel="stylesheet" />
+
+<link rel="icon" th:href="@{/image/applie-touch-icon.png}" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+<style type="text/css">
+	.navbar-inverse{
+		/*background-color: green;*/
+	}
+
+	.navbar-nav>li>a{
+		color: #1C7871!important;
+		font-size: 2rem;
+		margin-right: 100px;
+		margin-top: 10px;
+		/*border: 1px solid #1C7871!important;*/
+
+	}
+</style>
+</head> 
+ <body>
+ 
+ <header role="banner" th:fragment="c_header">
+<style type="text/css">
+	.h-nav{
+	/* color: #1C7871!important; */
+	color: #fff!important;
+    font-weight: bold!important;
+    font-size: 1rem!important;
+    border-bottom: 1px solid #1C7871!important;
+    margin-right:20px;
+	}
+	.h-nav:hover{
+		border: 1px solid #1C7871;
+		transition: 0.3s;
+	}
+	.fa-home{
+		font-size: 2rem;
+    margin-right: 16px;
+    margin-top: 16px;
+	}
+	
+</style>
+
+
+<div class="top-bar" style="background: rgba(255,255,255,0.8);padding: 10px;">
+<div class="#">              
+<div class="row">
+<div class="col-md-6 col-sm-6 col-5">
+<div class="navbar-header">
+					<a th:href="@{/}"> <img
+									th:src="@{/image/logo.png}" 
+									alt="Smiley face" height="50" width="50"> </img>
+									<span style="color: black;font-size: 2rem;" class="ml-3">Spoken <span style="color: orange;font-size: 2rem;">Tutorials</span> </span>
+								</a>
+								
+</div>
+</div>
+<div class="col-md-6 col-sm-6 col-7 text-right">
+<div sec:authorize="isAuthenticated()" class='user-info1' style="margin-right: 20px;margin-top: 5px;"> 
+  <i class="fas fa-user" style="color: #1C7871;margin-right: 10px!important;"></i> Logged User : <span sec:authentication="name"></span> 
+</div>
+<div class="row">
+		<div class="col-md-12">
+		<!-- <a sec:authorize="isAnonymous()" th:href="@{/login}">Logins|New User</a> -->
+		<div sec:authorize="isAnonymous()">
+		<span><a th:href="@{/}"><i class="fas fa-home"></i></a></span>
+		</div>
+		<a sec:authorize="isAuthenticated()" th:href="@{/adminDeatail}" class="h-nav">MY ACCOUNT</a>
+		<a sec:authorize="isAuthenticated()" th:href="@{/logout}" class="h-nav">LOGOUT</a>
+</div>
+</div>
+            </div>
+          </div>
+        </div>
+        <div>
+  </div>
+      <div id="postResultDiv"></div>
+      
+      </div>
+    
+    </header>
+ 
+ 
+ <div th:fragment="c_nav">
+ <div class="navbar-header">
+					<a th:href="@{/}" > <img
+									th:src="@{/image/HandN-logo.jpg}" 
+									alt="Smiley face" height="80" width="120"> </img>
+					 </a>
+								<span style="color: #1C7871;font-size: 2.5rem;">Health And <span style="color: #BF360D;font-size: 2.5rem;">Nutrition</span> </span>
+</div>
+ </div>
+	<div th:fragment="navbar">
+		<div class="page-top"
+			style="width: 100%; height: 0px; background-color: pink;"></div>
+		<!-- Static navbar -->
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a th:href="@{/}"> <img
+									th:src="{/image/HandN-logo.jpg}" href="www.google."
+									alt="Smiley face" height="80" width="120"> </img>
+								</a>
+								<span style="color: #1C7871;font-size: 2.5rem;">Health And <span style="color: #BF360D;font-size: 2.5rem;">Nutrition</span> </span>
+				</div>
+				<div id="navbar">
+					<ul class="nav navbar-nav navbar-left">
+					<!-- 
+					drop down box -->
+<!-- 						<li class="dropdown"><a href="#" class="dropdown-toggle"
+							data-toggle="dropdown" role="button" aria-haspopup="true"
+							aria-expanded="false">SPOKEN <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="#">Browse the bookshelf</a></li>
+								<li><a href="#">Store hours &#38; Directions</a></li>
+								<li><a href="#">FAQ</a></li>
+
+							</ul></li> -->
+						<form class="navbar-form">
+					<!--  serch opration -->
+							<!-- <div class="form-group">
+								<input type="text" name="keyword" class="form-control"
+									placeholder="Book title" />
+							</	div> -->
+						<!-- 	<button type="submit" class="btn btn-default">Search</button> -->
+						</form>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#"> </a></li>
+						<!-- <li><a sec:authorize="isAnonymous()" th:href="@{/login}">Login|New User</a></li> -->
+						<!-- <li><a sec:authorize="isAnonymous()" th:href="@{/login}" class="login">Login</a></li> -->
+						<li><a sec:authorize="isAuthenticated()" th:href="@{/myProfile}">MY ACCOUNT</a></li>
+						<li><a sec:authorize="isAuthenticated()" th:href="@{/logout}">LOGOUT</a></li>
+					</ul>
+				</div>
+				<!--/.nav-collapse -->
+			</div>
+			<!--/.container-fluid -->
+		</nav>
+	</div>
+
+	<div th:fragment="body-bottom-scripts">
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	
+	</div>
+</body>
+</html>

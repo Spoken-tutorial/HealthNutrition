@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+
+<body>
+<div th:replace="common/sidebar :: top_header"></div>
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+			<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+										<div class="card">
+							<div class="card-header">
+								<h4>Edit contributor assignment</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										 <form class="form-horizontal"
+											th:action="@{/assignTutorialToContributor}" method="post"
+											onsubmit="return submitForm(this);">
+											<div class="form-group">
+
+												<label for="inputUserame"></label> <select
+													id="contributorId" class="form-control"
+													name="contributorName" required="required">
+													<option selected="selected">Select User</option>
+
+
+													<option th:each="contributors: ${userByContributors}"
+														th:value="${contributors.getUser().getUsername()}"
+														th:text="${contributors.getUser().getUsername()}"></option>
+
+												</select>
+											</div>
+											<div class="form-group">
+												<label for="lanId"></label> <select id="lanId"
+													class="form-control" name="languageName"
+													required="required">
+													<option>Select Language</option>
+												</select>
+											</div>
+											<div class="form-group">
+												<label for="catgoryByContributor"></label> <select
+													id="catgoryByContributor" class="form-control"
+													name="contributorCategory" required="required">
+													<option>Select Category</option>
+												</select>
+											</div>
+
+
+											<div class="form-group">
+												<label for="catgoryByContributor">Select Topic</label> <select
+													id="assignTopic" class="form-control select selectpicker"
+													name="inputTopic" required="required" multiple="multiple">
+												</select>
+
+											</div>
+											<button id="submitContribution" type="submit"
+												class="btn btn-success">Submit</button>
+											&nbsp;&nbsp;&nbsp;
+										</form> 
+
+									</div>
+								</div>
+							</div>
+						</div>
+			
+			
+			</div>
+</div>
+</div>
+	
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script th:inline="javascript">
+    
+		var projectPath='[(@{/})]';
+		
+	</script>
+
+</body>
+ 
+</html>
+ 
+ 
