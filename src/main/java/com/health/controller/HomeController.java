@@ -4509,7 +4509,6 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/uploadTutorial", method = RequestMethod.GET)
 	public String uploadTutorialGet(Model model,Principal principal) {
-
 		User usr=new User();
 
 		if(principal!=null) {
@@ -4549,7 +4548,6 @@ public class HomeController {
 										@RequestParam(value="categoryName") String categoryName,
 										@RequestParam(name="inputTopic") int topicId,
 										@RequestParam(name="inputLanguage") String langName) {
-
 		User usr=new User();
 
 		if(principal!=null) {
@@ -4563,7 +4561,7 @@ public class HomeController {
 		Topic topic=topicService.findById(topicId);
 		Language lan=lanService.getByLanName(langName);
 		TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
-		
+		Tutorial tutorial = null;
 		if(!lan.getLangName().equalsIgnoreCase("english")) {
 			
 			boolean goAhead = false;
@@ -4601,7 +4599,7 @@ public class HomeController {
 		
 		ContributorAssignedTutorial conTutorial=conRepo.findByTopicCatAndLanViewPart( topicCat, lan);
 		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTutorial);
-
+		
 		if(tutorials.isEmpty()) {
 
 			model.addAttribute("statusOutline", CommonData.ADD_CONTENT);
@@ -4615,7 +4613,7 @@ public class HomeController {
 		}else {
 
 			for(Tutorial local:tutorials) {
-
+				tutorial = local;
 				model.addAttribute("statusOutline", CommonData.tutorialStatus[local.getOutlineStatus()]);
 				model.addAttribute("statusScript", CommonData.tutorialStatus[local.getScriptStatus()]);
 				model.addAttribute("statusSlide", CommonData.tutorialStatus[local.getSlideStatus()]);
@@ -4624,8 +4622,6 @@ public class HomeController {
 				model.addAttribute("statusPreReq", CommonData.tutorialStatus[local.getPreRequisticStatus()]);
 
 				model.addAttribute("tutorial", local);
-				
-
 				
 				if(local.getVideo() != null) {
 
@@ -4636,21 +4632,22 @@ public class HomeController {
 				System.out.println("Video Duration"+container.getDuration()/1000000);
 				System.out.println("file Size"+container.getFileSize()/1000000);
 
-			
+				
+				
+					System.out.println("CONTAINER IS NOT NULL");
+					IStream stream = container.getStream(0);
 					
-				IStream stream = container.getStream(0);
-				IStreamCoder coder = stream.getStreamCoder();
-				System.out.println("width :"+coder.getWidth());
-				System.out.println("Height :"+coder.getHeight());
-				
-				model.addAttribute("FileWidth", coder.getWidth());
-				model.addAttribute("FileHeight", coder.getHeight());
-				model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-				model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-				
-				container.close();
-
-
+					if(stream!=null) {
+					IStreamCoder coder = stream.getStreamCoder();
+					System.out.println("width :"+coder.getWidth());
+					System.out.println("Height :"+coder.getHeight());
+					
+					model.addAttribute("FileWidth", coder.getWidth());
+					model.addAttribute("FileHeight", coder.getHeight());
+					model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+					model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+					container.close();
+				}
 				}
 
 				
@@ -4681,6 +4678,19 @@ public class HomeController {
 		}else {
 			model.addAttribute("otherLan", true);
 		}
+		
+		String topic_name = topic.getTopicName();
+		topic_name	= topic_name.replaceAll(" ", "-");
+		model.addAttribute("topic_name", topic_name);
+		model.addAttribute("script_manager_view_url",CommonData.SCRIPT_MANAGER_BASE+CommonData.SCRIPT_MANAGER_VIEW);
+		model.addAttribute("sm_default_param", CommonData.SM_DEFAULT_PARAM);
+		String tutorial_id="";
+		if(tutorial!=null) {
+			tutorial_id = Integer.toString(tutorial.getTutorialId());
+		}
+		String sm_url = CommonData.SCRIPT_MANAGER_BASE+CommonData.SCRIPT_MANAGER_VIEW+Integer.toString(cat.getCategoryId())+"/"
+				+tutorial_id+"/"+Integer.toString(lan.getLanId())+"/"+topic_name+"/"+"1";
+		model.addAttribute("sm_url", sm_url);
 		return "uploadTutorialPost";
 	}
 

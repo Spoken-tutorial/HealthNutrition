@@ -200,7 +200,18 @@ public class CommonData {
 	
 	public static final long categoryFileSizeImageFileSize = 1*1024*1024;
 	
+//	public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
+	public static String SCRIPT_MANAGER_BASE= "http://beta.scriptmanager.spoken-tutorial.org/";
 	
+	public static String SCRIPT_MANAGER_CREATE= "create/healthnutrition/";
+	
+	public static String SCRIPT_MANAGER_VIEW= "view/healthnutrition/";
+	
+	public static String SM_DEFAULT_PARAM= "1";
+	
+	
+	
+//	public static String SCRIPT_MANAGER_VIEW= "view/healthnutrition";
 
 
 

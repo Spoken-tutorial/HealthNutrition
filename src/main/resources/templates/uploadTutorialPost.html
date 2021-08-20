@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
 <head th:replace="common/trail :: common-trail"></head>
+<style>
+	#sm_url:hover{
+		background-color: #D1ECF1!important;
+	}
+</style>
 <body>
 	<div th:replace="common/sidebar :: top_header"></div>
 	<div class="container-fluid">
@@ -835,7 +840,7 @@
 								<div class="modal-content">
 									<div class="modal-header">
 										<h5 class="modal-title" id="exampleModalLabelScript">Upload
-											Script</h5>
+											Scripts</h5>
 										<button type="button" class="close" data-dismiss="modal"
 											aria-label="Close">
 											<span aria-hidden="true">&times;</span>
@@ -844,6 +849,9 @@
 									<div class="modal-body">
 										<div class="row">
 											<div class="col-12">
+											<div class="alert alert-info" role="alert">
+  												<a th:href="${sm_url}" class="alert-link" style="text-decoration: underline;" target="_blank" id="sm_url">Spoken Tutorial Script Manager</a>
+											</div>
 												<div class="alert alert-success d-none w-100" role="alert" id="status_script"></div>
 												<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
 												<form class="form-horizontal mb-3"
