@@ -80,6 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/getTopicOnCatAndLan/**",
 			"/getRolesOnCatLanUser/**",
 			"/getTutorial/**",
+			"/statistics",
 			"/statistics/**",
 			"/tutCountOnCat/**",
 			"/tutCountOnLan/**",

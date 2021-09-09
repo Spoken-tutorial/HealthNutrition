@@ -473,6 +473,7 @@ public class AjaxController{
 		for(TopicCategoryMapping temp : local) {
 
 			topicName.put(temp.getTopic().getTopicId(), temp.getTopic().getTopicName());
+			
 		}
 		return topicName;
 
@@ -685,7 +686,7 @@ public class AjaxController{
 		Category cat = catService.findBycategoryname(catName);
 
 		List<TopicCategoryMapping> localTopicCat = topicCatService.findAllByCategory(cat) ;
-
+		
 		List<ContributorAssignedMultiUserTutorial> conTutorialByUser=conMultiService.getAllByuser(usr);
 
 		for(ContributorAssignedMultiUserTutorial localCon:conTutorialByUser) {
@@ -2259,5 +2260,25 @@ public class AjaxController{
 		
 		return "Total number of tutorial under "+id +" Language is "+total;
 	}
+	
+	@RequestMapping("/unpublishTutorial")
+	public @ResponseBody  String unpublishTutorial(@RequestParam(value = "id") int id) {
+
+		Tutorial tut = tutService.getById(id);
+		
+		if(tut.isStatus()) {
+			tut.setStatus(false);
+		}else {
+			return "0";
+		}
+		try {
+			tutService.save(tut);
+			return "success";
+		}catch (Exception e) {
+			System.err.print(e);
+			return "failed";
+		}
+	}
+	
 		
 }

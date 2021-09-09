@@ -2,6 +2,8 @@ package com.health.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+
 import com.health.model.Category;
 import com.health.model.Event;
 
@@ -58,7 +60,8 @@ public interface CategoryService {
 	 * @param cat category object
 	 */
 	Category save(Category cat);
-	
-    
-    
+
+	List<Category> findAllByOrder();
+
+	    
 }

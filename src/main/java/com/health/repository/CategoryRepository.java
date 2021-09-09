@@ -2,6 +2,7 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,7 +15,7 @@ import com.health.model.Category;
  * @version 1.0
  *
  */
-public interface CategoryRepository extends CrudRepository<Category,Integer>{
+public interface CategoryRepository extends JpaRepository<Category,Integer>{
 
 	/**
 	 * Find the next unique id for the object
@@ -29,5 +30,8 @@ public interface CategoryRepository extends CrudRepository<Category,Integer>{
 	 * @return category object
 	 */
 	Category findBycatName(String catname);
+	
+	@Query(value="select category from Category category order by category.catName")
+	List<Category> findAllByOrderBy();
 
 }

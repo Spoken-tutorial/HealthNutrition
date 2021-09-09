@@ -63,5 +63,7 @@ public interface TopicCategoryMappingService {
 	 * @return TopicCategoryMapping object
 	 */
 	TopicCategoryMapping findByCategoryAndOrder(Category cat, int order);
+	
+	TopicCategoryMapping findByCategoryAndStatus(Category cat, Boolean status);
 }
 

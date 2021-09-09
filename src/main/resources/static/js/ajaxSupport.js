@@ -3294,8 +3294,9 @@ $(document).ready(function() {
 	/******************************* changes made by om prakash *************************************************/
 			$('#categoryContributor').change(function() {
 				
+				
 						var catgoryid = $('#categoryContributor').val();
-
+						
 						$.ajax({
 
 							type : "GET",
@@ -3305,7 +3306,6 @@ $(document).ready(function() {
 							},
 							contentType : "application/json",
 							success : function(result) {
-
 							//	html += '<option value="'+ result[i]+ '">'+ result[i]+ '</option>';
 
 								var html = '';
@@ -3315,7 +3315,7 @@ $(document).ready(function() {
 			  	  			        html += '<option value=' + key + '>'+ value  + '</option>';
 			  	  			     })
 								html += '</option>';
-
+								
 								$("#inputTopicContributor").prop('disabled',false);
 								$('#inputTopicContributor').html(html);
 
@@ -4221,7 +4221,6 @@ $(document).ready(function() {
 /************************* changes made by om prakash **********************************************/	
 			$('#catgoryByContributor').on('change',function() {
 						var category = $(this).find("option:selected").val();
-				
 						$.ajax({
 							type : "GET",
 							url : projectPath+"loadTopicByCategory",
@@ -4258,6 +4257,9 @@ $(document).ready(function() {
 						});
 
 					});
+					
+					
+
 			
 /*********************************** end*******************************************************/
 
@@ -6621,6 +6623,7 @@ function validateEmail($email) {
 }
 
 function loadAllLanguages() {
+	
 	console.log("select_language.......",this);
 	component = this;
 	$.ajax({
@@ -6706,6 +6709,61 @@ function validate_file_size(elem,s){
 		return false;
 	}
 }
+
+$('#btn_unpublish').click(function() {
+				var msg='';
+				var id = this.value;
+				$
+						.ajax({
+
+							type : "GET",
+							url : projectPath+ "unpublishTutorial",
+							data : {
+								"id" : id
+							},
+							contentType : "application/json",
+							success : function(result) {
+								console.log(result);
+								if(result=="success"){
+									msg = 'Tutorial is unpublished.';
+									$('#response').addClass("alert-success");
+								}else if(result=="0"){
+									msg = 'Tutorial is already unpublished.';
+									$('#response').addClass("alert-warning");
+								}else{
+									msg = 'Some error occurred. Please contact site admin.';
+									$('#response').addClass("alert-danger");
+								}
+								$('#response').html(msg);
+								
+								$('#btn_unpublish').hide();
+								$('#btn_unpublish_anonther').show();
+								
+								},
+								//var html = '';
+								//var len = result.length;
+								//html += '<option value="0">Select language</option>';
+								//for (var i = 0; i < len; i++) {
+
+//									html += '<option value="'+ result[i]+ '">'+ result[i]+ '</option>';
+//								}
+//								html += '</option>';
+
+//								$("#inputLanguageList").prop('disabled',false);
+//								$('#inputLanguageList').html(html);
+								
+								
+								
+							
+
+							error : function(err) {
+								console.log(err);
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+							}
+						});
+
+			});
+			
 
 /* here is code for download question */
 

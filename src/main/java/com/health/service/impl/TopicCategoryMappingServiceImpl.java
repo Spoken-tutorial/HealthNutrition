@@ -104,5 +104,11 @@ public class TopicCategoryMappingServiceImpl implements TopicCategoryMappingServ
 		return topicCatRepo.findBycatAndorder(cat, order);
 	}
 
+	@Override
+	public TopicCategoryMapping findByCategoryAndStatus(Category cat, Boolean status) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

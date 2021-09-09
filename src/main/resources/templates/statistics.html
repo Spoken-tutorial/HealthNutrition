@@ -2,7 +2,13 @@
 <html xmlns:th="https://thymeleaf.org">
 <html>
 <head>
-<head th:replace="common/trail :: common-trail"></head>
+<head th:replace="common/trail :: common-trail">
+</head>
+<style>
+#tutorials_filter input{
+	width: 400px!important;
+}
+</style>
 <body>
 <section>
 	<div class="px-md-3">
@@ -47,7 +53,7 @@
 </nav>
 <div class="container">
 <div id="search-bar" class="container-lg mb-3 mt-5">
-<div class="row" style="width: 100%;">
+<!-- <div class="row" style="width: 100%;">
 <div class="col-md-4 mb-4">
             <select class="custom-select d-block w-100 catStat" name="categoryName">
               <option>Select Category</option>
@@ -69,25 +75,86 @@
 
           
 </div>
-</div>
+</div> -->
+
 
 <div id="statBox">
-	<p>Total Number of tutorials  <span th:text="${tutTotal}"/></p>
-	<p>Total Number of Categories <span th:text="${catTotal}"/></p>
-	<p>Total Number of Langauges <span th:text="${lanTotal}"/></p>
+<table class="table table-bordered table-sm">
+<thead>
+<tr class="table-info">
+<th class="text-muted">Total Categories</th>
+<th class="text-muted">Total Topics</th>
+<th class="text-muted">Total Languages</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span th:text="${catTotal}" class="text-muted"></span></td>
+<td class="text-muted"><span th:text="${tutTotal}"></span></td>
+<td class="text-muted"><span th:text="${lanTotal}"></span></td>
+</tr>
+</tbody>
+</table>
 </div>
-
 <div id="onChangedataStat">
 </div>
+<div class="border p-3">
 
-		
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script th:src="@{/js/ajaxSupport.js}"></script>
+<div  class="mb-3 pt-3"><span class="h5" style="border-bottom: 2px solid orange;">Tutorial views statistics</span></div>
+
+<form th:action="@{/statistics}">
+<div class="row">
+<div class="col-sm-6 col-md-4">
+<label for="categoryId"><b>Select Category :</b></label>
+<select class="custom-select" name="categoryId" id="categoryId">
+  <option value="0">All Categories</option>
+  <option th:each="item: ${catMap}" th:value="${item.key}" th:selected="(${item.key} == ${cat_value})"><span th:text="${item.value}"></span></option>
+</select>
+</div>
+<div class="col-sm-6 col-md-4">
+<label for="languageId"><b>Select Language :</b></label>
+<select class="custom-select" name="languageId" id="languageId">
+  <option value="0">All Languages</option>
+  
+  <option th:each="item: ${lanMap}" th:value="${item.key}" th:selected="(${item.key} == ${lan_value})" ><span th:text="${item.value}"></span></option>
+</select>
+</div>
+<div class="col-sm-12 col-md-4">
+<button class="btn btn-info" type="submit" style="margin-top:32px;">Filter Topics</button>
+</div>
+</div>
+</form>
+<br>
+<table class="table table-bordered table-sm" id="tutorials">
+<thead>
+<tr class="table-warning">
+<th>Topic</th>
+<th>Language</th>
+<th>Category</th>
+<th>Total Views</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="tut: ${tutorials}">
+<td th:text="${tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></td>
+<td th:text="${tut.getConAssignedTutorial().getLan().getLangName()}"></td>
+<td th:text="${tut.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></td>
+<td th:text="${tut.getUserVisit()}"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+	
+	
 <div th:replace="common/trail :: body-bottom-scripts"></div>
 <script th:inline="javascript">
 		var projectPath='[(@{/})]';
+		$('#tutorials').DataTable({"pageLength": 25});
+		$( document ).ready(function() {
+    		var elements = $("[aria-controls='tutorials']");
+    		elements.attr("placeholder", "Topic");
+		});	 
 	</script>
 </body>
 </html>

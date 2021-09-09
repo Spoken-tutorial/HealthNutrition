@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +28,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -4548,6 +4551,7 @@ public class HomeController {
 										@RequestParam(value="categoryName") String categoryName,
 										@RequestParam(name="inputTopic") int topicId,
 										@RequestParam(name="inputLanguage") String langName) {
+
 		User usr=new User();
 
 		if(principal!=null) {
@@ -4629,14 +4633,7 @@ public class HomeController {
 				int result=10;
 				result = container.open(env.getProperty("spring.applicationexternalPath.name")+local.getVideo(),IContainer.Type.READ,null);
 				
-				System.out.println("Video Duration"+container.getDuration()/1000000);
-				System.out.println("file Size"+container.getFileSize()/1000000);
-
-				
-				
-					System.out.println("CONTAINER IS NOT NULL");
 					IStream stream = container.getStream(0);
-					
 					if(stream!=null) {
 					IStreamCoder coder = stream.getStreamCoder();
 					System.out.println("width :"+coder.getWidth());
@@ -4648,6 +4645,7 @@ public class HomeController {
 					model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
 					container.close();
 				}
+
 				}
 
 				
@@ -6693,31 +6691,85 @@ public class HomeController {
 
 		return "showUsers";
 	}
-	
+
 	@RequestMapping(value = "/statistics",method = RequestMethod.GET)
-	public String statistics(Principal principal, Model model) {
+	public String statistics(Principal principal, Model model,
+			@RequestParam(name ="categoryId",defaultValue = "0") int categoryId,
+			@RequestParam(name ="languageId",defaultValue = "0") int languageId) {
 		
 		User usr=new User();
-
 		if(principal!=null) {
-
 			usr=userService.findByUsername(principal.getName());
 		}
-
 		model.addAttribute("userInfo", usr);
-		
 		List<Category> cat = catService.findAll();
+		
+		List<Category> categories = catService.findAllByOrder();
 		List<Language> lan =lanService.getAllLanguages();
-		List<Tutorial> tut = tutService.findAllBystatus(true);
+		List<Tutorial> tut ;
+		List<ContributorAssignedTutorial> contributor_Role = conRepo.findAll();
+		 
 		Collections.sort(cat);
 		Collections.sort(lan);
+		LinkedHashMap<Integer,String> catMap = new LinkedHashMap<>();
+		LinkedHashMap<Integer,String> lanMap = new LinkedHashMap<>();
+		for(Category c: categories) {
+			catMap.put(c.getCategoryId(), c.getCatName());
+		}
+		for(Language l: lan) {
+			lanMap.put(l.getLanId(), l.getLangName());
+		}
+		
+		model.addAttribute("catMap", catMap);
+		model.addAttribute("lanMap", lanMap);
+
+		List<Tutorial> tutorials;
+		if(categoryId!=0 & languageId!=0) {
+			Language language = lanService.getById(languageId);
+			Category category = catService.findByid(categoryId);
+			List<TopicCategoryMapping> topicCategoryMappings = topicCatService.findAllByCategory(category);
+			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCatAndLanViewPart(topicCategoryMappings, language);
+			tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+			model.addAttribute("cat_value", category.getCategoryId());
+			model.addAttribute("lan_value", language.getLanId());
+		}else if(categoryId!=0) {
+			Category category = catService.findByid(categoryId);
+			List<TopicCategoryMapping> topicCategoryMappings = topicCatService.findAllByCategory(category);
+			if(!topicCategoryMappings.isEmpty()){
+				List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCat(topicCategoryMappings);
+				tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+			}else {
+				tutorials = null;
+			}
 			
+			model.addAttribute("cat_value", category.getCategoryId());
+			model.addAttribute("lan_value", 0);
+		}else if(languageId!=0){
+			Language language = lanService.getById(languageId);
+			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByLan(language);
+			tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+			model.addAttribute("cat_value", 0);
+			model.addAttribute("lan_value", language.getLanId());
+		}else {
+			tutorials = tutService.findAllBystatus(true);
+			model.addAttribute("cat_value", 0);
+			model.addAttribute("lan_value", 0);
+		}
+		
 		model.addAttribute("categories", cat);
 		model.addAttribute("languages", lan);
 		model.addAttribute("catTotal", cat.size());
 		model.addAttribute("lanTotal", lan.size());
-		model.addAttribute("tutTotal", tut.size());
+		model.addAttribute("tutTotal", tutService.findAllBystatus(true).size());
+		model.addAttribute("tutorials", tutorials);
+		model.addAttribute("contributor_Role", contributor_Role);
 		
+		HashMap<String,Integer> cat_count = new HashMap<>();
+		HashMap<ContributorAssignedTutorial,Integer> contriRole_count = new HashMap<>();
+		
+		model.addAttribute("cat_count",cat_count);
+		model.addAttribute("contriRole_count",contriRole_count);
+				
 		return "statistics";
 	}
 	
@@ -6810,5 +6862,131 @@ public class HomeController {
 		return "cdContent";
 	}
 	
+	@RequestMapping(value = "/unpublishTopic",method = RequestMethod.GET)
+	public String unpublishTopic(Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+		model.addAttribute("userInfo", usr);
+		model.addAttribute("status", "get");
+		List<Category> categories_lst = catService.findAll();
+		List<String> categories = new ArrayList<String>();;
+		HashMap<Integer,String> map = new HashMap<>();
+		for(Category cat: categories_lst) {
+			map.put(cat.getCategoryId(),cat.getCatName());
+//			String name = cat.getCatName();
+//			categories.add(name);
+		}
+		List<Language> langs = lanService.getAllLanguages();
+		List<String> langauges=new ArrayList<String>();
+		for(Language temp:langs) {
+				langauges.add(temp.getLangName());
+		}
+		model.addAttribute("langauges", langauges);
+		model.addAttribute("categories", map);
+		model.addAttribute("method", "get");
+		return "unpublishTopic";
+
+	} 
 	
+	@RequestMapping(value = "/unpublishTopic",method = RequestMethod.POST)
+	public String unpublishTopicPost(HttpServletRequest request, 
+			@ModelAttribute("category") Integer categoryId, 
+			@ModelAttribute("topic") Integer topicId, 
+			@ModelAttribute("language") String language, 
+			Model model , Principal principal) {
+
+		model.addAttribute("classActiveForgetPassword", true);
+		Category cat = catService.findByid(categoryId);
+		Topic topic = topicService.findById(topicId);
+		model.addAttribute("topicname", topic.getTopicName());
+		
+		Language lan = lanService.getByLanName(language);
+		model.addAttribute("cat", cat.getCategoryId());
+		model.addAttribute("topic", topic.getTopicId());
+		model.addAttribute("lan", lan.getLangName());
+		model.addAttribute("catname", cat.getCatName());
+		TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat, topic);
+		ContributorAssignedTutorial con = conRepo.findByTopicCatAndLanViewPart(tcm, lan);
+		List<Tutorial> tut= tutService.findAllByContributorAssignedTutorial(con);
+		Tutorial t = tut.get(0);
+		model.addAttribute("tut", tut);
+		model.addAttribute("tutorial_id", t.getTutorialId());
+		List<Category> categories_lst = catService.findAll();
+		List<String> categories = new ArrayList<String>();;
+		HashMap<Integer,String> map = new HashMap<>();
+		for(Category c: categories_lst) {
+			map.put(c.getCategoryId(),c.getCatName());
+//			String name = cat.getCatName();
+//			categories.add(name);
+		}
+		List<Language> langs = lanService.getAllLanguages();
+		List<String> langauges=new ArrayList<String>();
+		for(Language temp:langs) {
+				langauges.add(temp.getLangName());
+		}
+		
+		HashMap<Integer,String> topicName=new HashMap<>();
+
+		
+
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+
+		for(TopicCategoryMapping temp : local) {
+
+			topicName.put(temp.getTopic().getTopicId(), temp.getTopic().getTopicName());
+			
+		}
+		
+		model.addAttribute("topics", topicName);
+		model.addAttribute("langauges", langauges);
+		model.addAttribute("categories", map);
+		model.addAttribute("method", "post");
+		
+		
+
+		
+//			model.addAttribute("status", t.isStatus());
+			model.addAttribute("status", "can_unpublish");
+		
+		if(t.isStatus()) {
+			model.addAttribute("status", "can_unpublish");
+		}else {
+			model.addAttribute("status", "already_unpublished");
+		}
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+		model.addAttribute("userInfo", usr);
+		
+		
+		
+		return "unpublishTopic";
+	}
+	
+	@RequestMapping(value = "/modifyComponentStatus",method = RequestMethod.GET)
+	public String modifyComponentStatus(Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		List<Category> categories = catService.findAll();
+		model.addAttribute("categories", categories);
+
+		return "modifyComponentStatus";
+
+	}
 }
