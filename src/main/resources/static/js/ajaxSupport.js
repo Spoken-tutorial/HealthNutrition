@@ -907,49 +907,6 @@ $(document).ready(function() {
 						});
 					});
 
-
-
-
-//			$('#categoryname').change(function() {
-//			alert('clicked');
-//			var categoryId = $(this).val();
-//			console.log(categoryId);
-//			$
-//			.ajax({
-//			type : "GET",
-//			url : "/listTopicsByCategory",
-//			data : {
-//			"category" : categoryId
-//			},
-//			contentType : "application/json",
-//			success : function(result) {
-//			console.log(result);
-//			var html = '';
-//			var len = result.length;
-//			html += '<option value="0">Select language</option>';
-//			for (var i = 0; i < len; i++) {
-
-//			html += '<option value="'
-//			+ result[i]
-//			+ '">'
-//			+ result[i]
-//			+ '</option>';
-//			}
-//			html += '</option>';
-
-//			$("#inputTopic").prop('disabled',false);
-//			$('#inputTopic').html(html);
-
-//			},
-//			error : function(err) {
-//			console.log("not working. ERROR: "+ JSON.stringify(err));
-//			}
-
-//			});
-
-//			});
-
-
 			/* here we write code for calling Topic */
 
 			$('#categoryId')
@@ -1308,9 +1265,6 @@ $(document).ready(function() {
 						var tutorialId = $("#tutorialId").val();
 						var preCommentMsg = $("#preCommentMsg").val();
 
-
-//						alert(preCommentMsg);
-
 						var vals = $("#preAcceptDomain").val();
 
 						if (vals == '0') 
@@ -1329,16 +1283,21 @@ $(document).ready(function() {
 								contentType : "application/json",
 								success : function(
 										result) {
-									showStatus(SUCCESS, result);
+									///showStatus(SUCCESS, result);
 //									$("#statusVideoByDomain").prop('disabled',false);
 //									$('#statusVideoByDomain').html(result);
-
+									$('.d_status').show();
+									$('.d_status').html(result);
+									$('.d_status').addClass('alert-success');
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR, result);
+									//showStatus(ERROR, result);
+									$('.d_status').show();
+									$('.d_status').html(result);
+									$('.d_status').addClass('alert-danger');
 								}
 							});
 
@@ -1353,7 +1312,7 @@ $(document).ready(function() {
 								data : {
 									"id" : tutorialId,
 									"msg":preCommentMsg,
-									"type" : "Pre_requistic",
+									"type" : "prerequisite",
 									"role" : "Domain"
 								},
 								contentType : "application/json",
@@ -1361,14 +1320,18 @@ $(document).ready(function() {
 										result) {
 //									$("#statusVideoByDomain").prop('disabled',false);
 //									$('#statusVideoByDomain').html(result);
-									showStatus(SUCCESS, result);
+									//showStatus(SUCCESS, result);
+									$('.d_c_pre').show();
+									$('.d_c_pre').html(result);
 
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR, result);
+									//showStatus(ERROR, result);
+									$('.d_c_pre').show();
+									$('.d_c_pre').html(result);
 								}
 
 							});
@@ -1430,7 +1393,7 @@ $(document).ready(function() {
 								{
 									"id" : tutorialId,
 									"msg" : msg,
-									"type" : "Pre_requistic",
+									"type" : "prerequisite",
 									"role" : "Quality"
 								},
 								contentType : "application/json",
@@ -1438,14 +1401,18 @@ $(document).ready(function() {
 										result) {
 //									$("#statusVideoByDomain").prop('disabled',false);
 //									$('#statusVideoByDomain').html(result);
-									showStatus(SUCCESS, result);
+									//showStatus(SUCCESS, result);q_pre
+									$('.q_pre').show();
+									$('.q_pre').html(result);
 
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR, result);
+									$('.q_pre').show();
+									$('.q_pre').html(result);
+									//showStatus(ERROR, result);
 								}
 
 							});
@@ -1483,17 +1450,19 @@ $(document).ready(function() {
 						//$("#exampleModalLabelPre").prop('disabled',false);
 						//$("#exampleModalLabelPre").html("Result");
 						
-						var msg = 'Pre-Requistic updated successfully.'
+						var msg = 'Prerequisite updated successfully.'
 									$('#statusPreReq').addClass('d-block');
 								$('#statusPreReq').html(msg);
 						$.each(result , function( key, value ) {
 			  	  			        if(key == 1){
-										$('#status_pr').addClass('d-block');
+										//$('#status_pr').addClass('d-block');
+										$('#status_pr').show();
 										$('#status_pr').addClass('alert-success');
 										$('#status_pr').html(value);
 										
 									}else{
-										$('#status_pr').addClass('d-block');
+										//$('#status_pr').addClass('d-block');
+										$('#status_pr').show();s
 								 		$('#status_pr').addClass('alert-danger');
 										$('#status_pr').html(value);
 									}
@@ -1502,8 +1471,6 @@ $(document).ready(function() {
 					},
 
 					error : function(err) {
-						alert('error uploadpreRequsiteId');
-						console.log("error");
 						console
 						.log("not working. ERROR: "+ JSON.stringify(err));
 						
@@ -1983,9 +1950,7 @@ $(document).ready(function() {
 								source.setAttribute('href', res);
 
 								str = result[0].split("/");
-								console.log(str);
 								fileName = str[str.length - 1];
-								console.log(str);
 								$('#viewScript').html(fileName);
 							},
 
@@ -2264,9 +2229,7 @@ $(document).ready(function() {
 
 								source.setAttribute('href', res);
 								str = result[0].split("/");
-								console.log(str);
 								fileName = str[str.length - 1];
-								console.log(str);
 								$('#sliedPdf').html(fileName);
 							},
 
@@ -2281,107 +2244,11 @@ $(document).ready(function() {
 
 					});
 
-//			$('#lanId').change(
-//					
-//					function() {
-//						alert('test');
-//						var languageName = $("#option :selected").val();
-//						$.ajax({
-//							type : "GET",
-//							url : projectPath+"loadCategoryByLanguage",
-//							data : {
-//								"id" : languageName
-//							},
-//							contentType : "application/json",
-//							success : function(result) {
-//								var html = '';
-//								var len = result.length;
-//								html += '<option value="0">Select Category</option>';
-//								for (var i = 0; i < len; i++) {
-//									html += '<option value="'+ result[i]+ '">'+ result[i]+ '</option>';
-//								}
-//								html += '</option>';
-//								$("#catgoryByContributor").prop('disabled',false);
-//								$('#catgoryByContributor').html(html);
-//							},
-//							error : function(err) {
-//								console.log("not working. ERROR: "+ JSON.stringify(err));
-//							}
-//						});
-//					});
-
-
-//			question start
-//			$('#fetch_questions').click(
-//			function() {
-//			alert('ques');
-//			var categoryid = $('#catMasterId').val();
-//			var topicid = $('#lanMasterTrId').val();
-//			var lanId = $('#dwnByLanguageId').val();
-//			$.ajax({
-//			type : "GET",
-//			url : "/displayQuestion",
-//			data : {
-//			"categorname" : categoryid,
-//			"topicid" : topicid,
-//			"lanId" : lanId
-//			},
-//			contentType : "application/json",
-//			success : function(result) {
-//			$('#questions').html(result);
-//			console.log(result);
-//			alert('success');
-//			},
-//			error : function(err) {
-//			console.log("not working. ERROR: "+ JSON.stringify(err));
-//			alert('error');
-//			}
-//			});
-//			});
-//			question end
 			$('#fetch_questions').click(
 			function() {
 			$('#questionnaire').tab('show');
 			
 			});
-
-
-
-			/*$('#catgoryByContributor').click(
-					function() {
-						// var languageName = $form.find( '#lanId'
-						// ).val(),
-						var category = $(this).find("option:selected").val();
-						var languageName = $('#lanId').val();
-						var userName = $('#contributorId').val();
-						// var languageName=$("option :lanId").text();
-
-						$.ajax({
-							type : "GET",
-							url : projectPath+"loadTopicByCategory",
-							data : {
-								"id" : category,
-								"lanId" : languageName,
-								"userName" : userName
-							},
-							contentType : "application/json",
-							success : function(result) {
-								var html = '';
-								var len = result.length;
-								for (var i = 0; i < len; i++) {
-									html += '<option value="'+ result[i] + '">'+ result[i] + '</option>';
-								}
-								html += '</option>';
-								$("#inputTopic").prop('disabled', false);
-								$('#inputTopic').html(html);
-							},
-							error : function(err) {
-								console.log("not working. ERROR: "
-										+ JSON.stringify(err));
-							}
-						});
-
-					});*/
 
 			// here write code for keyword view //add content form
 			$('#keywordModaleView').click(
@@ -2869,8 +2736,6 @@ $(document).ready(function() {
 
 					});
 			$( "#categoryname" ).change(function() {
-				
-
 				var catgoryid = $(this).val();
 				
 				$.ajax({
@@ -2908,7 +2773,6 @@ $(document).ready(function() {
 
 
 			$('#inputTopicName').change(function() {
-//				alert('here 3');
 				var topic = $(this).val();
 				var categoryName = $("#categoryname").val();
 				$.ajax({
@@ -2920,8 +2784,6 @@ $(document).ready(function() {
 					},
 					contentType : "application/json",
 					success : function(result) {
-						console.log(result);
-
 						var html = '';
 						var len = result.length;
 						html += '<option value="0">Select language</option>';
@@ -3377,7 +3239,6 @@ $(document).ready(function() {
 			$('#inputTopic')
 			.change(
 					function() {
-//						alert('here');
 						var catgoryid = $(this).find(
 						":selected").val();
 						$
@@ -3432,16 +3293,12 @@ $(document).ready(function() {
 						var saveInfo = editor.getData();
 						var tutorialId=$("#tutorialId").val();
 						
-						console.log("******************");
-						console.log(saveInfo);
-						console.log("******************");
 						/*var keywordArea = $("#keyword").val();*/
 						var categoryid = $("#categoryId").val();
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
 						localStorage.setItem("upload_outline_msg","Outline updated.");
 //						editor.isReadOnly = true;
-
 						$.ajax({
 							type : "GET",
 							url : projectPath+"addOutline",
@@ -3463,10 +3320,8 @@ $(document).ready(function() {
 									//.addClass(
 									//'d-block');
 								//$('#statusOutlineC').html(msg);
-								
 								$.each(result , function( key, value ) {
 			  	  			        if(key == 1){
-										
 										$('#statusOutlineC').addClass('d-block');
 										$('#statusOutlineC').html(value);
 										
@@ -3524,13 +3379,9 @@ $(document).ready(function() {
 //						$('#editKeyword').toggle();
 						
 						var keywordArea = $("#keywordArea").val();
-						console.log("keywordArea "+keywordArea);
 						var categoryid = $("#categoryId").val();
-						console.log("categoryid "+categoryid);
 						var topicid = $("#topicID").val();
-						console.log("topicid "+topicid);
 						var lanId = $("#lanId").val();
-						console.log("lanId "+lanId);
 //						var categoryid = $("#categoryId").val();
 //						var topicid = $("#topicID").val();
 //						var lanId = $("#lanId").val();
@@ -3581,17 +3432,12 @@ $(document).ready(function() {
 			 */
 
 			$('#scriptId').click(function() {
-						// here1
 						var categoryid = $("#categoryId").val();
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
 						var TutorialID=$("#tutorialId").val();
-
 						var form = $('#upload-file-form-script')[0];
 						var formData = new FormData(form);
-//						alert(form);
-						console.log(form);
-						console.log(form[0]);
 
 						formData.append('categoryname', categoryid);
 						formData.append('topicid', topicid);
@@ -3619,6 +3465,8 @@ $(document).ready(function() {
 			  	  			        if(key == 1){
 										$('#status_script').addClass('d-block');
 										$('#status_script').html(value);
+										document.getElementById("scriptId").disabled = true;
+										
 										
 									}else{
 										$('#status_script').addClass('d-block');
@@ -3630,6 +3478,7 @@ $(document).ready(function() {
 							},
 
 							error : function(err) {
+								alert('error');
 								console.log("not working. ERROR: "+ JSON.stringify(err));
 								var result = "Error";
 								showStatus(ERROR,result);
@@ -3647,18 +3496,12 @@ $(document).ready(function() {
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
 						var TutorialID=$("#tutorialId").val();
-
 						var form = $('#upload-file-form')[0];
 						var formData = new FormData(form);
-
 						formData.append('categoryname', categoryid);
 						formData.append('topicid', topicid);
 						formData.append('lanId', lanId);
 						formData.append('id',TutorialID);
-						
-
-						console.log(formData);
-
 						$.ajax({
 							type : "POST",
 							url : projectPath+"addSlide",
@@ -3720,7 +3563,6 @@ $(document).ready(function() {
 /******************** changes made by om prakash *****************************************/
 			
 			$('#videoId').click(function() {
-//						alert('videoId');
 						var categoryid = $("#categoryId").val();
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
@@ -4000,7 +3842,7 @@ $(document).ready(function() {
 							},
 
 							error : function(err) {
-								console.lo3g("not working. ERROR: "+ JSON.stringify(err));
+								console.log("not working. ERROR: "+ JSON.stringify(err));
 							}
 
 						});
@@ -4009,7 +3851,6 @@ $(document).ready(function() {
 			
 			//Following function refreshes the table dynamically whenever a row is deleted
 			$('.dynamicTable tbody').on( 'click', '.rejectRole', function () {
-				//alert('a');
 				var elem = $(this).parents('table');
 				var id = $(elem).attr('id');
 				var table = $('#'+id).DataTable();	
@@ -4028,7 +3869,6 @@ $(document).ready(function() {
 			$('.rejectRole').click(function() {
 				// use localStorage to retrieve information on
 				// page refresh
-				//alert('Here');
 				localStorage.setItem('activeTab',"MasterTrainer");
 				var contributionId = $(this).val();
 				
@@ -4059,7 +3899,7 @@ $(document).ready(function() {
 					},
 
 					error : function(err) {
-						console.lo3g("not working. ERROR: "+ JSON.stringify(err));
+						console.log("not working. ERROR: "+ JSON.stringify(err));
 					}
 
 				});
@@ -4104,7 +3944,7 @@ $(document).ready(function() {
 							},
 
 							error : function(err) {
-								console.lo3g("not working. ERROR: "
+								console.log("not working. ERROR: "
 										+ JSON.stringify(err));
 							}
 
@@ -4116,7 +3956,6 @@ $(document).ready(function() {
 					function() {
 
 						var contributionId = $("#contributorId").val();
-//						alert(contributionId);
 
 						$.ajax({
 							type : "GET",
@@ -4149,7 +3988,6 @@ $(document).ready(function() {
 			$('#contributorId').on('change',function() {
 						
 						var userContributor = $(this).find(':selected').val();
-						console.log(userContributor);
 						$.ajax({
 							type : "GET",
 							url : projectPath+"loadLanguageByUser",
@@ -4158,8 +3996,6 @@ $(document).ready(function() {
 							},
 							contentType : "application/json",
 							success : function(result) {
-
-								console.log(result);
 								var html = '';
 								var len = result.length;
 								html += '<option value="0">Select Language</option>';
@@ -4182,7 +4018,6 @@ $(document).ready(function() {
 			
 /************************* changes made by om prakash **********************************************/			
 			$('#lanId').on('change',function() {
-				console.log('test');
 					var languageName = $("#option :selected").text();
 
 						$.ajax({
@@ -4501,7 +4336,6 @@ $(document).ready(function() {
 							},
 
 							error : function(err) {
-//								alert('failed');
 								console
 								.log("not working. ERROR: "
 										+ JSON
@@ -4564,12 +4398,6 @@ $(document).ready(function() {
 
 						} else if (vals === '1') {
 
-//							$('#keywordNeedImprovement').css({
-//							'visibility' : 'hidden'
-//							});
-
-//							alert("Hello");
-
 							$.ajax({
 								type : "GET",
 								url : projectPath+"acceptDomainKeywords",
@@ -4579,7 +4407,10 @@ $(document).ready(function() {
 								contentType : "application/json",
 								success : function(
 										result) {
-									showStatus(SUCCESS,result);
+									//showStatus(SUCCESS,result);
+									$('.d_kw_status').show();
+									$('.d_kw_status').html(result);
+									$('.d_kw_status').addClass('alert-success');
 //									$("#statusKeywordByDomain").prop('disabled',false);
 //									$('#statusKeywordByDomain').html(result);
 
@@ -4588,7 +4419,10 @@ $(document).ready(function() {
 								error : function(err) {
 									console.lo3g("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR,result);
+									$('.d_kw_status').show();
+									$('.d_kw_status').html(result);
+									$('.d_kw_status').addClass('alert-danger');
+									//showStatus(ERROR,result);
 								}
 
 							});
@@ -4617,13 +4451,17 @@ $(document).ready(function() {
 
 //									$("#statusKeywordByDomain").prop('disabled',false);
 //									$('#statusKeywordByDomain').html(result);
-									showStatus(SUCCESS,result);
+									//showStatus(SUCCESS,result);
+									$('.d_c_kw').show();
+									$('.d_c_kw').html(result);
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR,result);
+									//showStatus(ERROR,result);
+									$('.d_c_kw').show();
+									$('.d_c_kw').html(result);
 								}
 
 							});
@@ -4698,6 +4536,10 @@ $(document).ready(function() {
 								success : function(result) {
 									// $("#statusOutlineByDomain").prop('disabled',false);
 									// $('#statusOutlineByDomain').html(result);
+									
+									//$('.d_c_outline').show();
+									//$('.d_c_outline').html(result);
+									
 									showStatus(SUCCESS,result);
 								},
 
@@ -4726,7 +4568,10 @@ $(document).ready(function() {
 								contentType : "application/json",
 								success : function(
 										result) {
-									showStatus(SUCCESS,result);
+											$('.d_c_outline').show();
+									$('.d_c_outline').html(result);
+
+									//showStatus(SUCCESS,result);
 									// $("#statusOutlineByDomain").prop('disabled',false);
 									// $('#statusOutlineByDomain').html(result);
 								},
@@ -5124,12 +4969,8 @@ $(document).ready(function() {
 /************************ changes made by om prakash ***************************************/
 			
 			$('#videoAcceptOrNeedToImprovemenetByAdmin').click(function() {
-
-						
 						var tutorialId = $("#tutorialId").val();
-
 						var vals = $("#VideoAcceptAdmin").val();
-
 						if (vals == 0) {
 							$('#msgVideoCommentByAdmin').css({
 								'visibility' : 'hidden'
@@ -5138,7 +4979,6 @@ $(document).ready(function() {
 							alert("Select Accept Or Need To Improvement");
 
 						} else if (vals == 1) {
-
 							$('#msgVideoCommentByAdmin').css({
 								'visibility' : 'hidden'
 							});
@@ -5154,7 +4994,6 @@ $(document).ready(function() {
 								},
 								contentType : "application/json",
 								success : function(result) {
-
 									$("#statusVideoByAdmin").prop('disabled',false);
 									$('#statusVideoByAdmin').html(result);
 										$('#success_msg').html(result);
@@ -5163,6 +5002,7 @@ $(document).ready(function() {
 								},
 
 								error : function(err) {
+									
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
 									showStatus(ERROR, result);
@@ -5171,15 +5011,13 @@ $(document).ready(function() {
 							});
 
 						} else if (vals == 2) {
-
 							$('#msgVideoCommentByAdmin').css({
 								'visibility' : 'visible'
 							});
-
 							var msg = $("#msgVideoCommentByAdmin").val();
 
 //							alert("mse admin player" + msg);
-
+						
 							$.ajax({
 
 								type : "GET",
@@ -5190,11 +5028,13 @@ $(document).ready(function() {
 								},
 								contentType : "application/json",
 								success : function(result) {
+									//$("#statusVideoByAdmin").prop('disabled',false);
+									//$('#statusVideoByAdmin').html(result);
 
-									$("#statusVideoByAdmin").prop('disabled',false);
-									$('#statusVideoByAdmin').html(result);
-
-									showStatus(SUCCESS, result);
+									//showStatus(SUCCESS, result);
+									$('.a_v_cmt').show();
+									$('.a_v_cmt').html(result);
+									$('.a_v_cmt').addClass('alert-success');
 
 								},
 
@@ -5249,7 +5089,6 @@ $(document).ready(function() {
 			/* Here is code keywod accept or need to improvement */
 //			$('#KeywordAcceptDomain').click(function() {
 			$('#KeywordAcceptDomain').change(function() {
-//				alert('HERE');
 				var vals = $("#KeywordAcceptDomain").val();
 				if (vals === '2'){
 					$('#keywordNeedImprovement').show();
@@ -5335,14 +5174,20 @@ $(document).ready(function() {
 										result) {
 //									$("#statusVideoByDomain").prop('disabled',false);
 //									$('#statusVideoByDomain').html(result);
-									showStatus(SUCCESS, result);
+									$('.d_video_cmt').show();
+									$('.d_video_cmt').html(result);
+									$('.d_video_cmt').addClass('alert-success');
+									//showStatus(SUCCESS, result);
 
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR, result);
+									$('.d_video_cmt').show();
+									$('.d_video_cmt').html(result);
+									$('.d_video_cmt').addClass('alert-danger');
+									//showStatus(ERROR, result);
 								}
 
 							});
@@ -5380,13 +5225,18 @@ $(document).ready(function() {
 								success : function(result) {
 //									$("#saveCommentScript").prop('disabled',false);
 //									$('#saveCommentScript').html(result);
-									showStatus(SUCCESS,result);
+									//showStatus(SUCCESS,result);
+									$('.d_c_script').show();
+									$('.d_c_script').html(result);
+									
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR,result);
+									//showStatus(ERROR,result);
+									$('.d_c_script').show();
+									$('.d_c_script').html(result);
 								}
 							});
 
@@ -5408,13 +5258,17 @@ $(document).ready(function() {
 
 									$("#saveCommentScript").prop('disabled',false);
 									$('#saveCommentScript').html(result);
-									showStatus(SUCCESS,result);
+									//showStatus(SUCCESS,result);
+									$('.d_c_script').show();
+									$('.d_c_script').html(result);
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR,result);
+									//showStatus(ERROR,result);
+									$('.d_c_script').show();
+									$('.d_c_script').html(result);
 								}
 
 							});
@@ -5605,7 +5459,10 @@ $(document).ready(function() {
 //									'#commentOutlineByQuality')
 //									.html(
 //									result);
-									showStatus(SUCCESS,result);
+									//showStatus(SUCCESS,result);
+									$('.q_outline').show();
+									$('.q_outline').html(result);
+									$('.q_outline').addClass('alert-success');
 
 								},
 
@@ -5615,7 +5472,11 @@ $(document).ready(function() {
 											+ JSON
 											.stringify(err));
 									result ="Error occured";
-									showStatus(ERROR,result);
+									//showStatus(ERROR,result);
+									$('.q_outline').show();
+									$('.q_outline').html(result);
+									$('.q_outline').addClass('alert-success');
+									
 								}
 
 							});
@@ -5850,7 +5711,6 @@ $(document).ready(function() {
 //			$('#keywordAccepOrNeedToImprovementQuality').click(
 			$('#keywordQualitAceept').change(
 					function() {
-						console.log('changed');
 						var vals = $("#keywordQualitAceept").val();
 						if (vals === '2'){
 							$('#NeedImprovementKeyword').show();
@@ -5878,7 +5738,6 @@ $(document).ready(function() {
 					});
 			$('#graphicsQuality').change(
 					function() {
-						console.log('changed');
 						var vals = $("#graphicsQuality").val();
 						if (vals === '2'){
 							$('#graphicsNeedImprovementByQuality').show();
@@ -5995,14 +5854,19 @@ $(document).ready(function() {
 								success : function(result) {
 //									$("#statusSlideByDomain").prop('disabled',false);
 //									$('#statusSlideByDomain').html(result);
-									showStatus(SUCCESS, result);
+									//showStatus(SUCCESS, result);
+									
+									$('.d_c_slide').show();
+									$('.d_c_slide').html(result);
 
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR, result);
+									$('.d_c_slide').show();
+									$('.d_c_slide').html(result);
+									//showStatus(ERROR, result);
 								}
 
 							});
@@ -6025,12 +5889,16 @@ $(document).ready(function() {
 
 //									$("#statusSlideByDomain").prop('disabled',false);
 //									$('#statusKeywordByQuality').html(result);
-									showStatus(SUCCESS, result);
+									//showStatus(SUCCESS, result);
+									$('.d_c_slide').show();
+									$('.d_c_slide').html(result);
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
-									showStatus(ERROR, result);
+									//showStatus(ERROR, result);
+									$('.d_c_slide').show();
+									$('.d_c_slide').html(result);
 								}
 
 							});
@@ -6104,13 +5972,20 @@ $(document).ready(function() {
 
 //									$("#statusKeywordByQuality").prop('disabled',false);
 //									$('#statusKeywordByQuality').html(result);
-									showStatus(SUCCESS,result);
+									//showStatus(SUCCESS,result);
+									$('.q_kw_cmt').show();
+									$('.q_kw_cmt').html(result);
+									$('.q_kw_cmt').addClass('alert-success');
+									
 								},
 
 								error : function(err) {
 									console.log("not working. ERROR: "+ JSON.stringify(err));
 									result = "Error";
-									showStatus(ERROR,result);
+									//showStatus(ERROR,result);
+									$('.q_kw_cmt').show();
+									$('.q_kw_cmt').html(result);
+									$('.q_kw_cmt').addClass('alert-danger');
 								}
 
 							});
@@ -6172,7 +6047,7 @@ $(document).ready(function() {
 				var inputTopicPre =$("#inputTopicPre").val();
 
 
-				alert(inputTopicPre);
+				//alert(inputTopicPre);
 
 				$.ajax({
 					type: "GET",
@@ -6182,7 +6057,7 @@ $(document).ready(function() {
 					success: function (result)
 					{
 
-						alert("save information");
+						//alert("save information");
 
 						var html = '';
 						var len = result.length;
@@ -6259,7 +6134,7 @@ $(document).ready(function() {
 				var inputTopicPre =$("#inputTopicPre").val();
 
 
-				alert(inputTopicPre);
+				//alert(inputTopicPre);
 
 				$.ajax({
 					type: "GET",
@@ -6269,7 +6144,7 @@ $(document).ready(function() {
 					success: function (result)
 					{
 
-						alert("save information");
+						//alert("save information");
 
 						var html = '';
 						var len = result.length;
@@ -6363,15 +6238,13 @@ $(document).ready(function() {
 								success : function(
 										result) {
 
-									$("#statusQualityByQuality").prop(
-													'disabled',
-													false);
-									$(
-									'#statusQualityByQuality')
-									.html(
-											result);
+									//$("#statusQualityByQuality").prop('disabled',false);
+									//$('#statusQualityByQuality').html(result);
 
-									showStatus(SUCCESS,result);
+									//showStatus(SUCCESS,result);
+									$('.q_video_cmt').show();
+									$('.q_video_cmt').html(result);
+									$('.q_video_cmt').addClass('alert-success');
 
 								},
 
@@ -6381,7 +6254,10 @@ $(document).ready(function() {
 											+ JSON
 											.stringify(err));
 									result = "Error";
-									showStatus(ERROR,result);
+									//showStatus(ERROR,result);
+									$('.q_video_cmt').show();
+									$('.q_video_cmt').html(result);
+									$('.q_video_cmt').addClass('alert-danger');
 								}
 
 							});
@@ -6391,14 +6267,12 @@ $(document).ready(function() {
 					});
 
 			$(".c-modal-close").click(function() {
-				console.log('this');
 				$(".modal").removeClass("is-active");
 			});
 
 /********* Changes made by Om Prakash ************************/
 
 			$(".comment-contri").click(function() {
-				console.log('this');
 				component = this.id;
 				var elem_id = '#'+component+'_comment'
 				var tutorialId = $("#tutorialId").val();
@@ -6428,13 +6302,11 @@ $(document).ready(function() {
 			});
 
 			$("#show_all_consultants").click(function() {
-				console.log('this');
 				$.ajax({
 					type: "GET",
 					url: projectPath+"displayConsultants",
 					contentType: "application/json",
 					success: function (result){
-						console.log(result);
 						$('.cons_record').show();
 						var id = result[0].id;
 						var name = result[0].nameConsaltant;
@@ -6447,9 +6319,6 @@ $(document).ready(function() {
 
 						var markup = "<tr><td>" + id + "</td><td>" + name + "</td><td>"+desc+"</td><td>"+"image"+"</td><td>"+elink+"</td><td>"+dlink+"</td></tr>";
 
-						console.log(elink);
-						console.log(dlink);
-						console.log(markup);
 						$("table tbody").append(markup);
 
 					},
@@ -6547,7 +6416,7 @@ $(document).ready(function() {
 				});*/
 
 			$("#addNullPrerequisite").click(function() {
-				console.log("this.......");
+				
 				component = this.id;
 				var elem_id = '#'+component+'_comment'
 				var tutorialId = $("#tutorialId").val();
@@ -6561,12 +6430,11 @@ $(document).ready(function() {
 					},
 					contentType : "application/json",
 					success : function(result) {
-						var msg = 'Pre-Requistic updated successfully.'
+						var msg = 'Prerequisite updated successfully.'
 									// $('#statusOutline').html(html);
-									$('#statusPreReq')
-									.addClass(
-									'd-block');
-								$('#statusPreReq').html(msg);
+									$('#status_pr').show();
+								$('#status_pr').html(msg);
+								$('#status_pr').addClass('alert-success');
 					},
 
 					error : function(err) {
@@ -6574,10 +6442,11 @@ $(document).ready(function() {
 						console.log("not working. ERROR: "+ JSON.stringify(err));
 							var msg = 'Error in updating Pre-Requistic.'
 									// $('#statusOutline').html(html);
-									$('#statusPreReq').addClass('d-block');
-								 $('#statusPreReq').addClass('alert-danger');
+									$('#status_pr').show();
+								$('#status_pr').html(msg);
+								 $('#status_pr').addClass('alert-danger');
 
-								$('#statusPreReq').html(msg);
+								
 
 					}
 				});
@@ -6623,8 +6492,6 @@ function validateEmail($email) {
 }
 
 function loadAllLanguages() {
-	
-	console.log("select_language.......",this);
 	component = this;
 	$.ajax({
 		type : "GET",
@@ -6700,8 +6567,6 @@ function readImageUrl(input) {
 	  }
 	}
 function validate_file_size(elem,s){
-	console.log(elem.files[0].size);
-	console.log(s);
 	var fileSize = elem.files[0].size;
 	if(fileSize > s){
 		alert("Please check file size");
@@ -6723,7 +6588,6 @@ $('#btn_unpublish').click(function() {
 							},
 							contentType : "application/json",
 							success : function(result) {
-								console.log(result);
 								if(result=="success"){
 									msg = 'Tutorial is unpublished.';
 									$('#response').addClass("alert-success");
@@ -6757,7 +6621,6 @@ $('#btn_unpublish').click(function() {
 							
 
 							error : function(err) {
-								console.log(err);
 								console.log("not working. ERROR: "+ JSON.stringify(err));
 							}
 						});

@@ -21,7 +21,7 @@ border: 1px solid #014F7A!important;}
 	<!-- Fixed Header And Menu Bar -->
 	<header class=" pt-3 mb-5" id="top-fixed-banner">
 		<section th:replace="index.html :: header-bar"></section>
-		<nav th:replace="index.html :: navbar"></nav>
+  		<nav th:replace="index.html :: navbar"></nav>
 	</header>
 
 	<main>
@@ -33,34 +33,16 @@ border: 1px solid #014F7A!important;}
 				<thead class="">
 
 					<tr>
-						<th>Consultant</th>
-						<th>Category</th>
-						<th>Profile</th>
-
+						<th>Languages</th>
+						<th>Total Tutorials</th>
 					</tr>
 
 
 				</thead>
 				<tbody>
-
-
-					<tr th:each="consultant : ${listConsultant}" class="py-6" >
-						<td class="td-img" ><img
-							th:src="@{/files/}+@{${consultant.getUser().getProfilePic()}}"
-							 style="max-width:30%;min-width:150px;" /><br>
-							 <span th:text="${consultant.getUser().getFullName()}"></span>
-							 </td>
-						<td  class="td-name" >
-						<span th:text="${map.get(consultant.getConsultantId())}">
-						
-						</span>
-						
-						</td>
-						<td th:text="${consultant.getDescription()}" ></td>
-
-
-
-
+					<tr th:each="instance : ${map}">
+					    <td th:text="${instance.key}">keyvalue</td>
+					    <td th:text="${instance.value}">num</td>
 					</tr>
 				</tbody>
 
@@ -81,7 +63,7 @@ border: 1px solid #014F7A!important;}
 		<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js" ></script>
 <script type="text/javascript">
 $(document).ready( function () {
-    $('#tableId').DataTable();
+    $('#tableId').DataTable({"pageLength": 25});
 } );
 </script>
 

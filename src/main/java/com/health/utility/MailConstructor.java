@@ -2,6 +2,7 @@ package com.health.utility;
 
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,9 @@ import com.health.model.User;
  */
 @Component
 public class MailConstructor {
+	
+	@Value("${spring.mail.username}")
+	String contact_mail;
 	
 	/**
 	 * This method used to achieve forget password feature in application
@@ -112,5 +116,21 @@ public class MailConstructor {
 		email.setText(message);
 		email.setTo(usr.getEmail());
 		return email;
+	}
+	
+	/**
+	 * This method used to send email when feedback form is filled
+	 * @param usr user object
+	 * @return SimpleMailMessage object
+	 */
+	public SimpleMailMessage feedbackMailSend(String  name, String email, String message) {
+		String mail_body="Feedback Mail : \n"
+				+ "name : "+ name +"\n"
+				+ "email : "+ email;
+		SimpleMailMessage mail=new SimpleMailMessage();
+		mail.setSubject("Feedback Mail");
+		mail.setText(mail_body);
+		mail.setTo(contact_mail);
+		return mail;
 	}
 }

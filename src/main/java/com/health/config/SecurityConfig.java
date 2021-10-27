@@ -85,7 +85,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/tutCountOnCat/**",
 			"/tutCountOnLan/**",
 			"/cdContentInfo/**",
-			"/getContributorByTutLanUser/**"
+			"/getContributorByTutLanUser/**",
+			"/showConsultant/**",
+			"/showLanguages/**"
 	};
 
 	/**
@@ -122,6 +124,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/details/**",
 			"/tutorialStatus/**",
 			"/users/**"
+			
 
 	};
 

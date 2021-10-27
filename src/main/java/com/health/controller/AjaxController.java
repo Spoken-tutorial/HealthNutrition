@@ -332,7 +332,6 @@ public class AjaxController{
 		}
 
 		if(newPass.length()<6) {
-			System.out.println("vik");
 			status.add("passwordLengthError");
 			return status;
 		}
@@ -369,8 +368,6 @@ public class AjaxController{
 		List<TraineeInformation> traineeListResponse = new ArrayList<TraineeInformation>() ;
 
 		for(TraineeInformation x : traineeList) {
-
-			System.out.println(x.getAge());
 			TraineeInformation tem = new TraineeInformation(x.getTrainingId(), x.getName(), x.getEmail(), x.getPhone(), x.getAge(), x.getAadhar(), x.getGender(), x.getOrganization(), null);
 			traineeListResponse.add(tem);
 		}
@@ -397,8 +394,6 @@ public class AjaxController{
 		for(TrainingTopic x :trainingTopic) {
 //			TrainingInformation temp = trainingInforService.getById(x.getTraineeInfos().getTrainingId());
 			Event event = eventService.findById(x.getEvent().getEventId());
-			System.err.println("***********************");
-			System.err.println(event);
 //			topicName.put(temp.getTrainingId(), temp.getTitleName());
 			topicName.put(event.getEventId(), event.getEventName());
 		}
@@ -491,7 +486,6 @@ public class AjaxController{
 	public @ResponseBody HashMap<Integer, String> getTopicByCategoryPreRequistic(@RequestParam(value = "id") String id,
 																			@RequestParam(value = "tutorialId") int tutorialId,
 																			@RequestParam(value = "langName") String langName) {
-		System.out.println("*********************L");
 
 		HashMap<Integer,String> topicName=new HashMap<>();
 
@@ -515,21 +509,13 @@ public class AjaxController{
 		List<Tutorial> tuts = tutService.findAllByContributorAssignedTutorialList(tempCon);
 
 		for(Tutorial temp : tuts) {
-
-			System.out.println("*********************");
-			System.out.println(temp.getTutorialId());
-			System.out.println("*********************");
 			if(temp.getTutorialId() != tut.getTutorialId()) {
-				
 				if(temp.isStatus()) {
 					topicName.put(temp.getTutorialId(), temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 				}
-				
 			}
-
 		}
 		return topicName;
-
 	}
 
 
@@ -591,8 +577,6 @@ public class AjaxController{
 					usr.setUserRoles(null);
 					usrservice.save(usr);
 				}
-				
-				System.out.println("vikash");
 				
 				usrRole.setRole(null);
 				usrRole.setUser(null);
@@ -815,7 +799,6 @@ public class AjaxController{
 			Tutorial local=new Tutorial();
 			local.setDateAdded(ServiceUtility.getCurrentTime());
 			local.setConAssignedTutorial(conLocal);
-			System.out.println(conLocal.getLan().getLangName());
 			local.setOutline(outlineData);
 			local.setOutlineStatus(CommonData.DOMAIN_STATUS);
 			local.setOutlineUser(usr);
@@ -849,7 +832,6 @@ public class AjaxController{
 
 			try {
 				tutService.save(local);
-				System.out.println("in Exception-block");
 				LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
 				logService.save(log);
 			}catch (Exception e) {
@@ -963,7 +945,6 @@ public class AjaxController{
 	@RequestMapping("/addPreRequisticWhenNotRequired")
 	public @ResponseBody HashMap<Integer, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
 			Principal principal) {
-		System.out.println("******************************************Here");
 		
 		HashMap<Integer, String> temp = new HashMap<>();
 		User usr=new User();
@@ -1013,7 +994,6 @@ public class AjaxController{
 			@RequestParam(value = "categoryname") String catName,
 			@RequestParam(value = "topicid") int topicId,
 			@RequestParam(value = "lanId") String lanId,Principal principal) {
-		System.out.println("******************************************Here");
 		
 		HashMap<Integer, String> temp = new HashMap<>();
 		User usr=new User();
@@ -1354,7 +1334,6 @@ public class AjaxController{
 	 */
 	@RequestMapping("/addScript")
 	public @ResponseBody HashMap<Integer, String> addScript(@RequestParam(value = "id") int tutorialId,
-											@RequestParam(value = "uploadsScriptFile") MultipartFile videoFile,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
 											@RequestParam(value = "lanId") String lanId,
@@ -1370,29 +1349,29 @@ public class AjaxController{
 		}
 		
 		
-		if(!ServiceUtility.checkFileExtensiononeFilePDF(videoFile)) { // throw error on extension
-			
-			temp.put(0, "File extension must be in PDF") ;
-			return temp;
-		}
-		
-		if(!ServiceUtility.checkScriptSlideProfileQuestion(videoFile)) {
-			
-			temp.put(0, "File Size must be under 20 MB") ;
-			return temp;
-		}
+//		if(!ServiceUtility.checkFileExtensiononeFilePDF(videoFile)) { // throw error on extension
+//			
+//			temp.put(0, "File extension must be in PDF") ;
+//			return temp;
+//		}
+//		
+//		if(!ServiceUtility.checkScriptSlideProfileQuestion(videoFile)) {
+//			
+//			temp.put(0, "File Size must be under 20 MB") ;
+//			return temp;
+//		}
 
 		if(tutorialId != 0) {
 			Tutorial tut=tutService.getById(tutorialId);
 			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.DOMAIN_STATUS, tut.getScriptStatus(), CommonData.contributorRole, usr, tut);
 			try {
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Script");
-					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Script");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
+//					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Script");
+//					int indexToStart=pathtoUploadPoster.indexOf("Media");
 
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+//					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
-					tut.setScript(document);
+//					tut.setScript(document);
 					tut.setScriptStatus(CommonData.DOMAIN_STATUS);
 					tut.setScriptUser(usr);
 					try {
@@ -1400,16 +1379,16 @@ public class AjaxController{
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						temp.put(0, "Please Try again") ;
+						temp.put(0, CommonData.GENERAL_ERROR_MSG) ;
 						return temp;
 					}
 
 					logService.save(log);
-					temp.put(1, CommonData.Script_SAVE_SUCCESS_MSG);
+					temp.put(1, CommonData.SCRIPT_FOR_DOMAIN_REVIEW);
 					return temp;
 
 			}catch (Exception e) {
-				temp.put(0, "Please Try again") ;
+				temp.put(0, CommonData.GENERAL_ERROR_MSG) ;
 				return temp;
 			}
 
@@ -1454,13 +1433,13 @@ public class AjaxController{
 			try {
 				tutService.save(local);
 
-				if(ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Script")) {
-					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Script");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+//				if(ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Script")) {
+//					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Script");
+//					int indexToStart=pathtoUploadPoster.indexOf("Media");
+//
+//					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 					Tutorial tut1=tutService.getById(newTutorialid);
-					tut1.setScript(document);
+//					tut1.setScript(document);
 					tut1.setScriptStatus(CommonData.DOMAIN_STATUS);
 					tut1.setScriptUser(usr);
 					tutService.save(tut1);
@@ -1470,22 +1449,20 @@ public class AjaxController{
 					temp.put(1, CommonData.Script_SAVE_SUCCESS_MSG);
 					return temp;
 
-				}else {
-
-					temp.put(0, "Please Try again") ;
-					return temp; /////////////////  throw error
-				}
+//				}
+//				else {
+//
+//					temp.put(0, "Please Try again") ;
+//					return temp; /////////////////  throw error
+//				}
 
 
 			}catch (Exception e) {
 				// TODO: handle exception
 				temp.put(0, "Please Try again") ;
 				return temp;       // throw error
-			}
-
-
-		}
-
+			} 
+		} 
 
 	}
 
@@ -1576,7 +1553,7 @@ public class AjaxController{
 		tutService.save(tutorial);
 		logService.save(log);
 
-		return CommonData.Script_SAVE_SUCCESS_MSG;
+		return CommonData.SCRIPT_FOR_QUALITY_REVIEW;
 
 	}
 
@@ -1732,7 +1709,7 @@ public class AjaxController{
 		tutorial.setScriptStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Script_SAVE_SUCCESS_MSG;
+		return CommonData.SCRIPT_STATUS_UPDATE_SUCCESS;
 
 	}
 
@@ -2086,6 +2063,9 @@ public class AjaxController{
 			addLocal.setName(contactData.getName());
 
 			ffService.save(addLocal);
+			SimpleMailMessage msg = mailConstructor.feedbackMailSend(contactData.getName(), contactData.getEmail(), contactData.getMessage());
+			mailSender.send(msg);
+			
 			status.add("Success");
 
 		} catch (Exception e) {
@@ -2136,8 +2116,6 @@ public class AjaxController{
 	 */
 	@GetMapping("/getConsultantDetails")
 	public @ResponseBody List<String> getConsultantDetailsInfo(@RequestParam(value = "id") int consultantId) {
-		System.err.print("inside*********************************************");
-		System.out.println("inside test *********************************************");
 		Consultant cons = consultantService.findById(consultantId);
 		User user = cons.getUser();
 
@@ -2153,10 +2131,6 @@ public class AjaxController{
 				}
 			}
 		}
-
-		System.err.print("cat-lang*********************************************");
-		System.err.print(cat_lang);
-		System.err.print("cat-lang*********************************************");
 		return cat_lang;
 
 	}

@@ -1,7 +1,19 @@
 
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
-
+<style>
+.fa-user-circle,.fa-clock, .fa-comment-alt{
+color : #014F7A;}
+#sm_url:hover, #cat:hover{
+background: none!important;}
+.modal-title{
+font-weight : bold!important;
+color: #014F7A;
+font-size: 1rem;
+}
+.modal-header{
+border-bottom: 2px solid #014F7A!important;}
+</style>
 <head th:replace="common/trail :: common-trail"></head>
 <body>
 	<div th:replace="common/sidebar :: top_header"></div>
@@ -27,7 +39,6 @@
 												<td><input class="form-control" id="categoryId"
 													name="categoryName" th:value="${category}"
 													readonly="readonly"></input></td>
-
 											</tr>
 										</thead>
 
@@ -83,7 +94,7 @@
 														<span style="color: green;" th:text="${statusOutline}">Pending</span>
 												</span></td>
 												<td>
-												<span style="color: green;" th:if="${tutorial.getOutlineUser()}" th:text="${tutorial.getOutlineUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getOutlineUser()}" th:text="${#strings.capitalizeWords(tutorial.getOutlineUser().getFullName())}"></span>
 												</span></td>
 												
 												<th>
@@ -103,7 +114,7 @@
 														<span style="color: green;" th:text="${statusScript}">Pending</span>
 												</span></td>
 												<td>
-												<span style="color: green;" th:if="${tutorial.getScriptUser()}" th:text="${tutorial.getScriptUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getScriptUser()}" th:text="${#strings.capitalizeWords(tutorial.getScriptUser().getFullName())}"></span>
 												</span></td>
 												
 												<th>
@@ -124,7 +135,7 @@
 														<span style="color: green;" th:text="${statusSlide}">Pending</span>
 												</span></td>
 												<td>
-												<span style="color: green;" th:if="${tutorial.getSlideUser()}" th:text="${tutorial.getSlideUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getSlideUser()}" th:text="${#strings.capitalizeWords(tutorial.getSlideUser().getFullName())}"></span>
 												</span></td>
 												
 												<th>
@@ -147,7 +158,7 @@
 														<span style="color: green;" th:text="${statusVideo}">Pending</span>
 												</span></td>
 												<td>
-												<span style="color: green;" th:if="${tutorial.getVideoUser()}" th:text="${tutorial.getVideoUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getVideoUser()}" th:text="${#strings.capitalizeWords(tutorial.getVideoUser().getFullName())}"></span>
 												</span></td>
 
 												
@@ -169,7 +180,7 @@
 														<span style="color: green;" th:text="${statusKeyword}">Pending</span>
 												</span></td>
 												<td>
-												<span style="color: green;" th:if="${tutorial.getKeywordUser()}" th:text="${tutorial.getKeywordUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getKeywordUser()}" th:text="${#strings.capitalizeWords(tutorial.getKeywordUser().getFullName())}"></span>
 												</span></td>
 												
 												<th>
@@ -190,7 +201,7 @@
 												<td><span class="status-contri"
 													th:text="${statusPreReq}"></span></td>
 												<td>
-												<span style="color: green;" th:if="${tutorial.getPreRequiticUser()}" th:text="${tutorial.getPreRequiticUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getPreRequiticUser()}" th:text="${#strings.capitalizeWords(tutorial.getPreRequiticUser().getFullName())}"></span>
 												</span></td>
 												
 												<th>
@@ -322,8 +333,8 @@
 										<div class="modal-header">
 											<h5 class="modal-title" id="exampleModalLabelscriptStatus">Quality Review - Script</h5>
 
-											<div style="color: green; padding-left: 20px"
-												id="saveCommentScript"></div>
+											<!-- <div style="color: green; padding-left: 20px"
+												id="saveCommentScript"></div> -->
 
 
 											<div class="modal-title"></div>
@@ -337,9 +348,13 @@
 											<div class="row">
 											
 												<div class="col-12">
+												<div class="alert alert-msg" style="display: none;"></div>
 												<div th:if="${tutorial.getScriptStatus()!=3}" class="alert alert-info ">Not valid for review</div>
-													<div class="alert alert-msg" style="display: none;"></div>
-													<div th:if="${tutorial.getScriptStatus()!=0}" class="border border-secondary p-3 mb-3" >
+												<div class="alert alert-info" role="alert">
+  												<i class="fas fa-external-link-alt"></i> <a th:href="${sm_url}" class="alert-link" style="text-decoration: underline;color: #014F7A;" target="_blank" id="sm_url">Click here to proceed to Script Manager</a>
+											</div>
+													
+													<!-- <div th:if="${tutorial.getScriptStatus()!=0}" class="border border-secondary p-3 mb-3" >
 														<span id="scriptIdQuality"
 															th:each="scriptpath : ${tutorial}"> <a
 															target="_blank" id="cat" name="categoryName"
@@ -350,10 +365,14 @@
 														</a>
 
 														</span>
-													</div>
+													</div> -->
 													<div th:if="${tutorial.getScriptStatus()==3}">
-													
-														<form class="form-horizontal" th:action="@{/addkeyword}"
+													<div class="card border-info mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Review Feedback :</span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal" th:action="@{/addkeyword}"
 															 method="post">
 															<div class="form-group">
 																<select id="scriptAccept" class="form-control">
@@ -366,13 +385,16 @@
 															</div>
 
 															<div id="scriptNeedImprovement" style="display: none;">
-																<label for="msgScriptQuality">Comments</label>
+																<label for="msgScriptQuality"><span class="font-weight-bold">Add your comment below:</span></label>
 																<textarea class="form-control" name="msgScriptQuality"
-																	id="msgScriptQuality" rows="10" required="required"
-																	placeholder="Add your comments here."></textarea>
+																	id="msgScriptQuality" rows="3" required="required"
+																	></textarea>
 
 															</div>
 														</form>
+  </div>
+</div>
+														
 
 
 
@@ -382,18 +404,30 @@
 
 												</div>
 
-													<div class="col-12">
-														<div th:if="${not #lists.isEmpty(comScript)}">
-															<h6 class="border-bottom">Comments:</h6>
+													<div class="col-12"><div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comScript)}">
 															<div th:each="comment : ${comScript}"
-																class="border-bottom">
-																<p class="my-0"><strong><i class="fas fa-user mr-2"></i><span th:text="${comment.getUser().getFullName()}"></span></strong></p>
-											    <p class="my-0"><small><i class="far fa-clock mr-2"></i><span th:text="${comment.getDateAdded()}"></span></small></p>
-											    <p class="my-0 text-muted" ><span th:text="${comment.getComment()}"></span></p>
+																class="border-bottom py-2">
+																<span class="my-0">
+																<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+																</span><br>
+											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
 
 															</div>
 
 														</div>
+														<div th:if="${#lists.isEmpty(comScript)}">
+															<span>No comments available.</span>
+
+														</div>
+  </div>
+</div>
+														
 													</div>
 
 
@@ -449,8 +483,14 @@
 										<div class="modal-body">
 											<div class="row">
 												<div class="col-12">
-												<div th:if="${tutorial.getVideoStatus()!=3}"><div class="alert alert-info">Not valid for review</div></div>
-													<div class="alert alert-msg" style="display: none;"></div>
+												<div class="alert alert-msg" style="display: none;"></div>
+												<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
+  </div>
+  <div class="card-body">
+    <div th:if="${tutorial.getVideoStatus()!=3}"><div class="alert alert-info">Not valid for review</div></div>
+													
 													<div th:if="${tutorial.getVideo()!=null}" class="embed-responsive embed-responsive-16by9 mb-5">
 														<video id='storedVideoIdDomain' controls="controls"
 															style="width: 100% !important;">
@@ -460,11 +500,35 @@
 																type="video/mp4"></source>
 														</video>
 													</div>
-													<div> Video Duration : <span th:text="${FileDurationInSecond}"/> Seconds </div> 
-													<div> Video File Size : <span th:text="${fileSizeInMB}"/> MB </div>
-													<div> Video Width : <span th:text="${FileWidth}"/> </div> 
-													<div> Video Height : <span th:text="${FileHeight}"/>  </div>
-													<div th:if="${tutorial.getVideoStatus() == 3}">
+													<table class="table table-bordered">
+													<tbody>
+													<tr>
+													<td>Video Duration</td>
+													<td><span th:text="${FileDurationInSecond}"></span> Seconds</td>
+													</tr>
+													<tr>
+													<td>Video File Size</td>
+													<td><span th:text="${fileSizeInMB}"></span> MB</td>
+													</tr>
+													<tr>
+													<td>Video Width</td>
+													<td><span th:text="${FileWidth}"></span></td>
+													</tr>
+													<tr>
+													<td>Video Height</td>
+													<td><span th:text="${FileHeight}"></span></td>
+													</tr>
+													</tbody>
+													</table>
+  </div>
+</div>
+<div class="alert q_video_cmt" style="display: none;"></div>
+<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Review Feedback : </span>
+  </div>
+  <div class="card-body">
+    <div th:if="${tutorial.getVideoStatus() == 3}">
 														<form class="form-horizontal"
 															th:action="@{/addOutlineStataus}"
 															 method="post">
@@ -484,46 +548,12 @@
 															<div id="NeedImprovement" style="display: none;">
 																<label for="msgVideoQuality">Comments: </label>
 																<textarea class="form-control" name="msgVideoQuality"
-																	id="msgVideoQuality" rows="10" required="required"></textarea>
+																	id="msgVideoQuality" rows="3" required="required"></textarea>
 
 
 															</div>
 															<br />
-
-														</form>
-
-
-													</div>
-
-												</div>
-
-												<div class="col-12">
-													<div th:if="${not #lists.isEmpty(comVideo)}">
-														<h6 class="border-bottom">Comments:</h6>
-														<div th:each="comment : ${comVideo}"
-															class="border-bottom">
-															<p class="my-0">
-																<strong><span
-																	th:text="${comment.getUser().getFullName()}"></span></strong>
-															</p>
-															<p class="my-0">
-																<small><span
-																	th:text="${comment.getDateAdded()}"></span></small>
-															</p>
-															<p class="my-0 text-muted">
-																<span th:text="${comment.getComment()}"></span>
-															</p>
-
-														</div>
-
-													</div>
-												</div>
-											</div>
-
-
-										</div>
-										<div class="modal-footer">
-											<div th:if="${tutorial}">
+						<div th:if="${tutorial}">
 												<div th:if="${tutorial.getVideoStatus() == 3}">
 													<button id="VideoAcceptOrNeedToImprovemenetByQuality"
 														type="button" class="btn btn-success">Submit</button>
@@ -538,6 +568,48 @@
 												<button id="VideoAcceptOrNeedToImprovemenetByQuality"
 													type="button" class="btn btn-success">Submit</button>
 											</div>
+														</form>
+
+
+													</div>
+  </div>
+</div>
+												
+													
+													
+
+												</div>
+
+												<div class="col-12">
+												<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comVideo)}">
+														<div th:each="comment : ${comVideo}"
+															class="border-bottom py-2">
+															<span class="my-0">
+																<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+															</span><br>
+															
+															<span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
+
+														</div>
+
+													</div>
+	<div th:if="${#lists.isEmpty(comVideo)}"><span>No comments available.</span></div>
+  </div>
+</div>
+													
+												</div>
+											</div>
+
+
+										</div>
+										<div class="modal-footer">
+											
 
 											<button type="button" class="btn btn-secondary"
 												data-dismiss="modal">Close</button>
@@ -572,7 +644,12 @@
 												<div class="col-12">
 												<div th:if="${tutorial.getPreRequisticStatus()!=3}"><div class="alert alert-info">Not valid for review</div></div>
 												<div class="alert alert-msg" style="display: none;"></div>
-																							<div class="form-group mb-3">
+												<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Selected prerequisite : <span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
+  </div>
+  <div class="card-body">
+    <div class="form-group mb-3">
 												<div th:if="${tutorial.getPreRequistic()!=null}" class="embed-responsive embed-responsive-16by9 mb-5">
 														<video id='storedPreId' controls="controls"
 															style="width: 100% !important;">
@@ -586,61 +663,41 @@
 												
 
 											</div>
-											<div>
-												<div th:if="${tutorial.getPreRequistic()==null}"
+											<div th:if="${tutorial.getPreRequistic()==null}"
 												
 												class="alert alert-secondary upload-status" role="alert">
 												This tutorial has no prerequisite
 												
 												
 												</div>
+											
+  </div>
+</div>
+																							
+											<div>
+												<div class="alert alert-success w-100 q_pre mt-3" role="alert" style="display:none;"></div>
 												<div th:if="${tutorial.getPreRequisticStatus()==3}">
-												<form class="form-horizontal" th:action="@{/addkeyword}"
+												<div class="card border-info my-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Review Feedback :</span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal" th:action="@{/addkeyword}"
 													 method="post">
-
 													<div class="form-group">
-
 														<select id="preAcceptQuality" class="form-control">
-
 															<option value="0">Select</option>
 															<option value="1">Accept</option>
 															<option value="2">Need Improvement</option>
-
 														</select>
-
 													</div>
-
 													<div id="preNeedImprovementQuality" style="display: none">
-
-														<label for="preCommentMsgTest">Comments: </label>
+														<label for="preCommentMsgTest"><span class="font-weight-bold">Add your comment below:</span></label>
 														<textarea class="form-control" name="preCommentMsgTest"
-															id="preCommentMsgTest" rows="10" required="required"></textarea>
-
+															id="preCommentMsgTest" rows="3" required="required"></textarea>
 													</div>
 													<br />
-												</form>
-												</div>
-											</div>
-												</div>
-												<div class="col-12">
-												<div th:if="${not #lists.isEmpty(comPreReq)}">
-									<h6 class="border-bottom">Comments: </h6>
-											    <div th:each="comment : ${comPreReq}" class="border-bottom"> 
-											    <p class="my-0"><strong><i class="fas fa-user mr-2"></i><span th:text="${comment.getUser().getFullName()}"></span></strong></p>
-											    <p class="my-0"><small><i class="far fa-clock mr-2"></i><span th:text="${comment.getDateAdded()}"></span></small></p>
-											    <p class="my-0 text-muted" ><span th:text="${comment.getComment()}"></span></p>
-											    
-											    </div>
-									
-									</div>
-												
-												</div>
-											</div>
-
-
-										</div>
-										<div class="modal-footer">
-											<div th:if="${tutorial}">
+													<div th:if="${tutorial}">
 												<div th:if="${tutorial.getPreRequisticStatus() == 3}">
 													<button id="preAcceptOrNeedToImprovemenetByQuality"
 														type="button" class="btn btn-success">Submit</button>
@@ -655,6 +712,47 @@
 												<button id="preAcceptOrNeedToImprovemenetByQuality"
 													type="button" class="btn btn-success">Submit</button>
 											</div>
+												</form>
+  </div>
+</div>
+												
+												</div>
+											</div>
+												</div>
+												<div class="col-12">
+												<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+   <div th:if="${not #lists.isEmpty(comPreReq)}">
+											    <div th:each="comment : ${comPreReq}" class="border-bottom py-2"> 
+											    <span class="my-0">
+											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+																
+											    </span><br>
+											    
+											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i>
+											    <span th:text="${comment.getComment()}"></span></span>
+											    
+											    </div>
+									
+									</div>
+									<div th:if="${#lists.isEmpty(comPreReq)}">
+									<span>No comments available.</span>
+									</div>
+  </div>
+</div>
+												
+												
+												</div>
+											</div>
+
+
+										</div>
+										<div class="modal-footer">
+											
 
 											<button type="button" class="btn btn-secondary"
 												data-dismiss="modal">Close</button>
@@ -694,13 +792,28 @@
 										<div class="modal-body">
 											<div class="row">
 												<div class="col-12">
+												<div class="alert alert-success w-100 q_outline mt-3" role="alert" style="display:none;"></div>
 												<div th:if="${tutorial.getOutlineStatus() != 3}"><div class="alert alert-info">Not valid for review</div></div>
 													<div class="alert alert-msg" style="display: none;"></div>
-													<div class="border border-info p-2 mb-5">
+													<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
+  </div>
+  <div class="card-body">
+    <span th:utext="${tutorial.getOutline()}"></span>
+  </div>
+</div>
+													<!-- <div class="border border-info p-2 mb-5">
 														<span th:utext="${tutorial.getOutline()}"></span>
-													</div>
+													</div> -->
+													<!-- <div class="alert alert-success w-100 q_outline mt-3" role="alert" style="display:none;"></div> -->
 													<div th:if="${tutorial.getOutlineStatus() == 3}">
-														<form class="form-horizontal" th:action="@{/}"
+													<div class="card border-info">
+  <div class="card-header">
+    <span class="font-weight-bold">Review Feedback :</span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal" th:action="@{/}"
 															 method="post">
 
 															<div class="form-group">
@@ -716,46 +829,14 @@
 
 															</div>
 
-															<div id="NeedImprovement" class="textarea-comment"
+															<div id="NeedImprovement" class="textarea-comment mb-2"
 																style="display: none">
-																<label for="msgQualitytOutline">Comments</label>
+																<label for="msgQualitytOutline"><span class="font-weight-bold">Add your comment below:</span></label>
 																<textarea class="form-control" name="msgQualitytOutline"
-																	id="msgQualitytOutline" rows="10" required="required">
+																	id="msgQualitytOutline" rows="3" required="required">
 								 </textarea>
-
 															</div>
-
-
-															
-
-														</form>
-
-													</div>
-												</div>
-
-												<div class="col-12">
-													<div th:if="${not #lists.isEmpty(comOutline)}">
-														<h6 class="border-bottom">Comments:</h6>
-														<div th:each="comment : ${comOutline}"
-															class="border-bottom">
-															<p class="my-0"><strong><i class="fas fa-user mr-2"></i><span th:text="${comment.getUser().getFullName()}"></span></strong></p>
-											    <p class="my-0"><small><i class="far fa-clock mr-2"></i><span th:text="${comment.getDateAdded()}"></span></small></p>
-											    <p class="my-0 text-muted" ><span th:text="${comment.getComment()}"></span></p>
-
-														</div>
-
-													</div>
-
-												</div>
-											</div>
-
-
-
-
-
-										</div>
-										<div class="modal-footer">
-											<div th:if="${tutorial}">
+															<div th:if="${tutorial}">
 												<div th:if="${tutorial.getOutlineStatus() == 3}">
 													<button id="submitQualityOutlineStatus" type="button"
 														class="btn btn-success">Submit</button>
@@ -769,6 +850,67 @@
 												<button id="submitQualityOutlineStatus" type="button"
 													class="btn btn-success">Submit</button>
 											</div>
+														</form>
+  </div>
+</div>
+														
+													</div>
+												</div>
+
+												<div class="col-12">
+													<div th:if="${not #lists.isEmpty(comOutline)}">
+													<div class="card mt-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:each="comment : ${comOutline}"
+															class="border-bottom py-2">
+															<span class="my-0">
+															<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> 
+																<span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, 
+																<span th:text="${#dates.year(comment.getDateAdded())}"></span> , 
+																<span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small></span><br>
+																
+															<!-- <i class="fas fa-user mr-2"></i><span th:text="${comment.getUser().getFullName()}"></span></p>
+											    <p class="my-0"><small><i class="far fa-clock mr-2"></i><span th:text="${comment.getDateAdded()}"></span></small></p> -->
+											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
+
+														</div>
+  </div>
+</div>
+														
+														
+
+													</div>
+													<div th:if="${#lists.isEmpty(comOutline)}">
+													<span>No comments available.</span>
+													</div>
+
+												</div>
+											</div>
+
+
+
+
+
+										</div>
+										<div class="modal-footer">
+											<!-- <div th:if="${tutorial}">
+												<div th:if="${tutorial.getOutlineStatus() == 3}">
+													<button id="submitQualityOutlineStatus" type="button"
+														class="btn btn-success">Submit</button>
+												</div>
+												<div th:unless="${tutorial.getOutlineStatus() == 3}">
+													<button id="submitQualityOutlineStatus" type="button"
+														class="btn btn-success" disabled="disabled">Submit</button>
+												</div>
+											</div>
+											<div th:unless="${tutorial}">
+												<button id="submitQualityOutlineStatus" type="button"
+													class="btn btn-success">Submit</button>
+											</div> -->
 
 
 											<button type="button" class="btn btn-secondary"
@@ -808,74 +950,54 @@
 										<div class="modal-body">
 											<div class="row">
 												<div class="col-12">
-												<div th:if="${tutorial.getSlideStatus() != 3}"><div class="alert alert-info">Not valid for review</div></div>
-													<div class="alert alert-msg" style="display: none;"></div>
-													<div th:if="${tutorial.getSlide()!=null}" class="border border-secondary p-3 mb-3">
+												<div class="alert alert-msg" style="display: none;"></div>
+												<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
+  </div>
+  <div class="card-body">
+    <div th:if="${tutorial.getSlideStatus() != 3}"><div class="alert alert-info">Not valid for review</div></div>
+													
+													 <div th:if="${tutorial.getSlide()!=null}" class="alert alert-info p-3 mb-3">
 														<span id="slideIdQuality"
 															th:each="slidepath : ${tutorial}"> <a
 															target="_blank" id="cat" name="categoryName"
-															th:href="@{/files/}+@{${slidepath.getSlide()}}"> <span
-																>View slides</span>
+															th:href="@{/files/}+@{${slidepath.getSlide()}}" class="alert-link"> <span
+																>
+																<i class="fas fa-external-link-alt"></i> Click to download slides for <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
+															</span>
 														</a>
 														</span>
-													</div>
+													</div> 
+  </div>
+</div>
+												
 
 													<div th:if="${tutorial.getSlideStatus() == 3}">
-														<form class="form-horizontal" th:action="@{/addkeyword}"
+													<div class="card border-info">
+  <div class="card-header">
+    <span class="font-weight-bold">Review Feedback :</span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal" th:action="@{/addkeyword}"
 															 method="post">
 
 															<div class="form-group">
 
 																<select id="slideAcceptByQuality" class="form-control">
-
-
 																	<option value="0">Select</option>
 																	<option value="1">Accept</option>
 																	<option value="2">Need Improvement</option>
-
 																</select>
-
 															</div>
-
 															<div id="slideNeedToImp" style="display: none;">
-																<label for="msgScriptDomain">Comments</label>
+																<label for="msgScriptDomain"><span class="font-weight-bold">Add your comment below:</span></label>
 																<textarea class="form-control" name="slideCommentMsg"
-																	id="slideCommentMsg" rows="10" required="required"
+																	id="slideCommentMsg" rows="3" required="required"
 																	placeholder="Enter your comments here.">
 								 </textarea>
-
 															</div>
-
-														</form>
-
-
-													</div>
-
-
-												</div>
-
-												<div class="col-12">
-													<div th:if="${not #lists.isEmpty(comSlide)}">
-														<h6 class="border-bottom">Comments:</h6>
-														<div th:each="comment : ${comSlide}"
-															class="border-bottom">
-															<p class="my-0"><strong><i class="fas fa-user mr-2"></i><span th:text="${comment.getUser().getFullName()}"></span></strong></p>
-											    <p class="my-0"><small><i class="far fa-clock mr-2"></i><span th:text="${comment.getDateAdded()}"></span></small></p>
-											    <p class="my-0 text-muted" ><span th:text="${comment.getComment()}"></span></p>
-
-														</div>
-
-													</div>
-
-												</div>
-											</div>
-
-
-
-
-										</div>
-										<div class="modal-footer">
-											<div th:if="${tutorial}">
+															<div th:if="${tutorial}">
 												<div th:if="${tutorial.getSlideStatus() == 3}">
 													<button id="slideAcceptOrNeedToImprovemenetByQuality"
 														type="button" class="btn btn-success">Submit</button>
@@ -890,6 +1012,47 @@
 												<button id="slideAcceptOrNeedToImprovemenetByQuality"
 													type="button" class="btn btn-success">Submit</button>
 											</div>
+														</form>
+  </div>
+</div>
+														
+													</div>
+
+
+												</div>
+
+												<div class="col-12">
+												<div class="card mt-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comSlide)}">
+														
+														<div th:each="comment : ${comSlide}"
+															class="border-bottom py-2">
+															<span class="my-0">
+															<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+															</span><br>
+											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
+
+														</div>
+
+													</div>
+  </div>
+</div>
+													
+
+												</div>
+											</div>
+
+
+
+
+										</div>
+										<div class="modal-footer">
+											
 
 											<button type="button" class="btn btn-secondary"
 												data-dismiss="modal">Close</button>
@@ -926,56 +1089,77 @@
 													
 													<div th:if="${tutorial.getKeywordStatus()!=3}"><div class="alert alert-info">Not valid for review</div></div>
 													<div class="alert alert-msg" style="display: none;"></div>
-													<div th:if="${tutorial.getKeyword() != null}" class="border border-info p-2 mb-5">
+													<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
+  </div>
+  <div class="card-body">
+    <div th:if="${tutorial.getKeyword() != null}" class="border p-2 mb-5">
 														<span th:utext="${tutorial.getKeyword()}"></span>
 													</div>
+  </div>
+</div>
+													<div class="alert q_kw_cmt" style="display: none;"></div>
 													<div th:if="${tutorial.getKeywordStatus()==3}">
-														<form class="form-horizontal"
+													<div class="card border-info mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Review Feedback :</span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal"
 															th:action="@{/addOutlineStataus}"
 															 method="post">
 
 															<div class="form-group">
-
 																<select id="keywordQualitAceept" class="form-control">
-
 																	<option value="0">Select</option>
 																	<option value="1">Accept</option>
 																	<option value="2">Need Improvement</option>
-
 																</select>
-
 															</div>
-
 															<div id="NeedImprovementKeyword" style="display: none;">
-																<label for="msgkeywordQuality">Comments</label>
+																<label for="msgkeywordQuality"><span class="font-weight-bold">Add your comment below:</span></label>
 																<textarea class="form-control" name="msgkeywordQuality"
-																	id="msgkeywordQuality" rows="10" required="required"
+																	id="msgkeywordQuality" rows="3" required="required"
 																	placeholder="Add comments here."></textarea>
-
-
 															</div>
 															<br />
-
-															
-
 														</form>
+  </div>
+</div>
+														
 													</div>
 
-													<div class="col-12">
-														<div th:if="${not #lists.isEmpty(comKeyword)}">
-															<h6 class="border-bottom">Comments:</h6>
+													
+												</div>
+												<div class="col-12">
+													<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comKeyword)}">
+															
 															<div th:each="comment : ${comKeyword}"
-																class="border-bottom">
-																<p class="my-0"><strong><i class="fas fa-user mr-2"></i><span th:text="${comment.getUser().getFullName()}"></span></strong></p>
-											    <p class="my-0"><small><i class="far fa-clock mr-2"></i><span th:text="${comment.getDateAdded()}"></span></small></p>
-											    <p class="my-0 text-muted" ><span th:text="${comment.getComment()}"></span></p>
+																class="border-bottom py-2">
+																<span class="my-0">
+																<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+																</span><br>
+											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
 
 															</div>
 
 														</div>
+														<div th:if="${ #lists.isEmpty(comKeyword)}">
+															<span>No comments available.</span>
+
+														</div>
+  </div>
+</div>
+														
 
 													</div>
-												</div>
 
 
 

@@ -2,10 +2,19 @@
 <html xmlns:th="https://thymeleaf.org">
 <head th:replace="common/trail :: common-trail"></head>
 <style>
-	#sm_url:hover{
-		background-color: #D1ECF1!important;
-	}
+.fa-user-circle,.fa-clock,.fa-comment-alt{
+color : #014F7A;}
+#sm_url:hover,#sliedPdf:hover{
+background: none!important;}
+.modal-title{
+font-weight : bold!important;
+color: #014F7A;
+font-size: 1rem;
+}
+.modal-header{
+border-bottom: 2px solid #014F7A!important;}
 </style>
+
 <body>
 	<div th:replace="common/sidebar :: top_header"></div>
 	<div class="container-fluid">
@@ -99,7 +108,7 @@
 													th:text="${statusOutline}"></span></td>
 												<td>
 												<div th:if="${tutorial}">
-												<span style="color: green;" th:if="${tutorial.getOutlineUser()}" th:text="${tutorial.getOutlineUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getOutlineUser()}" th:text="${#strings.capitalizeWords(tutorial.getOutlineUser().getFullName())}"></span>
 												</span></div></td>
 												
 												<th><span>
@@ -118,7 +127,7 @@
 													th:text="${statusScript}">Pending</span></td>
 												<td>
 												<div th:if="${tutorial}">
-												<span style="color: green;" th:if="${tutorial.getScriptUser()}" th:text="${tutorial.getScriptUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getScriptUser()}" th:text="${#strings.capitalizeWords(tutorial.getScriptUser().getFullName())}"></span>
 												</span></div></td>
 												
 												<th><span>
@@ -140,7 +149,7 @@
 													th:text="${statusSlide}">Pending</span></td>
 												<td>
 												<div th:if="${tutorial}">
-												<span style="color: green;" th:if="${tutorial.getSlideUser()}" th:text="${tutorial.getSlideUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getSlideUser()}" th:text="${#strings.capitalizeWords(tutorial.getSlideUser().getFullName())}"></span>
 												</span></div></td>
 												
 												<th><span>
@@ -161,7 +170,7 @@
 													th:text="${statusVideo}">Pending</span></td>
 												<td>
 												<div th:if="${tutorial}">
-												<span style="color: green;" th:if="${tutorial.getVideoUser()}" th:text="${tutorial.getVideoUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getVideoUser()}" th:text="${#strings.capitalizeWords(tutorial.getVideoUser().getFullName())}"></span>
 												</span></div></td>
 												
 												<th><span>
@@ -180,7 +189,7 @@
 													th:text="${statusKeyword}">Pending</span></td>
 												<td>
 												<div th:if="${tutorial}">
-												<span style="color: green;" th:if="${tutorial.getKeywordUser()}" th:text="${tutorial.getKeywordUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getKeywordUser()}" th:text="${#strings.capitalizeWords(tutorial.getKeywordUser().getFullName())}"></span>
 												</span></div></td>
 												
 												<th><span>
@@ -198,7 +207,7 @@
 												<td><span class="status-contri"
 													th:text="${statusPreReq}"></span></td>
 												<td><div th:if="${tutorial}">
-												<span style="color: green;" th:if="${tutorial.getPreRequiticUser()}" th:text="${tutorial.getPreRequiticUser().getUsername()}"></span>
+												<span style="color: green;" th:if="${tutorial.getPreRequiticUser()}" th:text="${#strings.capitalizeWords(tutorial.getPreRequiticUser().getFullName())}"></span>
 												</span></div></td>
 												<th>
 													<button type="button" class="btn btn-info"
@@ -247,8 +256,8 @@
 								<div class="modal-content">
 									<div class="modal-header">
 
-										<h5 class="modal-title" id="exampleModalLabel">Add
-											Outline</h5>
+										<span class="modal-title" id="exampleModalLabel">Add
+											Outline</span>
 
 										<button type="button" class="close" data-dismiss="modal"
 											aria-label="Close">
@@ -259,14 +268,19 @@
 									<div class="modal-body">
 										<div class="alert alert-success d-none w-100" role="alert"
 											id="statusOutlineC"></div>
-											<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
-										<div class="container">
+											<!-- <div class="alert alert-success d-none w-100 commentS" role="alert"></div> -->
+										<!-- <div class="container"> -->
 											<div class="row">
-												<div class="col" style="display: flex; flex-wrap: wrap;">
-													<form th:action="@{/addOutline}" method="post"
+												<div class="col-12" style="display: flex; flex-wrap: wrap;">
+												<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span>
+  </div>
+  <div class="card-body">
+    <form th:action="@{/addOutline}" method="post"
 														style="width: 100%;">
 														<div class="form-group">
-															<label for="message-text" class="col-form-label"></label>
+															<!-- <label for="message-text" class="col-form-label"><span class="font-weight-bold">Add outline : <span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span></label> -->
 															<textarea class="form-control editor" name="editor"
 																id="editor" rows="10">
 										        		  
@@ -276,31 +290,44 @@
 										          			 </textarea>
 														</div>
 													</form>
+  </div>
+</div>
+													
 												</div>
-												<div class="col">
-													<div th:if="${not #lists.isEmpty(comOutline)}">
-														<h6 class="border-bottom">Comments:</h6>
-
+												<div class="col-12">
+												<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comOutline)}">
 														<div th:each="outlineComment : ${comOutline}"
 															th:if="${not #lists.isEmpty(comOutline)}"
-															class="border-bottom">
-															<p class="my-0">
-																<strong><i class="far fa-comment-alt"></i> <span
-																	th:text="${outlineComment.getUser().getFullName()}"></span></strong>
-															</p>
-															<p class="my-0">
-																<small><span
-																	th:text="${outlineComment.getDateAdded()}"></span></small>
-															</p>
-															<p class="my-0 text-muted">
-																<span th:text="${outlineComment.getComment()}"></span>
-															</p>
+															class="border-bottom py-2">
+															<span class="my-0">
+															<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(outlineComment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(outlineComment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(outlineComment.getDateAdded())}"></span>, <span th:text="${#dates.year(outlineComment.getDateAdded())}"></span> , <span th:text="${#dates.format(outlineComment.getDateAdded(),'HH:mm a')}"></span></small>
+																
+															</span><br>
+															
+															<span class="my-0 text-muted">
+																<i class="far fa-comment-alt"></i> <span th:text="${outlineComment.getComment()}"></span>
+															</span>
 
 														</div>
 													</div>
-													<div class="textarea-comment">
-
-														<label for="msgCommentOutline" class="comments">Comments</label>
+													<div th:if="${#lists.isEmpty(comOutline)}">
+													<span>No comments available.</span>
+													</div>
+  </div>
+</div>
+<div class="alert alert-success d-none w-100 commentS mt-2" role="alert"></div>
+<div class="card mt-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Add your comment below : </span>
+  </div>
+  <div class="card-body">
+    <div class="textarea-comment">
 														<textarea class="form-control msgComment"
 															name="msgCommentOutline" rows="3" required="required"
 															id="Outline_comment"
@@ -309,12 +336,17 @@
 													</div>
 													<button id="Outline" type="button"
 														class="btn comment-contri">comment</button>
+  </div>
+</div>
+													
+													
+													
 
 
 												</div>
 
 											</div>
-										</div>
+										<!-- </div> -->
 									</div>
 									<div class="modal-footer">
 										<div th:if="${tutorial}">
@@ -370,13 +402,25 @@
 										<div class="row">
 											<div class="col-12">
 												<div class="alert alert-success d-none w-100" role="alert" id="status_video"></div>
-												<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
-												<form class="form-horizontal" th:action="@{/addkeyword}"
+												<!-- <div class="alert alert-success d-none w-100 commentS" role="alert"></div> -->
+												<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal" th:action="@{/addkeyword}"
 													onsubmit="return submitForm(this);" method="post">
 													<div class="form-group">
 														<div id="VideoView"></div>
 														<span id="VideoView1"> </span>
 														<div th:if="${tutorial}">
+														
+														<!-- <div>
+														<div> Video Duration : <span th:text="${FileDurationInSecond}"/> Seconds </div> 
+														<div> Video File Size : <span th:text="${fileSizeInMB}"/> MB </div> 
+														<div> Video Width : <span th:text="${FileWidth}"/> </div> 
+														<div> Video Height : <span th:text="${FileHeight}"/>  </div> 
+														</div> -->
 															<div th:if="${tutorial.getVideo()}" id="videoDiv"
 																class="container" height="240" width="320"
 																scrolling="auto" autoplay="autoplay">
@@ -392,12 +436,10 @@
 																</video>
 																
 															</div>
+															
 
 														</div>
-														<div> Video Duration : <span th:text="${FileDurationInSecond}"/> Seconds </div> 
-														<div> Video File Size : <span th:text="${fileSizeInMB}"/> MB </div> 
-														<div> Video Width : <span th:text="${FileWidth}"/> </div> 
-														<div> Video Height : <span th:text="${FileHeight}"/>  </div> 
+														
 													</div>
 												</form>
 												<form id="upload-file-form-video"
@@ -420,35 +462,82 @@
 													</div>
 
 												</form>
+												<table class="table table-bordered">
+														<!-- <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+    </tr>
+  </thead> -->
+  <tbody>
+  <tr>
+      <th scope="row">Video Duration</th>
+      <td><span th:text="${FileDurationInSecond}"></span> Seconds</td>
+    </tr>
+    <tr>
+      <th scope="row">Video File Size</th>
+      <td><span th:text="${fileSizeInMB}"></span> MB</td>
+    </tr>
+    <tr>
+      <th scope="row">Video Width</th>
+      <td><span th:text="${FileWidth}"></span></td>
+    </tr>
+    <tr>
+      <th scope="row">Video Height</th>
+      <td><span th:text="${FileHeight}"></span></td>
+    </tr>
+  </tbody>
+														</table>
+												
+												
+  </div>
+</div>
+												
+												
 											</div>
 											<div class="col-12">
-												<div th:if="${not #lists.isEmpty(comVideo)}">
-													<h6 class="border-bottom">Comments:</h6>
+											<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comVideo)}">
+													
 													<div th:each="comment : ${comVideo}"
-														class="border-bottom">
-														<p class="my-0">
-															<strong><i class="far fa-comment-alt"></i> <span
-																th:text="${comment.getUser().getFullName()}"></span></strong>
-														</p>
-														<p class="my-0">
-															<small><span
-																th:text="${comment.getDateAdded()}"></span></small>
-														</p>
-														<p class="my-0 text-muted">
-															<span th:text="${comment.getComment()}"></span>
-														</p>
+														class="border-bottom py-2">
+														<span class="my-0">
+															<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+														</span><br>
+														
+														<span class="my-0 text-muted">
+															<i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span>
+														</span>
 
 													</div>
 
 												</div>
-												<div class="textarea-comment">
+												<div th:if="${ #lists.isEmpty(comVideo)}"><span>No comments available.</span></div>
+  </div>
+</div>
+												
+												<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
+												<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Add your comment below : </span>
+  </div>
+  <div class="card-body">
+    <div class="textarea-comment">
 													<textarea class="form-control msgComment"
 														name="msgCommentOutline" rows="3" required="required"
 														id="Video_comment"
 														placeholder="Please enter your suggestions.">	</textarea>
-
+<button id="Video" type="button" class="btn comment-contri">comment</button>
 												</div>
-												<button id="Video" type="button" class="btn comment-contri">comment</button>
+  </div>
+</div>
+												
+												
 											</div>
 										</div>
 
@@ -493,7 +582,7 @@
 								role="document">
 								<div class="modal-content">
 									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelKeyWord">Upload
+										<h5 class="modal-title" id="exampleModalLabelKeyWord">Add
 											Keyword</h5>
 										<div class="modal-title"></div>
 										<span style="color: green; padding-left: 50px"
@@ -509,39 +598,58 @@
 											<div class="col-12">
 												<div class="alert d-none w-100" role="alert" id="status_kw"></div>
 												<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
-												<form class="form-horizontal" th:action="@{/addkeyword}"
+												<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal" th:action="@{/addkeyword}"
 													onsubmit="return submitForm(this);" method="post">
 													<div class="form-group">
-														<label for="message-text" class="col-form-label">Add
-															Keyword</label>
+														<!-- <label for="message-text" class="col-form-label">Add
+															Keyword</label> -->
 														<textarea class="form-control" name="keywordArea"
-															id="keywordArea" rows="10" required="required">
-															<span th:if="${tutorial}" th:text="${tutorial.getKeyword()}"/>
+															id="keywordArea" rows="3" required="required" th:if="${tutorial.getKeyword()}" th:text="${tutorial.getKeyword()}"></textarea>
+															<textarea class="form-control" name="keywordArea"
+															id="keywordArea" rows="3" required="required" th:unless="${tutorial.getKeyword()}" >
+															<span ></span>
 							            				</textarea>
 													</div>
 												</form>
+  </div>
+</div>
+												
 											</div>
 
 											<div class="col-12">
-												<div th:if="${not #lists.isEmpty(comKeyword)}">
-													<h6 class="border-bottom">Comments:</h6>
+											<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comKeyword)}">
 													<div th:each="comment : ${comKeyword}"
-														class="border-bottom">
-														<p class="my-0">
-															<strong><span
-																th:text="${comment.getUser().getFullName()}"></span></strong>
-														</p>
-														<p class="my-0">
-															<small><span
-																th:text="${comment.getDateAdded()}"></span></small>
-														</p>
-														<p class="my-0 text-muted">
-															<span th:text="${comment.getComment()}"></span>
-														</p>
+														class="border-bottom py-2">
+														<span class="my-0">
+															<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+														</span><br>
+														<span class="my-0 text-muted">
+															<i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span>
+														</span>
 
 													</div>
 												</div>
-												<div class="textarea-comment">
+												<div th:if="${ #lists.isEmpty(comKeyword)}"><span>No comments available.</span>
+												</div>
+  </div>
+</div>
+<div class="card mt-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Add your comment below : </span>
+  </div>
+  <div class="card-body">
+    <div class="textarea-comment">
 													<textarea class="form-control msgComment"
 														name="msgCommentOutline" rows="3" required="required"
 														id="Keyword_comment"
@@ -550,6 +658,8 @@
 												</div>
 												<button id="Keyword" type="button"
 													class="btn comment-contri">comment</button>
+  </div>
+</div>
 
 											</div>
 
@@ -559,16 +669,16 @@
 										<div th:if="${tutorial}">
 											<div
 												th:if="${tutorial.getKeywordStatus() == 0 or tutorial.getKeywordStatus() == 4}">
-												<button id="keywordId" type="button" class="btn btn-success">Upload</button>
+												<button id="keywordId" type="button" class="btn btn-success">Submit</button>
 											</div>
 											<div
 												th:unless="${tutorial.getKeywordStatus() == 0 or tutorial.getKeywordStatus() == 4}">
 												<button id="keywordId" type="button" class="btn btn-success"
-													disabled="disabled">Upload</button>
+													disabled="disabled">Submit</button>
 											</div>
 										</div>
 										<div th:unless="${tutorial}">
-											<button id="keywordId" type="button" class="btn btn-success">Upload</button>
+											<button id="keywordId" type="button" class="btn btn-success">Submit</button>
 										</div>
 
 										<!-- <button type="button" class="btn btn-outline-warning"
@@ -646,7 +756,7 @@
 								role="document">
 								<div class="modal-content">
 									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelKeyword">Upload
+										<h5 class="modal-title" id="exampleModalLabelKeyword">Add
 											Prerequisite</h5>
 										<button type="button" class="close" data-dismiss="modal"
 											aria-label="Close">
@@ -654,7 +764,7 @@
 										</button>
 									</div>
 									<div class="modal-body">
-									<div class="alert d-none w-100" role="alert" id="status_pr"></div>
+									<div class="alert w-100" role="alert" id="status_pr" style="display:none;"></div>
 										<!-- <div class="alert alert-success d-none w-100" role="alert"
 											id="statusPreReq"></div> -->
 										<div class="row">
@@ -663,10 +773,16 @@
 											</div>
 											
 											<div class="col-12" th:if="${tutorial}">
-												<form method="post">
+											<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span>
+  </div>
+  <div class="card-body">
+    <form method="post">
 
 													<div class="form-group">
-														<label for="inputUserame">Add Prerequisite</label> <select
+														<label for="inputUserame">
+														<span class="font-weight-bold">Select Prerequisite</span></label> <select
 															id="preRequsiteId" class="form-control"
 															name="preRequsite" required="required">
 															<option selected="selected">Select Category</option>
@@ -680,7 +796,7 @@
 														</select>
 													</div>
 													<div class="form-group ">
-														<label for="inputTopic">Topic Name</label> <select
+														<label for="inputTopic"><span class="font-weight-bold">Topic Name</span></label> <select
 															id="inputLanguageAll" class="form-control"
 															name="inputLanguageAll" required="required">
 														</select>
@@ -712,11 +828,41 @@
 													</div>
 													<button type="button" class="btn btn-success" id="addNullPrerequisite" style="display:none;">Submit</button>
 												</form>
+
+  </div>
+  
+</div>
+																							</div>
+											<div class="col-12">
+											<div class="card my-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comPreReq)}">
+											    <div th:each="comment : ${comPreReq}" class="border-bottom py-2"> 
+											    <span class="my-0">
+											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+											    </span><br>
+											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
+											    </div>
+									
+									</div>
+									<div th:if="${ #lists.isEmpty(comPreReq)}"><span>No comments available.</span></div>
+  </div>
+</div>
 											</div>
-											<div class="col-12"></div>
 										</div>
 
 
+
+									</div>
+									<div class="modal-footer">
+										
+
+										<button type="button" class="btn btn-secondary"
+											data-dismiss="modal">Close</button>
 
 									</div>
 
@@ -821,6 +967,7 @@
 
 
 									</div>
+									
 
 								</div>
 							</div>
@@ -840,7 +987,7 @@
 								<div class="modal-content">
 									<div class="modal-header">
 										<h5 class="modal-title" id="exampleModalLabelScript">Upload
-											Scripts</h5>
+											Script</h5>
 										<button type="button" class="close" data-dismiss="modal"
 											aria-label="Close">
 											<span aria-hidden="true">&times;</span>
@@ -849,12 +996,14 @@
 									<div class="modal-body">
 										<div class="row">
 											<div class="col-12">
+											<div class="alert alert-success d-none w-100" role="alert" id="status_script"></div>
+											
 											<div class="alert alert-info" role="alert">
-  												<a th:href="${sm_url}" class="alert-link" style="text-decoration: underline;" target="_blank" id="sm_url">Spoken Tutorial Script Manager</a>
+  												<i class="fas fa-external-link-alt"></i> <a th:href="${sm_url}" class="alert-link" style="text-decoration: underline;" target="_blank" id="sm_url">Click here to proceed to Script Manager</a>
 											</div>
-												<div class="alert alert-success d-none w-100" role="alert" id="status_script"></div>
-												<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
-												<form class="form-horizontal mb-3"
+												
+												
+												<!-- <form class="form-horizontal mb-3"
 													th:action="@{/addkeyword}"
 													onsubmit="return submitForm(this);" method="post">
 													<div th:if="${tutorial}" class="card">
@@ -864,13 +1013,11 @@
 																	th:href="@{/files/}+@{${tutorial.getScript()}}"
 																	name="ScriptPdf" target="_blank" id="ScriptPdf">Click
 																	To View</a>
-																<!-- <a name="ScriptPdf" target="_blank"
-																	id="viewScript" href="#"></a> -->
 															</div>
 														</div>
 													</div>
-												</form>
-												<form id="upload-file-form-script"
+												</form> -->
+												<!-- <form id="upload-file-form-script"
 													submit="return submitForm(this);">
 													<div class="form-group">
 														<div class="custom-file">
@@ -883,43 +1030,62 @@
 															<div class="invalid-feedback">Example invalid
 																custom file feedback</div>
 														</div>
-														<!-- here -->
-
 													</div>
-
-
-												</form>
+												</form> -->
 
 											</div>
 											<div class="col-12">
-												<div th:if="${not #lists.isEmpty(comScript)}">
-													<h6 class="border-bottom">Comments:</h6>
-													<div th:each="comment : ${comScript}"
-														class="border-bottom">
-														<p class="my-0">
-															<i class="far fa-user"></i> <strong><span
-																th:text="${comment.getUser().getFullName()}"></span></strong>
-														</p>
-														<p class="my-0">
-															<i class="far fa-clock"></i> <small><span
-																th:text="${comment.getDateAdded()}"></span></small>
-														</p>
-														<p class="my-0 text-muted">
-															<span th:text="${comment.getComment()}"></span>
-														</p>
+												<!-- <div th:if="${not #lists.isEmpty(comScript)}"> -->
+												
+													<div class="card mb-2">
+  <div class="card-header bg-light">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comScript)}">
+    	<div th:each="comment : ${comScript}"
+														class="border-bottom py-2">
+														<span class="my-0">
+															<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+														</span><br>
+														<!-- <p class="my-0">
+															
+														</p> -->
+														<span class="my-0 text-muted ">
+															<i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span>
+														</span>
 
 													</div>
+    </div>
+    <div th:if="${#lists.isEmpty(comScript)}">
+    <span>No comments available.</span>
+    </div>
+  </div>
+</div>
+													
+													
 
-												</div>
-												<div class="textarea-comment">
-													<label for="Script_comment" class="comments">Comments</label>
+												<!-- </div> -->
+												<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
+												<div class="card">
+  <div class="card-header">
+    <!-- <label for="Script_comment" class="comments"> --><span class="font-weight-bold">Add your comment below : </span><!-- </label> -->
+  </div>
+  <div class="card-body">
+    <div class="textarea-comment">
+													
 													<textarea class="form-control msgComment"
 														name="msgCommentOutline" rows="3" required="required"
 														id="Script_comment"
-														placeholder="Please enter your suggestions.">	</textarea>
+														>	</textarea>
 
 												</div>
 												<button id="Script" type="button" class="btn comment-contri">comment</button>
+  </div>
+</div>
+												
+												
 
 											</div>
 										</div>
@@ -931,16 +1097,16 @@
 										<div th:if="${tutorial}">
 											<div
 												th:if="${tutorial.getScriptStatus() == 0 or tutorial.getScriptStatus() == 4}">
-												<button id="scriptId" type="button" class="btn btn-success">Upload</button>
+												<button id="scriptId" type="button" class="btn btn-success">Submit For Domain Review</button>
 											</div>
 											<div
 												th:unless="${tutorial.getScriptStatus() == 0 or tutorial.getScriptStatus() == 4}">
 												<button id="scriptId" type="button" class="btn btn-success"
-													disabled="disabled">Upload</button>
+													disabled="disabled">Under Review Process</button>
 											</div>
 										</div>
 										<div th:unless="${tutorial}">
-											<button id="scriptId" type="button" class="btn btn-success">Upload</button>
+											<button id="scriptId" type="button" class="btn btn-success">Submit For Domain Review</button>
 										</div>
 
 										<button type="button" class="btn btn-secondary"
@@ -984,25 +1150,37 @@
 											<div class="col-12">
 												<div class="alert d-none w-100" role="alert" id="status_slide"></div>
 												<div class="alert alert-success d-none w-100 commentS" role="alert"></div>
-
-												<form class="form-horizontal mb-3"
+												<div class="card mb-2">
+  <div class="card-header">
+    <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal mb-3"
 													th:action="@{/addkeyword}"
 													onsubmit="return submitForm(this);" method="post">
-													<div th:if="${tutorial}" class="card">
-														<div class="card-body">
-															<div class="form-group">
+													<div th:if="${tutorial}" >
+													<div  th:if="${tutorial.getSlideStatus() != 0}">
+													<div >
+															<div class="alert alert-info" role="alert">
 
-																<a name="sliedPdf"
-																	th:if="${tutorial.getSlideStatus() != 0}"
+																<!-- <a name="sliedPdf"
+																	
 																	target="_blank"
 																	th:href="@{/files/}+@{${tutorial.getSlide()}}"
 																	id="sliedPdf"><i class="far fa-file-alt"></i> View
-																	Slide</a>
+																	Slide</a> -->
+																<a class="alert-link sm_url"
+												 target="_blank" id="sliedPdf"
+												name="categoryName" th:href="@{/files/}+@{${tutorial.getSlide()}}" style="text-decoration: underline;color: #014F7A;">
+												<!-- <span th:text="${scriptpath.getTopic().getTopicname()}"></span> -->
+												<i class="fas fa-external-link-alt"></i> Click to download slides for <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span></a>
 															</div>
+															
 														</div>
 													</div>
+														
+													</div>
 												</form>
-
 												<form id="upload-file-form"
 													submit="return submitForm(this);">
 													<div class="form-group">
@@ -1026,29 +1204,46 @@
 
 													</div>
 												</form>
-											</div>
+
+												
+
+  </div>
+</div>
+																							</div>
 											<div class="col-12">
-												<div th:if="${not #lists.isEmpty(comSlide)}">
-													<h6 class="border-bottom">Comments:</h6>
+											<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comSlide)}">
+													
 													<div th:each="comment : ${comSlide}"
 														th:if="${not #lists.isEmpty(comSlide)}"
-														class="border-bottom">
-														<p class="my-0">
-															<strong><span
-																th:text="${comment.getUser().getFullName()}"></span></strong>
-														</p>
-														<p class="my-0">
-															<small><span
-																th:text="${comment.getDateAdded()}"></span></small>
-														</p>
-														<p class="my-0 text-muted">
-															<span th:text="${comment.getComment()}"></span>
-														</p>
+														class="border-bottom py-2">
+														<span class="my-0 text-muted">
+															<i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+														</span><br>
+														<!-- <p class="my-0">
+															
+														</p> -->
+														<span class="my-0 text-muted">
+															<i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span>
+														</span>
 
 													</div>
 
 												</div>
-												<div class="textarea-comment">
+												<div th:if="${#lists.isEmpty(comSlide)}"><span>No comments available.</span></div>
+  </div>
+</div>
+<div class="card mt-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Add your comment below : </span>
+  </div>
+  <div class="card-body">
+   <div class="textarea-comment">
 													<textarea class="form-control msgComment"
 														name="msgCommentOutline" rows="3" required="required"
 														id="Slide_comment"
@@ -1056,6 +1251,11 @@
 
 												</div>
 												<button id="Slide" type="button" class="btn comment-contri">comment</button>
+  </div>
+</div>
+												
+												
+												
 											</div>
 										</div>
 

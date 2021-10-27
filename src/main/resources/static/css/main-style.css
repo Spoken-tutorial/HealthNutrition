@@ -54,20 +54,20 @@ hr.content-divider {
   max-width: 75px;
   height: 5px;
 }
-
+/* 
 #parallax-1 {
-  /*background: url(https://source.unsplash.com/featured/?nature);*/
+  background: url(https://source.unsplash.com/featured/?nature);
   background: url('../image/bg2.jpg');
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  /* border-top: 10px solid coral; */
+  border-top: 10px solid coral;
 }
 
 #parallax-1 hr {
   background: coral;
-}
+} */
 
 #parallax-2 {
   background: url('../image/bg1.jpg');

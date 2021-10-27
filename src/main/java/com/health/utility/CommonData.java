@@ -37,18 +37,24 @@ public class CommonData {
 	public static String Video_STATUS_SUCCESS_MSG = "Video status updated successfully";
 
 	public static String Script_SAVE_SUCCESS_MSG = "Script saved successfully";
+	
+	public static String SCRIPT_FOR_DOMAIN_REVIEW = "Script submitted for domain review.";
+	
+	public static String SCRIPT_FOR_QUALITY_REVIEW = "Script submitted for quality review.";
+	
+	public static String SCRIPT_STATUS_UPDATE_SUCCESS = "Script status updated successfully.";
 
 	public static String Slide_SAVE_SUCCESS_MSG = "Slide saved successfully";
 
-	public static String PRE_REQUISTIC_SAVE_SUCCESS_MSG = "Pre-Requistic saved successfully";
+	public static String PRE_REQUISTIC_SAVE_SUCCESS_MSG = "Prerequisite saved successfully";
 
 	public static String Graphics_SAVE_SUCCESS_MSG = "Graphics saved successfully";
 
 	public static String RECORD_SAVE_SUCCESS_MSG = "Record saved successfully.";
 
-	public static String EVENT_CHECK_DATE = "Please check event date";
+	public static String EVENT_CHECK_DATE = "Please check event date.";
 
-	public static String EVENT_CHECK_CONTACT = "Contact number should be of 10 digits";
+	public static String EVENT_CHECK_CONTACT = "Contact number should be of 10 digits.";
 
 	public static String EVENT_CHECK_EMAIL = "Please check email id";
 
@@ -142,7 +148,8 @@ public class CommonData {
 			NEED_IMPROVEMENT_MSG, WAITING_PUBLISH,PUBLISHED
 	};
 
-	public static String COMMENT_SUCCESS = "Comment Added";
+//	public static String COMMENT_SUCCESS = "Comment Added";
+	public static String COMMENT_SUCCESS = "Your comment is posted successfully.";
 
 	public static String FAILURE = "Failed";
 
@@ -154,7 +161,7 @@ public class CommonData {
 
 	public static String OUTLINE = "Outline";
 
-	public static String PRE_REQUISTIC = "Pre_requistic";
+	public static String PRE_REQUISTIC = "prerequisite";
 
 	public static String SLIDE = "Slide";
 
@@ -200,8 +207,8 @@ public class CommonData {
 	
 	public static final long categoryFileSizeImageFileSize = 1*1024*1024;
 	
-public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
-//	public static String SCRIPT_MANAGER_BASE= "http://beta.scriptmanager.spoken-tutorial.org/";
+//public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
+	public static String SCRIPT_MANAGER_BASE= "https://scriptmanager.spoken-tutorial.org/";
 	
 	public static String SCRIPT_MANAGER_CREATE= "create/healthnutrition/";
 	
@@ -212,6 +219,9 @@ public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
 	public static String UNPUBLISH_SUCCESS= "Tutorial is unpubished.";
 	
 	public static String GENERAL_ERROR_MSG= "Some error occurred. Please contact site admin.";
+	
+	public static String CONSULTANT_ERROR= "Consultant doesn't exist";
+	
 	
 	
 	

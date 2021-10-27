@@ -67,10 +67,9 @@ body{
 .spk-title{
 	color: #1C7871!important;
 	color: #004F7A!important;
-	margin: 2rem 0!important;
-	font-size: 2rem;
-	font-weight: bold;
-}
+	margin: 1rem 0!important;
+	font-size: 1.5rem;
+	}
 .catBtn,.consBtn{
 	border: 1px solid #004F7A!important;
     color: #004F7A!important;
@@ -97,9 +96,9 @@ header .upper-bar{
 	border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 .contact-num{
-	font-size: 0.9rem;
+	font-size: 1.2rem;
     font-family: "Times New Roman", Times, serif;
-    color: #1C7871;
+    /* color: #1C7871; */
     font-weight: bold;
 }
 .h-login{
@@ -547,10 +546,11 @@ footer{
 	color: rgba(0,0,0,0.6);
 }
 .comments{
-	display: block;
-	border-bottom: 2px solid #014F7A;
+	/* display: block; */
+	/* border-bottom: 2px solid #014F7A; */
 	color: #014F7A;
 	font-weight: bold;
+	margin-bottom:none!important;
 }
 #back-to-top{
 	position:fixed;

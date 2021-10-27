@@ -11,6 +11,11 @@
 	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
 	<link rel="stylesheet" th:href="@{/css/main.css}"/>
+	<style>
+	.fa-user-circle,.fa-comment-alt,.fa-clock{
+		color: #014F7A;
+	}
+	</style>
 </head>
 <body>
   <div th:replace="common/sidebar :: top_header"></div>
@@ -21,29 +26,30 @@
   </div>
   <div class="col-md-9 col-lg-10 p-md-5">
   <div>
-					<div class="alert alert-success" role="alert"
+					<!-- <div class="alert alert-success" role="alert"
 						th:if="${success_msg}">
 						<div id="#test" class="">
 							<div>
 								<span id="success_msg"></span>
 							</div>
 						</div>
-					</div>
-					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+					</div> -->
+					<!-- <div class="alert alert-danger" role="alert" th:if="${error_msg}">
 						<div id="#test" class="">
 							<div>
 								<span  id="error_msg"></span>
 							</div>
 						</div>
-					</div>
+					</div> -->
 				</div>
   <div class="card">
 					<div class="card-header">
-						<h4>Review video</h4>
+						<span class="font-weight-bold" style="color:#014F7A;">Review video : </span><span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
 					</div>
 					<div class="card-body">
 						<div class="row">
 							<div class="col-lg-6">
+							<div class="alert alert-msg" style="display: none;"></div>
 									                  <form th:action="@{/submitTutorial}" method="post">
 
 			               <table class="table table-bordered">
@@ -132,13 +138,36 @@
 													<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
 													</video>
 </div>
-													<div> Video Duration : <span th:text="${FileDurationInSecond}"/> Seconds </div> 
-													<div> Video File Size : <span th:text="${fileSizeInMB}"/> MB </div>
-													<div> Video Width : <span th:text="${FileWidth}"/> </div> 
-													<div> Video Height : <span th:text="${FileHeight}"/>  </div>
+<table class="table table-bordered">
+<tbody>
+<tr>
+<td>Video Duration</td>
+<td><span th:text="${FileDurationInSecond}"></span> Seconds</td>
+</tr>
+<tr>
+<td>Video File Size</td>
+<td><span th:text="${fileSizeInMB}"></span> MB</td>
+</tr>
+<tr>
+<td>Video Width</td>
+<td><span th:text="${FileWidth}"></span></td>
+</tr>
+<tr>
+<td>Video Height</td>
+<td><span th:text="${FileHeight}"></span></td>
+</tr>
+</tbody>
+</table>
+													
 								<div class="row">
 								<div class="col-md-12">
-								<form  class="form-horizontal"  th:action="@{/addkeyword}" onsubmit="return submitForm(this);" method="post" >
+								<div class="alert a_v_cmt" style="display: none;"></div>
+								<div class="card">
+  <div class="card-header">
+    <span class="font-weight-bold">Review Feedback :</span>
+  </div>
+  <div class="card-body">
+    <form  class="form-horizontal"  th:action="@{/addkeyword}" onsubmit="return submitForm(this);" method="post" >
 
 						          <div class="form-group">
 						 
@@ -154,13 +183,13 @@
 						          
 				 <div id="videoNeedImprovement" style="display: none;">
 				 
-				 	<label for="msgVideoCommentByAdmin">Comments : </label>
+				 	<label for="msgVideoCommentByAdmin"><span class="font-weight-bold">Add your comment below : </span></label>
 								 <textarea class="form-control"  name="msgVideoCommentByAdmin" 
-								 id="msgVideoCommentByAdmin" rows="10" required="required" ></textarea>
+								 id="msgVideoCommentByAdmin" rows="3" required="required" ></textarea>
 							
 				</div>
 				
-				<hr/> 
+				<br>
 				<div th:if="${tutorial}">
 											<div
 												th:if="${tutorial.getVideoStatus() == 1}">
@@ -180,7 +209,10 @@
 				 	   
 
 		</form>	
-								</div>
+
+  </div>
+</div>
+																</div>
 								</div>
 		
 	            </div>
@@ -193,27 +225,25 @@
 							    
 	<!-- 	Here is code for comment View -->  
 	
-	
-			<span th:each="mesComment : ${comVideo}">  
-				               
-					
-				                  
-				       <div class="alert alert-info">
-				                  
-				               <strong style="color:green; text-transform:uppercase;"> <span style="color:green;" th:text="${mesComment.getUser().getUsername()}"></span></strong>
-				                  
-				                     <span style="color:green;" th:text="${mesComment.getComment()}">
-				                   
-				                   	</span>
-				                   	
-				             	</div>      	
-				    	</span>
-				             	
-				             
-	
-						    
-							    
-			     				            
+	<div class="card mt-2">
+  <div class="card-header">
+    <span class="font-weight-bold">Comments</span>
+  </div>
+  <div class="card-body">
+    <div th:if="${not #lists.isEmpty(comVideo)}">
+											    <div th:each="comment : ${comVideo}" class="border-bottom py-2"> 
+											    <span class="my-0">
+											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
+																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+											    </span><br>
+											    
+											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
+											    </div>
+									</div>
+									<div th:if="${#lists.isEmpty(comVideo)}"><span>No comments available.</span></div>
+  </div>
+</div>
+			        
 			          </form>
 							</div>
 						</div>

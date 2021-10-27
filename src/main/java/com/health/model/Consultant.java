@@ -50,7 +50,7 @@ public class Consultant{
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
-
+	
 	public int getConsultantId() {
 		return consultantId;
 	}
@@ -91,7 +91,6 @@ public class Consultant{
 	public void setUser(User user) {
 		this.user = user;
 	}
-
-
+	
 
 }

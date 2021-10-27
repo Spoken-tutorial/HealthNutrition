@@ -24,6 +24,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -218,6 +219,12 @@ public class HomeController {
 
 	@Autowired
 	private OrganizationRoleService organizationRoleService;
+	
+	@Value("${scriptmanager_url}")
+	private String scriptmanager_url;
+	
+	@Value("${scriptmanager_path}")
+	private String scriptmanager_path;
 
     private static YouTube youtube;
     
@@ -246,9 +253,14 @@ public class HomeController {
 
 		List<Tutorial> tutorials = tutService.findAllBystatus(true);
 		for(Tutorial temp :tutorials) {
-			catTemp.add(temp.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-			lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
-			topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				catTemp.add(c.getCatName());
+				lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
+				topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+			}
+			
 		}
 		
 		List<String> catTempSorted =new ArrayList<String>(catTemp);
@@ -336,23 +348,6 @@ public class HomeController {
 			model.addAttribute("carouselList", carouselHome.subList(1, carousel.size()));
 		}
 
-
-
-//		EPLiteClient client = new EPLiteClient("http://localhost:9001", "bb1fe836e7b81e0158d210baa1c7a9c854b74a183da71f8fa0a32eb108952961");
-//		client.createPad("my_pad1");
-//		client.setText("my_pad1", "foo!!");
-//		String text = client.getText("Demo").get("text").toString();
-//		Map result = client.listAllPads();
-//		List padIds = (List) result.get("padIDs");
-
-
-		System.err.println("*************************");
-		System.err.println("EPLiteClient");
-//		System.err.println(text);
-//		System.err.println(padIds);
-
-		System.err.println("*************************");
-
 		return "index";
 	}
 
@@ -417,7 +412,6 @@ public class HomeController {
 		}
 
 		model.addAttribute("userInfo", usr);
-		System.out.println(lan);
 		if(!cat.contentEquals("Select Category")) {
 			localCat = catService.findBycategoryname(cat);
 		}
@@ -472,7 +466,6 @@ public class HomeController {
 		}
 
 		for(Tutorial temp :tut) {
-			System.out.println(temp.getTutorialId());
 			if(temp.isStatus()) {
 				tutToView.add(temp);
 			}
@@ -547,9 +540,6 @@ public class HomeController {
 			 Collections.sort(relatedTutorial);
 			 
 			 model.addAttribute("tutorials", relatedTutorial);
-			 System.out.println("*******************");
-			 System.out.println(tutorials);
-			 System.out.println("*******************");
 
 				Set<String> catTemp = new HashSet<String>();
 				Set<String> topicTemp = new HashSet<String>();
@@ -571,7 +561,8 @@ public class HomeController {
 				model.addAttribute("categories", catTempSorted);
 				model.addAttribute("languages", lanTempSorted);
 				model.addAttribute("topics", topicTemp);
-
+				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
+				model.addAttribute("sm_url", sm_url);
 			return "tutorial";
 	}
 	
@@ -608,11 +599,63 @@ public class HomeController {
 	public String showConsultantGet(Model model) {
 
 		List<Consultant> consults = consultService.findAll();
-		System.out.println("******************************"+consults);
 		model.addAttribute("listConsultant", consults);
+		
+		HashMap<Integer, String> map = new HashMap<>();
+		User user = userService.findByEmail("bellatonyp@gmail.com");
+		Set<UserRole> roles = user.getUserRoles();
+		Set<Category> categorys = user.getCategories();
+		for(Consultant c:consults) {
+			String s="";
+			Set<UserRole> userRoles = c.getUser().getUserRoles();
+			for(UserRole ur:userRoles) {
+				if(ur.getRole().getName().equals(CommonData.domainReviewerRole)) {
+					s= s+ ur.getCategory().getCatName()+" , ";
+				}
+			}
+			map.put(c.getConsultantId(),s.substring(0, s.length()-2));
+			
+		}
+		map.put(100,"teststring");
+
+		model.addAttribute("map", map);
 		return "Consultants";
 	}
+	@RequestMapping(value = "/showLanguages",method = RequestMethod.GET)
+	public String showLanguagesGet(Model model) {
 
+		HashMap<String, Integer> map = new HashMap<>();
+		List<Language> langs = lanService.getAllLanguages();
+		for(Language lang:langs) {
+			List<ContributorAssignedTutorial> tutorials = conRepo.findAllByLan(lang);
+			map.put(lang.getLangName(), tutorials.size());
+		}
+		model.addAttribute("map", map);
+		
+//		List<Consultant> consults = consultService.findAll();
+//		model.addAttribute("listConsultant", consults);
+//		
+//		HashMap<Integer, String> map = new HashMap<>();
+//		User user = userService.findByEmail("bellatonyp@gmail.com");
+//		Set<UserRole> roles = user.getUserRoles();
+//		Set<Category> categorys = user.getCategories();
+//		for(Consultant c:consults) {
+//			String s="";
+//			Set<UserRole> userRoles = c.getUser().getUserRoles();
+//			for(UserRole ur:userRoles) {
+//				if(ur.getRole().getName().equals(CommonData.domainReviewerRole)) {
+//					s= s+ ur.getCategory().getCatName()+" , ";
+//				}
+//			}
+//			map.put(c.getConsultantId(),s.substring(0, s.length()-2));
+//			
+//		}
+//		map.put(100,"teststring");
+//
+//		model.addAttribute("map", map);
+		return "languages";
+	}
+	
 	/**
 	 * Redirects to Testimonail Page
 	 * @param model Model object
@@ -652,7 +695,6 @@ public class HomeController {
 			userService.save(usr);
 			
 			String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-			System.out.println(appUrl);
 			SimpleMailMessage newEmail = mailConstructor.constructResetTokenEmail(appUrl, request.getLocale(), token, usr);
 
 			mailSender.send(newEmail);
@@ -704,7 +746,6 @@ public class HomeController {
 			return mv;
 		}
 
-		System.out.println(token);
 		mv.addObject("resetToken", usr.getToken());
 		mv.setViewName("resetPassword");
 		return mv;
@@ -1154,9 +1195,6 @@ public class HomeController {
 
 		String roleName=req.getParameter("role");
 		String lanIdInString = req.getParameter("roleId");
-		System.err.print("***************** ROLE ID");
-		System.err.print(lanIdInString);
-		System.err.print("***************** ROLE ID");
 		int roleId = Integer.parseInt(lanIdInString);
 		OrganizationRole role = organizationRoleService.getById(roleId);
 //		Language lan = lanService.getById(lanId);
@@ -2168,9 +2206,12 @@ public class HomeController {
 	@RequestMapping(value = "/addConsultant",method = RequestMethod.POST)
 	public String addConsultantPost(Model model,Principal principal,
 									@RequestParam("nameConsaltant") String name,
+									@RequestParam("lastname") String lastname,
 									@RequestParam("categoryName") int catId,
 									@RequestParam("lanName") int lanId,
-									@RequestParam("email") String email) {
+									@RequestParam("email") String email,
+									@RequestParam("desc") String desc,
+									@RequestParam("photo") MultipartFile photo){
 
 		User usr=new User();
 
@@ -2219,11 +2260,18 @@ public class HomeController {
 			model.addAttribute("msg", "Please Try Again");
 			return "addConsultant";
 		}
+		if(!ServiceUtility.checkFileExtensionImage(photo) ) {
+			model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
+			return "addConsultant";
+		}
 		
+
 		Role role = roleService.findByname(CommonData.domainReviewerRole);
 
 		User userTemp = new User();
 		userTemp.setId(userService.getNewId());
+		userTemp.setFirstName(name);
+		userTemp.setLastName(lastname);
 		userTemp.setEmail(email);
 		userTemp.setUsername(email);
 		userTemp.setDateAdded(ServiceUtility.getCurrentTime());
@@ -2235,14 +2283,28 @@ public class HomeController {
 		int newConsultid=consultService.getNewConsultantId();
 		Consultant local=new Consultant();
 		local.setConsultantId(newConsultid);
-		local.setDescription("null");
+		local.setDescription(desc);
+		
 		local.setDateAdded(ServiceUtility.getCurrentTime());
 		local.setUser(userTemp);
-
+		String pathtoUploadPhoto;
+		try {
+			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+newConsultid);
+			pathtoUploadPhoto = ServiceUtility.uploadFile(photo, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+newConsultid);
+			int indexToStart=pathtoUploadPhoto.indexOf("Media");
+			String cons_photo=pathtoUploadPhoto.substring(indexToStart, pathtoUploadPhoto.length());
+			local.getUser().setProfilePic(cons_photo);
+//			local.setDisplay_picture(cons_photo);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		Set<Consultant> consults=new HashSet<Consultant>();
 		consults.add(local);
-
+		
 		try {
+			
 			userService.addUserToConsultant(usr, consults);
 
 			UserRole usrRole= new UserRole();
@@ -2274,6 +2336,133 @@ public class HomeController {
 		model.addAttribute("msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
 		return "addConsultant";
 
+	}
+
+	@RequestMapping(value = "/consultant/edit/{id}", method = RequestMethod.GET)
+	public String editConsultant(@PathVariable int id,Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+		Consultant consultant = consultService.findById(id);
+//		Testimonial test=testService.findById(id);
+		
+		if(consultant == null) {
+
+			return "redirect:/addConsultant";
+		}
+
+//		if(consultant.getUser().getId() != usr.getId()) {
+//
+//			return "redirect:/addConsultant";
+//		}
+
+		model.addAttribute("consultant", consultant);
+
+		return "updateConsultant";
+	}
+
+	@RequestMapping(value = "/updateConsultant", method = RequestMethod.POST)
+	public String updateConnsultant(HttpServletRequest req,Model model,Principal principal,@RequestParam("photo") MultipartFile file) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		String consultant_id=req.getParameter("consultant_id");
+		String name=req.getParameter("name");
+		String lastname=req.getParameter("lastname");
+		String desc=req.getParameter("desc");
+
+		Consultant consultant=consultService.findById(Integer.parseInt(consultant_id));
+
+		if(consultant==null) {
+			// accommodate error message
+			model.addAttribute("error_msg", CommonData.CONSULTANT_ERROR);
+			return "addConsultant";
+		}
+
+		if(!file.isEmpty()) {
+		try {
+
+			String pathSampleVideo = null;;
+			try {
+				pathSampleVideo = ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+//			IContainer container = IContainer.make();
+//			int result=10;
+//			result = container.open(pathSampleVideo,IContainer.Type.READ,null);
+//
+//			try {
+//				if(result<0) {
+//
+//					model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+//					return "addConsultant";
+//
+//				}else {
+//						if(container.getDuration()>CommonData.videoDuration) {
+//
+//							model.addAttribute("error_msg",CommonData.VIDEO_DURATION_ERROR);
+//							Path deletePreviousPath=Paths.get(pathSampleVideo);
+//							Files.delete(deletePreviousPath);
+//							return "addConsultant";
+//					}
+//				}
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//				model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+//				return "updateTestimonial";
+//			}
+
+			    ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
+				String pathtoUploadPoster=ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
+				int indexToStart=pathtoUploadPoster.indexOf("Media");
+
+				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				consultant.getUser().setFirstName(name);
+				consultant.getUser().setLastName(lastname);
+				consultant.setDescription(desc);
+				consultant.getUser().setProfilePic(document);
+				consultService.save(consultant);
+
+				
+
+
+		}catch (Exception e) {
+			// TODO: handle exception
+
+			e.printStackTrace();
+			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			model.addAttribute("consultant", consultant);
+			return "updateConsultant";    // throw a error
+		}
+		}else {
+
+			consultant.getUser().setFirstName(name);
+			consultant.getUser().setLastName(lastname);
+			consultant.setDescription(desc);
+			
+			consultService.save(consultant);		}
+			model.addAttribute("consultant", consultant);
+
+		model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+
+		return "updateConsultant";
 	}
 
 	/************************************END**********************************************/
@@ -3530,9 +3719,6 @@ public class HomeController {
 		Role role=roleService.findByname(CommonData.contributorRole);
 		List<UserRole> userRoles = usrRoleService.findByLanUser(lan, usr, role);
 		if(!userRoles.isEmpty()) {
-			System.out.println("***************IF True*****");
-			System.out.println(usrRoleService.findByLanUser(lan, usr, role));
-
 			// throw error
 			//model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
 			List<Language> languages=lanService.getAllLanguages();
@@ -3630,9 +3816,7 @@ public class HomeController {
 		Role role=roleService.findByname(CommonData.externalContributorRole);
 		List<UserRole> userRoles = usrRoleService.findByLanUser(lan, usr, role);
 		if(!userRoles.isEmpty()) {
-			System.out.println("***************IF True*****");
-			System.out.println(usrRoleService.findByLanUser(lan, usr, role));
-
+			
 			// throw error
 			//model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
 			List<Language> languages=lanService.getAllLanguages();
@@ -4098,9 +4282,7 @@ public class HomeController {
 			return "addMasterTrainerRole";
 		}
 		List<OrganizationRole> org_roles = organizationRoleService.findAll();
-		System.err.println("**********************ROLES**********************************");
-		System.err.println(org_roles);
-		System.err.println("*************************ROLES*******************************");
+		
 		model.addAttribute("org_roles", org_roles);
 
 		model.addAttribute("alredaySubmittedFlag", false);
@@ -4135,12 +4317,10 @@ public class HomeController {
 		String aadhar=req.getParameter("aadharNumber");
 		String lang=req.getParameter("languages");
 		String roleOrg=req.getParameter("newRole");
-		System.out.println("******"+lang);
+		
 
 		List<OrganizationRole> org_roles = organizationRoleService.findAll();
-		System.err.println("**********************ROLES**********************************");
-		System.err.println(org_roles);
-		System.err.println("*************************ROLES*******************************");
+		
 		model.addAttribute("org_roles", org_roles);
 
 		int userIndianMappingId=userIndianMappingService.getNewId();
@@ -4164,14 +4344,10 @@ public class HomeController {
 		String[] lan = lang.split("&");
 		for(String x : lan) {
 
-
-			System.out.println("lanName:"+ x);
-
 			String[] y = x.split("_");
 			for(int z=1 ; z<y.length ; z++) {
 
 				IndianLanguage temp = iLanService.findByName(y[0]);
-				System.out.println(temp.getLanName());
 
 				UserIndianLanguageMapping tempUser = new UserIndianLanguageMapping();
 				tempUser.setId(userIndianMappingId++);
@@ -4180,10 +4356,8 @@ public class HomeController {
 
 				for(char xx : y[z].toCharArray()) {
 
-					System.out.println(xx);
 					if(xx=='r') {
 						tempUser.setRead(true);
-						System.out.println("read"+xx);
 					}
 //					else if(xx=='w') {
 //						tempUser.setWrite(true);
@@ -4191,12 +4365,10 @@ public class HomeController {
 //					}
 					else if(xx=='s') {
 						tempUser.setSpeak(true);
-						System.out.println(xx);
 					}
 				}
 
 				userIndianMapping.add(tempUser);
-				System.out.println("name"+y[z]);
 			}
 
 		}
@@ -4217,9 +4389,6 @@ public class HomeController {
 		usr.setOrganization(organization);
 		usr.setAge(Integer.parseInt(age));
 		usr.setPhone(Long.parseLong(mobileNumber));
-		System.err.print("**********************************");
-		System.err.print(roleOrg);
-		System.err.print("**********************************");
 
 		List<OrganizationRole> orgRolesList = organizationRoleService.findAll();
 		boolean isRoleExist = orgRolesList.stream().anyMatch(o -> o.getRole().equals(roleOrg));
@@ -4428,7 +4597,6 @@ public class HomeController {
 		
 		model.addAttribute("userByContributors", userRolesUniqueTemp);
 
-		System.out.println(catName);
 
 		Language lan=lanService.getByLanName(lanName);
 		Category cat=catService.findByid(Integer.parseInt(catName));
@@ -4444,7 +4612,6 @@ public class HomeController {
 
 				TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, localtopic);
 
-				System.out.println(topicCat.getTopicCategoryId());
 				ContributorAssignedTutorial x=conRepo.findByTopicCatAndLanViewPart(topicCat, lan);
 
 				if(x == null) {
@@ -4636,8 +4803,6 @@ public class HomeController {
 					IStream stream = container.getStream(0);
 					if(stream!=null) {
 					IStreamCoder coder = stream.getStreamCoder();
-					System.out.println("width :"+coder.getWidth());
-					System.out.println("Height :"+coder.getHeight());
 					
 					model.addAttribute("FileWidth", coder.getWidth());
 					model.addAttribute("FileHeight", coder.getHeight());
@@ -4680,15 +4845,17 @@ public class HomeController {
 		String topic_name = topic.getTopicName();
 		topic_name	= topic_name.replaceAll(" ", "-");
 		model.addAttribute("topic_name", topic_name);
-		model.addAttribute("script_manager_view_url",CommonData.SCRIPT_MANAGER_BASE+CommonData.SCRIPT_MANAGER_VIEW);
+		model.addAttribute("script_manager_view_url",scriptmanager_url+scriptmanager_path);
 		model.addAttribute("sm_default_param", CommonData.SM_DEFAULT_PARAM);
 		String tutorial_id="";
 		if(tutorial!=null) {
 			tutorial_id = Integer.toString(tutorial.getTutorialId());
 		}
-		String sm_url = CommonData.SCRIPT_MANAGER_BASE+CommonData.SCRIPT_MANAGER_VIEW+Integer.toString(cat.getCategoryId())+"/"
+		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(cat.getCategoryId())+"/"
 				+tutorial_id+"/"+Integer.toString(lan.getLanId())+"/"+topic_name+"/"+"1";
 		model.addAttribute("sm_url", sm_url);
+		
+		model.addAttribute("comment_success", CommonData.COMMENT_SUCCESS);
 		return "uploadTutorialPost";
 	}
 
@@ -4790,15 +4957,9 @@ public class HomeController {
 		IContainer container = IContainer.make();
 		int result=10;
 		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-		
-		System.out.println("Video Duration"+container.getDuration()/1000000);
-		System.out.println("file Size"+container.getFileSize()/1000000);
-		
 
 		IStream stream = container.getStream(0);
 		IStreamCoder coder = stream.getStreamCoder();
-		System.out.println("width :"+coder.getWidth());
-		System.out.println("Height :"+coder.getHeight());
 		
 		model.addAttribute("FileWidth", coder.getWidth());
 		model.addAttribute("FileHeight", coder.getHeight());
@@ -4953,20 +5114,23 @@ public class HomeController {
 		int result=10;
 		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
 		
-		System.out.println("Video Duration"+container.getDuration()/1000000);
-		System.out.println("file Size"+container.getFileSize()/1000000);
-		
-
 		IStream stream = container.getStream(0);
-		IStreamCoder coder = stream.getStreamCoder();
-		System.out.println("width :"+coder.getWidth());
-		System.out.println("Height :"+coder.getHeight());
+		if(stream!=null) {
+			IStreamCoder coder = stream.getStreamCoder();
+			
+			model.addAttribute("FileWidth", coder.getWidth());
+			model.addAttribute("FileHeight", coder.getHeight());
+			
+			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+		}else {
+			model.addAttribute("FileWidth", "");
+			model.addAttribute("FileHeight", "");
+			
+			model.addAttribute("fileSizeInMB", "");
+			model.addAttribute("FileDurationInSecond", "");
+		}
 		
-		model.addAttribute("FileWidth", coder.getWidth());
-		model.addAttribute("FileHeight", coder.getHeight());
-		
-		model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-		model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
 		
 		container.close();
 		
@@ -5100,21 +5264,23 @@ public class HomeController {
 		IContainer container = IContainer.make();
 		int result=10;
 		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-		
-		System.out.println("Video Duration"+container.getDuration()/1000000);
-		System.out.println("file Size"+container.getFileSize()/1000000);
-		
 
 		IStream stream = container.getStream(0);
-		IStreamCoder coder = stream.getStreamCoder();
-		System.out.println("width :"+coder.getWidth());
-		System.out.println("Height :"+coder.getHeight());
-		
-		model.addAttribute("FileWidth", coder.getWidth());
-		model.addAttribute("FileHeight", coder.getHeight());
-		
-		model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-		model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+		if(stream!=null) {
+			IStreamCoder coder = stream.getStreamCoder();
+			
+			model.addAttribute("FileWidth", coder.getWidth());
+			model.addAttribute("FileHeight", coder.getHeight());
+			
+			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+		}else {
+			model.addAttribute("FileWidth", "");
+			model.addAttribute("FileHeight", "");
+			
+			model.addAttribute("fileSizeInMB", "");
+			model.addAttribute("FileDurationInSecond", "");
+		}
 		
 		container.close();
 		}
@@ -5129,7 +5295,15 @@ public class HomeController {
 		}else {
 			model.addAttribute("otherLan", true);
 		}
-
+		String tutorial_id="";
+		if(tutorial!=null) {
+			tutorial_id = Integer.toString(tutorial.getTutorialId());
+		}
+		String topic_name = topicName.getTopicName();
+		topic_name	= topic_name.replaceAll(" ", "-");
+		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(catName.getCategoryId())+"/"
+				+tutorial_id+"/"+Integer.toString(lanName.getLanId())+"/"+topic_name+"/"+"1";
+		model.addAttribute("sm_url", sm_url);
 		return "addContentDomainReview";
 
 
@@ -5303,7 +5477,6 @@ public class HomeController {
            
             youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, credential).build();
 
-            System.out.println("Uploading: " + tutorial.getTutorialId());
 
             
             Video videoObjectDefiningMetadata = new Video();
@@ -5441,7 +5614,6 @@ public class HomeController {
 
 		model.addAttribute("comOutline", comOutline);
 		model.addAttribute("comScript",comScript );
-		System.out.println(comScript+"********************");
 		model.addAttribute("comSlide",comSlide );
 		model.addAttribute("comVideo", comVideo);
 		model.addAttribute("comKeyword", comKeyword);
@@ -5468,15 +5640,19 @@ public class HomeController {
 		
 
 		IStream stream = container.getStream(0);
-		IStreamCoder coder = stream.getStreamCoder();
-		System.out.println("width :"+coder.getWidth());
-		System.out.println("Height :"+coder.getHeight());
+		if(stream!=null) {
+			IStreamCoder coder = stream.getStreamCoder();
+			model.addAttribute("FileWidth", coder.getWidth());
+			model.addAttribute("FileHeight", coder.getHeight());
+			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+		}else {
+			model.addAttribute("FileWidth", "");
+			model.addAttribute("FileHeight", "");
+			model.addAttribute("fileSizeInMB", "");
+			model.addAttribute("FileDurationInSecond", "");
+		}
 		
-		model.addAttribute("FileWidth", coder.getWidth());
-		model.addAttribute("FileHeight", coder.getHeight());
-		
-		model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-		model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
 		
 		container.close();
 
@@ -5492,7 +5668,15 @@ public class HomeController {
 		}else {
 			model.addAttribute("otherLan", true);
 		}
-
+		String tutorial_id="";
+		if(tutorial!=null) {
+			tutorial_id = Integer.toString(tutorial.getTutorialId());
+		}
+		String topic_name = topicName.getTopicName();
+		topic_name	= topic_name.replaceAll(" ", "-");
+		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(catName.getCategoryId())+"/"
+				+tutorial_id+"/"+Integer.toString(lanName.getLanId())+"/"+topic_name+"/"+"1";
+		model.addAttribute("sm_url", sm_url);
 		return "addContentQualityReview";
 
 

@@ -75,12 +75,24 @@ font-weight:bold!important;
 
 											</div>
 
+											<div class="row">
+											<div class="col">
 											<div class="form-group">
-												<label for="nameConsaltant">Name *<span class="text-muted">( Full Name with the official Title )</span></label> <input type="text"
+												<label for="nameConsaltant">First Name *<!-- <span class="text-muted">( Full Name with the official Title )</span> --></label> <input type="text"
 													class="form-control" id="nameConsaltant"
 													name="nameConsaltant" required="required"
 													placeholder="Name of the consultant" />
+											</div>
+											</div>
 
+											<div class="col">
+											<div class="form-group">
+												<label for="lastnameConsultant">Last Name *<!-- <span class="text-muted">( Full Name with the official Title )</span> --></label> <input type="text"
+													class="form-control" id="lastnameConsultant"
+													name="lastname" required="required"
+													placeholder="Last name of the consultant" />
+											</div>
+											</div>
 											</div>
 											
 											<div class="form-group">
@@ -92,6 +104,14 @@ font-weight:bold!important;
 													
 													<input required="required" type="email" class="form-control" id="email" name="email" />
 											</div>
+											<div class="form-group">
+											    <label for="description">Description</label> <span class="text-muted"> (2000 characters limit) </span>
+											    <textarea class="form-control" id="description" rows="3" name="desc" maxlength="2000"></textarea>
+											  </div>
+											<div class="form-group">
+											    <label for="photo">Display Photo</label>
+											    <input type="file" class="form-control-file" id="photo" name="photo" accept="image/*">
+											</div> 
 											
 
 											<button type="submit" class="btn btn-success a-btn">Submit</button>
@@ -112,33 +132,61 @@ font-weight:bold!important;
                             	 </div>
   <thead>
     <tr>
-      <th scope="col">E-mail</th>
+      <th scope="col">Name (E-mail)</th>
       <th scope="col">Description</th>
-      <th scope="col">Poster</th>
+      <th scope="col">Display Photo</th>
       <th scope="col">Enable/Disable on Homepage </th>
     </tr>
   </thead>
   <tbody>
     <tr th:each="consultant : ${consultants}" >
-       <td th:text="${consultant.getUser().getEmail()}"></td>
-       <td th:text="${consultant.getDescription()}"></td>
+       <td>
+       <a th:href="${'/consultant/edit/'+ consultant.getConsultantId()}" th:id="|c_${consultant.getConsultantId()}|">
+       <span th:text="${consultant.getUser().getFullName()}" th:id="|cn_${consultant.getConsultantId()}|"></span>
+       </a>
+       
+       <span>(</span>
+       <span th:text="${consultant.getUser().getEmail()}" th:id="|ce_${consultant.getConsultantId()}|"></span><span>)</span>
+       </td>
+       <td th:text="${consultant.getDescription()}" th:id="|cd_${consultant.getConsultantId()}|"></td>
        <td><img id="imagesource" th:src="@{/files/}+@{${consultant.getUser().getProfilePic()}}"
 			style="width: 150px; height: 100px" />
 	  </td>
-	   <td><div th:if="${consultant.getUser().getProfilePic() != null}">
+	   <td>
+	   <!-- <div th:if="${consultant.getUser().getProfilePic() != null}"> -->
 	   			<div th:if="${consultant.isOnHome()}">
 	   				<a class="disableConsult" th:value="${consultant.getConsultantId()}" title="Click to Disable Consultant"><i class="fas fa-times-circle" th:id="${consultant.getConsultantId()}" style="color:red"></i></a>
 	   			</div>
 	   			<div th:unless="${consultant.isOnHome()}">
 	   				<a class="enableConsult" th:value="${consultant.getConsultantId()}" title="Click to Enable Consultant"><i class="fas fa-check-circle" th:id="${consultant.getConsultantId()}" style="color:green"></i> </a>
 	   			</div>
-	   		</div>
+	   		<!-- </div> -->
 	  </td>
       
     </tr>
     
   </tbody>
 </table>	
+<!-- Modal -->
+<div class="modal fade" id="c_details" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 					</div>
 				</div>
@@ -227,6 +275,25 @@ font-weight:bold!important;
 														});
 
 											});
+											
+						$('#c_details').on('show.bs.modal', function (event) {
+						alert('here');
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var recipient = button.data('target') // Extract info from data-* attributes
+  console.log(button);
+  console.log(typeof button);
+  var c_id = button.attr('id');
+  var i = c_id.indexOf('_');
+  var index = c_id.substring(i+1);
+  alert(index);
+  var desc = '#cd_'+index;
+  alert($(desc).text());
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  modal.find('.modal-title').text('New message to ' + recipient)
+  modal.find('.modal-body input').val(recipient)
+})
 						});
 	</script>
 	</div>
