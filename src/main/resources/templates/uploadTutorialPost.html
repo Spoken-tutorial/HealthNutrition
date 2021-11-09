@@ -606,14 +606,17 @@ border-bottom: 2px solid #014F7A!important;}
     <form class="form-horizontal" th:action="@{/addkeyword}"
 													onsubmit="return submitForm(this);" method="post">
 													<div class="form-group">
-														<!-- <label for="message-text" class="col-form-label">Add
-															Keyword</label> -->
-														<textarea class="form-control" name="keywordArea"
-															id="keywordArea" rows="3" required="required" th:if="${tutorial.getKeyword()}" th:text="${tutorial.getKeyword()}"></textarea>
+															<div th:if="${tutorial}">
 															<textarea class="form-control" name="keywordArea"
-															id="keywordArea" rows="3" required="required" th:unless="${tutorial.getKeyword()}" >
-															<span ></span>
+															id="keywordArea" rows="3" required="required" th:if="${tutorial.getKeyword()}" th:text="${tutorial.getKeyword()}"></textarea>
+															</div>
+															<div th:unless="${tutorial}">
+															<textarea class="form-control" name="keywordArea"
+															id="keywordArea" rows="3" required="required" >
 							            				</textarea>
+															</div>
+														
+															
 													</div>
 												</form>
   </div>

@@ -689,7 +689,6 @@ public class HomeController {
 		}
 		
 		try {
-			
 			String token = UUID.randomUUID().toString();
 			usr.setToken(token);
 			userService.save(usr);
@@ -796,12 +795,12 @@ public class HomeController {
 		usr.setToken(null);
 		userService.save(usr);
 
-		mv.addObject("Success", "Password got updated Successfully");
+		mv.addObject("Success", "Password updated Successfully");
 		mv.setViewName("resetPassword");
 		return mv;
 
 	}
-
+	
 	/**
 	 * redirects to category page
 	 * @param model Model object

@@ -524,50 +524,7 @@ $(document).ready(function() {
 	// JQUERY AJAX CALL TO TAKE CONTACT DATA FROM USER SIDE ----------------------------------------
 			
 			
-			$('#name').change(function(){
-				var name=$('#name').val();
-				var email=$('#email').val();
-				var desc=$('#message').val();
-	  			
-	  			
-	  			$("#contactForm").prop('disabled', true);
-				
-	  			if(name.length>0&& email.length>0 && desc.length>0){
-	  				$("#contactForm").prop('disabled', false);
-	  			}
-	  			
-	  			
-	  		})
-	  		
-	  		$('#email').change(function(){
-				var name=$('#name').val();
-				var email=$('#email').val();
-				var desc=$('#message').val();
-	  			
-	  			
-	  			$("#contactForm").prop('disabled', true);
-				
-	  			if(name.length>0&& email.length>0 && desc.length>0){
-	  				$("#contactForm").prop('disabled', false);
-	  			}
-	  			
-	  			
-	  		})
-	  		
-	  		$('#message').change(function(){
-				var name=$('#name').val();
-				var email=$('#email').val();
-				var desc=$('#message').val();
-	  			
-	  			
-	  			$("#contactForm").prop('disabled', true);
-				
-	  			if(name.length>0&& email.length>0 && desc.length>0){
-	  				$("#contactForm").prop('disabled', false);
-	  			}
-	  			
-	  			
-	  		})
+			
 			
 	  		
 		
@@ -586,6 +543,8 @@ $(document).ready(function() {
 					var urlPassed;
 					
 					urlPassed= projectPath+"addContactForm";
+					$('#feedback_spinner').show();
+					
 				
 					
 					$.ajax({
@@ -599,7 +558,7 @@ $(document).ready(function() {
 			        	
 			       		 success: function (data){
 			       			 
-			       			 
+			       			 $('#feedback_spinner').hide();
 			       			$('#statusOnContactForm').css({"display": "none"}); 
 							  
 							 $('#statusOnContactFormAfterAjaxCallSucess').css({"display": "none"});
@@ -607,24 +566,25 @@ $(document).ready(function() {
 							
 							 if(data[0]==="Success"){
 								 $('#statusOnContactFormAfterAjaxCallSucess').css({"display": "block"});
-								 setTimeout(function() {
-							            $('#statusOnContactFormAfterAjaxCallSucess').fadeOut(1000)}, 4000);
+								// setTimeout(function() {
+							      //      $('#statusOnContactFormAfterAjaxCallSucess').fadeOut(1000)}, 4000);
 							 }else {
 								 $('#statusOnContactFormAfterAjaxCallFailure').css({"display": "block"});
-								 setTimeout(function() {
-							            $('#statusOnContactFormAfterAjaxCallFailure').fadeOut(1000)}, 4000);
+								// setTimeout(function() {
+							      //      $('#statusOnContactFormAfterAjaxCallFailure').fadeOut(1000)}, 4000);
 							 }
 							 
 							 $("#name").prop('value', "");
 							 $("#email").prop('value', "");
 							 $("#message").prop('value', "");
 							 
-							 setTimeout(function() {
-						            $('#Failure').fadeOut(1000)}, 4000);
+							// setTimeout(function() {
+						    //        $('#Failure').fadeOut(1000)}, 4000);
 							 
 						},
 						
 						error : function(err){
+							$('#feedback_spinner').hide();
 							console.log("not working. ERROR: "+JSON.stringify(err));
 						}
 						
