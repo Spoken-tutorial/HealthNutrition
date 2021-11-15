@@ -1259,10 +1259,13 @@ border-bottom: 2px solid #014F7A!important;}
 		</div>
 	</div>
 
-	<script src="js/ckeditor.js"></script>
+	
+	<script th:src="@{/js/ckeditor.js}"></script>
 
 	<script>
+	
 	$( document ).ready(function() {
+	console.log("uploadTut after");
 		var msg = localStorage.getItem("upload_outline_msg");
 		var content = '<div class="alert alert-info" role="alert">'+msg+'</div>';
 	    if(msg!=""){
@@ -1282,21 +1285,27 @@ border-bottom: 2px solid #014F7A!important;}
 	    
 	});
 	
-	let editor;
-
+	var editor;
+	console.log("CREATEING CLASSIC EDITOR");
 	ClassicEditor
 	    .create( document.querySelector( '#editor' ) )
 	    .then( newEditor => {
 	       editor = newEditor;
+	       console.log("editor value **** " + editor);
+	       console.log(editor);
 	       /* editor.setReadOnly(true); */
 	    } )
 	    .catch( error => {
-	        console.error( error );"@{/}"
+	        console.error( error );
+	        console.log("ERROR IN CREATEING CLASSIC EDITOR");
 	    } );
-
-	// Assuming there is a <button id="submit">Submit</button> in your application.
+	console.log("CREATEING CLASSIC EDITOR DONE");
+	
 		document.querySelector( '#outlineId' ).addEventListener( 'click', () => {
+		
 	    const editorData = editor.getData();
+	    console.log("from uploadTutorialPost");
+	    console.log(editorData);
 	    return editor.getData();
 
 	    // ...

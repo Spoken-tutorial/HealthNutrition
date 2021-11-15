@@ -2,6 +2,7 @@
 //var Health="/HealthNutrition";
 
 $(document).ready(function() {
+	
 			$('.pending-upload').tooltip({ title: 'Pending' });
 			$('.admin-review').tooltip({ title: 'Waiting for Admin Review' });
 			$('.domain-review').tooltip({ title: 'Waiting for Domain Review' });
@@ -3249,8 +3250,10 @@ $(document).ready(function() {
 				
 //						$(this).toggle();
 						$('#editOutline').toggle();
-
+						console.log("from ajaxSuport");
+						
 						var saveInfo = editor.getData();
+						console.log(saveInfo);
 						var tutorialId=$("#tutorialId").val();
 						
 						/*var keywordArea = $("#keyword").val();*/
