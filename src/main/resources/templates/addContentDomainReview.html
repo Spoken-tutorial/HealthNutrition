@@ -440,8 +440,7 @@ border-bottom: 2px solid #014F7A!important;}
     <span class="font-weight-bold">Review Feedback :</span>
   </div>
   <div class="card-body">
-    <form class="form-horizontal" th:action="@{/}"
-											onsubmit="return submitForm(this);" method="post">
+    <form class="form-horizontal" th:action="@{/}" method="post">
 
 											<div class="form-group">
 												 <select id="outlineAcceptOtrNeedImp"
@@ -605,8 +604,7 @@ border-bottom: 2px solid #014F7A!important;}
     <span class="font-weight-bold">Review Feedback :</span>
   </div>
   <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
+    <form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 											<div class="form-group">
 												<select id="KeywordAcceptDomain" class="form-control">
 													<option value="0">Select</option>
@@ -781,8 +779,7 @@ border-bottom: 2px solid #014F7A!important;}
   </div>
   <div class="card-body">
     <div th:if="${tutorial.getVideoStatus() == 2}">
-											<form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
+											<form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 
 											<div class="form-group">
 												<select id="VideoAcceptDomain" class="form-control">
@@ -888,8 +885,7 @@ border-bottom: 2px solid #014F7A!important;}
 									</div>
 									<div class="modal-body">
 
-										<form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
+										<form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 
 											<div class="form-group">
 
@@ -968,8 +964,7 @@ border-bottom: 2px solid #014F7A!important;}
     <span class="font-weight-bold">Review Feedback :</span>
   </div>
   <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
+    <form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 
 											<div class="form-group">
 
@@ -1121,8 +1116,7 @@ border-bottom: 2px solid #014F7A!important;}
     <span class="font-weight-bold">Review Feedback :</span>
   </div>
   <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
+    <form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 
 											<div class="form-group">
 												<select id="preAcceptDomain" class="form-control">
@@ -1285,8 +1279,7 @@ border-bottom: 2px solid #014F7A!important;}
     <span class="font-weight-bold">Review Feedback :</span>
   </div>
   <div class="card-body">
-    <form class="form-horizontal mb-3" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
+    <form class="form-horizontal mb-3" th:action="@{/addkeyword}" method="post">
 											<div class="form-group">
 												<select id="SlideAcceptDomain" class="form-control">
 													<option value="0">Select</option>
@@ -1390,8 +1383,7 @@ border-bottom: 2px solid #014F7A!important;}
 									</div>
 									<div class="modal-body">
 
-										<form id="upload-file-form-prerequisite"
-											onsubmit="return submitForm(this);" method="post">
+										<form id="upload-file-form-prerequisite" method="post">
 
 											<div class="form-group">
 												<label for="message-text" class="col-form-label">Add
@@ -1422,15 +1414,6 @@ border-bottom: 2px solid #014F7A!important;}
 							</div>
 
 						</div>
-						
-					
-						<script>
-							function submitForm() {
-								return confirm('Do you really want to submit the form?');
-
-								alert("Submit form succefully");
-							}
-						</script>
 
 						<!-- End KeyWord-->
 
@@ -1518,8 +1501,7 @@ border-bottom: 2px solid #014F7A!important;}
 									</div>
 									<div class="modal-body">
 
-										<form id="upload-file-form-script"
-											submit="return submitForm(this);">
+										<form id="upload-file-form-script">
 
 											<!-- <div class="form-group" style="padding-top: 80px">
 
@@ -1572,7 +1554,7 @@ border-bottom: 2px solid #014F7A!important;}
 									</div>
 									<div class="modal-body">
 
-										<form id="upload-file-form" submit="return submitForm(this);">
+										<form id="upload-file-form">
 
 
 											<!-- <div class="form-group" style="padding-top: 80px">

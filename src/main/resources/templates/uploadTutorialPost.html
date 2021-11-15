@@ -408,8 +408,7 @@ border-bottom: 2px solid #014F7A!important;}
     <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span>
   </div>
   <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-													onsubmit="return submitForm(this);" method="post">
+    <form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 													<div class="form-group">
 														<div id="VideoView"></div>
 														<span id="VideoView1"> </span>
@@ -442,8 +441,7 @@ border-bottom: 2px solid #014F7A!important;}
 														
 													</div>
 												</form>
-												<form id="upload-file-form-video"
-													onsubmit="return submitForm(this);">
+												<form id="upload-file-form-video">
 													<div class="custom-file mb-3">
 														
 															<div>
@@ -603,8 +601,7 @@ border-bottom: 2px solid #014F7A!important;}
     <span class="font-weight-bold"><span th:text="${category.getCatName()}"></span> | <span th:text="${topic.getTopicName()}"></span></span>
   </div>
   <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-													onsubmit="return submitForm(this);" method="post">
+    <form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 													<div class="form-group">
 															<div th:if="${tutorial}">
 															<textarea class="form-control" name="keywordArea"
@@ -721,8 +718,7 @@ border-bottom: 2px solid #014F7A!important;}
 									</div>
 									<div class="modal-body">
 
-										<form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
+										<form class="form-horizontal" th:action="@{/addkeyword}" method="post">
 
 											<div class="form-group">
 
@@ -1004,38 +1000,6 @@ border-bottom: 2px solid #014F7A!important;}
 											<div class="alert alert-info" role="alert">
   												<i class="fas fa-external-link-alt"></i> <a th:href="${sm_url}" class="alert-link" style="text-decoration: underline;" target="_blank" id="sm_url">Click here to proceed to Script Manager</a>
 											</div>
-												
-												
-												<!-- <form class="form-horizontal mb-3"
-													th:action="@{/addkeyword}"
-													onsubmit="return submitForm(this);" method="post">
-													<div th:if="${tutorial}" class="card">
-														<div class="card-body">
-															<div class="form-group">
-																<a th:if="${tutorial.getScriptStatus() != 0}"
-																	th:href="@{/files/}+@{${tutorial.getScript()}}"
-																	name="ScriptPdf" target="_blank" id="ScriptPdf">Click
-																	To View</a>
-															</div>
-														</div>
-													</div>
-												</form> -->
-												<!-- <form id="upload-file-form-script"
-													submit="return submitForm(this);">
-													<div class="form-group">
-														<div class="custom-file">
-															<input type="file" class="custom-file-input"
-																id="uploadScriptFile" name="uploadsScriptFile"
-																placeholder="uploadFile" accept=".pdf"
-																required="required"></input> <label
-																class="custom-file-label" for="uploadsScriptId">Choose
-																file...</label>
-															<div class="invalid-feedback">Example invalid
-																custom file feedback</div>
-														</div>
-													</div>
-												</form> -->
-
 											</div>
 											<div class="col-12">
 												<!-- <div th:if="${not #lists.isEmpty(comScript)}"> -->
@@ -1159,8 +1123,7 @@ border-bottom: 2px solid #014F7A!important;}
   </div>
   <div class="card-body">
     <form class="form-horizontal mb-3"
-													th:action="@{/addkeyword}"
-													onsubmit="return submitForm(this);" method="post">
+													th:action="@{/addkeyword}" method="post">
 													<div th:if="${tutorial}" >
 													<div  th:if="${tutorial.getSlideStatus() != 0}">
 													<div >
@@ -1184,8 +1147,7 @@ border-bottom: 2px solid #014F7A!important;}
 														
 													</div>
 												</form>
-												<form id="upload-file-form"
-													submit="return submitForm(this);">
+												<form id="upload-file-form">
 													<div class="form-group">
 														<div class="custom-file">
 															
