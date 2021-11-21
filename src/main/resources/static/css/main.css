@@ -83,6 +83,14 @@ body{
 	/* color: #004F7A!important; */
 	/* font-weight: bold; */
 }
+.title-1{
+	font-weight: bold!important;
+	color: #014F7A;
+	font-size: 1rem;
+}
+.table-comp{
+	background: lightblue;
+}
 /*-----------------------------------Common---------------------------*/
 /*-----------------------------------header upper-bar---------------------------*/
 #top-fixed-banner{
@@ -402,7 +410,7 @@ box-shadow: 0 10px 16px rgba(0, 0, 0, .13), 0 6px 6px rgba(0, 0, 0, .19);
     width: 250px!important;
     
 }
-}
+
 .v-item .vid{
 	width: 100%;
 	margin-bottom: 15px;
@@ -667,7 +675,7 @@ footer{
 
 #tutorialPage .link-style:hover::after {
     width: 100%;
-    //transition: width .3s;
+    transition: width .3s;
 }
 #tutorialPage ul{
 	list-style-type: none;

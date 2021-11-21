@@ -229,6 +229,131 @@ public class HomeController {
     private static YouTube youtube;
     
 	private static final String VIDEO_FILE_FORMAT = "video/*";
+	
+	
+
+	private User getUser(Principal principal,UserService usrservice) {
+		User usr=new User();
+		if(principal!=null) {
+			usr=usrservice.findByUsername(principal.getName());
+		}
+		return usr;
+	}
+	
+
+	static void setCompStatus(Model model,List<Tutorial> tutorials) {
+		
+		if(tutorials.isEmpty()) {
+
+			model.addAttribute("statusOutline", CommonData.ADD_CONTENT);
+			model.addAttribute("statusScript", CommonData.ADD_CONTENT);
+			model.addAttribute("statusSlide", CommonData.ADD_CONTENT);
+			model.addAttribute("statusVideo", CommonData.ADD_CONTENT);
+			model.addAttribute("statusKeyword", CommonData.ADD_CONTENT);
+			model.addAttribute("statusPreReq", CommonData.ADD_CONTENT);
+			model.addAttribute("statusGraphics", CommonData.ADD_CONTENT);
+			model.addAttribute("tutorial", null);
+		}else {
+			for(Tutorial local:tutorials) {
+				model.addAttribute("statusOutline", CommonData.tutorialStatus[local.getOutlineStatus()]);
+				model.addAttribute("statusScript", CommonData.tutorialStatus[local.getScriptStatus()]);
+				model.addAttribute("statusSlide", CommonData.tutorialStatus[local.getSlideStatus()]);
+				model.addAttribute("statusVideo", CommonData.tutorialStatus[local.getVideoStatus()]);
+				model.addAttribute("statusKeyword", CommonData.tutorialStatus[local.getKeywordStatus()]);
+				model.addAttribute("statusPreReq", CommonData.tutorialStatus[local.getPreRequisticStatus()]);
+
+//				model.addAttribute("tutorial", local);
+				
+				
+				
+			}
+
+		}
+	}
+private void setVideoInfo(Model model, List<Tutorial> tutorials) {
+	
+	HashMap<String, Long> video_data = new HashMap<String, Long>();	
+	if(!tutorials.isEmpty()) {
+		for(Tutorial local:tutorials) {
+			if(local.getVideo() != null) {
+
+				IContainer container = IContainer.make();
+				int result=10;
+				result = container.open(env.getProperty("spring.applicationexternalPath.name")+local.getVideo(),IContainer.Type.READ,null);
+				
+					IStream stream = container.getStream(0);
+					if(stream!=null) {
+					IStreamCoder coder = stream.getStreamCoder();
+					model.addAttribute("FileWidth", coder.getWidth());
+					model.addAttribute("FileHeight", coder.getHeight());
+					model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+					model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+					
+					container.close();
+				}
+			}
+		}
+	}
+	
+}
+	
+static void setCompComment(Model model,List<Tutorial> tutorials,CommentService comService) {
+	
+	if(!tutorials.isEmpty()) {
+		for(Tutorial local:tutorials) {
+			List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, local);
+			List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT, local);
+			List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, local);
+
+			List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, local);
+			List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC, local);
+			List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, local);
+
+			model.addAttribute("comOutline", comOutline);
+			model.addAttribute("comScript",comScript );
+			model.addAttribute("comSlide",comSlide );
+			model.addAttribute("comVideo", comVideo);
+			model.addAttribute("comKeyword", comKeyword);
+			model.addAttribute("comPreReq", comPreRequistic);
+			
+		}
+	}
+}
+
+static void setEngLangStatus(Model model,Language lan) {
+	if(!lan.getLangName().equalsIgnoreCase("english")) {
+		model.addAttribute("isEnglish", false);
+	}else {
+		model.addAttribute("isEnglish", true);
+	}
+}
+
+private String setPreReqInfo(Tutorial tut) {
+	String prefix = "Selected prerequisite : ";
+	String pre_req = prefix + "This tutorial has no prerequisite.";
+	if(tut.getPreRequistic()!=null) {
+		Tutorial local = tut.getPreRequistic();
+		String catName = local.getConAssignedTutorial().getTopicCatId().getCat().getCatName();
+		String topicName = local.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName();
+		pre_req = prefix + catName + " - " + topicName;
+	}
+	return pre_req;
+}
+
+static String setScriptManagerUrl(Model model,String scriptmanager_url,String scriptmanager_path, Tutorial tutorial, Topic topic,Language lan, Category cat) {
+	String topic_name = topic.getTopicName();
+	topic_name	= topic_name.replaceAll(" ", "-");
+	model.addAttribute("topic_name", topic_name);
+	model.addAttribute("script_manager_view_url",scriptmanager_url+scriptmanager_path);
+	model.addAttribute("sm_default_param", CommonData.SM_DEFAULT_PARAM);
+	String tutorial_id="";
+	if(tutorial!=null) {
+		tutorial_id = Integer.toString(tutorial.getTutorialId());
+	}
+	String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(cat.getCategoryId())+"/"
+			+tutorial_id+"/"+Integer.toString(lan.getLanId())+"/"+topic_name+"/"+"1";
+	return sm_url;
+}
 
 	/**
 	 * Index page Url
@@ -4703,6 +4828,33 @@ public class HomeController {
 	}
 
 
+	private List<Category> getPreReqCategories(Language lan){
+		List<Category> categories = new ArrayList<Category>();
+		List<Category> preReqCategories = new ArrayList<Category>();
+		Set<Category> preReqCatSet = new HashSet<Category>();
+//		get all category
+		categories = catService.findAll();
+//		for each category; 
+		for(Category category : categories) {
+			if(category.isStatus()) {
+				List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(category);
+				List<ContributorAssignedTutorial> con_t = conRepo.findAllByTopicCatAndLanViewPart(tcm, lan);
+				for(ContributorAssignedTutorial c : con_t) {
+					List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(c);
+					if(!tut.isEmpty()) {
+						if(tut.get(0).isStatus()) {
+							preReqCatSet.add(category);
+						}
+					}
+					
+				}
+			}
+		}
+		for(Category c : preReqCatSet) {
+			preReqCategories.add(c);
+		}
+		return preReqCategories;
+	}
 	/**
 	 * load tutorial component page to add various component for the tutorial
 	 * @param model Model object
@@ -4718,20 +4870,25 @@ public class HomeController {
 										@RequestParam(name="inputTopic") int topicId,
 										@RequestParam(name="inputLanguage") String langName) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-		List<Category> categories = catService.findAll();
-		Category cat=catService.findBycategoryname(categoryName);
-		Topic topic=topicService.findById(topicId);
+		model.addAttribute("userInfo", getUser(principal, userService));
 		Language lan=lanService.getByLanName(langName);
+		model.addAttribute("language", lan);
+		List<Category> categories = getPreReqCategories(lan);
+		model.addAttribute("categories", categories);
+		Category cat=catService.findBycategoryname(categoryName);
+		model.addAttribute("category", cat);
+		Topic topic=topicService.findById(topicId);
+		model.addAttribute("topic", topic);
+		
 		TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
 		Tutorial tutorial = null;
+		
+//		set component status for current tutorial
+		ContributorAssignedTutorial conTutorial=conRepo.findByTopicCatAndLanViewPart( topicCat, lan);
+		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTutorial);
+		setCompStatus(model,tutorials);
+		setEngLangStatus(model, lan);
+		
 		if(!lan.getLangName().equalsIgnoreCase("english")) {
 			
 			boolean goAhead = false;
@@ -4746,18 +4903,21 @@ public class HomeController {
 			}
 			
 			if(goAhead == false) {
-				model.addAttribute("error_msg", "Please Add English Verion of tutorial first");
+				model.addAttribute("error_msg", "Please add English version of tutorial first.");
+				model.addAttribute("disable", true);
 				return "uploadTutorialPost";
 			}else {
 				
 				if(tutTemp.isEmpty()) {
-					model.addAttribute("error_msg", "Please Add English Verion of tutorial first");
+					model.addAttribute("error_msg", "Please add English version of tutorial first.");
+					model.addAttribute("disable", true);
 					return "uploadTutorialPost";
 					
 				}else {
 					for(Tutorial x : tutTemp) {
 						if(!x.isStatus()) {
-							model.addAttribute("error_msg", "Please Add English Verion of tutorial first");
+							model.addAttribute("error_msg", "Please publish English version of tutorial first.");
+							model.addAttribute("disable", true);
 							return "uploadTutorialPost";
 						}
 					}
@@ -4767,94 +4927,24 @@ public class HomeController {
 			
 		}
 		
-		ContributorAssignedTutorial conTutorial=conRepo.findByTopicCatAndLanViewPart( topicCat, lan);
-		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTutorial);
-		
-		if(tutorials.isEmpty()) {
-
-			model.addAttribute("statusOutline", CommonData.ADD_CONTENT);
-			model.addAttribute("statusScript", CommonData.ADD_CONTENT);
-			model.addAttribute("statusSlide", CommonData.ADD_CONTENT);
-			model.addAttribute("statusVideo", CommonData.ADD_CONTENT);
-			model.addAttribute("statusKeyword", CommonData.ADD_CONTENT);
-			model.addAttribute("statusPreReq", CommonData.ADD_CONTENT);
-			model.addAttribute("statusGraphics", CommonData.ADD_CONTENT);
-			model.addAttribute("tutorial", null);
-		}else {
-
+		if(!tutorials.isEmpty()) {
+//			set video details
+			setVideoInfo(model,tutorials);
+			setCompComment(model, tutorials, comService);
 			for(Tutorial local:tutorials) {
 				tutorial = local;
-				model.addAttribute("statusOutline", CommonData.tutorialStatus[local.getOutlineStatus()]);
-				model.addAttribute("statusScript", CommonData.tutorialStatus[local.getScriptStatus()]);
-				model.addAttribute("statusSlide", CommonData.tutorialStatus[local.getSlideStatus()]);
-				model.addAttribute("statusVideo", CommonData.tutorialStatus[local.getVideoStatus()]);
-				model.addAttribute("statusKeyword", CommonData.tutorialStatus[local.getKeywordStatus()]);
-				model.addAttribute("statusPreReq", CommonData.tutorialStatus[local.getPreRequisticStatus()]);
-
+				String sm_url = setScriptManagerUrl(model, categoryName, langName, tutorial, topic, lan, cat);
+				model.addAttribute("sm_url", sm_url);
 				model.addAttribute("tutorial", local);
-				
-				if(local.getVideo() != null) {
-
-				IContainer container = IContainer.make();
-				int result=10;
-				result = container.open(env.getProperty("spring.applicationexternalPath.name")+local.getVideo(),IContainer.Type.READ,null);
-				
-					IStream stream = container.getStream(0);
-					if(stream!=null) {
-					IStreamCoder coder = stream.getStreamCoder();
-					
-					model.addAttribute("FileWidth", coder.getWidth());
-					model.addAttribute("FileHeight", coder.getHeight());
-					model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-					model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-					container.close();
+				if(local.getPreRequisticStatus()!=0) {
+					model.addAttribute("pre_req", setPreReqInfo(local));
 				}
-
-				}
-
 				
-
-				List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, local);
-				List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT, local);
-				List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, local);
-
-				List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, local);
-				List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC, local);
-				List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, local);
-
-				model.addAttribute("comOutline", comOutline);
-				model.addAttribute("comScript",comScript );
-				model.addAttribute("comSlide",comSlide );
-				model.addAttribute("comVideo", comVideo);
-				model.addAttribute("comKeyword", comKeyword);
-				model.addAttribute("comPreReq", comPreRequistic);
+				
 			}
+			
 		}
 
-		model.addAttribute("category", cat);
-		model.addAttribute("topic", topic);
-		model.addAttribute("language", lan);
-		model.addAttribute("categories", categories);
-		if(!lan.getLangName().equalsIgnoreCase("english")) {
-			model.addAttribute("otherLan", false);
-		}else {
-			model.addAttribute("otherLan", true);
-		}
-		
-		String topic_name = topic.getTopicName();
-		topic_name	= topic_name.replaceAll(" ", "-");
-		model.addAttribute("topic_name", topic_name);
-		model.addAttribute("script_manager_view_url",scriptmanager_url+scriptmanager_path);
-		model.addAttribute("sm_default_param", CommonData.SM_DEFAULT_PARAM);
-		String tutorial_id="";
-		if(tutorial!=null) {
-			tutorial_id = Integer.toString(tutorial.getTutorialId());
-		}
-		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(cat.getCategoryId())+"/"
-				+tutorial_id+"/"+Integer.toString(lan.getLanId())+"/"+topic_name+"/"+"1";
-		model.addAttribute("sm_url", sm_url);
-		
-		model.addAttribute("comment_success", CommonData.COMMENT_SUCCESS);
 		return "uploadTutorialPost";
 	}
 

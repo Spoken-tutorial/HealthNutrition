@@ -158,6 +158,15 @@
 			<!--/.container-fluid -->
 		</nav>
 	</div>
+	<div th:fragment="alert_msg">
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+								<span th:text="${success_msg}"></span>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+								<span th:text="${error_msg}"></span>
+					</div>
+ 	</div>
 
 	<div th:fragment="body-bottom-scripts">
 	<script

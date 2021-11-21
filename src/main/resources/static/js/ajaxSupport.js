@@ -1,5 +1,8 @@
 
 //var Health="/HealthNutrition";
+const OUTLINE_SUCCESS_MSG = "Outline saved successfully !";
+const COMPONENT_UPLOAD_ERROR_MSG = "Some error occurred. Please contact admin."
+const COMPONENT_UPLOAD_SUCCESS_MSG = "Component added successfully."
 
 $(document).ready(function() {
 	
@@ -685,10 +688,6 @@ $(document).ready(function() {
 
 			});
 			
-			$('#prerequisiteModale').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
 
 			$('.nav-item').on(
 					'click',
@@ -711,32 +710,6 @@ $(document).ready(function() {
 			});
 			
 
-			// Contributor
-
-			// here is code for keyword review
-			$('#keywordModale').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
-
-			// here is code for Script
-			$('#scriptModale').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
-
-			// Here is code for
-			$('#slideModale').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
-
-			$('#videoModel').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
-
-			// Admin
 
 			$('#VideoStatusAccept').on('hidden.bs.modal', function() {
 				location.reload();
@@ -1166,8 +1139,8 @@ $(document).ready(function() {
 
 
 
-								$("#inputLanguageAll").prop('disabled',false);
-								$('#inputLanguageAll').html(html);
+								$("#preReqTopic").prop('disabled',false);
+								$('#preReqTopic').html(html);
 
 							},
 
@@ -1387,65 +1360,40 @@ $(document).ready(function() {
 			// Changes made by om prakash
 
 			$('#uploadpreRequsiteId').click(function() {
-//				var tutorialId = $("#inputLanguageAll").val();
+
 				var tutorialId = $("#tutorialId").val();
 				var categoryid = $("#categoryId").val();
-//				var topicid = $("#topicID").val();
-				var topicid = $("#inputLanguageAll").val();
-				
+				var topicid = $("#topicID").val();
 				var lanId = $("#lanId").val();
+				
+				
+				var preReqTutId = $("#preReqTopic").val(); //Id of pre-req tutorial 
+				var prRequired_checkbox = document.getElementById('prRequired');
 
 				$.ajax({
 					type : "GET",
 					url : projectPath+"addPreRequistic",
 					data : {
-
 						"id" :tutorialId,
 						"categoryname" : categoryid,
 						"topicid" : topicid,
-						"lanId" : lanId
+						"lanId" : lanId,
+						"preReqTutId" : preReqTutId
 					},
 					contentType : "application/json",
 					success : function(result) 
 					{
-						//$("#exampleModalLabelPre").prop('disabled',false);
-						//$("#exampleModalLabelPre").html("Result");
-						
-						var msg = 'Prerequisite updated successfully.'
-									$('#statusPreReq').addClass('d-block');
-								$('#statusPreReq').html(msg);
-						$.each(result , function( key, value ) {
-			  	  			        if(key == 1){
-										//$('#status_pr').addClass('d-block');
-										$('#status_pr').show();
-										$('#status_pr').addClass('alert-success');
-										$('#status_pr').html(value);
-										
-									}else{
-										//$('#status_pr').addClass('d-block');
-										$('#status_pr').show();s
-								 		$('#status_pr').addClass('alert-danger');
-										$('#status_pr').html(value);
-									}
-			  	  			     })
-
+						setComponentUploadStatus(result,'alert-pre','status-pre','uploadpreRequsiteId');
+						prRequired_checkbox.disabled = true;
 					},
 
 					error : function(err) {
 						console
 						.log("not working. ERROR: "+ JSON.stringify(err));
-						
-						var msg = 'Error in updating Pre-Requistic.'
-									// $('#statusOutline').html(html);
-									$('#statusPreReq').addClass('d-block');
-								 $('#statusPreReq').addClass('alert-danger');
-
-								$('#statusPreReq').html(msg);
+						setErrorStatus('alert-pre');
 					}
-
 				});
-
-					});
+});
 
 
 
@@ -1884,165 +1832,17 @@ $(document).ready(function() {
 			// Contributor
 
 			// here is code for keyword review
-			$('#keywordModale').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
-			$('#scriptModale').on(
-					'shown.bs.modal',
-					function() {
-						var categoryid = $("#categoryId").val();
-						var topicid = $("#topicId").val();
-						var lanId = $("#lanId").val();
-						$.ajax({
-
-							type : "GET",
-							url : projectPath+"scriptPdf",
-							data : {
-								"categorname" : categoryid,
-								"topicid" : topicid,
-								"lanId" : lanId
-							},
-							contentType : "application/json",
-							success : function(result) {
-								var res =  filep + result;
-								source = document
-								.getElementById('viewScript');
-								source.setAttribute('href', res);
-
-								str = result[0].split("/");
-								fileName = str[str.length - 1];
-								$('#viewScript').html(fileName);
-							},
-
-							error : function(err) {
-								console.log("not working. ERROR: "
-										+ JSON.stringify(err));
-							}
-						});
-
-					});
+			//$('#keywordModale').on('hidden.bs.modal', function() {location.reload();});
+			
 
 /********************** changes made by om prakash **************************************/
 			
-			$('#keywordModale').on('shown.bs.modal',function() {
-						
-						var tutorialID= $("#tutorialId").val();
+			
 
-						if(tutorialID !=0 ){
-								$.ajax({
-									type : "GET",
-									url : projectPath+"viewKeyword",
-									data : {
-										"id" : tutorialID
-									},
-									contentType : "application/json",
-									success : function(result) {
-										if(result!=null){
-											$("#keyword").val(result);
-											$('#keyword').prop('readonly', true);
-//											$("#keywordId").hide();
-										}
-										
-		
-									},
-									error : function(err) {
-										console.log("not working. ERROR: "+ JSON.stringify(err));
-									}
-		
-								});
-						
-						}
-
-					});
-
-			// here is code for
-			$('#outlineModalContri').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
+			
 			
 	/********************* changes made by om prakash *******************************/
 			
-			$('#outlineModalContri').on('shown.bs.modal',function() {
-
-						/*var categoryid = $("#categoryId").val();
-						var topicid = $("#topicId").val();
-						var lanId = $("#lanId").val();*/
-				
-						var tutorialID= $("#tutorialId").val();
-						
-						if(tutorialID !=0 ){
-							
-								$.ajax({
-		
-									type : "GET",
-									url : projectPath+"viewOutline",
-									data : {
-										"id" : tutorialID
-									},
-									contentType : "application/json",
-									success : function(result) {
-										if(result==null){
-											$('#editOutline').hide();
-										}
-										editor.setData(result); // add
-										// retrieved
-										// outline
-										// content
-										// to editor
-//										editor.isReadOnly = true;
-		
-									},
-									error : function(err) {
-										console.log("not working. ERROR: "+ JSON.stringify(err));
-									}
-		
-								});
-						
-						}
-
-					});
-
-			// here is code for Script
-			$('#scriptModale').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
-
-			$('#slideModale').on('hidden.bs.modal', function() {
-				location.reload();
-			});
-
-			/* load By Contributor user only contributor assign from */
-
-//			$('#contributorId')
-//			.click(
-//			function() {
-//			var userContributor = $(this).find(':selected').val();
-//			$.ajax({
-//			type : "GET",
-//			url : "/loadLanguageByUser",
-//			data : {
-//			"id" : userContributor
-//			},
-//			contentType : "application/json",
-//			success : function(result) {
-//			var html = '';
-//			var len = result.length;
-//			html += '<option value="0">Select Language</option>';
-//			for (var i = 0; i < len; i++) {
-//			html += '<option value="'+ result[i]+ '">'+ result[i]+ '</option>';
-//			}
-//			html += '</option>';
-//			$("#lanId").prop('disabled',false);
-//			$('#lanId').html(html);
-//			},
-//			error : function(err) {
-//			console.log("not working. ERROR: "+ JSON.stringify(err));
-//			}
-//			});
-//			});
 			/* here is code for download question */
 
 			$('#inputLanguage1')
@@ -2155,56 +1955,7 @@ $(document).ready(function() {
 
 					});
 
-			$('#slideModale').on(
-					'shown.bs.modal',
-					function() {
-
-						var categoryid = $("#categoryId").val();
-
-						var topicid = $("#topicId").val();
-
-						var lanId = $("#lanId").val();
-
-						$.ajax({
-
-							type : "GET",
-
-							url : projectPath+"sliedPdf",
-
-							data : {
-								"categorname" : categoryid,
-								"topicid" : topicid,
-								"lanId" : lanId
-							},
-
-							contentType : "application/json",
-
-							success : function(result)
-
-							{
-
-								var res = filep+result;
-
-								source = document
-								.getElementById('sliedPdf');
-
-								source.setAttribute('href', res);
-								str = result[0].split("/");
-								fileName = str[str.length - 1];
-								$('#sliedPdf').html(fileName);
-							},
-
-							error : function(err) {
-
-								console.log("not working. ERROR: "
-										+ JSON.stringify(err));
-
-							}
-
-						});
-
-					});
-
+			
 			$('#fetch_questions').click(
 			function() {
 			$('#questionnaire').tab('show');
@@ -2554,10 +2305,7 @@ $(document).ready(function() {
 
 					});
 
-			$('#videoModel').on('hidden.bs.modal', function() {
-				location.reload();
-
-			});
+		//	$('#videoModel').on('hidden.bs.modal', function() {location.reload();});
 
 			$('#videoClick')
 			.click(
@@ -3245,23 +2993,36 @@ $(document).ready(function() {
 
 					});
 /******************************** changes made by om prakash ************************************/
+
+			function setComponentUploadStatus(result,alert,status,submit_btn){
+				var alert_elem = document.getElementById(alert);
+				var status_elem = document.getElementById(status);
+				var btn_elem = document.getElementById(submit_btn);
+				alert_elem.classList.remove("d-none");
+				alert_elem.innerText = result[1];
+				status_elem.innerText = result[2];
+				if(result[0]=="success"){
+					alert_elem.classList.add('alert-success');
+					btn_elem.disabled = true;
+				}else{
+					alert_elem.classList.add('alert-danger');
+				}
+			}
+			
+			function setErrorStatus(alert_id){
+				var alert_elem = document.getElementById(alert_id);
+				alert_elem.classList.add('alert-danger');
+				alert_elem.innerText = COMPONENT_UPLOAD_ERROR_MSG;
+			}
 			
 			$('#outlineId').click(function() {
-				
-//						$(this).toggle();
-						$('#editOutline').toggle();
-						console.log("from ajaxSuport");
-						
 						var saveInfo = editor.getData();
-						console.log(saveInfo);
-						var tutorialId=$("#tutorialId").val();
 						
-						/*var keywordArea = $("#keyword").val();*/
+						var tutorialId=$("#tutorialId").val();
 						var categoryid = $("#categoryId").val();
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
-						localStorage.setItem("upload_outline_msg","Outline updated.");
-//						editor.isReadOnly = true;
+						
 						$.ajax({
 							type : "GET",
 							url : projectPath+"addOutline",
@@ -3275,39 +3036,12 @@ $(document).ready(function() {
 							},
 							contentType : "application/json",
 							success : function(result) {
-								// $("#statusOutline").prop('disabled',
-								// false);
-								//var msg = 'Outline updated successfully.'
-									// $('#statusOutline').html(html);
-									//$('#statusOutlineC')
-									//.addClass(
-									//'d-block');
-								//$('#statusOutlineC').html(msg);
-								$.each(result , function( key, value ) {
-			  	  			        if(key == 1){
-										$('#statusOutlineC').addClass('d-block');
-										$('#statusOutlineC').html(value);
-										
-									}else{
-										$('#statusOutlineC').addClass('d-block');
-								 		$('#statusOutlineC').addClass('alert-danger');
-
-										$('#statusOutlineC').html(value);
-									}
-			  	  			     })
-
+								setComponentUploadStatus(result,'alert-outline','status-outline','outlineId');
 							},
 							error : function(err) {
 								console.log("not working. ERROR: "+ JSON.stringify(err));
-								var msg = 'Error in updating outline.'
-									// $('#statusOutline').html(html);
-									$('#statusOutlineC').addClass('d-block');
-								 $('#statusOutlineC').addClass('alert-danger');
-
-								$('#statusOutlineC').html(msg);
-
+								setErrorStatus('alert-outline');
 							}
-
 						});
 
 					});
@@ -3337,19 +3071,14 @@ $(document).ready(function() {
 	/*********************** changes made by om prakash *************************************/
 
 			$('#keywordId').click(function() {
-				
-//						$(this).toggle();
-//						$('#editKeyword').toggle();
 						
 						var keywordArea = $("#keywordArea").val();
+						
 						var categoryid = $("#categoryId").val();
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
-//						var categoryid = $("#categoryId").val();
-//						var topicid = $("#topicID").val();
-//						var lanId = $("#lanId").val();
 						var tutorialId=$("#tutorialId").val();
-//						$('#keyword').prop('readonly', true);
+						
 						$.ajax({
 							type : "GET",
 							url : projectPath+"addKeyword",
@@ -3362,28 +3091,12 @@ $(document).ready(function() {
 							},
 							contentType : "application/json",
 							success : function(result) {
-								showStatus(SUCCESS,result);
-//								$("#statuskeyword").prop('disabled',
-//								false);
-//								$('#statuskeyword').html(result);
-								$.each(result , function( key, value ) {
-			  	  			        if(key == 1){
-										$('#status_kw').addClass('d-block');
-										$('#status_kw').addClass('alert-success');
-										$('#status_kw').html(value);
-										
-									}else{
-										$('#status_kw').addClass('d-block');
-								 		$('#status_kw').addClass('alert-danger');
-										$('#status_kw').html(value);
-									}
-			  	  			     })
-
+							setComponentUploadStatus(result,'alert-kw','status-kw','keywordId');
 							},
 
 							error : function(err) {
 								console.log("not working. ERROR: "	+ JSON.stringify(err));
-								var result = "Error"; showStatus(ERROR,result);
+								setErrorStatus('alert-kw');
 							}
 
 						});
@@ -3399,8 +3112,10 @@ $(document).ready(function() {
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
 						var TutorialID=$("#tutorialId").val();
-						var form = $('#upload-file-form-script')[0];
-						var formData = new FormData(form);
+						
+					//	var form = $('#upload-file-form-script')[0];
+						//var formData = new FormData(form);
+						var formData = new FormData();
 
 						formData.append('categoryname', categoryid);
 						formData.append('topicid', topicid);
@@ -3411,40 +3126,17 @@ $(document).ready(function() {
 							type : "POST",
 							url : projectPath+"addScript",
 							data : formData,
-							enctype : 'multipart/form-data',
+							//enctype : 'multipart/form-data',
 							processData : false,
 							contentType : false,
 							cache : false,
 							success : function(result) {
-//								$("#statusofScript").prop('disabled',true);
-//								$('#statusofScript').html(result[2]);
-								$('#viewScript').html(result);
-//								source = document.getElementById('storedVideoId');
-//								source.setAttribute('src',result[1]);
-								//var result = "Script updated successfully";
-								//showStatus(SUCCESS,result);
-								$('.upload-status').hide();
-								$.each(result , function( key, value ) {
-			  	  			        if(key == 1){
-										$('#status_script').addClass('d-block');
-										$('#status_script').html(value);
-										document.getElementById("scriptId").disabled = true;
-										
-										
-									}else{
-										$('#status_script').addClass('d-block');
-								 		$('#status_script').addClass('alert-danger');
-										$('#status_script').html(value);
-									}
-			  	  			     })
-								
+								setComponentUploadStatus(result,'alert-script','status-script','scriptId');
 							},
 
 							error : function(err) {
-								alert('error');
 								console.log("not working. ERROR: "+ JSON.stringify(err));
-								var result = "Error";
-								showStatus(ERROR,result);
+								setErrorStatus('alert-script');
 							}
 						});
 
@@ -3459,6 +3151,7 @@ $(document).ready(function() {
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
 						var TutorialID=$("#tutorialId").val();
+						
 						var form = $('#upload-file-form')[0];
 						var formData = new FormData(form);
 						formData.append('categoryname', categoryid);
@@ -3474,33 +3167,12 @@ $(document).ready(function() {
 							contentType : false,
 							cache : false,
 							success : function(result) {
-//								$("#statusofSlide").prop('disabled',true);
-//								$('#statusofSlide').html(result[2]);
-
-//								$('#sliedPdf').html(projectPath);
-								/*$("#sliedPdf").prop('href', result[1]);*/
-								//var result = "Slide uploaded successfully";
-								//showStatus(SUCCESS,result);
-								$.each(result , function( key, value ) {
-			  	  			        if(key == 1){
-										$('#status_slide').addClass('d-block');
-										$('#status_slide').addClass('alert-success');
-										$('#status_slide').html(value);
-										
-									}else{
-										$('#status_slide').addClass('d-block');
-								 		$('#status_slide').addClass('alert-danger');
-										$('#status_slide').html(value);
-									}
-			  	  			     })
-
+								setComponentUploadStatus(result,'alert-slide','status-slide','slideId');
 							},
 
 							error : function(err) {
-								alert('error');
 								console.log("not working. ERROR: "+ JSON.stringify(err));
-							var result = "Slide uploaded successfully";
-							showStatus(SUCCESS,result);
+							setErrorStatus('alert-slide');
 							}
 
 						});
@@ -3531,7 +3203,7 @@ $(document).ready(function() {
 						var lanId = $("#lanId").val();
 						var tutorialID=$('#tutorialId').val();
 
-						var form = $('#upload-file-form-video')[0];
+						var form = $('#upload-video')[0];
 						var formData = new FormData(form);
 						
 						formData.append('id',tutorialID);
@@ -3549,32 +3221,13 @@ $(document).ready(function() {
 							contentType : false,
 							cache : false,
 							success : function(result) {
-
-								$("#statusofVideo").prop('disabled',true);
-//								$('#statusofVideo').html(result);
-								//showStatus(SUCCESS,result);
-
-							/*	source = document.getElementById('storedVideoId');
-								source.setAttribute('src',result[1]);
-								source.setAttribute('type','video/mp4')*/
-								$.each(result , function( key, value ) {
-			  	  			        if(key == 1){
-										$('#status_video').addClass('d-block');
-										$('#status_video').addClass('alert-success');
-										$('#status_video').html(value);
-										
-									}else{
-										$('#status_video').addClass('d-block');
-								 		$('#status_video').addClass('alert-danger');
-										$('#status_video').html(value);
-									}
-			  	  			     })
-
+								setComponentUploadStatus(result,'alert-video','status-video','videoId');
 							},
 
 							error : function(err) {
 								console
 								.log("not working. ERROR: "+ JSON.stringify(err));
+								setErrorStatus('alert-video');
 							}
 
 						});
@@ -6380,37 +6033,35 @@ $(document).ready(function() {
 
 			$("#addNullPrerequisite").click(function() {
 				
-				component = this.id;
-				var elem_id = '#'+component+'_comment'
 				var tutorialId = $("#tutorialId").val();
+				var categoryid = $("#categoryId").val();
+				var topicid = $("#topicID").val();
+				var lanId = $("#lanId").val();
+				var info_elem = document.getElementById('current_pr');
+				var prRequired_checkbox = document.getElementById('prRequired');
 				
-				var msg = $(elem_id).val();
+				
 				$.ajax({
 					type : "GET",
 					url : projectPath+"addPreRequisticWhenNotRequired",
 					data : {
-						"id" :tutorialId
+						"id" :tutorialId,
+						"categoryname" : categoryid,
+						"topicid" : topicid,
+						"lanId" : lanId
 					},
 					contentType : "application/json",
 					success : function(result) {
-						var msg = 'Prerequisite updated successfully.'
-									// $('#statusOutline').html(html);
-									$('#status_pr').show();
-								$('#status_pr').html(msg);
-								$('#status_pr').addClass('alert-success');
+						setComponentUploadStatus(result,'alert-pre','status-pre','addNullPrerequisite');
+						
+						prRequired_checkbox.disabled = true;
+						info_elem.classList.remove('d-none');
+						info_elem.innerText = "Selected prerequisite : This tutorial has no prerequisite."
 					},
 
 					error : function(err) {
-						alert('error');
 						console.log("not working. ERROR: "+ JSON.stringify(err));
-							var msg = 'Error in updating Pre-Requistic.'
-									// $('#statusOutline').html(html);
-									$('#status_pr').show();
-								$('#status_pr').html(msg);
-								 $('#status_pr').addClass('alert-danger');
-
-								
-
+						setErrorStatus('alert-pre');
 					}
 				});
 
