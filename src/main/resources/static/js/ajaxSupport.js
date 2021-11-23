@@ -1360,7 +1360,6 @@ $(document).ready(function() {
 			// Changes made by om prakash
 
 			$('#uploadpreRequsiteId').click(function() {
-
 				var tutorialId = $("#tutorialId").val();
 				var categoryid = $("#categoryId").val();
 				var topicid = $("#topicID").val();
@@ -3046,32 +3045,10 @@ $(document).ready(function() {
 
 					});
 
-			$('#editOutline').click(function() {
-				$(this).toggle();
-				$('outlineId').toggle();
-
-				editor.isReadOnly = false;
-				// outlineId
-				$('#outlineId').show();
-				$("#outlineId").html("Save changes");
-
-			});
-
-//			$('#editKeyword').click(function() {
-//				$(this).toggle();
-//				$('keywordId').toggle();
-//				$('#keyword').prop('readonly', false);
-//				// outlineId
-//				$('#keywordId').show();
-//				$("#keywordId").html("Save changes");
-//
-//			});
-
 			/* Save keyWord information into table */
 	/*********************** changes made by om prakash *************************************/
 
 			$('#keywordId').click(function() {
-						
 						var keywordArea = $("#keywordArea").val();
 						
 						var categoryid = $("#categoryId").val();
@@ -3113,8 +3090,6 @@ $(document).ready(function() {
 						var lanId = $("#lanId").val();
 						var TutorialID=$("#tutorialId").val();
 						
-					//	var form = $('#upload-file-form-script')[0];
-						//var formData = new FormData(form);
 						var formData = new FormData();
 
 						formData.append('categoryname', categoryid);
@@ -3147,6 +3122,7 @@ $(document).ready(function() {
 			 */
 
 			$('#slideId').click(function() {
+				$('.loader-wrapper').removeClass('d-none');
 						var categoryid = $("#categoryId").val();
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
@@ -3167,10 +3143,12 @@ $(document).ready(function() {
 							contentType : false,
 							cache : false,
 							success : function(result) {
+								$('.loader-wrapper').addClass('d-none');
 								setComponentUploadStatus(result,'alert-slide','status-slide','slideId');
 							},
 
 							error : function(err) {
+								$('.loader-wrapper').addClass('d-none');
 								console.log("not working. ERROR: "+ JSON.stringify(err));
 							setErrorStatus('alert-slide');
 							}
@@ -3198,6 +3176,7 @@ $(document).ready(function() {
 /******************** changes made by om prakash *****************************************/
 			
 			$('#videoId').click(function() {
+				$('.loader-wrapper').removeClass('d-none');
 						var categoryid = $("#categoryId").val();
 						var topicid = $("#topicID").val();
 						var lanId = $("#lanId").val();
@@ -3221,10 +3200,12 @@ $(document).ready(function() {
 							contentType : false,
 							cache : false,
 							success : function(result) {
+								$('.loader-wrapper').addClass('d-none');
 								setComponentUploadStatus(result,'alert-video','status-video','videoId');
 							},
 
 							error : function(err) {
+								$('.loader-wrapper').addClass('d-none');
 								console
 								.log("not working. ERROR: "+ JSON.stringify(err));
 								setErrorStatus('alert-video');
@@ -6032,7 +6013,6 @@ $(document).ready(function() {
 				});*/
 
 			$("#addNullPrerequisite").click(function() {
-				
 				var tutorialId = $("#tutorialId").val();
 				var categoryid = $("#categoryId").val();
 				var topicid = $("#topicID").val();

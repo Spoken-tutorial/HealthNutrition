@@ -233,12 +233,12 @@ public class AjaxController{
 
 	}
 	
-	private String getDocument(Tutorial tut, MultipartFile videoFile, String comp) {
+	private String getDocument(Tutorial tut, MultipartFile mediaFile, String comp) {
 		ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp);
 		String pathtoUploadPoster;
 		String document = "";
 		try {
-			pathtoUploadPoster = ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp);
+			pathtoUploadPoster = ServiceUtility.uploadVideoFile(mediaFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp);
 			int indexToStart=pathtoUploadPoster.indexOf("Media");
 			document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
@@ -248,22 +248,24 @@ public class AjaxController{
 		return document;
 	}
 	
-	private HashMap<Integer, String> addSlideComp(Tutorial tut,MultipartFile videoFile, User usr) {
+	private HashMap<Integer, String> addSlideComp(Tutorial tut,MultipartFile slideFile, User usr) {
 		HashMap<Integer, String> temp = new HashMap<>();
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.DOMAIN_STATUS, tut.getSlideStatus(), CommonData.contributorRole, usr, tut);
 		try {
-				String  document = getDocument(tut,videoFile,"Slide");
-				tut.setSlide(document);
+				String  document = getDocument(tut,slideFile,"Slide");
+				
 				if(document!="") {
+					tut.setSlide(document);
 					tut.setSlideStatus(CommonData.DOMAIN_STATUS);
 					tut.setSlideUser(usr);
 					tutService.save(tut);
 					temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getSlideStatus());
+					logService.save(log);
 				}
 		}catch (Exception e) {
 			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getSlideStatus());
 		}
-		logService.save(log);
+		
 		return temp;
 	}
 	
@@ -273,18 +275,19 @@ public class AjaxController{
 
 		try {
 			String  document = getDocument(tut,videoFile,"Video");
-			tut.setSlide(document);
+			//tut.setVideo(document);
 			if(document!="") {
 				tut.setVideo(document);
 				tut.setVideoStatus(CommonData.ADMIN_STATUS);
 				tut.setVideoUser(usr);
 				tutService.save(tut);
 				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus());
+				logService.save(log);
 			}
 		}catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getSlideStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus());
 		}
-		logService.save(log);
+		
 		return temp;
 	}
 	

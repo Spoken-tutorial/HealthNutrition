@@ -478,7 +478,9 @@
 					<div th:unless="${tutorial}">
 						<button id="slideId" type="button" class="btn btn-success">Upload</button>
 					</div>
-
+					<div class="loader-wrapper d-none">
+					<div class=" loader"></div> <div> Uploading data ... Please wait.</div>
+					</div>
 					<button type="button" class="btn btn-secondary"
 						data-dismiss="modal">Close</button>
 				</div>
@@ -611,6 +613,9 @@
 					</div>
 					<div th:unless="${tutorial}">
 						<button id="videoId" type="button" class="btn btn-success">Upload</button>
+					</div>
+					<div class="loader-wrapper d-none">
+					<div class=" loader"></div> <div> Uploading data ... Please wait.</div>
 					</div>
 					<button type="button" class="btn btn-secondary"
 						data-dismiss="modal">Close</button>
@@ -771,6 +776,7 @@
 													</div>
 
 												</div>
+												
 												<button id="uploadpreRequsiteId" name="uploadpreRequsiteId"
 													type="button" class="btn btn-success">Upload</button>
 											</div>

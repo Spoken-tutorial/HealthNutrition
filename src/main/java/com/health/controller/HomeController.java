@@ -4894,11 +4894,16 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 			boolean goAhead = false;
 			List<Tutorial> tutTemp = null ;
 			List<ContributorAssignedTutorial> tempCon = conRepo.findByTopicCat(topicCat);
-			for(ContributorAssignedTutorial x : tempCon) {
-				if(x.getLan().getLangName().equalsIgnoreCase("english")) {
-					goAhead =true;
-					tutTemp = tutService.findAllByContributorAssignedTutorial(x);
-					break;
+			List<TopicCategoryMapping> tcm_list = topicCatService.findAllByTopic(topic);
+			
+			for(TopicCategoryMapping tc : tcm_list) {
+				List<ContributorAssignedTutorial> ct = conRepo.findByTopicCat(tc);
+				for(ContributorAssignedTutorial x : ct) {
+					if(x.getLan().getLangName().equalsIgnoreCase("english")) {
+						goAhead =true;
+						tutTemp = tutService.findAllByContributorAssignedTutorial(x);
+						break;
+					}
 				}
 			}
 			
@@ -4922,29 +4927,22 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 						}
 					}
 				}
-				
 			}
-			
 		}
-		
 		if(!tutorials.isEmpty()) {
 //			set video details
 			setVideoInfo(model,tutorials);
 			setCompComment(model, tutorials, comService);
 			for(Tutorial local:tutorials) {
 				tutorial = local;
-				String sm_url = setScriptManagerUrl(model, categoryName, langName, tutorial, topic, lan, cat);
+				String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, lan, cat);
 				model.addAttribute("sm_url", sm_url);
 				model.addAttribute("tutorial", local);
 				if(local.getPreRequisticStatus()!=0) {
 					model.addAttribute("pre_req", setPreReqInfo(local));
 				}
-				
-				
 			}
-			
 		}
-
 		return "uploadTutorialPost";
 	}
 
