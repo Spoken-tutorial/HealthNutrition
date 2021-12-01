@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<body>
+<div th:fragment="my_fragment2(data_id, data_class)">
+    <p th:class="${data_id}" th:id="${data_class}"></p>
+</div>
+ <div th:fragment="comments_fragment(comments,text_id,btn_id)">
+ <div class="card" >
+													<div class="card-header">
+														<span class="font-weight-bold">Comments</span>
+													</div>
+													<div class="card-body">
+													<div th:if="${not #lists.isEmpty(comments)}">
+		<div th:each="comment : ${comments}"
+			th:if="${not #lists.isEmpty(comments)}"
+			class="border-bottom py-2">
+			<span class="my-0"> <i class="far fa-user-circle"></i>
+				<span
+				th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span>
+				<span class="mx-3"></span><i class="far fa-clock"></i>
+				<small> <span
+					th:text="${#dates.day(comment.getDateAdded())}"></span>
+					<span
+					th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>,
+					<span
+					th:text="${#dates.year(comment.getDateAdded())}"></span>
+					, <span
+					th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+	
+			</span><br> <span class="my-0 text-muted"> <i
+				class="far fa-comment-alt"></i> <span
+				th:text="${comment.getComment()}"></span>
+			</span>
+	
+		</div>
+	</div>
+	<div th:if="${#lists.isEmpty(comments)}">
+		<span>No comments available.</span>
+	</div>
+													</div>
+												</div>
+	<div class="alert alert-success d-none w-100 commentS mt-2"
+													role="alert"></div>
+												<div class="card mt-2">
+													<div class="card-header">
+														<span class="font-weight-bold">Add your comment
+															below : </span>
+													</div>
+													<div class="card-body">
+														<div class="textarea-comment">
+															<textarea class="form-control msgComment"
+																name="msgCommentOutline" rows="3" required="required"
+																th:id="${text_id}"
+																placeholder="Please enter your suggestions.">	</textarea>
+
+														</div>
+														<button th:id="${btn_id}" type="button"
+															class="btn comment-contri">comment</button>
+													</div>
+												</div>
+												
+	
+ </div>
+  
+<div th:fragment="review_feedback(componentType, role)">
+<div class="alert alert-status d-none"></div>
+<div class="card border-warning">
+  <div class="card-header border-warning">
+    <span class="font-weight-bold">Review Feedback :</span>
+  </div>
+  <div class="card-body">
+    <form class="form-horizontal" th:data-type="${componentType}" th:data-role="${role}">
+											<div class="form-group">
+												 <select class="form-control select-review">
+													<option value="0">Select</option>
+													<option value="1">Accept</option>
+													<option value="2">Need Improvement</option>
+												</select>
+											</div>
+											<div class="textarea-comment d-none" id="OutlineNeedImp">
+											<label for="OutlineNeedImp"><span class="font-weight-bold">Add your comment below :</span></label>
+												<textarea class="form-control comment-box" name="msgCommentOutline"
+													id="msgCommentOutline" rows="3" required="required"
+													placeholder="Please enter your suggestions.">	</textarea>
+											</div>
+											
+											<br />
+<!-- <div th:if="${tutorial}"> -->
+											<!-- <div th:if="${componentStatus == 2}"> -->
+													<button type="button" class="btn btn-success submit-review">Submit</button>
+											<!-- </div> -->
+											<!-- <div th:unless="${componentStatus == 2}">
+													<button  type="button" class="btn btn-success submit-review" disabled="disabled">Submit</button>
+											</div> -->
+										<!-- </div> -->
+										</form>
+
+  </div>
+</div>
+</div>
+
+<div th:fragment="comment_review(comments)">
+	<div class="card mt-2">
+  		<div class="card-header">
+    		<span class="font-weight-bold">Comments</span>
+  		</div>
+  	<div class="card-body">
+   		<div th:if="${not #lists.isEmpty(comments)}">
+			<div th:each="comment : ${comments}" class="border-bottom py-2"> 
+				<span class="my-0">
+				<i class="far fa-user-circle"></i>
+				<span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span>
+				<span class="mx-3"></span><i class="far fa-clock"></i>
+				<small><span th:text="${#dates.day(comment.getDateAdded())}"></span>
+				<span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, 
+				<span th:text="${#dates.year(comment.getDateAdded())}"></span> , 
+				<span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
+				</span><br>
+				<span class="my-0 text-muted" >
+					<i class="far fa-comment-alt"></i>
+					<span th:text="${comment.getComment()}"></span>
+				</span>
+			</div>
+		</div>
+		<div th:if="${#lists.isEmpty(comments)}">
+		<span>No comments available.</span>
+	</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

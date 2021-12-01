@@ -330,12 +330,14 @@ static void setEngLangStatus(Model model,Language lan) {
 
 private String setPreReqInfo(Tutorial tut) {
 	String prefix = "Selected prerequisite : ";
-	String pre_req = prefix + "This tutorial has no prerequisite.";
+	String pre_req = "";
 	if(tut.getPreRequistic()!=null) {
 		Tutorial local = tut.getPreRequistic();
 		String catName = local.getConAssignedTutorial().getTopicCatId().getCat().getCatName();
 		String topicName = local.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName();
 		pre_req = prefix + catName + " - " + topicName;
+	}else {
+		pre_req = prefix + "This tutorial has no prerequisite.";
 	}
 	return pre_req;
 }
@@ -4803,13 +4805,7 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 	 */
 	@RequestMapping(value = "/uploadTutorial", method = RequestMethod.GET)
 	public String uploadTutorialGet(Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 
 		List<String> catName = new ArrayList<String>();
@@ -4818,12 +4814,11 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 		for(ContributorAssignedMultiUserTutorial temp:con) {
 			ContributorAssignedTutorial conTemp = conRepo.findById(temp.getConAssignedTutorial().getId());
 			catName.add(conTemp.getTopicCatId().getCat().getCatName());
-
 		}
-		HashSet<String> uniqueCatName=new HashSet<String>(catName);    // to return unique value
-
-
-		model.addAttribute("contributorTutorial", uniqueCatName);
+		HashSet<String> uniqueCatName=new HashSet<String>(catName);    
+		List<String> categories = new ArrayList<String>(uniqueCatName);
+		Collections.sort(categories);
+		model.addAttribute("contributorTutorial", categories);
 		return "uploadTutorialPre";
 	}
 
@@ -4883,7 +4878,6 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 		TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
 		Tutorial tutorial = null;
 		
-//		set component status for current tutorial
 		ContributorAssignedTutorial conTutorial=conRepo.findByTopicCatAndLanViewPart( topicCat, lan);
 		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTutorial);
 		setCompStatus(model,tutorials);
@@ -4938,7 +4932,7 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 				String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, lan, cat);
 				model.addAttribute("sm_url", sm_url);
 				model.addAttribute("tutorial", local);
-				if(local.getPreRequisticStatus()!=0) {
+				if(local.getPreRequisticStatus()!=0 ) {
 					model.addAttribute("pre_req", setPreReqInfo(local));
 				}
 			}
@@ -5152,13 +5146,7 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 	public String listAdminReviewTutorialGet(@PathVariable(name = "catName") String cat,
 			@PathVariable (name = "topicName") String topic,
 			@PathVariable (name = "language") String lan,Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
 		Category catName = catService.findBycategoryname(cat);
@@ -5170,61 +5158,56 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
 			return "redirect:/listTutorialForAdminReview";
 		}
-		
+		List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTut);
 		Tutorial tutorial=tutService.findAllByContributorAssignedTutorial(conTut).get(0);
+		if(tutorial == null) {
+			return "redirect:/listTutorialForAdminReview";
+		}
 
 		if(tutorial.getVideoStatus() != CommonData.ADMIN_STATUS) {
-			 // return some error
 			return "redirect:/listTutorialForAdminReview";
 		}
-
-		if(tutorial == null) {
-			// throw a error
-			return "redirect:/listTutorialForAdminReview";
-
-		}
-
-
-		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, tutorial);
-
-		model.addAttribute("comVideo", comVideo);
-
 
 		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
 		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
 		model.addAttribute("tutorial", tutorial);
 		
+		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, tutorial);
+		model.addAttribute("comVideo", comVideo);
+		setVideoInfo(model, tutorials);
+		
+	
+		
+//		if(tutorial.getVideo() != null) {
+//		IContainer container = IContainer.make();
+//		int result=10;
+//		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
+//		
+//		IStream stream = container.getStream(0);
+//		if(stream!=null) {
+//			IStreamCoder coder = stream.getStreamCoder();
+//			
+//			model.addAttribute("FileWidth", coder.getWidth());
+//			model.addAttribute("FileHeight", coder.getHeight());
+//			
+//			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+//			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+//		}else {
+//			model.addAttribute("FileWidth", "");
+//			model.addAttribute("FileHeight", "");
+//			
+//			model.addAttribute("fileSizeInMB", "");
+//			model.addAttribute("FileDurationInSecond", "");
+//		}
+//		
+//		
+//		container.close();
+//		
+//		}
+		
 
-		if(tutorial.getVideo() != null) {
-		IContainer container = IContainer.make();
-		int result=10;
-		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
 		
-		IStream stream = container.getStream(0);
-		if(stream!=null) {
-			IStreamCoder coder = stream.getStreamCoder();
-			
-			model.addAttribute("FileWidth", coder.getWidth());
-			model.addAttribute("FileHeight", coder.getHeight());
-			
-			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-		}else {
-			model.addAttribute("FileWidth", "");
-			model.addAttribute("FileHeight", "");
-			
-			model.addAttribute("fileSizeInMB", "");
-			model.addAttribute("FileDurationInSecond", "");
-		}
-		
-		
-		container.close();
-		
-		}
-		
-
-		model.addAttribute("success_msg", CommonData.Video_STATUS_SUCCESS_MSG);
 		return "addContentAdminReview";
 
 
@@ -5291,106 +5274,109 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 	 */
 	@RequestMapping(value = "domainreview/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
 	public String listDomainReviewTutorialGet(@PathVariable(name = "catName") String cat,
-			@PathVariable (name = "topicName") String topic,
+			@PathVariable (name = "topicName") String topicName,
 			@PathVariable (name = "language") String lan,Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
-		Category catName = catService.findBycategoryname(cat);
-		Topic topicName = topicService.findBytopicName(topic);
-		Language lanName = lanService.getByLanName(lan);
-		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
-		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+		Category category = catService.findBycategoryname(cat);
+		Topic topic = topicService.findBytopicName(topicName);
+		Language language = lanService.getByLanName(lan);
+		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
+		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
+		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTut);
+		Tutorial tutorial = tutorials.get(0);
 		
-		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
-			return "redirect:/listTutorialForDomainReview";
-		}
-		
-		Tutorial tutorial=tutService.findAllByContributorAssignedTutorial(conTut).get(0);
-
-
-		if(tutorial == null) {
-
-			return "redirect:/listTutorialForDomainReview";
-
-		}
-
-		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
-		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
-		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, tutorial);
-
-		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, tutorial);
-		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
-		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
-
-		model.addAttribute("comOutline", comOutline);
-		model.addAttribute("comScript",comScript );
-		model.addAttribute("comSlide",comSlide );
-		model.addAttribute("comVideo", comVideo);
-		model.addAttribute("comKeyword", comKeyword);
-		model.addAttribute("comPreReq", comPreRequistic);
-
-
-		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
-		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
-		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
-		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
-		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
-		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
-
-		model.addAttribute("tutorial", tutorial); 
-		
-
-		if(tutorial.getVideo() != null) {
-		IContainer container = IContainer.make();
-		int result=10;
-		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-
-		IStream stream = container.getStream(0);
-		if(stream!=null) {
-			IStreamCoder coder = stream.getStreamCoder();
-			
-			model.addAttribute("FileWidth", coder.getWidth());
-			model.addAttribute("FileHeight", coder.getHeight());
-			
-			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-		}else {
-			model.addAttribute("FileWidth", "");
-			model.addAttribute("FileHeight", "");
-			
-			model.addAttribute("fileSizeInMB", "");
-			model.addAttribute("FileDurationInSecond", "");
-		}
-		
-		container.close();
-		}
-
-
 		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
 		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
 		
-		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
-			model.addAttribute("otherLan", false);
-		}else {
-			model.addAttribute("otherLan", true);
+		if(category == null || topic == null || language == null || topicCatMap == null || conTut == null) {
+			return "redirect:/listTutorialForDomainReview";
 		}
-		String tutorial_id="";
-		if(tutorial!=null) {
-			tutorial_id = Integer.toString(tutorial.getTutorialId());
+		
+		
+		if(tutorials.get(0) == null) {
+			return "redirect:/listTutorialForDomainReview";
 		}
-		String topic_name = topicName.getTopicName();
-		topic_name	= topic_name.replaceAll(" ", "-");
-		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(catName.getCategoryId())+"/"
-				+tutorial_id+"/"+Integer.toString(lanName.getLanId())+"/"+topic_name+"/"+"1";
+
+		setCompComment(model, tutorials, comService);
+		setCompStatus(model, tutorials);
+		setVideoInfo(model, tutorials);
+		model.addAttribute("tutorial", tutorial);
+		setEngLangStatus(model, language);
+		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
+		
+//		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
+//		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
+//		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, tutorial);
+//
+//		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, tutorial);
+//		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
+//		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
+
+//		model.addAttribute("comOutline", comOutline);
+//		model.addAttribute("comScript",comScript );
+//		model.addAttribute("comSlide",comSlide );
+//		model.addAttribute("comVideo", comVideo);
+//		model.addAttribute("comKeyword", comKeyword);
+//		model.addAttribute("comPreReq", comPreRequistic);
+
+
+//		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
+//		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
+//		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
+//		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
+//		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
+//		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
+
+		 
+		
+
+//		if(tutorial.getVideo() != null) {
+//		IContainer container = IContainer.make();
+//		int result=10;
+//		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
+//
+//		IStream stream = container.getStream(0);
+//		if(stream!=null) {
+//			IStreamCoder coder = stream.getStreamCoder();
+//			
+//			model.addAttribute("FileWidth", coder.getWidth());
+//			model.addAttribute("FileHeight", coder.getHeight());
+//			
+//			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+//			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+//		}else {
+//			model.addAttribute("FileWidth", "");
+//			model.addAttribute("FileHeight", "");
+//			
+//			model.addAttribute("fileSizeInMB", "");
+//			model.addAttribute("FileDurationInSecond", "");
+//		}
+//		
+//		container.close();
+//		}
+
+
+		
+		
+//		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
+//			model.addAttribute("otherLan", false);
+//		}else {
+//			model.addAttribute("otherLan", true);
+//		}
+		
+//		String tutorial_id="";
+//		if(tutorial!=null) {
+//			tutorial_id = Integer.toString(tutorial.getTutorialId());
+//		}
+//		String topic_name = topic.getTopicName();
+//		topic_name	= topic_name.replaceAll(" ", "-");
+//		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(category.getCategoryId())+"/"
+//				+tutorial_id+"/"+Integer.toString(language.getLanId())+"/"+topic_name+"/"+"1";
+//		model.addAttribute("sm_url", sm_url);
 		return "addContentDomainReview";
 
 
@@ -5661,109 +5647,112 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 	 */
 	@RequestMapping(value = "qualityreview/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
 	public String listQualityReviewTutorialGet(@PathVariable(name = "catName") String cat,
-			@PathVariable (name = "topicName") String topic,
+			@PathVariable (name = "topicName") String topicName,
 			@PathVariable (name = "language") String lan,Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
-		Category catName = catService.findBycategoryname(cat);
-		Topic topicName = topicService.findBytopicName(topic);
-		Language lanName = lanService.getByLanName(lan);
-		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
-		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+		Category category = catService.findBycategoryname(cat);
+		Topic topic = topicService.findBytopicName(topicName);
+		Language language = lanService.getByLanName(lan);
+		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
+		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
 		
-		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
+		if(category == null || topicName == null || language == null || topicCatMap == null || conTut == null) {
 			return "redirect:/listTutorialForQualityReview";
 		}
 		
-		Tutorial tutorial=tutService.findAllByContributorAssignedTutorial(conTut).get(0);
-		
-
-		if(tutorial == null) {
+		List<Tutorial> tutorials =tutService.findAllByContributorAssignedTutorial(conTut);
+		if(tutorials == null) {
 			return "redirect:/listTutorialForQualityReview";
-
 		}
 
-
-		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
-		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
-		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE,  tutorial);
-
-		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD,  tutorial);
-		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
-		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
-
-		model.addAttribute("comOutline", comOutline);
-		model.addAttribute("comScript",comScript );
-		model.addAttribute("comSlide",comSlide );
-		model.addAttribute("comVideo", comVideo);
-		model.addAttribute("comKeyword", comKeyword);
-		model.addAttribute("comPreReq", comPreRequistic);
-
-
-		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
-		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
-		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
-		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
-		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
-		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
-
-		model.addAttribute("tutorial", tutorial);
-		
-
-		if(tutorial.getVideo() != null) {
-		IContainer container = IContainer.make();
-		int result=10;
-		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-		
-		System.out.println("Video Duration"+container.getDuration()/1000000);
-		System.out.println("file Size"+container.getFileSize()/1000000);
-		
-
-		IStream stream = container.getStream(0);
-		if(stream!=null) {
-			IStreamCoder coder = stream.getStreamCoder();
-			model.addAttribute("FileWidth", coder.getWidth());
-			model.addAttribute("FileHeight", coder.getHeight());
-			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-		}else {
-			model.addAttribute("FileWidth", "");
-			model.addAttribute("FileHeight", "");
-			model.addAttribute("fileSizeInMB", "");
-			model.addAttribute("FileDurationInSecond", "");
-		}
-		
-		
-		container.close();
-
-		}
-
-
+		Tutorial tutorial =tutService.findAllByContributorAssignedTutorial(conTut).get(0);
 		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
 		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
 		
-		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
-			model.addAttribute("otherLan", false);
-		}else {
-			model.addAttribute("otherLan", true);
-		}
-		String tutorial_id="";
-		if(tutorial!=null) {
-			tutorial_id = Integer.toString(tutorial.getTutorialId());
-		}
-		String topic_name = topicName.getTopicName();
-		topic_name	= topic_name.replaceAll(" ", "-");
-		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(catName.getCategoryId())+"/"
-				+tutorial_id+"/"+Integer.toString(lanName.getLanId())+"/"+topic_name+"/"+"1";
+		model.addAttribute("tutorial", tutorial);
+		setCompComment(model, tutorials, comService);
+		setCompStatus(model, tutorials);
+		setVideoInfo(model, tutorials);
+		setEngLangStatus(model, language);
+		String sm_url = setScriptManagerUrl(model, lan, lan, tutorial, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
+		
+
+//		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
+//		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
+//		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE,  tutorial);
+//
+//		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD,  tutorial);
+//		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
+//		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
+
+//		model.addAttribute("comOutline", comOutline);
+//		model.addAttribute("comScript",comScript );
+//		model.addAttribute("comSlide",comSlide );
+//		model.addAttribute("comVideo", comVideo);
+//		model.addAttribute("comKeyword", comKeyword);
+//		model.addAttribute("comPreReq", comPreRequistic);
+
+
+//		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
+//		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
+//		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
+//		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
+//		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
+//		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
+
+		
+		
+
+//		if(tutorial.getVideo() != null) {
+//		IContainer container = IContainer.make();
+//		int result=10;
+//		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
+//		
+//		System.out.println("Video Duration"+container.getDuration()/1000000);
+//		System.out.println("file Size"+container.getFileSize()/1000000);
+//		
+//
+//		IStream stream = container.getStream(0);
+//		if(stream!=null) {
+//			IStreamCoder coder = stream.getStreamCoder();
+//			model.addAttribute("FileWidth", coder.getWidth());
+//			model.addAttribute("FileHeight", coder.getHeight());
+//			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+//			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+//		}else {
+//			model.addAttribute("FileWidth", "");
+//			model.addAttribute("FileHeight", "");
+//			model.addAttribute("fileSizeInMB", "");
+//			model.addAttribute("FileDurationInSecond", "");
+//		}
+//		
+//		
+//		container.close();
+//
+//		}
+
+
+		
+		
+//		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
+//			model.addAttribute("otherLan", false);
+//		}else {
+//			model.addAttribute("otherLan", true);
+//		}
+//		String tutorial_id="";
+//		if(tutorial!=null) {
+//			tutorial_id = Integer.toString(tutorial.getTutorialId());
+//		}
+//		String topic_name = topic.getTopicName();
+//		topic_name	= topic_name.replaceAll(" ", "-");
+//		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(category.getCategoryId())+"/"
+//				+tutorial_id+"/"+Integer.toString(language.getLanId())+"/"+topic_name+"/"+"1";
+//		model.addAttribute("sm_url", sm_url);
 		return "addContentQualityReview";
 
 

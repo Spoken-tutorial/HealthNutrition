@@ -9,16 +9,6 @@
 #sm_url:hover, #sliedPdf:hover {
 	background: none !important;
 }
-
-.modal-title {
-	font-weight: bold !important;
-	color: #014F7A;
-	font-size: 1rem;
-}
-
-.modal-header {
-	border-bottom: 2px solid #014F7A !important;
-}
 </style>
 
 <body>
@@ -69,7 +59,7 @@
 									</tr>
 								</table>
 
-								<table class="table table-bordered table-comp">
+								<table class="table table-bordered table-cont">
 									<thead>
 										<tr>
 											<th>Sr.No.</th>
@@ -294,8 +284,7 @@
 
 						</div>
 						<div class="col-12">
-							<div
-								th:replace="common/commonElements :: comments_fragment(${comOutline},'Outline_comment','Outline')"></div>
+							<div th:replace="common/commonElements :: comments_fragment(${comOutline},'Outline_comment','Outline')"></div>
 						</div>
 
 					</div>
@@ -739,7 +728,7 @@
 								<div class="card-body">
 								<div th:if="${pre_req}" class="alert alert-info" role="alert" th:text="${pre_req}"></div>
 								<div class="alert alert-info d-none" role="alert" id="current_pr"></div>
-									<form method="post" th:unless="${pre_req}">
+									<form method="post" >
 									<div id="pr-data">
 									<div class="form-group">
 											<label for="preRequsiteId"> <span
@@ -748,7 +737,6 @@
 												required="required">
 												<option selected="selected">Select Category</option>
 												<span id="categorySelect" th:each="category : ${categories}">
-
 													<option class="form-control" 
 														name="categoryName" th:text="${category.getCatName()}"
 														readonly="readonly"></option>

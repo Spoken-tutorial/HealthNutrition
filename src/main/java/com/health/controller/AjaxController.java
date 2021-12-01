@@ -188,12 +188,13 @@ public class AjaxController{
 		return usr;
 	}
 	
-	private HashMap<Integer, String> updateResponse(String res, String msg, int comp_status) {
+	private HashMap<Integer, String> updateResponse(String res, String msg, int comp_status, int tutorial_id) {
 		//0: success/error ; 1:info msg 2:comp status
 		HashMap<Integer, String> temp = new HashMap<>();
 		temp.put(0, res);
 		temp.put(1, msg);
 		temp.put(2, CommonData.tutorialStatus[comp_status]);
+		temp.put(3, String.valueOf(tutorial_id));
 		return temp;
 	}
 
@@ -205,9 +206,9 @@ public class AjaxController{
 		tut.setOutlineUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getOutlineStatus());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getOutlineStatus(), tut.getTutorialId());
 		} catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getOutlineStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getOutlineStatus(),tut.getTutorialId());
 			return temp;
 		}
 		logService.save(log);
@@ -222,10 +223,10 @@ public class AjaxController{
 		tut.setScriptUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getScriptStatus());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getScriptStatus(),tut.getTutorialId());
 		} catch (Exception e) {
 			e.printStackTrace();
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getScriptStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getScriptStatus(),tut.getTutorialId());
 			return temp;
 		}
 		logService.save(log);
@@ -259,11 +260,11 @@ public class AjaxController{
 					tut.setSlideStatus(CommonData.DOMAIN_STATUS);
 					tut.setSlideUser(usr);
 					tutService.save(tut);
-					temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getSlideStatus());
+					temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getSlideStatus(),tut.getTutorialId());
 					logService.save(log);
 				}
 		}catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getSlideStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getSlideStatus(),tut.getTutorialId());
 		}
 		
 		return temp;
@@ -281,11 +282,11 @@ public class AjaxController{
 				tut.setVideoStatus(CommonData.ADMIN_STATUS);
 				tut.setVideoUser(usr);
 				tutService.save(tut);
-				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus());
+				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus(),tut.getTutorialId());
 				logService.save(log);
 			}
 		}catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus(),tut.getTutorialId());
 		}
 		
 		return temp;
@@ -302,9 +303,9 @@ public class AjaxController{
 		tut.setKeywordUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getKeywordStatus());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getKeywordStatus(),tut.getTutorialId());
 		}catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getKeywordStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getKeywordStatus(),tut.getTutorialId());
 			return temp;
 		}
 		logService.save(log);
@@ -321,9 +322,9 @@ public class AjaxController{
 			tut.setPreRequisticStatus(CommonData.DOMAIN_STATUS);
 			tut.setPreRequiticUser(usr);
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId());
 		} catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId());
 			return temp;
 		}
 		
@@ -341,9 +342,9 @@ public class AjaxController{
 		tut.setPreRequiticUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId());
 		} catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId());
 			return temp;
 		}
 		logService.save(log);
@@ -387,9 +388,16 @@ public class AjaxController{
 			e.printStackTrace();
 			//temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, local.getOutlineStatus());
 		}
-		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-		logService.save(log);
+		//LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
+		//logService.save(log);
 		return local;
+	}
+	
+	private HashMap<String, String> setResponse(Integer status) {
+		HashMap<String, String> temp = new HashMap<String, String>();
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[status]);
+		return temp;
 	}
 	
 	/**
@@ -1010,7 +1018,7 @@ public class AjaxController{
 			if(local!=null) {
 				temp = addOutlineComp(local,outlineData,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
 			}
 		}
 		
@@ -1063,7 +1071,7 @@ public class AjaxController{
 			if(local!=null) {
 				temp = addKeywordComp(local,keywordData,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
 			}
 		}
 		return temp;
@@ -1097,7 +1105,7 @@ public class AjaxController{
 			if(tut!=null) {
 				temp = addNullPreReq(tut,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
 			}
 		}
 		return temp;
@@ -1134,7 +1142,7 @@ public class AjaxController{
 			if(local != null) {
 				temp = addPreReqComp(local,preReq,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
 			}
 		}
 		return temp;
@@ -1164,11 +1172,11 @@ public class AjaxController{
 		User usr= getUser(principal);
 		
 		if(!ServiceUtility.checkFileExtensionVideo(videoFile)) { // throw error on extension
-			temp = updateResponse(ERROR_TOKEN, VIDEO_EXTN_ERROR, 0);
+			temp = updateResponse(ERROR_TOKEN, VIDEO_EXTN_ERROR, 0,tutorialId);
 			return temp;
 		}
 		if(!ServiceUtility.checkVideoSize(videoFile)) {
-			temp = updateResponse(ERROR_TOKEN, VIDEO_SIZE_ERROR, 0);
+			temp = updateResponse(ERROR_TOKEN, VIDEO_SIZE_ERROR, 0,tutorialId);
 			return temp;
 		}
 		Tutorial local = null;
@@ -1180,7 +1188,7 @@ public class AjaxController{
 			if(local!=null){
 				temp = addVideoComp(local,videoFile,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
 			}
 			
 		}
@@ -1210,11 +1218,11 @@ public class AjaxController{
 		User usr = getUser(principal); 
 		
 		if(!ServiceUtility.checkFileExtensionZip(videoFile)) { // throw error on extension
-			temp = updateResponse(ERROR_TOKEN, ZIP_EXTN_ERROR, 0);
+			temp = updateResponse(ERROR_TOKEN, ZIP_EXTN_ERROR, 0,tutorialId);
 			return temp;
 		}
 		if(!ServiceUtility.checkScriptSlideProfileQuestion(videoFile)) {
-			temp = updateResponse(ERROR_TOKEN, SLIDE_SIZE_ERROR, 0);
+			temp = updateResponse(ERROR_TOKEN, SLIDE_SIZE_ERROR, 0,tutorialId);
 			return temp;
 		}
 		Tutorial local = null;
@@ -1228,7 +1236,7 @@ public class AjaxController{
 			if(local!=null) {
 				temp = addSlideComp(local,videoFile,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
 			}
 			//add slide
 		}
@@ -1315,8 +1323,9 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainOutline")
-	public @ResponseBody String acceptDomainOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
+	public @ResponseBody HashMap<String, String> acceptDomainOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
 
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1329,7 +1338,13 @@ public class AjaxController{
 		tutorial.setOutlineStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Outline_SAVE_SUCCESS_MSG;
+//		return CommonData.Outline_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
+//		ToDO Add user
+		//temp.put("user", usrservice.);
+		//return CommonData.SUCCESS_STATUS;
+		return temp;
 
 	}
 
@@ -1340,8 +1355,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainScript")
-	public @ResponseBody String acceptDomainScript(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainScript(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1355,8 +1370,10 @@ public class AjaxController{
 		tutorial.setScriptStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-
-		return CommonData.SCRIPT_FOR_QUALITY_REVIEW;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
+//		return CommonData.SCRIPT_FOR_QUALITY_REVIEW;
+		return temp;
 
 	}
 
@@ -1367,8 +1384,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainVideo")
-	public @ResponseBody String acceptDomainVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1382,7 +1399,10 @@ public class AjaxController{
 		tutorial.setVideoStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Video_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
+		//return CommonData.Video_SAVE_SUCCESS_MSG;
+		return temp;
 
 	}
 
@@ -1393,8 +1413,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainSlide")
-	public @ResponseBody String acceptDomainSlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainSlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1407,7 +1427,10 @@ public class AjaxController{
 		tutorial.setSlideStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Slide_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
+//		return CommonData.Slide_SAVE_SUCCESS_MSG;
+		return temp;
 
 	}
 
@@ -1418,8 +1441,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainKeywords")
-	public @ResponseBody String acceptDomainKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1432,7 +1455,9 @@ public class AjaxController{
 		tutorial.setKeywordStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Keyword_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
+		return temp;
 
 	}
 
@@ -1443,8 +1468,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainPreRequistic")
-	public @ResponseBody String acceptDomainPreRequistic(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainPreRequistic(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1456,7 +1481,10 @@ public class AjaxController{
 		tutorial.setPreRequisticStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
+		//return CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG;
+		return temp;
 
 	}
 
@@ -1473,24 +1501,18 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityOutline")
-	public @ResponseBody String acceptQualityOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualityOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.WAITING_PUBLISH_STATUS, tutorial.getOutlineStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setOutlineStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Outline_SAVE_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getOutlineStatus()); 
+		return temp;
 	}
 
+	
 	/**
 	 * accept script component from quality reviewer
 	 * @param tutorialId int value
@@ -1498,22 +1520,15 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityScript")
-	public @ResponseBody String acceptQualityScript(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualityScript(@RequestParam(value = "id") int tutorialId,Principal principal) {	
+		User usr= getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.WAITING_PUBLISH_STATUS, tutorial.getScriptStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setScriptStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.SCRIPT_STATUS_UPDATE_SUCCESS;
-
+		HashMap<String, String> temp = setResponse(tutorial.getScriptStatus()); 
+		return temp;
 	}
 
 	/**
@@ -1523,22 +1538,15 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityVideo")
-	public @ResponseBody String acceptQualityVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualityVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.WAITING_PUBLISH_STATUS, tutorial.getVideoStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setVideoStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Video_STATUS_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getVideoStatus()); 
+		return temp;
 	}
 
 	/**
@@ -1548,22 +1556,15 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualitySlide")
-	public @ResponseBody String acceptQualitySlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualitySlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.WAITING_PUBLISH_STATUS, tutorial.getSlideStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Slide_SAVE_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getSlideStatus()); 
+		return temp;
 	}
 
 	/**
@@ -1573,21 +1574,16 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityKeywords")
-	public @ResponseBody String acceptQualityKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
+	public @ResponseBody HashMap<String, String> acceptQualityKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal); 
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.WAITING_PUBLISH_STATUS, tutorial.getKeywordStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Keyword_SAVE_SUCCESS_MSG;
+		HashMap<String, String> temp = setResponse(tutorial.getKeywordStatus()); 
+		return temp;
 
 	}
 
@@ -1598,21 +1594,16 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityPreRequistic")
-	public @ResponseBody String acceptQualityPreRequistic(@RequestParam(value = "id") int tutorialId, Principal principal) {
+	public @ResponseBody HashMap<String, String> acceptQualityPreRequistic(@RequestParam(value = "id") int tutorialId, Principal principal) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.WAITING_PUBLISH_STATUS, tutorial.getPreRequisticStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG;
+		HashMap<String, String> temp = setResponse(tutorial.getPreRequisticStatus()); 
+		return temp;
 
 	}
 
@@ -1678,11 +1669,12 @@ public class AjaxController{
 	 * @return string
 	 */
 	@RequestMapping("/commentByReviewer")
-	public @ResponseBody String commentByReviewer(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> commentByReviewer(@RequestParam(value = "id") int tutorialId,
 													@RequestParam(value = "msg") String msg,
 													@RequestParam(value = "type") String type,
 													@RequestParam(value = "role") String role,
 													Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 
 		User usr=new User();
 
@@ -1739,7 +1731,13 @@ public class AjaxController{
 
 		}else {
 
-			return CommonData.FAILURE;
+
+			//			return CommonData.FAILURE;
+			temp.put("response", CommonData.FAILURE_STATUS);
+			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
+			return temp;
+//			return CommonData.FAILURE_STATUS;
+			
 		}
 
 		com.setUser(usr);
@@ -1769,11 +1767,19 @@ public class AjaxController{
 			tutService.save(tut);
 			logService.save(log);
 
-			return CommonData.COMMENT_SUCCESS;
+//			return CommonData.COMMENT_SUCCESS;
+			temp.put("response", CommonData.SUCCESS_STATUS);
+			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
+			return temp;
+//			return CommonData.SUCCESS_STATUS;
 
 		}catch (Exception e) {
 			// TODO: handle exception
-			return CommonData.FAILURE;
+//			return CommonData.FAILURE;
+			temp.put("response", CommonData.FAILURE_STATUS);
+			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
+			return temp;
+//			return CommonData.FAILURE_STATUS;
 		}
 
 

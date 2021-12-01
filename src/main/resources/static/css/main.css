@@ -88,8 +88,14 @@ body{
 	color: #014F7A;
 	font-size: 1rem;
 }
-.table-comp{
+.table-cont{
 	background: lightblue;
+}
+.table-domain{
+	background: OldLace;
+}
+.table-quality{
+	background: #FAD0C9FF;
 }
 .loader-wrapper{
 	display: flex;
@@ -108,7 +114,13 @@ body{
   animation: spin 2s linear infinite;
   margin-right: 10px;
 }
-
+.modal-title{
+font-weight : bold!important;
+color: #014F7A;
+font-size: 1rem;
+}
+.modal-header{
+border-bottom: 2px solid #014F7A!important;}
 /* Safari */
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }

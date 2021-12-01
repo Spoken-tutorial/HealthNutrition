@@ -222,6 +222,16 @@ public class CommonData {
 	
 	public static String CONSULTANT_ERROR= "Consultant doesn't exist";
 	
+	public static String DOMAIN_REVIEW_FAIL= "0";
+	
+	public static String DOMAIN_REVIEW_SUCCCESS= "1";
+	
+	public static String FAILURE_STATUS= "0";
+	
+	public static String SUCCESS_STATUS = "1";
+	
+	
+	
 	
 	
 	
