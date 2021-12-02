@@ -19,6 +19,9 @@ const KEYWORD = "keyword";
 const PRE_REQUISITE = "prerequisite";
 const DOMAIN = "domain";
 const QUALITY = "quality";
+const ADMIN_REVIEWER = "admin-rev";
+
+
 //const OUTLINE = "outline";
 
 $(document).ready(function() {
@@ -2877,93 +2880,6 @@ $(document).ready(function() {
 
 					});
 
-			/* here is code for video accepet or need to improvement */
-/************************ changes made by om prakash ***************************************/
-			
-			$('#videoAcceptOrNeedToImprovemenetByAdmin').click(function() {
-						var tutorialId = $("#tutorialId").val();
-						var vals = $("#VideoAcceptAdmin").val();
-						if (vals == 0) {
-							$('#msgVideoCommentByAdmin').css({
-								'visibility' : 'hidden'
-							});
-
-							alert("Select Accept Or Need To Improvement");
-
-						} else if (vals == 1) {
-							$('#msgVideoCommentByAdmin').css({
-								'visibility' : 'hidden'
-							});
-
-							$
-							.ajax({
-
-								type : "GET",
-								url : projectPath+"acceptAdminVideo",
-								data : {
-									"id" : tutorialId,
-									"show_status" :1
-								},
-								contentType : "application/json",
-								success : function(result) {
-									$("#statusVideoByAdmin").prop('disabled',false);
-									$('#statusVideoByAdmin').html(result);
-										$('#success_msg').html(result);
-									showStatus(SUCCESS, result);
-
-								},
-
-								error : function(err) {
-									
-									console.log("not working. ERROR: "+ JSON.stringify(err));
-									result = "Error";
-									showStatus(ERROR, result);
-								}
-
-							});
-
-						} else if (vals == 2) {
-							$('#msgVideoCommentByAdmin').css({
-								'visibility' : 'visible'
-							});
-							var msg = $("#msgVideoCommentByAdmin").val();
-
-//							alert("mse admin player" + msg);
-						
-							$.ajax({
-
-								type : "GET",
-								url : projectPath+"commentByAdminReviewer",
-								data : {
-									"id" :tutorialId,
-									"msg" : msg
-								},
-								contentType : "application/json",
-								success : function(result) {
-									//$("#statusVideoByAdmin").prop('disabled',false);
-									//$('#statusVideoByAdmin').html(result);
-
-									//showStatus(SUCCESS, result);
-									$('.a_v_cmt').show();
-									$('.a_v_cmt').html(result);
-									$('.a_v_cmt').addClass('alert-success');
-
-								},
-
-								error : function(err) {
-									console.log("not working. ERROR: "+ JSON.stringify(err));
-									result = "Error";
-									showStatus(ERROR, result);
-								}
-
-							});
-
-						}
-
-					});
-			
-		/*************************** end ***********************************/
-
 			$('#catAllID').change(function(){
 
 				var selectedCategoryId=$(this).find(":selected").val();
@@ -3492,7 +3408,8 @@ function getQualityReviewURL(component){
 function getURL(role,component,review){
 	if(review == REVIEW_NEED_IMPROVEMENT) return 'commentByReviewer'
 	if(role == DOMAIN) return getDomainReviewURL(component);
-	if(role == QUALITY) return getQualityReviewURL(component); 
+	if(role == QUALITY) return getQualityReviewURL(component);
+	if(role == ADMIN_REVIEWER) return 'acceptAdminVideo'; 
 }
 
 function setTutorialData(){

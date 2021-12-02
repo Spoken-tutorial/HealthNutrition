@@ -179,6 +179,9 @@ public class AjaxController{
 	private static final String VIDEO_SIZE_ERROR = "File Size must be under 400 MB.";
 	private static final int NULL_TUTORIAL = 0;
 	private static final int ADD_COMPONENT = 0;
+	private static final String DOMAIN = "domain";
+	private static final String QUALITY = "quality";
+	private static final String ADMIN_REVIEWER = "admin-rev";
 	
 	
 			
@@ -1289,12 +1292,6 @@ public class AjaxController{
 
 	}
 
-
-
-	/*************************************** END ******************************************************/
-
-
-	/********************************** operation at Admin End *****************************************/
 	
 	/**
 	 * accept video component from admin reviewer
@@ -1303,30 +1300,17 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptAdminVideo")
-	public @ResponseBody String addAdminVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> addAdminVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.DOMAIN_STATUS, tutorial.getVideoStatus(), CommonData.adminReviewerRole, usr, tutorial);
-
 		tutorial.setVideoStatus(CommonData.DOMAIN_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Video_STATUS_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getVideoStatus()); 
+		return temp;
 	}
 
-
-
-	/***********************************END ***************************************************************/
-
-	/********************************** operation at DOMAIN USER *****************************************/
 	
 	/**
 	 * accept outline component from domain reviewer
@@ -1625,53 +1609,6 @@ public class AjaxController{
 /******************************* COMMENT MODULE UNDER CREATION PART ********************************/
 
 	/**
-	 * records comment made by user under admin role interface
-	 * @param tutorialId int value
-	 * @param msg string
-	 * @param principal Principal object
-	 * @return string
-	 */
-	@RequestMapping("/commentByAdminReviewer")
-	public @ResponseBody String commentByAdminReviewer(@RequestParam(value = "id") int tutorialId,
-													@RequestParam(value = "msg") String msg, Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
-		Tutorial tut = tutService.getById(tutorialId);
-
-		Comment com = new Comment();
-		com.setComment(msg);
-		com.setCommentId(comService.getNewCommendId());
-		com.setDateAdded(ServiceUtility.getCurrentTime());
-		com.setType(CommonData.VIDEO);
-		com.setUser(usr);
-		com.setTutorialInfos(tut);
-		com.setRoleName(CommonData.adminReviewerRole);
-
-		try {
-			comService.save(com);
-
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.IMPROVEMENT_STATUS, tut.getVideoStatus(), CommonData.adminReviewerRole, usr, tut);
-			tut.setVideoStatus(CommonData.IMPROVEMENT_STATUS);
-			tutService.save(tut);
-			logService.save(log);
-			return CommonData.COMMENT_SUCCESS;
-
-		}catch (Exception e) {
-			// TODO: handle exception
-			return CommonData.FAILURE;
-		}
-
-
-
-	}
-
-	/**
 	 * records comment made by user given type of component
 	 * @param tutorialId int value
 	 * @param msg string
@@ -1688,21 +1625,18 @@ public class AjaxController{
 													Principal principal) {
 		HashMap<String, String> temp = new HashMap<String, String>();
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
+		User usr = getUser(principal);
 
 		String roleName = null;
 		int statusvalue=0;
 		String typeValue=null;
 
-		if(role.equalsIgnoreCase("Quality")) {
+		if(role.equalsIgnoreCase(QUALITY)) {
 			roleName=CommonData.qualityReviewerRole;
-		}else if(role.equalsIgnoreCase("Domain")) {
+		}else if(role.equalsIgnoreCase(DOMAIN)) {
 			roleName=CommonData.domainReviewerRole;
+		}else if(role.equalsIgnoreCase(ADMIN_REVIEWER)) {
+			roleName=CommonData.adminReviewerRole;
 		}
 		Tutorial tut = tutService.getById(tutorialId);
 
@@ -1742,26 +1676,17 @@ public class AjaxController{
 			typeValue = CommonData.OUTLINE;
 
 		}else {
-
-
-			//			return CommonData.FAILURE;
 			temp.put("response", CommonData.FAILURE_STATUS);
 			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
 			return temp;
-//			return CommonData.FAILURE_STATUS;
-			
 		}
 
 		com.setUser(usr);
 		com.setTutorialInfos(tut);
 
-
-
 		try {
 			comService.save(com);
-
 			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), typeValue, CommonData.IMPROVEMENT_STATUS, statusvalue, roleName, usr, tut);
-
 			if(type.equalsIgnoreCase(CommonData.SCRIPT)) {
 				tut.setScriptStatus(CommonData.IMPROVEMENT_STATUS);
 			}else if(type.equalsIgnoreCase(CommonData.KEYWORD)) {
@@ -1779,23 +1704,15 @@ public class AjaxController{
 			tutService.save(tut);
 			logService.save(log);
 
-//			return CommonData.COMMENT_SUCCESS;
 			temp.put("response", CommonData.SUCCESS_STATUS);
 			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
 			return temp;
-//			return CommonData.SUCCESS_STATUS;
 
 		}catch (Exception e) {
-			// TODO: handle exception
-//			return CommonData.FAILURE;
 			temp.put("response", CommonData.FAILURE_STATUS);
 			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
 			return temp;
-//			return CommonData.FAILURE_STATUS;
 		}
-
-
-
 	}
 
 
