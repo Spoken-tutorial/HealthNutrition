@@ -539,8 +539,6 @@
 											<div id="VideoView"></div>
 											<span id="VideoView1"> </span>
 											<div th:if="${tutorial}">
-
-
 												<div th:if="${tutorial.getVideo()}" id="videoDiv"
 													class="container" height="240" width="320" scrolling="auto"
 													autoplay="autoplay">
@@ -753,7 +751,7 @@
 										th:text="${topic.getTopicName()}"></span></span>
 								</div>
 								<div class="card-body">
-								<div th:if="${pre_req}" class="alert alert-info" role="alert" th:text="${pre_req}"></div>
+								<div th:if="${pre_req}" class="alert alert-info" role="alert" th:text="${pre_req}" id="prev_pr"> </div>
 								<div class="alert alert-info d-none" role="alert" id="current_pr"></div>
 									<form method="post" >
 									<div id="pr-data">

@@ -2532,32 +2532,6 @@ private void getUsers() {
 				e1.printStackTrace();
 			}
 
-//			IContainer container = IContainer.make();
-//			int result=10;
-//			result = container.open(pathSampleVideo,IContainer.Type.READ,null);
-//
-//			try {
-//				if(result<0) {
-//
-//					model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-//					return "addConsultant";
-//
-//				}else {
-//						if(container.getDuration()>CommonData.videoDuration) {
-//
-//							model.addAttribute("error_msg",CommonData.VIDEO_DURATION_ERROR);
-//							Path deletePreviousPath=Paths.get(pathSampleVideo);
-//							Files.delete(deletePreviousPath);
-//							return "addConsultant";
-//					}
-//				}
-//			} catch (IOException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//				model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-//				return "updateTestimonial";
-//			}
-
 			    ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
 				String pathtoUploadPoster=ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
 				int indexToStart=pathtoUploadPoster.indexOf("Media");
@@ -5099,13 +5073,7 @@ private void getUsers() {
 	 */
 	@RequestMapping(value = "listTutorialForAdminReview", method = RequestMethod.GET)
 	public String listAdminReviewTutorialGet(Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		HashSet<Tutorial> toReview = new HashSet<>();
 		HashSet<Tutorial> reviewed = new HashSet<>();
@@ -5118,7 +5086,6 @@ private void getUsers() {
 
 		List<Tutorial> tutorials =  tutService.findAllByContributorAssignedTutorialList(conTutorials);
 		for(Tutorial temp:tutorials) {
-
 			if(temp.getVideoStatus() == CommonData.ADMIN_STATUS) {
 				toReview.add(temp);
 			}else if(temp.getVideoStatus() > CommonData.ADMIN_STATUS) {
@@ -5129,9 +5096,6 @@ private void getUsers() {
 		model.addAttribute("tutorialToReview", toReview);
 		model.addAttribute("tutorialReviewed", reviewed);
 		return "listTutorialAdminReviwer";
-
-
-
 	}
 
 	/**
@@ -5175,37 +5139,6 @@ private void getUsers() {
 		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, tutorial);
 		model.addAttribute("comVideo", comVideo);
 		setVideoInfo(model, tutorials);
-		
-	
-		
-//		if(tutorial.getVideo() != null) {
-//		IContainer container = IContainer.make();
-//		int result=10;
-//		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-//		
-//		IStream stream = container.getStream(0);
-//		if(stream!=null) {
-//			IStreamCoder coder = stream.getStreamCoder();
-//			
-//			model.addAttribute("FileWidth", coder.getWidth());
-//			model.addAttribute("FileHeight", coder.getHeight());
-//			
-//			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-//			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-//		}else {
-//			model.addAttribute("FileWidth", "");
-//			model.addAttribute("FileHeight", "");
-//			
-//			model.addAttribute("fileSizeInMB", "");
-//			model.addAttribute("FileDurationInSecond", "");
-//		}
-//		
-//		
-//		container.close();
-//		
-//		}
-		
-
 		
 		return "addContentAdminReview";
 
@@ -5307,75 +5240,6 @@ private void getUsers() {
 		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
 		
-//		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
-//		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
-//		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, tutorial);
-//
-//		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, tutorial);
-//		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
-//		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
-
-//		model.addAttribute("comOutline", comOutline);
-//		model.addAttribute("comScript",comScript );
-//		model.addAttribute("comSlide",comSlide );
-//		model.addAttribute("comVideo", comVideo);
-//		model.addAttribute("comKeyword", comKeyword);
-//		model.addAttribute("comPreReq", comPreRequistic);
-
-
-//		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
-//		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
-//		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
-//		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
-//		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
-//		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
-
-		 
-		
-
-//		if(tutorial.getVideo() != null) {
-//		IContainer container = IContainer.make();
-//		int result=10;
-//		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-//
-//		IStream stream = container.getStream(0);
-//		if(stream!=null) {
-//			IStreamCoder coder = stream.getStreamCoder();
-//			
-//			model.addAttribute("FileWidth", coder.getWidth());
-//			model.addAttribute("FileHeight", coder.getHeight());
-//			
-//			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-//			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-//		}else {
-//			model.addAttribute("FileWidth", "");
-//			model.addAttribute("FileHeight", "");
-//			
-//			model.addAttribute("fileSizeInMB", "");
-//			model.addAttribute("FileDurationInSecond", "");
-//		}
-//		
-//		container.close();
-//		}
-
-
-		
-		
-//		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
-//			model.addAttribute("otherLan", false);
-//		}else {
-//			model.addAttribute("otherLan", true);
-//		}
-		
-//		String tutorial_id="";
-//		if(tutorial!=null) {
-//			tutorial_id = Integer.toString(tutorial.getTutorialId());
-//		}
-//		String topic_name = topic.getTopicName();
-//		topic_name	= topic_name.replaceAll(" ", "-");
-//		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(category.getCategoryId())+"/"
-//				+tutorial_id+"/"+Integer.toString(language.getLanId())+"/"+topic_name+"/"+"1";
-//		model.addAttribute("sm_url", sm_url);
 		return "addContentDomainReview";
 
 
@@ -5677,81 +5541,9 @@ private void getUsers() {
 		setCompStatus(model, tutorials);
 		setVideoInfo(model, tutorials);
 		setEngLangStatus(model, language);
-		String sm_url = setScriptManagerUrl(model, lan, lan, tutorial, topic, language, category);
+		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
 		
-
-//		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
-//		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
-//		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE,  tutorial);
-//
-//		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD,  tutorial);
-//		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
-//		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
-
-//		model.addAttribute("comOutline", comOutline);
-//		model.addAttribute("comScript",comScript );
-//		model.addAttribute("comSlide",comSlide );
-//		model.addAttribute("comVideo", comVideo);
-//		model.addAttribute("comKeyword", comKeyword);
-//		model.addAttribute("comPreReq", comPreRequistic);
-
-
-//		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
-//		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
-//		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
-//		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
-//		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
-//		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
-
-		
-		
-
-//		if(tutorial.getVideo() != null) {
-//		IContainer container = IContainer.make();
-//		int result=10;
-//		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-//		
-//		System.out.println("Video Duration"+container.getDuration()/1000000);
-//		System.out.println("file Size"+container.getFileSize()/1000000);
-//		
-//
-//		IStream stream = container.getStream(0);
-//		if(stream!=null) {
-//			IStreamCoder coder = stream.getStreamCoder();
-//			model.addAttribute("FileWidth", coder.getWidth());
-//			model.addAttribute("FileHeight", coder.getHeight());
-//			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-//			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-//		}else {
-//			model.addAttribute("FileWidth", "");
-//			model.addAttribute("FileHeight", "");
-//			model.addAttribute("fileSizeInMB", "");
-//			model.addAttribute("FileDurationInSecond", "");
-//		}
-//		
-//		
-//		container.close();
-//
-//		}
-
-
-		
-		
-//		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
-//			model.addAttribute("otherLan", false);
-//		}else {
-//			model.addAttribute("otherLan", true);
-//		}
-//		String tutorial_id="";
-//		if(tutorial!=null) {
-//			tutorial_id = Integer.toString(tutorial.getTutorialId());
-//		}
-//		String topic_name = topic.getTopicName();
-//		topic_name	= topic_name.replaceAll(" ", "-");
-//		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(category.getCategoryId())+"/"
-//				+tutorial_id+"/"+Integer.toString(language.getLanId())+"/"+topic_name+"/"+"1";
-//		model.addAttribute("sm_url", sm_url);
 		return "addContentQualityReview";
 
 
@@ -6065,41 +5857,17 @@ private void getUsers() {
 			return "masterTrainerOperation";
 		}
 
-//		if(trainingInfoService.findByTopicName(titleName) != null) {
-//
-//			// throw error on output
-//			model.addAttribute("error_msg",CommonData.NAME_ERROR);
-//			return "masterTrainerOperation";
-//		}
-
-//		Language lan=lanService.getByLanName(lanName);
-
-
-//		Topic topic=topicService.findById(topicId);
-//		TopicCategoryMapping topicCatMap=topicCatService.findAllByCategoryAndTopic(cat, topic);
-
 		int newTrainingdata=trainingInfoService.getNewId();
 		TrainingInformation trainingData=new TrainingInformation();
 		trainingData.setDateAdded(ServiceUtility.getCurrentTime());
 		trainingData.setTrainingId(newTrainingdata);
 		trainingData.setTotalParticipant(totaltrainee);
-//		trainingData.setLan(lan);
-//		trainingData.setAddress(address);
 		trainingData.setUser(usr);
 		trainingData.setEvent(event);
 
 		try {
 			trainingInfoService.save(trainingData);
 			int trainingTopicId=trainingTopicServ.getNewId();
-//			for(int topicID : topicId) {
-//				Topic topicTemp=topicService.findById(topicID);
-//				TopicCategoryMapping topicCatMap=topicCatService.findAllByCategoryAndTopic(cat, topicTemp);
-//				TrainingTopic trainingTemp=new TrainingTopic(trainingTopicId++, topicCatMap, trainingData);
-//				trainingTopicTemp.add(trainingTemp);
-//
-//			}
-//
-//			trainingData.setTrainingTopicId(trainingTopicTemp);
 			trainingInfoService.save(trainingData);
 
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryMasterTrainer+newTrainingdata);
@@ -6359,12 +6127,7 @@ private void getUsers() {
 		Role role = roleService.findByname(CommonData.adminReviewerRole);
 
 		if(usrRoleService.findByLanCatUser(language, category, usr, role)!=null) {
-
-			// throw error
-			//model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
-
 			model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR);
-
 			return "assignRoleToDomain";
 		}
 
@@ -6743,13 +6506,6 @@ private void getUsers() {
 		TrainingInformation trainingData=trainingInfoService.getById(trainingId);
 
 		model.addAttribute("training",trainingData);
-
-//		if(trainingInfoService.findByTopicName(titleName) != null) {
-//
-//			// throw error on output
-//			model.addAttribute("error_msg",CommonData.NAME_ERROR);
-//			return "updateTraining";
-//		}
 
 		trainingData.setTotalParticipant(totaltrainee);
 

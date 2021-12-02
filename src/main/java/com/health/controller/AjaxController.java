@@ -1624,7 +1624,7 @@ public class AjaxController{
 													@RequestParam(value = "role") String role,
 													Principal principal) {
 		HashMap<String, String> temp = new HashMap<String, String>();
-
+		
 		User usr = getUser(principal);
 
 		String roleName = null;
@@ -1677,7 +1677,7 @@ public class AjaxController{
 
 		}else {
 			temp.put("response", CommonData.FAILURE_STATUS);
-			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
+			temp.put("status", CommonData.tutorialStatus[statusvalue]);
 			return temp;
 		}
 
@@ -1705,12 +1705,12 @@ public class AjaxController{
 			logService.save(log);
 
 			temp.put("response", CommonData.SUCCESS_STATUS);
-			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
+			temp.put("status", CommonData.tutorialStatus[CommonData.IMPROVEMENT_STATUS]);
 			return temp;
 
 		}catch (Exception e) {
 			temp.put("response", CommonData.FAILURE_STATUS);
-			temp.put("status", CommonData.tutorialStatus[tut.getOutlineStatus()]);
+			temp.put("status", CommonData.tutorialStatus[statusvalue]);
 			return temp;
 		}
 	}

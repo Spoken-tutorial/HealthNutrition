@@ -22,7 +22,6 @@ const QUALITY = "quality";
 const ADMIN_REVIEWER = "admin-rev";
 
 
-//const OUTLINE = "outline";
 
 $(document).ready(function() {
 	
@@ -763,7 +762,6 @@ $(document).ready(function() {
 								var len = result.length;
 								html += '<option value="0">Select Category</option>';
 								for (var i = 0; i < len; i++) {
-
 									html += '<option value="'+ result[i]+ '">'+ result[i]+ '</option>';
 								}
 								html += '</option>';
@@ -1088,14 +1086,12 @@ $(document).ready(function() {
 					});
 
 
-
-			// Changes made by om prakash
-
 			$('#uploadpreRequsiteId').click(function() {
 				let [tutorialId,category,topicid,lang] = setTutorialData();
 				
 				var preReqTutId = $("#preReqTopic").val(); //Id of pre-req tutorial 
 				var prRequired_checkbox = document.getElementById('prRequired');
+				var prev_pr = document.getElementById('prev_pr');
 
 				$.ajax({
 					type : "GET",
@@ -1112,6 +1108,7 @@ $(document).ready(function() {
 					{
 						setComponentUploadStatus(result,'alert-pre','status-pre','uploadpreRequsiteId','user-pre');
 						prRequired_checkbox.disabled = true;
+						prev_pr.classList.add('d-none');
 					},
 					error : function(err) {
 						console.log("not working. ERROR: "+ JSON.stringify(err));
@@ -3162,11 +3159,10 @@ $(document).ready(function() {
 			});
 
 			$("#addNullPrerequisite").click(function() {
-				var tutorialId = $("#tutorialId").val();
-				var categoryid = $("#categoryId").val();
-				var topicid = $("#topicID").val();
-				var lanId = $("#lanId").val();
+				let [tutorialId,category,topicid,lang] = setTutorialData();
+				
 				var info_elem = document.getElementById('current_pr');
+				var prev_pr = document.getElementById('prev_pr');
 				var prRequired_checkbox = document.getElementById('prRequired');
 				
 				
@@ -3175,15 +3171,16 @@ $(document).ready(function() {
 					url : projectPath+"addPreRequisticWhenNotRequired",
 					data : {
 						"id" :tutorialId,
-						"categoryname" : categoryid,
+						"categoryname" : category,
 						"topicid" : topicid,
-						"lanId" : lanId
+						"lanId" : lang
 					},
 					contentType : "application/json",
 					success : function(result) {
 						setComponentUploadStatus(result,'alert-pre','status-pre','addNullPrerequisite','user-pre');
 						
 						prRequired_checkbox.disabled = true;
+						prev_pr.classList.add('d-none');
 						info_elem.classList.remove('d-none');
 						info_elem.innerText = "Selected prerequisite : This tutorial has no prerequisite."
 					},
