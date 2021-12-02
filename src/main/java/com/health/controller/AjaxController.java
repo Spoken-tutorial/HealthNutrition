@@ -177,6 +177,8 @@ public class AjaxController{
 	private static final String SLIDE_SIZE_ERROR = "File Size must be under 20 MB";
 	private static final String VIDEO_EXTN_ERROR = "File extension must be in MP4.";
 	private static final String VIDEO_SIZE_ERROR = "File Size must be under 400 MB.";
+	private static final int NULL_TUTORIAL = 0;
+	private static final int ADD_COMPONENT = 0;
 	
 	
 			
@@ -188,27 +190,49 @@ public class AjaxController{
 		return usr;
 	}
 	
-	private HashMap<Integer, String> updateResponse(String res, String msg, int comp_status, int tutorial_id) {
+	//private HashMap<Integer, String> updateResponse(String res, String msg, int comp_status, int tutorial_id) {
+	private HashMap<String, String> updateResponse(String res, String msg, int comp_status, int tutorialId, User user) {
 		//0: success/error ; 1:info msg 2:comp status
-		HashMap<Integer, String> temp = new HashMap<>();
-		temp.put(0, res);
-		temp.put(1, msg);
-		temp.put(2, CommonData.tutorialStatus[comp_status]);
-		temp.put(3, String.valueOf(tutorial_id));
+		HashMap<String, String> temp = new HashMap<>();
+		temp.put("response", res);
+		temp.put("message", msg);
+		temp.put("component_status", CommonData.tutorialStatus[comp_status]);
+		temp.put("tutorial_id", String.valueOf(tutorialId));
+		String firstName = "";
+		String lastName = "";
+		if(user.getFirstName()!="") {
+			firstName = user.getFirstName();
+			if(firstName.length()>1) {
+				firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1);
+			}
+			else {
+				firstName = firstName.toUpperCase();
+			}
+		}
+		if(user.getLastName()!="") {
+			lastName = user.getLastName();
+			if(lastName.length()>1) {
+				lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1);
+			}else {
+				lastName = lastName.toUpperCase();
+			}
+		}
+		temp.put("user", firstName+" "+lastName);
+		
 		return temp;
 	}
 
-	private HashMap<Integer, String> addOutlineComp(Tutorial tut, String outline, User usr) {
-		HashMap<Integer, String> temp = new HashMap<>(); 
+	private HashMap<String, String> addOutlineComp(Tutorial tut, String outline, User usr) {
+		HashMap<String, String> temp = new HashMap<>(); 
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, tut.getOutlineStatus(), CommonData.contributorRole, usr, tut);
 		tut.setOutline(outline);
 		tut.setOutlineStatus(CommonData.DOMAIN_STATUS);
 		tut.setOutlineUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getOutlineStatus(), tut.getTutorialId());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getOutlineStatus(), tut.getTutorialId(),usr);
 		} catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getOutlineStatus(),tut.getTutorialId());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getOutlineStatus(),tut.getTutorialId(),usr);
 			return temp;
 		}
 		logService.save(log);
@@ -216,17 +240,17 @@ public class AjaxController{
 
 	}
 	
-	private HashMap<Integer, String> addScriptComp(Tutorial tut, User usr) {
-		HashMap<Integer, String> temp = new HashMap<>();
+	private HashMap<String, String> addScriptComp(Tutorial tut, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.DOMAIN_STATUS, tut.getScriptStatus(), CommonData.contributorRole, usr, tut);
 		tut.setScriptStatus(CommonData.DOMAIN_STATUS);
 		tut.setScriptUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getScriptStatus(),tut.getTutorialId());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getScriptStatus(),tut.getTutorialId(),usr);
 		} catch (Exception e) {
 			e.printStackTrace();
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getScriptStatus(),tut.getTutorialId());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getScriptStatus(),tut.getTutorialId(),usr);
 			return temp;
 		}
 		logService.save(log);
@@ -249,8 +273,8 @@ public class AjaxController{
 		return document;
 	}
 	
-	private HashMap<Integer, String> addSlideComp(Tutorial tut,MultipartFile slideFile, User usr) {
-		HashMap<Integer, String> temp = new HashMap<>();
+	private HashMap<String, String> addSlideComp(Tutorial tut,MultipartFile slideFile, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.DOMAIN_STATUS, tut.getSlideStatus(), CommonData.contributorRole, usr, tut);
 		try {
 				String  document = getDocument(tut,slideFile,"Slide");
@@ -260,33 +284,32 @@ public class AjaxController{
 					tut.setSlideStatus(CommonData.DOMAIN_STATUS);
 					tut.setSlideUser(usr);
 					tutService.save(tut);
-					temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getSlideStatus(),tut.getTutorialId());
+					temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getSlideStatus(),tut.getTutorialId(),usr);
 					logService.save(log);
 				}
 		}catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getSlideStatus(),tut.getTutorialId());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getSlideStatus(),tut.getTutorialId(),usr);
 		}
 		
 		return temp;
 	}
 	
-	private HashMap<Integer, String> addVideoComp(Tutorial tut,MultipartFile videoFile, User usr) {
-		HashMap<Integer, String> temp = new HashMap<>();
+	private HashMap<String, String> addVideoComp(Tutorial tut,MultipartFile videoFile, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.ADMIN_STATUS, tut.getVideoStatus(), CommonData.contributorRole, usr, tut);
 
 		try {
 			String  document = getDocument(tut,videoFile,"Video");
-			//tut.setVideo(document);
 			if(document!="") {
 				tut.setVideo(document);
 				tut.setVideoStatus(CommonData.ADMIN_STATUS);
 				tut.setVideoUser(usr);
 				tutService.save(tut);
-				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus(),tut.getTutorialId());
+				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus(),tut.getTutorialId(),usr);
 				logService.save(log);
 			}
 		}catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus(),tut.getTutorialId());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus(),tut.getTutorialId(),usr);
 		}
 		
 		return temp;
@@ -295,17 +318,17 @@ public class AjaxController{
 	
 	
 	
-	private HashMap<Integer, String> addKeywordComp(Tutorial tut, String keywordData, User usr) {
-		HashMap<Integer, String> temp = new HashMap<>(); 
+	private HashMap<String, String> addKeywordComp(Tutorial tut, String keywordData, User usr) {
+		HashMap<String, String> temp = new HashMap<>(); 
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.DOMAIN_STATUS, tut.getKeywordStatus(), CommonData.contributorRole, usr, tut);
 		tut.setKeyword(keywordData);
 		tut.setKeywordStatus(CommonData.DOMAIN_STATUS);
 		tut.setKeywordUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getKeywordStatus(),tut.getTutorialId());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getKeywordStatus(),tut.getTutorialId(),usr);
 		}catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getKeywordStatus(),tut.getTutorialId());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getKeywordStatus(),tut.getTutorialId(),usr);
 			return temp;
 		}
 		logService.save(log);
@@ -313,8 +336,8 @@ public class AjaxController{
 
 	}
 	
-	private HashMap<Integer, String> addPreReqComp(Tutorial tut,Tutorial prereq, User usr) {
-		HashMap<Integer, String> temp = new HashMap<>();
+	private HashMap<String, String> addPreReqComp(Tutorial tut,Tutorial prereq, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.DOMAIN_STATUS, tut.getPreRequisticStatus(), CommonData.contributorRole, usr, tut);
 
 		try {
@@ -322,9 +345,9 @@ public class AjaxController{
 			tut.setPreRequisticStatus(CommonData.DOMAIN_STATUS);
 			tut.setPreRequiticUser(usr);
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
 		} catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
 			return temp;
 		}
 		
@@ -333,8 +356,8 @@ public class AjaxController{
 
 	}
 	
-	private HashMap<Integer, String> addNullPreReq(Tutorial tut, User usr) {
-		HashMap<Integer, String> temp = new HashMap<>();
+	private HashMap<String, String> addNullPreReq(Tutorial tut, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.DOMAIN_STATUS, tut.getPreRequisticStatus(), CommonData.contributorRole, usr, tut);
 
 		tut.setPreRequistic(null);
@@ -342,9 +365,9 @@ public class AjaxController{
 		tut.setPreRequiticUser(usr);
 		try {
 			tutService.save(tut);
-			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId());
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
 		} catch (Exception e) {
-			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId());
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
 			return temp;
 		}
 		logService.save(log);
@@ -352,7 +375,6 @@ public class AjaxController{
 	}
 	
 	private Tutorial createTutorial(String catName,int topicId,String lang,User usr) {
-		HashMap<Integer, String> temp = new HashMap<>();
 		Category cat = catService.findBycategoryname(catName);
 		Topic topic=topicService.findById(topicId);
 		TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
@@ -383,13 +405,9 @@ public class AjaxController{
 		}
 		try {
 			tutService.save(local);
-			//temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, local.getOutlineStatus());
 		}catch (Exception e) {
 			e.printStackTrace();
-			//temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, local.getOutlineStatus());
 		}
-		//LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-		//logService.save(log);
 		return local;
 	}
 	
@@ -997,18 +1015,17 @@ public class AjaxController{
 	 * @return string
 	 */
 	@RequestMapping("/addOutline")
-	public @ResponseBody HashMap<Integer, String> addOutline(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addOutline(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "saveOutline") String outlineData,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
 											@RequestParam(value = "lanId") String lang,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
+		HashMap<String, String> temp = new HashMap<>();
 		User usr=getUser(principal);
 		Tutorial local = null;
 
-//		if tutorial exist : change only outline component
 		if(tutorialId!=0) {
 			Tutorial tut=tutService.getById(tutorialId);
 			temp = addOutlineComp(tut,outlineData,usr);
@@ -1018,7 +1035,7 @@ public class AjaxController{
 			if(local!=null) {
 				temp = addOutlineComp(local,outlineData,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0,usr);
 			}
 		}
 		
@@ -1052,14 +1069,14 @@ public class AjaxController{
 	 * @return string
 	 */
 	@RequestMapping("/addKeyword")
-	public @ResponseBody HashMap<Integer, String> addKeyword(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addKeyword(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "savekeyword") String keywordData,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
 											@RequestParam(value = "lanId") String lanId,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
+		HashMap<String, String> temp = new HashMap<>();
 		User usr = getUser(principal);
 		Tutorial local = null;
 		if(tutorialId!=0) {
@@ -1071,7 +1088,7 @@ public class AjaxController{
 			if(local!=null) {
 				temp = addKeywordComp(local,keywordData,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, ADD_COMPONENT,NULL_TUTORIAL,usr);
 			}
 		}
 		return temp;
@@ -1086,13 +1103,13 @@ public class AjaxController{
 	 * @return String object
 	 */
 	@RequestMapping("/addPreRequisticWhenNotRequired")
-	public @ResponseBody HashMap<Integer, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
 			@RequestParam(value = "categoryname") String catName,
 			@RequestParam(value = "topicid") int topicId,
 			@RequestParam(value = "lanId") String lanId,
 			Principal principal) {
 		
-		HashMap<Integer, String> temp = new HashMap<>();
+		HashMap<String, String> temp = new HashMap<>();
 		User usr = getUser(principal);
 
 		Tutorial tut = null;
@@ -1105,7 +1122,7 @@ public class AjaxController{
 			if(tut!=null) {
 				temp = addNullPreReq(tut,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0,usr);
 			}
 		}
 		return temp;
@@ -1121,14 +1138,14 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addPreRequistic")
-	public @ResponseBody HashMap<Integer, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
 			@RequestParam(value = "categoryname") String catName,
 			@RequestParam(value = "topicid") int topicId,
 			@RequestParam(value = "lanId") String lanId,
 			@RequestParam(value = "preReqTutId") int preReqTutId,
 			Principal principal) {
 		
-		HashMap<Integer, String> temp = new HashMap<>();
+		HashMap<String, String> temp = new HashMap<>();
 		User usr = getUser(principal);
 
 		Tutorial tut = null;
@@ -1142,7 +1159,7 @@ public class AjaxController{
 			if(local != null) {
 				temp = addPreReqComp(local,preReq,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR,ADD_COMPONENT,NULL_TUTORIAL,usr);
 			}
 		}
 		return temp;
@@ -1159,7 +1176,7 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addVideo")
-	public @ResponseBody HashMap<Integer, String> addKeyword(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addKeyword(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "videoFileName") MultipartFile videoFile,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
@@ -1167,16 +1184,16 @@ public class AjaxController{
 											Principal principal) {
 
 		
-		HashMap<Integer, String> temp = new HashMap<>();
+		HashMap<String, String> temp = new HashMap<>();
 		
 		User usr= getUser(principal);
 		
 		if(!ServiceUtility.checkFileExtensionVideo(videoFile)) { // throw error on extension
-			temp = updateResponse(ERROR_TOKEN, VIDEO_EXTN_ERROR, 0,tutorialId);
+			temp = updateResponse(ERROR_TOKEN, VIDEO_EXTN_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
 		if(!ServiceUtility.checkVideoSize(videoFile)) {
-			temp = updateResponse(ERROR_TOKEN, VIDEO_SIZE_ERROR, 0,tutorialId);
+			temp = updateResponse(ERROR_TOKEN, VIDEO_SIZE_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
 		Tutorial local = null;
@@ -1188,7 +1205,7 @@ public class AjaxController{
 			if(local!=null){
 				temp = addVideoComp(local,videoFile,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, ADD_COMPONENT,NULL_TUTORIAL,usr);
 			}
 			
 		}
@@ -1207,38 +1224,35 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addSlide")
-	public @ResponseBody HashMap<Integer, String> addSlide(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addSlide(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "uploadsSlideFile") MultipartFile videoFile,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
 											@RequestParam(value = "lanId") String lanId,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
+		HashMap<String, String> temp = new HashMap<>();
 		User usr = getUser(principal); 
 		
 		if(!ServiceUtility.checkFileExtensionZip(videoFile)) { // throw error on extension
-			temp = updateResponse(ERROR_TOKEN, ZIP_EXTN_ERROR, 0,tutorialId);
+			temp = updateResponse(ERROR_TOKEN, ZIP_EXTN_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
 		if(!ServiceUtility.checkScriptSlideProfileQuestion(videoFile)) {
-			temp = updateResponse(ERROR_TOKEN, SLIDE_SIZE_ERROR, 0,tutorialId);
+			temp = updateResponse(ERROR_TOKEN, SLIDE_SIZE_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
 		Tutorial local = null;
 		if(tutorialId != 0) {
-			//addslide
 			Tutorial tut=tutService.getById(tutorialId);
 			temp = addSlideComp(tut,videoFile,usr);
 		}else {
-			//create Tut
 			local = createTutorial(catName, topicId, lanId, usr);
 			if(local!=null) {
 				temp = addSlideComp(local,videoFile,usr);
 			}else {
-				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0);
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, ADD_COMPONENT,NULL_TUTORIAL,usr);
 			}
-			//add slide
 		}
 		return temp;
 
@@ -1255,17 +1269,15 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addScript")
-	public @ResponseBody HashMap<Integer, String> addScript(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addScript(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
 											@RequestParam(value = "lanId") String lang,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
-		
-		User usr=getUser(principal);
+		HashMap<String, String> temp = new HashMap<>();
+		User usr = getUser(principal);
 
-//		iff ttutorial is present ; change status of script 
 		if(tutorialId !=0) {
 			Tutorial tut=tutService.getById(tutorialId);
 			temp = addScriptComp(tut,usr);

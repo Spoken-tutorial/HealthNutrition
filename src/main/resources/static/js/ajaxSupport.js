@@ -1089,11 +1089,7 @@ $(document).ready(function() {
 			// Changes made by om prakash
 
 			$('#uploadpreRequsiteId').click(function() {
-				var tutorialId = $("#tutorialId").val();
-				var categoryid = $("#categoryId").val();
-				var topicid = $("#topicID").val();
-				var lanId = $("#lanId").val();
-				
+				let [tutorialId,category,topicid,lang] = setTutorialData();
 				
 				var preReqTutId = $("#preReqTopic").val(); //Id of pre-req tutorial 
 				var prRequired_checkbox = document.getElementById('prRequired');
@@ -1103,21 +1099,19 @@ $(document).ready(function() {
 					url : projectPath+"addPreRequistic",
 					data : {
 						"id" :tutorialId,
-						"categoryname" : categoryid,
+						"categoryname" : category,
 						"topicid" : topicid,
-						"lanId" : lanId,
+						"lanId" : lang,
 						"preReqTutId" : preReqTutId
 					},
 					contentType : "application/json",
 					success : function(result) 
 					{
-						setComponentUploadStatus(result,'alert-pre','status-pre','uploadpreRequsiteId');
+						setComponentUploadStatus(result,'alert-pre','status-pre','uploadpreRequsiteId','user-pre');
 						prRequired_checkbox.disabled = true;
 					},
-
 					error : function(err) {
-						console
-						.log("not working. ERROR: "+ JSON.stringify(err));
+						console.log("not working. ERROR: "+ JSON.stringify(err));
 						setErrorStatus('alert-pre');
 					}
 				});
@@ -2230,28 +2224,33 @@ $(document).ready(function() {
 						});
 
 					});
-/******************************** changes made by om prakash ************************************/
 
-			function setComponentUploadStatus(result,alert,status,submit_btn){
+
+			function setComponentUploadStatus(result,alert,status,submit_btn,user){
 				var alert_elem = document.getElementById(alert);
 				var status_elem = document.getElementById(status);
+				var user_elem = document.getElementById(user);
 				var btn_elem = document.getElementById(submit_btn);
 				var tutorial = document.getElementById("tutorialId");
 				
 				alert_elem.classList.remove("d-none");
-				alert_elem.innerText = result[1];
-				status_elem.innerText = result[2];
-				if(result[0]=="success"){
+				alert_elem.innerText = result['message'];
+				status_elem.innerText = result['component_status'];
+				user_elem.innerText = result['user'];
+				if(result['response']=="success"){
+					alert_elem.classList.remove('alert-danger');
 					alert_elem.classList.add('alert-success');
 					btn_elem.disabled = true;
 				}else{
+					alert_elem.classList.remove('alert-success');
 					alert_elem.classList.add('alert-danger');
 				}
-				tutorial.value = result[3];
+				tutorial.value = result['tutorial_id'];
 			}
 			
 			function setErrorStatus(alert_id){
 				var alert_elem = document.getElementById(alert_id);
+				alert_elem.classList.remove("d-none");
 				alert_elem.classList.add('alert-danger');
 				alert_elem.innerText = COMPONENT_UPLOAD_ERROR_MSG;
 			}
@@ -2263,44 +2262,33 @@ $(document).ready(function() {
 			}
 						
 			$('#outlineId').click(function() {
-						var saveInfo = editor.getData();
-						
-						var tutorialId=$("#tutorialId").val();
-						var categoryid = $("#categoryId").val();
-						var topicid = $("#topicID").val();
-						var lanId = $("#lanId").val();
-						
+						let [tutorialId,category,topicid,lang] = setTutorialData();
+						var outline = editor.getData();
 						$.ajax({
 							type : "GET",
 							url : projectPath+"addOutline",
 							data : {
-								"saveOutline" : saveInfo,
+								"saveOutline" : outline,
 								"id" : tutorialId,
-								"categoryname" : categoryid,
+								"categoryname" : category,
 								"topicid" : topicid,
-								"lanId" : lanId
-								
+								"lanId" : lang
 							},
 							contentType : "application/json",
 							success : function(result) {
-								setComponentUploadStatus(result,'alert-outline','status-outline','outlineId');
+								setComponentUploadStatus(result,'alert-outline','status-outline','outlineId','user-outline');
 							},
 							error : function(err) {
 								console.log("not working. ERROR: "+ JSON.stringify(err));
 								setErrorStatus('alert-outline');
 							}
 						});
-
 					});
 
 			
 			$('#keywordId').click(function() {
+						let [tutorialId,category,topicid,lang] = setTutorialData();
 						var keywordArea = $("#keywordArea").val();
-						
-						var categoryid = $("#categoryId").val();
-						var topicid = $("#topicID").val();
-						var lanId = $("#lanId").val();
-						var tutorialId=$("#tutorialId").val();
 						
 						$.ajax({
 							type : "GET",
@@ -2308,13 +2296,13 @@ $(document).ready(function() {
 							data : {
 								"savekeyword" : keywordArea,
 								"id" : tutorialId,
-								"categoryname" : categoryid,
+								"categoryname" : category,
 								"topicid" : topicid,
-								"lanId" : lanId
+								"lanId" : lang
 							},
 							contentType : "application/json",
 							success : function(result) {
-							setComponentUploadStatus(result,'alert-kw','status-kw','keywordId');
+							setComponentUploadStatus(result,'alert-kw','status-kw','keywordId','user-kw');
 							},
 
 							error : function(err) {
@@ -2327,28 +2315,23 @@ $(document).ready(function() {
 					});
 
 			$('#scriptId').click(function() {
-						var categoryid = $("#categoryId").val();
-						var topicid = $("#topicID").val();
-						var lanId = $("#lanId").val();
-						var TutorialID=$("#tutorialId").val();
+						let [tutorialId,category,topicid,lang] = setTutorialData();
 						
 						var formData = new FormData();
-
-						formData.append('categoryname', categoryid);
+						formData.append('categoryname', category);
 						formData.append('topicid', topicid);
-						formData.append('lanId', lanId);
-						formData.append('id',TutorialID);
+						formData.append('lanId', lang);
+						formData.append('id',tutorialId);
 
 						$.ajax({
 							type : "POST",
 							url : projectPath+"addScript",
 							data : formData,
-							//enctype : 'multipart/form-data',
 							processData : false,
 							contentType : false,
 							cache : false,
 							success : function(result) {
-								setComponentUploadStatus(result,'alert-script','status-script','scriptId');
+								setComponentUploadStatus(result,'alert-script','status-script','scriptId','user-script');
 							},
 
 							error : function(err) {
@@ -2360,18 +2343,15 @@ $(document).ready(function() {
 					});
 
 			$('#slideId').click(function() {
-				$('.loader-wrapper').removeClass('d-none');
-						var categoryid = $("#categoryId").val();
-						var topicid = $("#topicID").val();
-						var lanId = $("#lanId").val();
-						var TutorialID=$("#tutorialId").val();
+						$('.loader-wrapper').removeClass('d-none');
+						let [tutorialId,category,topicid,lang] = setTutorialData();
 						
 						var form = $('#upload-file-form')[0];
 						var formData = new FormData(form);
-						formData.append('categoryname', categoryid);
+						formData.append('categoryname', category);
 						formData.append('topicid', topicid);
-						formData.append('lanId', lanId);
-						formData.append('id',TutorialID);
+						formData.append('lanId', lang);
+						formData.append('id',tutorialId);
 						$.ajax({
 							type : "POST",
 							url : projectPath+"addSlide",
@@ -2382,7 +2362,7 @@ $(document).ready(function() {
 							cache : false,
 							success : function(result) {
 								$('.loader-wrapper').addClass('d-none');
-								setComponentUploadStatus(result,'alert-slide','status-slide','slideId');
+								setComponentUploadStatus(result,'alert-slide','status-slide','slideId','user-slide');
 							},
 
 							error : function(err) {
@@ -2401,22 +2381,18 @@ $(document).ready(function() {
 
 			
 			$('#videoId').click(function() {
-				$('.loader-wrapper').removeClass('d-none');
-						var categoryid = $("#categoryId").val();
-						var topicid = $("#topicID").val();
-						var lanId = $("#lanId").val();
-						var tutorialID=$('#tutorialId').val();
-
+						$('.loader-wrapper').removeClass('d-none');
+						let [tutorialId,category,topicid,lang] = setTutorialData();
+						
 						var form = $('#upload-video')[0];
 						var formData = new FormData(form);
 						
-						formData.append('id',tutorialID);
-						formData.append('categoryname',categoryid);
+						formData.append('id',tutorialId);
+						formData.append('categoryname',category);
 						formData.append('topicid', topicid);
-						formData.append('lanId', lanId);
+						formData.append('lanId', lang);
 
-						$
-						.ajax({
+						$.ajax({
 							type : "POST",
 							url : projectPath+"addVideo",
 							data : formData,
@@ -2426,7 +2402,7 @@ $(document).ready(function() {
 							cache : false,
 							success : function(result) {
 								$('.loader-wrapper').addClass('d-none');
-								setComponentUploadStatus(result,'alert-video','status-video','videoId');
+								setComponentUploadStatus(result,'alert-video','status-video','videoId','user-video');
 							},
 
 							error : function(err) {
@@ -2674,32 +2650,22 @@ $(document).ready(function() {
 			
 	
 			$('#lanId').on('change',function() {
-					var languageName = $("#option :selected").text();
-
 						$.ajax({
 							type : "GET",
 							url : projectPath+"loadCategory",
 							contentType : "application/json",
 							success : function(result) {
-
 								var html = '';
-								var len = result.length;
 								html += '<option value="0">Select Category</option>';
 								$.each(result , function( key, value ) {
-				  	  			        html += '<option value=' + key + '>'
-				  			               + value
-				  			               + '</option>';
+									html += `<option value=${key} >${value}</option>`
 				  	  			 })
-			  	  			    html += '</option>';
-								$("#catgoryByContributor").prop('disabled',false);
 								$('#catgoryByContributor').html(html);
-
 							},
 							error : function(err) {
 								console.log("not working. ERROR: "+ JSON.stringify(err));
 							}
 						});
-
 					});
 			
 /************************* changes made by om prakash **********************************************/	
@@ -3299,7 +3265,7 @@ $(document).ready(function() {
 					},
 					contentType : "application/json",
 					success : function(result) {
-						setComponentUploadStatus(result,'alert-pre','status-pre','addNullPrerequisite');
+						setComponentUploadStatus(result,'alert-pre','status-pre','addNullPrerequisite','user-pre');
 						
 						prRequired_checkbox.disabled = true;
 						info_elem.classList.remove('d-none');
@@ -3528,6 +3494,17 @@ function getURL(role,component,review){
 	if(role == DOMAIN) return getDomainReviewURL(component);
 	if(role == QUALITY) return getQualityReviewURL(component); 
 }
+
+function setTutorialData(){
+	let tutorialId=$("#tutorialId").val();
+	let category = $("#categoryId").val();
+	let topicid = $("#topicID").val();
+	let lang = $("#lanId").val();
+	
+	return [tutorialId,category,topicid,lang];
+}
+// ************************************ contributor uploads ************************************
+
 
 
 submit_review.forEach(function(elem){

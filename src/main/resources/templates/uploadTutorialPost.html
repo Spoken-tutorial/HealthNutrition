@@ -59,7 +59,7 @@
 									</tr>
 								</table>
 
-								<table class="table table-bordered table-cont">
+								<table class="table table-bordered table-cont table-hover">
 									<thead>
 										<tr>
 											<th>Sr.No.</th>
@@ -76,8 +76,12 @@
 												th:text="${statusOutline}" id="status-outline"></span></td>
 											<td>
 												<div th:if="${tutorial}">
-													<span th:if="${tutorial.getOutlineUser()}"
+													<span id="user-outline" th:if="${tutorial.getOutlineUser()}"
 														th:text="${#strings.capitalizeWords(tutorial.getOutlineUser().getFullName())}"></span>
+													<span id="user-outline" th:unless="${tutorial.getOutlineUser()}"></span>
+												</div>
+												<div th:unless="${tutorial}">
+													<span id="user-outline"></span>
 												</div>
 											</td>
 											<th><span th:if="${disable}">
@@ -103,8 +107,12 @@
 												th:text="${statusScript}" id="status-script">Pending</span></td>
 											<td>
 												<div th:if="${tutorial}">
-													<span th:if="${tutorial.getScriptUser()}"
+													<span id="user-script" th:if="${tutorial.getScriptUser()}"
 														th:text="${#strings.capitalizeWords(tutorial.getScriptUser().getFullName())}"></span>
+														<span id="user-script" th:uless="${tutorial.getScriptUser()}"></span>
+												</div>
+												<div th:unless="${tutorial}">
+													<span id="user-script"></span>
 												</div>
 											</td>
 
@@ -135,8 +143,12 @@
 												id="status-slide">Pending</span></td>
 											<td>
 												<div th:if="${tutorial}">
-													<span th:if="${tutorial.getSlideUser()}"
+													<span id="user-slide" th:if="${tutorial.getSlideUser()}"
 														th:text="${#strings.capitalizeWords(tutorial.getSlideUser().getFullName())}"></span>
+													<span id="user-slide" th:unless="${tutorial.getSlideUser()}"></span>
+												</div>
+												<div th:unless="${tutorial}">
+													<span id="user-slide"></span>
 												</div>
 											</td>
 
@@ -158,8 +170,12 @@
 												id="status-video">Pending</span></td>
 											<td>
 												<div th:if="${tutorial}">
-													<span th:if="${tutorial.getVideoUser()}"
+													<span id="user-video" th:if="${tutorial.getVideoUser()}"
 														th:text="${#strings.capitalizeWords(tutorial.getVideoUser().getFullName())}"></span>
+													<span id="user-video" th:unless="${tutorial.getVideoUser()}"></span>
+												</div>
+												<div th:unless="${tutorial}">
+													<span id="user-video"></span>
 												</div>
 											</td>
 
@@ -187,8 +203,12 @@
 												th:text="${statusKeyword}" id="status-kw">Pending</span></td>
 											<td>
 												<div th:if="${tutorial}">
-													<span th:if="${tutorial.getKeywordUser()}"
+													<span id="user-kw" th:if="${tutorial.getKeywordUser()}"
 														th:text="${#strings.capitalizeWords(tutorial.getKeywordUser().getFullName())}"></span>
+													<span id="user-kw" th:unless="${tutorial.getKeywordUser()}"></span>
+												</div>
+												<div th:unless="${tutorial}">
+													<span id="user-kw"></span>
 												</div>
 											</td>
 
@@ -205,11 +225,18 @@
 											<td>6</td>
 											<td>Prerequisite</td>
 											<td><span class="status-contri"
-												th:text="${statusPreReq}" id="status-pre">Pending</span></td>
-											<td><div th:if="${tutorial}">
-													<span th:if="${tutorial.getPreRequiticUser()}"
+												th:text="${statusPreReq}" id="status-pre"></span></td>
+											<td>
+											<div th:if="${tutorial}">
+													<span id="user-pre" th:if="${tutorial.getPreRequiticUser()}"
 														th:text="${#strings.capitalizeWords(tutorial.getPreRequiticUser().getFullName())}"></span>
-												</div></td>
+													<span id="user-pre" th:unless="${tutorial.getPreRequiticUser()}"></span>
+											</div>
+											<div th:unless="${tutorial}">
+													<span id="user-pre"></span>
+											</div>
+												
+												</td>
 											<th>
 												<button type="button" class="btn btn-info"
 													data-toggle="modal" data-target="#prerequisiteModale"
@@ -269,9 +296,9 @@
 									<form th:action="@{/addOutline}" method="post" class="w-100">
 										<div class="form-group">
 											<label for="message-text" class="col-form-label"><span>Add
-													outline : </span></label>
+													outline : </span><span class="text-muted">(Characters limit : 1500)</span></label>
 											<textarea class="form-control editor" name="editor"
-												id="editor" rows="10">
+												id="editor" rows="10" maxlength="1500">
 										        		  
 																	<span th:if="${tutorial}"
 													th:text="${tutorial.getOutline()}"></span>

@@ -357,6 +357,9 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 	return sm_url;
 }
 
+private void getUsers() {
+	
+}
 	/**
 	 * Index page Url
 	 * @param model Model Object
@@ -4640,6 +4643,7 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 		return "updateAssignContributor";
 	}
 
+	
 	/**
 	 * redirects to assign contributor page
 	 * @param model Model object
@@ -4649,14 +4653,7 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 	@RequestMapping(value = "/assignTutorialToContributor", method = RequestMethod.GET)
 	public String assignTutorialToContributoreGet(Model model,Principal principal) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
+		model.addAttribute("userInfo", getUser(principal, userService));
 
 		Role role=roleService.findByname(CommonData.contributorRole);
 		Role role1=roleService.findByname(CommonData.externalContributorRole);
@@ -4671,10 +4668,12 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 		for(UserRole x : userRolesTemp) {
 			userRolesUniqueTemp.add(x.getUser().getUsername());
 		}
-
-		model.addAttribute("userByContributorsAssigned", userRoles);
+		
 		
 		model.addAttribute("userByContributors", userRolesUniqueTemp);
+		model.addAttribute("userByContributorsAssigned", userRoles);
+		
+		
 
 		return "assignContributorList";
 	}
@@ -4718,7 +4717,7 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 		for(UserRole x : userRolesTemp) {
 			userRolesUniqueTemp.add(x.getUser().getUsername());
 		}
-
+		
 		model.addAttribute("userByContributorsAssigned", userRoles);
 		
 		model.addAttribute("userByContributors", userRolesUniqueTemp);
