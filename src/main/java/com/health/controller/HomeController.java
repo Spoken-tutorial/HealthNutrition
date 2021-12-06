@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -229,8 +230,6 @@ public class HomeController {
     private static YouTube youtube;
     
 	private static final String VIDEO_FILE_FORMAT = "video/*";
-	
-	
 
 	private User getUser(Principal principal,UserService usrservice) {
 		User usr=new User();
@@ -4636,14 +4635,11 @@ private void getUsers() {
 		
 		List<UserRole> userRolesTemp= usrRoleService.findAllByRoleAndStatusAndRevoked(role, true,false);
 		userRolesTemp.addAll(usrRoleService.findAllByRoleAndStatusAndRevoked(role1, true,false));
-		
-		HashSet<String> userRolesUniqueTemp = new HashSet<>();
-		
+		Collections.sort(userRolesTemp);
+		LinkedHashSet<User> userRolesUniqueTemp = new LinkedHashSet<>();
 		for(UserRole x : userRolesTemp) {
-			userRolesUniqueTemp.add(x.getUser().getUsername());
+			userRolesUniqueTemp.add(x.getUser());
 		}
-		
-		
 		model.addAttribute("userByContributors", userRolesUniqueTemp);
 		model.addAttribute("userByContributorsAssigned", userRoles);
 		
@@ -4685,11 +4681,14 @@ private void getUsers() {
 
 		List<UserRole> userRolesTemp= usrRoleService.findAllByRoleAndStatusAndRevoked(role, true,false);
 		userRolesTemp.addAll(usrRoleService.findAllByRoleAndStatusAndRevoked(role1, true,false));
-		
-		HashSet<String> userRolesUniqueTemp = new HashSet<>();
+		Collections.sort(userRolesTemp);
+		LinkedHashSet<User> userRolesUniqueTemp = new LinkedHashSet<>();
+		for(UserRole x : userRolesTemp) {
+			userRolesUniqueTemp.add(x.getUser());
+		}
 		
 		for(UserRole x : userRolesTemp) {
-			userRolesUniqueTemp.add(x.getUser().getUsername());
+			userRolesUniqueTemp.add(x.getUser());
 		}
 		
 		model.addAttribute("userByContributorsAssigned", userRoles);
@@ -4750,7 +4749,7 @@ private void getUsers() {
 		userRolesTemp= usrRoleService.findAllByRoleAndStatusAndRevoked(role, true,false);
 		
 		for(UserRole x : userRolesTemp) {
-			userRolesUniqueTemp.add(x.getUser().getUsername());
+			userRolesUniqueTemp.add(x.getUser());
 		}
 
 		model.addAttribute("userByContributorsAssigned", userRoles);

@@ -368,15 +368,16 @@
 							<div class="alert d-none w-100" role="alert" id="alert-script"></div>
 
 							<div class="alert alert-info" role="alert">
-								<i class="fas fa-external-link-alt"></i> <a th:href="${sm_url}"
+								<i th:if="${sm_url}" class="fas fa-external-link-alt"></i> <a th:if="${sm_url}" th:href="${sm_url}"
 									class="alert-link" style="text-decoration: underline;"
 									target="_blank" id="sm_url">Click here to proceed to Script
 									Manager</a>
+									<a th:unless="${sm_url}" class="alert-link" style="text-decoration: underline;"
+									target="_blank" id="sm_url">Please upload component or video first.</a>
 							</div>
 						</div>
 						<div class="col-12">
-							<div
-								th:replace="common/commonElements :: comments_fragment(${comScript},'Script_comment','Script')"></div>
+							<div th:replace="common/commonElements :: comments_fragment(${comScript},'Script_comment','Script')"></div>
 						</div>
 					</div>
 				</div>
