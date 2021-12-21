@@ -589,20 +589,13 @@ $(document).ready(function() {
 							
 							 if(data[0]==="Success"){
 								 $('#statusOnContactFormAfterAjaxCallSucess').css({"display": "block"});
-								// setTimeout(function() {
-							      //      $('#statusOnContactFormAfterAjaxCallSucess').fadeOut(1000)}, 4000);
 							 }else {
 								 $('#statusOnContactFormAfterAjaxCallFailure').css({"display": "block"});
-								// setTimeout(function() {
-							      //      $('#statusOnContactFormAfterAjaxCallFailure').fadeOut(1000)}, 4000);
 							 }
 							 
 							 $("#name").prop('value', "");
 							 $("#email").prop('value', "");
 							 $("#message").prop('value', "");
-							 
-							// setTimeout(function() {
-						    //        $('#Failure').fadeOut(1000)}, 4000);
 							 
 						},
 						
@@ -1681,27 +1674,18 @@ $(document).ready(function() {
 				
 				$.ajax({
 					type : "GET",
-					url : projectPath+"listTopicsByCategory",
+					url : projectPath+"loadTopicByCategory",
 					data : {
 						"id" : catgoryid
 					},
 					contentType : "application/json",
 					success : function(result) {
+						console.log(result);
 						var html = '';
-						var len = result.length;
 						html += '<option value="0">Select Topic</option>';
-						for (var i = 0; i < len; i++) {
-
-							html += '<option value="'
-								+ result[i]
-							+ '">'
-							+ result[i]
-							+ '</option>';
-						}
-						html += '</option>';
-
-//						$("#inputLanguage").prop('disabled',false);
-//						$('#inputLanguage').html(html);
+						$.each(result , function( key, value ) {
+			  	  			        html += `<option value="${key}"> ${value} </option>`;
+			  	  			     })
 						$("#inputTopicName").prop('disabled',false);
 						$('#inputTopicName').html(html);
 
@@ -1716,27 +1700,22 @@ $(document).ready(function() {
 			$('#inputTopicName').change(function() {
 				var topic = $(this).val();
 				var categoryName = $("#categoryname").val();
+				console.log(`${categoryName} - ${topic}`)
 				$.ajax({
 					type : "GET",
-					url : projectPath+"listLangByCategoryTopic",
+					url : projectPath+"loadLanguageByCategoryTopic",
 					data : {
 						"category" : categoryName,
 						"topic" : topic
 					},
 					contentType : "application/json",
 					success : function(result) {
+						console.log(result);
 						var html = '';
-						var len = result.length;
 						html += '<option value="0">Select language</option>';
-						for (var i = 0; i < len; i++) {
-
-							html += '<option value="'
-								+ result[i]
-							+ '">'
-							+ result[i]
-							+ '</option>';
-						}
-						html += '</option>';
+						$.each(result , function( key, value ) {
+			  	  			        html += `<option value="${key}"> ${value} </option>`;
+			  	  			     })
 
 						$("#inputLanguage").prop('disabled',false);
 						$('#inputLanguage').html(html);
@@ -2267,6 +2246,10 @@ $(document).ready(function() {
 						$.ajax({
 							type : "GET",
 							url : projectPath+"addOutline",
+							headers: {          
+    Accept: "application/json; charset=utf-8",         
+    "Content-Type": "application/json; charset=utf-8"   
+  }  ,
 							data : {
 								"saveOutline" : outline,
 								"id" : tutorialId,
@@ -2274,11 +2257,14 @@ $(document).ready(function() {
 								"topicid" : topicid,
 								"lanId" : lang
 							},
-							contentType : "application/json",
+							
 							success : function(result) {
+								
 								setComponentUploadStatus(result,'alert-outline','status-outline','outlineId','user-outline');
+								
 							},
 							error : function(err) {
+								
 								console.log("not working. ERROR: "+ JSON.stringify(err));
 								setErrorStatus('alert-outline');
 							}
@@ -3285,41 +3271,18 @@ function validate_file_size(elem,s){
 	}
 }
 
-$('#btn_unpublish').click(function() {
-				var msg='';
-				var id = this.value;
-				$
-						.ajax({
+function validate_checkbox(checkboxes){
+	let checked_flag = false;
+	checkboxes.forEach(elem=>{
+		if(elem.checked){
+			checked_flag = true;
+		}
+	})
+	
+	return checked_flag;
+}
 
-							type : "GET",
-							url : projectPath+ "unpublishTutorial",
-							data : {
-								"id" : id
-							},
-							contentType : "application/json",
-							success : function(result) {
-								if(result=="success"){
-									msg = 'Tutorial is unpublished.';
-									$('#response').addClass("alert-success");
-								}else if(result=="0"){
-									msg = 'Tutorial is already unpublished.';
-									$('#response').addClass("alert-warning");
-								}else{
-									msg = 'Some error occurred. Please contact site admin.';
-									$('#response').addClass("alert-danger");
-								}
-								$('#response').html(msg);
-								
-								$('#btn_unpublish').hide();
-								$('#btn_unpublish_anonther').show();
-								
-								},
-							error : function(err) {
-								console.log("not working. ERROR: "+ JSON.stringify(err));
-							}
-						});
 
-			});
 			
 /************************ Domain reviewer code **********************************/
 //for all select feedback change; if it is need for improvement show comment box
@@ -3456,3 +3419,193 @@ submit_review.forEach(function(elem){
 });
 	
 });
+// ************************************ contributor uploads ************************************
+$("#select-category").change(function(){
+	let category = this.value;
+	let topic = document.getElementById("select-topic");
+	let language = document.getElementById("select-language");
+	let btn_unpublish = document.getElementById("btn_unpublish");
+	btn_unpublish.disabled=true;
+	let success_alert = document.getElementById("msg-success");
+	let error_alert = document.getElementById("msg-error");
+	success_alert.classList.add('d-none');
+	error_alert.classList.add('d-none');
+	let html = "";
+	if(category!="0"){
+	topic.disabled = false;
+	language.disabled = true;
+	language.innerHTML = html;
+	let table_status = document.getElementById("table_status");
+	table_status.classList.add('d-none');
+	$.ajax({
+		url : projectPath+"loadTopicByCategory",
+		data : {"id" :category },
+		contentType : "application/json",
+		success : function(result) {
+			html+='<option value="0">Select Topic</option>'
+			for(let key in result){
+				html+=`<option value="${key}">${result[key]}</option>`;
+			}
+			topic.innerHTML = html;
+		},
+		error : function(err) {
+			console.log(err);
+		}
+	});
+	}else{
+		topic.disabled = true;
+		topic.innerHTML = html;
+		language.disabled = true;
+		language.value = "0";
+	}
+})
+
+$("#select-topic").change(function(){
+	let topic = this.value;
+	let language = document.getElementById("select-language");
+	language.disabled = false;
+	let category = document.getElementById("select-category").value;
+	let btn_unpublish = document.getElementById("btn_unpublish");
+	btn_unpublish.disabled=true;
+	let table_status = document.getElementById("table_status");
+	table_status.classList.add('d-none');
+	let html = "";
+	if(topic!="0"){
+		$.ajax({
+		url : projectPath+"loadLanguageByCategoryTopic",
+		data : {"category" :category, "topic" : topic },
+		contentType : "application/json",
+		success : function(result) {
+			if(Object.keys(result).length!=0){
+				html+='<option value="0">Select Language</option>'
+			for(let key in result){
+				html+=`<option value="${key}">${result[key]}</option>`;
+			}
+				language.innerHTML = html;
+			}else{
+				alert('No components are uploaded for this tutorial. ');
+			}
+			
+		},
+		error : function(err) {
+			console.log(err);
+		}
+	});
+	}else{
+		language.disabled = true;
+		language.value = "0";
+	}
+	
+});
+
+function setCheckboxStatus(val,checkbox_id){
+	let check_all = document.getElementById("check-all");
+	if(val==0 || val==4){
+			let c = document.getElementById(checkbox_id);
+			c.disabled = true;
+			c.checked = false;
+			check_all.checked=false;
+			check_all.disabled=true;
+		}
+	}
+$("#select-language").change(function(){
+	let btn_unpublish = document.getElementById("btn_unpublish");
+	btn_unpublish.disabled=false;
+	let category = document.getElementById("select-category").value;
+	let topic = document.getElementById("select-topic").value;
+	let language = document.getElementById("select-language").value;
+	let table_status = document.getElementById("table_status");
+	let topic_name = document.getElementById("topic_name");
+	
+	
+	console.log("**************** 0 *****************");
+	if(category!="0" && topic!="0" && language!="0"){
+		console.log("**************** 1 *****************");
+		$.ajax({
+		url : projectPath+"getComponentDetails",
+		data : {"category" :category, "topic" : topic, "language" : language },
+		contentType : "application/json",
+		success : function(result) {
+			if(result["response"]=="1"){
+				table_status.classList.remove('d-none');
+				console.log("**************** 2 *****************");
+				document.getElementById("outline").innerText = result["Outline"];
+				document.getElementById("script").innerText = result["Script"];
+				document.getElementById("slide").innerText = result["Slide"];
+				document.getElementById("keyword").innerText = result["Keyword"];
+				document.getElementById("video").innerText = result["Video"];	
+				document.getElementById("prerequisite").innerText = result["prerequisite"];
+				topic_name.innerText = result["topic_details"];
+				setCheckboxStatus(result["outline-status"],"check-outline");
+				setCheckboxStatus(result["script-status"],"check-script");
+				setCheckboxStatus(result["slide-status"],"check-slide");
+				setCheckboxStatus(result["video-status"],"check-video");
+				setCheckboxStatus(result["keyword-status"],"check-keyword");
+				setCheckboxStatus(result["prerequisite-status"],"check-prerequisite");
+				
+			}else{
+			console.log("**************** 3 *****************");
+			console.log("error");
+			}
+		},
+		error : function(err) {
+			console.log("**************** 4 *****************");
+			console.log(err);
+		}
+	});
+	}else{
+		console.log("**************** 5 *****************");
+	}
+});
+
+document.getElementById("btn_unpublish").addEventListener("click", function(event){
+  event.preventDefault();
+					let category = document.getElementById("select-category").value;
+				let topic = document.getElementById("select-topic").value;
+				let language = document.getElementById("select-language").value;				
+				let comp_all = document.getElementById("check-all");
+				let components = document.getElementById('components');
+				let checkboxes = components.querySelectorAll('.form-check-input');
+				let success_alert = document.getElementById("msg-success");
+				let error_alert = document.getElementById("msg-error");
+				let selected_checkboxes = "";
+				if(validate_checkbox(checkboxes) || comp_all.checked){
+					if(comp_all.checked){
+					selected_checkboxes = "Outline,Script,Slide,Keyword,Video,prerequisite";
+				}else{
+					checkboxes.forEach(elem => {
+					if(elem.checked) selected_checkboxes+= elem.value
+				});	
+				}
+				$.ajax({
+							type : "GET",
+							url : projectPath+ "unpublishTutorial",
+							data: {"category" : parseInt(category),"topic" : parseInt(topic),"language" : parseInt(language),"components" : selected_checkboxes},
+							contentType : "application/json",
+							success : function(result){
+								if(result["response"]=="1"){
+									success_alert.classList.remove("d-none");
+									success_alert.innerText=`Components updated for ${result["topic"]}`;
+									document.getElementById("outline").innerText = result["Outline"];
+				document.getElementById("script").innerText = result["Script"];
+				document.getElementById("slide").innerText = result["Slide"];
+				document.getElementById("keyword").innerText = result["Keyword"];
+				document.getElementById("video").innerText = result["Video"];	
+				document.getElementById("prerequisite").innerText = result["prerequisite"];
+								}else{
+									error_alert.classList.remove("d-none");
+									error_alert.innerText=`Components update failed for ${result["topic"]}.`;
+								}
+				},
+				error : function(err){
+								error_alert.classList.remove("d-none");
+								error_alert.innerText="Component update failed. Please contact site admin.";
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+				}
+							
+						});
+				}else{
+					alert('Please select atleast 1 component ');
+				}
+});
+

@@ -67,5 +67,8 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> {
 	@Query("from Tutorial t where t.conAssignedTutorial IN (:con) and t.status = true")
 	public Page<Tutorial> findAllByconAssignedTutorialListPagination(@Param("con")List<ContributorAssignedTutorial> con,Pageable page);
 	
+	@Query("from Tutorial t where t.conAssignedTutorial IN (:con) and t.status = true")
+	public List<Tutorial> findAllByconAssignedTutorialAndStatus(@Param("con")List<ContributorAssignedTutorial> con);
+	
 
 }

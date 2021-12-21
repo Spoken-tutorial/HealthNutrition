@@ -5,6 +5,42 @@
 	<div th:fragment="my_fragment2(data_id, data_class)">
 		<p th:class="${data_id}" th:id="${data_class}"></p>
 	</div>
+	<div th:fragment="search_bar">
+		<section id="search-bar" class="container-lg my-5">
+<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
+<div class="row" style="width: 100%;">
+<div class="col-md-3 mb-3">
+            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
+              <option value="0">Select Category</option>
+              <option th:each="category : ${categories}" th:value="${category.getCategoryId()}"><span th:text="${category.getCatName()}"></span></option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a valid foss.
+            </div>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
+              <option value="0">Select Topic</option>
+              <option th:each="topic : ${topics}" th:value="${topic.getTopicId()}"><span th:text="${topic.getTopicName()}">Title ...</span></option>
+            </select>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputLanguage" name="lan">
+              <option value="0">Select Language</option>
+              <option th:each="language : ${languages}" th:value="${language.getLanId()}"><span th:text="${language.getLangName()}">Title ...</span></option> 
+            </select>
+            <div class="invalid-feedback">
+              Please provide a valid language.
+            </div>
+</div>
+          <div class="col-md-3 mb-3" style="width: 100%;">
+           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
+          </div>
+</div>
+</form>
+          
+</section>
+	</div>
 	<div th:fragment="comments_fragment(comments,text_id,btn_id)">
 		<div class="card">
 			<div class="card-header">

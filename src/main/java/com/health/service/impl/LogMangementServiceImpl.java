@@ -1,5 +1,7 @@
 package com.health.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,12 @@ public class LogMangementServiceImpl implements LogMangementService{
 	public void save(LogManegement log) {
 		// TODO Auto-generated method stub
 		logRepo.save(log);
+	}
+
+	@Override
+	public List<LogManegement> getLogsWithSuperUser() {
+		return logRepo.getLogsWithSuperUser();
+		
 	}
 	
 	

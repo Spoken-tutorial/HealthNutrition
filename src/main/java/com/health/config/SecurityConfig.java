@@ -87,7 +87,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/cdContentInfo/**",
 			"/getContributorByTutLanUser/**",
 			"/showConsultant/**",
-			"/showLanguages/**"
+			"/showLanguages/**",
+			"/unpublishTutorial/**",
+			"/loadTopicByCategory/**",
+			"/loadLanguageByCategoryTopic/**"
 	};
 
 	/**
@@ -123,7 +126,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/viewTrainee/**",
 			"/details/**",
 			"/tutorialStatus/**",
-			"/users/**"
+			"/users/**",
+			"/unpublishTopic/**",
+//			"/unpublishTutorial/**"
 			
 
 	};

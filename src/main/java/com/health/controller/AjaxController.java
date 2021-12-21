@@ -2,6 +2,7 @@ package com.health.controller;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -421,6 +422,7 @@ public class AjaxController{
 		return temp;
 	}
 	
+	
 	/**
 	 * make visible/disable brochure object in system
 	 * @param id int value
@@ -717,11 +719,11 @@ public class AjaxController{
 		Category cat = catService.findByid(id);
 
 		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
-
-		for(TopicCategoryMapping temp : local) {
-
-			topicName.put(temp.getTopic().getTopicId(), temp.getTopic().getTopicName());
-			
+		List<ContributorAssignedTutorial> cat_list = conService.findAllByTopicCat(local);
+		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
+		HashSet<Topic> topics = new HashSet<>();
+		for(Tutorial t: tutorials) {
+			topicName.put(t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 		}
 		return topicName;
 
@@ -1972,24 +1974,198 @@ public class AjaxController{
 		
 		return "Total number of tutorial under "+id +" Language is "+total;
 	}
+	private void changeAllCompStatus(Tutorial tutorial, User user) {
+		LogManegement log_outline =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.IMPROVEMENT_STATUS, tutorial.getOutlineStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setOutlineStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_outline);
+		LogManegement log_script =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setScriptStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_script);
+		LogManegement log_slide=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setSlideStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_slide);
+		LogManegement log_video=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setVideoStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_video);
+		LogManegement log_keyword=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setKeywordStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_keyword);
+		LogManegement log_pre_req=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setPreRequisticStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_pre_req);
+		tutService.save(tutorial);
+	}
+	private Tutorial changeComponentStatus(String components,Tutorial tutorial,User user) {
+		LogManegement log_outline = null;
+		LogManegement log_script = null;
+		LogManegement log_slide = null;
+		LogManegement log_video = null;
+		LogManegement log_keyword = null;
+		LogManegement log_pre_req = null;
+
+			if(components.contains(CommonData.OUTLINE)) {
+				log_outline =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.IMPROVEMENT_STATUS, tutorial.getOutlineStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setOutlineStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_outline);
+				
+			} 
+			if(components.contains(CommonData.SCRIPT)) {
+				log_script =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setScriptStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_script);
+			} 
+			if(components.contains(CommonData.SLIDE)) {
+				log_slide=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.IMPROVEMENT_STATUS, tutorial.getSlideStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setSlideStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_slide);
+			}
+			if(components.contains(CommonData.VIDEO)) {
+				log_video=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.IMPROVEMENT_STATUS, tutorial.getVideoStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setVideoStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_video);
+			} 
+			if(components.contains(CommonData.KEYWORD)) {
+				log_keyword=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.IMPROVEMENT_STATUS, tutorial.getKeywordStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setKeywordStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_keyword);
+			} 
+			if(components.contains(CommonData.PRE_REQUISTIC)) {
+				log_pre_req=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.IMPROVEMENT_STATUS, tutorial.getPreRequisticStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setPreRequisticStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_pre_req);
+			}
+		
+		tutService.save(tutorial);
+//		if(log_outline!=null) {
+//			logService.save(log_outline);
+//		} 
+//		if(log_script!=null) {
+//			logService.save(log_script);
+//		} 
+//		if(log_slide!=null) {
+//			logService.save(log_slide);
+//		} 
+//		if(log_video!=null) {
+//			logService.save(log_video);
+//		}
+//		if(log_keyword!=null) {
+//			logService.save(log_keyword);
+//		} 
+//		if(log_pre_req!=null) {
+//			logService.save(log_pre_req);
+//		} 
+		
+		return tutorial;
+	}
 	
 	@RequestMapping("/unpublishTutorial")
-	public @ResponseBody  String unpublishTutorial(@RequestParam(value = "id") int id) {
-
-		Tutorial tut = tutService.getById(id);
-		
-		if(tut.isStatus()) {
-			tut.setStatus(false);
+	public @ResponseBody HashMap<String, String> unpublishTutorial(@RequestParam int category, 
+												  @RequestParam int  topic,
+												  @RequestParam int  language,
+												  @RequestParam String components,
+												  Principal principal) {
+		HashMap<String, String> res = new HashMap<String, String>();
+		User user = getUser(principal);
+		Category cat_ = catService.findByid(category);
+		Topic topic_ = topicService.findById(topic);
+		Language lang = langService.getById(language);
+		TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat_, topic_);
+		ContributorAssignedTutorial conAssignedTut = conService.findByTopicCatAndLanViewPart(tcm, lang);
+		List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conAssignedTut);
+		Tutorial tutorial = null;
+		if(!tutorials.isEmpty()) {
+			tutorial = tutorials.get(0);
+		}
+		if(tutorial!=null) {
+			tutorial = changeComponentStatus(components,tutorial,user);
+			tutorial.setStatus(false);
+			tutService.save(tutorial);
+			res.put("response", "1");
+			res.put(CommonData.OUTLINE, CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
+			res.put(CommonData.SCRIPT, CommonData.tutorialStatus[tutorial.getScriptStatus()]);
+			res.put(CommonData.SLIDE, CommonData.tutorialStatus[tutorial.getSlideStatus()]);
+			res.put(CommonData.KEYWORD, CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
+			res.put(CommonData.VIDEO, CommonData.tutorialStatus[tutorial.getVideoStatus()]);
+			res.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
 		}else {
-			return "0";
+			res.put("response", "0");
 		}
-		try {
-			tutService.save(tut);
-			return "success";
-		}catch (Exception e) {
-			System.err.print(e);
-			return "failed";
+		res.put("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		return res;
+
+	}
+	
+	@RequestMapping("/loadLanguageByCategoryTopic")
+	public @ResponseBody HashMap<Integer, String> getLanguageByContributorRole(@RequestParam(value = "category") int category,
+															@RequestParam(value = "topic") int topic) {
+
+		HashMap<Integer,String> languages=new HashMap<Integer,String>();
+		Category cat = catService.findByid(category);
+		Topic topic_=topicService.findById(topic);
+		TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic_);
+		List<TopicCategoryMapping> tcm = new ArrayList<TopicCategoryMapping>();
+		tcm.add(localTopicCat);
+		List<ContributorAssignedTutorial> catAssgnTut = conService.findAllByTopicCat(tcm);
+		for(ContributorAssignedTutorial c : catAssgnTut) {
+			if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
+				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
+			}
+			
 		}
+		return languages;
+	}
+	
+	@RequestMapping("/loadPublishedTopicsByCategory")
+	public @ResponseBody HashMap<Integer, String> loadPublishedTopicsByCategory(@RequestParam(value = "id") int id) {
+
+		HashMap<Integer,String> topicName=new HashMap<>();
+
+		Category cat = catService.findByid(id);
+
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		List<ContributorAssignedTutorial> conAssignTut = conService.findAllByTopicCat(local);
+		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(conAssignTut);
+		for(Tutorial tut : tutorials) {
+			topicName.put(tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());			
+		}
+
+		return topicName;
+
+	}
+	
+	@RequestMapping("/getComponentDetails")
+	public @ResponseBody HashMap<String, String> getComponentDetails(@RequestParam int category ,@RequestParam int topic, @RequestParam int language) {
+
+		HashMap<String,String> compStatus=new HashMap<>();
+
+		Category category_ = catService.findByid(category);
+		Topic topic_ = topicService.findById(topic);
+		Language langugage_ = lanService.getById(language);
+		TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(category_, topic_);
+		ContributorAssignedTutorial conAssgnTut = conService.findByTopicCatAndLanViewPart(tcm, langugage_);
+		List<Tutorial> tutorial = tutService.findAllByContributorAssignedTutorial(conAssgnTut);
+		if(!tutorial.isEmpty()) {
+			Tutorial t = tutorial.get(0);
+			compStatus.put(CommonData.OUTLINE, CommonData.tutorialStatus[t.getOutlineStatus()]);
+			compStatus.put(CommonData.SCRIPT, CommonData.tutorialStatus[t.getScriptStatus()]);
+			compStatus.put(CommonData.SLIDE, CommonData.tutorialStatus[t.getSlideStatus()]);
+			compStatus.put(CommonData.KEYWORD, CommonData.tutorialStatus[t.getKeywordStatus()]);
+			compStatus.put(CommonData.VIDEO, CommonData.tutorialStatus[t.getVideoStatus()]);
+			compStatus.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[t.getPreRequisticStatus()]);
+			compStatus.put("response", "1");
+			compStatus.put("topic_details", t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName() + " ("+t.getConAssignedTutorial().getLan().getLangName()+" )");
+			
+			compStatus.put("outline-status", String.valueOf(t.getOutlineStatus()));
+			compStatus.put("script-status", String.valueOf(t.getScriptStatus()));
+			compStatus.put("slide-status", String.valueOf(t.getSlideStatus()));
+			compStatus.put("video-status", String.valueOf(t.getVideoStatus()));
+			compStatus.put("keyword-status", String.valueOf(t.getKeywordStatus()));
+			compStatus.put("prerequisite-status", String.valueOf(t.getPreRequisticStatus()));
+		}else {
+			compStatus.put("response", "0");
+		}
+		return compStatus;
+
 	}
 	
 		

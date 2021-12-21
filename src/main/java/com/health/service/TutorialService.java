@@ -86,5 +86,7 @@ public interface TutorialService {
 	 * @return list of Tutorial object
 	 */
 	List<Tutorial> findAllBystatus(boolean status);
+	
+	List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con);
 
 }

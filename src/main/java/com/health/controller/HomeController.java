@@ -70,6 +70,7 @@ import com.health.model.Event;
 import com.health.model.FeedbackMasterTrainer;
 import com.health.model.IndianLanguage;
 import com.health.model.Language;
+import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
 import com.health.model.PostQuestionaire;
 import com.health.model.Question;
@@ -96,6 +97,7 @@ import com.health.service.EventService;
 import com.health.service.FeedBackMasterTrainerService;
 import com.health.service.IndianLanguageService;
 import com.health.service.LanguageService;
+import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
 import com.health.service.PostQuestionaireService;
 import com.health.service.QuestionService;
@@ -220,6 +222,9 @@ public class HomeController {
 
 	@Autowired
 	private OrganizationRoleService organizationRoleService;
+	
+	@Autowired
+	private LogMangementService logMangementService;
 	
 	@Value("${scriptmanager_url}")
 	private String scriptmanager_url;
@@ -359,6 +364,52 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 private void getUsers() {
 	
 }
+private List<Category> getCategories() {
+	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	Set<Category> catTemp = new HashSet<Category>();
+	for(Tutorial temp :tutorials) {
+		
+		Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+		if(c.isStatus()) {
+			catTemp.add(c);
+		}
+		
+	}
+	
+	List<Category> catTempSorted =new ArrayList<Category>(catTemp);
+	Collections.sort(catTempSorted);
+	
+	return catTempSorted;
+}
+private List<Topic> getTopics() {
+	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	Set<Topic> topicTemp = new HashSet<Topic>();
+	for(Tutorial temp :tutorials) {
+		
+		Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+		if(c.isStatus()) {
+			topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic());
+		}
+	}
+	List<Topic> topicTempSorted =new ArrayList<Topic>(topicTemp);
+	Collections.sort(topicTempSorted);
+	return topicTempSorted;
+}
+private List<Language> getLanguages() {
+	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	Set<Language> langTemp = new HashSet<Language>();
+	for(Tutorial temp :tutorials) {
+		Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+		if(c.isStatus()) {
+			langTemp.add(temp.getConAssignedTutorial().getLan());
+		}
+		
+	}
+	List<Language> lanTempSorted =new ArrayList<Language>(langTemp);
+	Collections.sort(lanTempSorted);
+	
+	return lanTempSorted;
+}
 	/**
 	 * Index page Url
 	 * @param model Model Object
@@ -376,28 +427,11 @@ private void getUsers() {
 		List<Brouchure> brochures= broService.findAll();
 		List<Carousel> carousel= caroService.findAll();
 
-		Set<String> catTemp = new HashSet<String>();
-		Set<String> topicTemp = new HashSet<String>();
 		Set<String> lanTemp = new HashSet<String>();
 
-		List<Tutorial> tutorials = tutService.findAllBystatus(true);
-		for(Tutorial temp :tutorials) {
-			
-			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
-			if(c.isStatus()) {
-				catTemp.add(c.getCatName());
-				lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
-				topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-			}
-			
-		}
-		
-		List<String> catTempSorted =new ArrayList<String>(catTemp);
-		Collections.sort(catTempSorted);
-		
-		List<String> lanTempSorted =new ArrayList<String>(lanTemp);
-		Collections.sort(lanTempSorted);
-		
+		List<Category> category_objs = catService.findAllByOrder();
+		Collections.sort(category_objs);
+	
 		List<Event> evnHome = new ArrayList<>();
 		List<Testimonial> testHome = new ArrayList<>();
 		List<Consultant> consulHome = new ArrayList<>();
@@ -467,10 +501,13 @@ private void getUsers() {
 		model.addAttribute("consultantCount", consults.size());
 
 
-
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTempSorted = getTopics();
+		
 		model.addAttribute("categories", catTempSorted);
 		model.addAttribute("languages", lanTempSorted);
-		model.addAttribute("topics", topicTemp);
+		model.addAttribute("topics", topicTempSorted);
 
 		if(!carouselHome.isEmpty()) {
 			model.addAttribute("carousel", carouselHome.get(0));
@@ -493,28 +530,15 @@ private void getUsers() {
 	 */
 	@RequestMapping(value = "/tutorials", method = RequestMethod.GET)
 	public String viewCoursesAvailable(HttpServletRequest req,
-			@RequestParam(name = "categoryName") String cat,
-			@RequestParam(name = "topic") String topic,
-			@RequestParam(name = "lan") String lan,
+			@RequestParam(name = "categoryName") int cat,
+			@RequestParam(name = "topic") int topic,
+			@RequestParam(name = "lan") int lan,
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 
-		Set<String> catTemp = new HashSet<String>();
-		Set<String> topicTemp = new HashSet<String>();
-		Set<String> lanTemp = new HashSet<String>();
-
-		List<Tutorial> tutorials = tutService.findAllBystatus(true);
-		for(Tutorial temp :tutorials) {
-			catTemp.add(temp.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-			lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
-			topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-		}
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTemp = getTopics();
 		
-		List<String> catTempSorted =new ArrayList<String>(catTemp);
-		Collections.sort(catTempSorted);
-		
-		List<String> lanTempSorted =new ArrayList<String>(lanTemp);
-		Collections.sort(lanTempSorted);
-
 		model.addAttribute("categories", catTempSorted);
 		model.addAttribute("languages", lanTempSorted);
 		model.addAttribute("topics", topicTemp);
@@ -541,16 +565,14 @@ private void getUsers() {
 		}
 
 		model.addAttribute("userInfo", usr);
-		if(!cat.contentEquals("Select Category")) {
-			localCat = catService.findBycategoryname(cat);
+		if(cat!=0) {
+			localCat = catService.findByid(cat);
 		}
-
-		if(!topic.contentEquals("Select Topic")) {
-			localTopic = topicService.findBytopicName(topic);
-		}
-
-		if(!lan.contentEquals("Select Language")) {
-			localLan= lanService.getByLanName(lan);
+			if(topic!=0) {
+			localTopic = topicService.findById(topic);
+		}		
+			if(lan!=0) {
+			localLan= lanService.getById(lan);
 		}
 
 		if(localCat != null && localTopic != null) {
@@ -4805,16 +4827,24 @@ private void getUsers() {
 		for(Category category : categories) {
 			if(category.isStatus()) {
 				List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(category);
-				List<ContributorAssignedTutorial> con_t = conRepo.findAllByTopicCatAndLanViewPart(tcm, lan);
-				for(ContributorAssignedTutorial c : con_t) {
-					List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(c);
-					if(!tut.isEmpty()) {
-						if(tut.get(0).isStatus()) {
-							preReqCatSet.add(category);
-						}
+				List<ContributorAssignedTutorial> con_t = new ArrayList<ContributorAssignedTutorial>();
+				if(!tcm.isEmpty()) {
+					if(lan==null) {
+						con_t = conRepo.findAllByTopicCat(tcm);
+					}else {
+						con_t = conRepo.findAllByTopicCatAndLanViewPart(tcm, lan);
 					}
-					
+					for(ContributorAssignedTutorial c : con_t) {
+						List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(c);
+						if(!tut.isEmpty()) {
+							if(tut.get(0).isStatus()) {
+								preReqCatSet.add(category);
+							}
+						}
+						
+					}
 				}
+				
 			}
 		}
 		for(Category c : preReqCatSet) {
@@ -6879,29 +6909,35 @@ private void getUsers() {
 	@RequestMapping(value = "/unpublishTopic",method = RequestMethod.GET)
 	public String unpublishTopic(Model model,Principal principal) {
 
-		User usr=new User();
+		User usr = getUser(principal, userService);
 
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
 		model.addAttribute("userInfo", usr);
-		model.addAttribute("status", "get");
-		List<Category> categories_lst = catService.findAll();
-		List<String> categories = new ArrayList<String>();;
-		HashMap<Integer,String> map = new HashMap<>();
-		for(Category cat: categories_lst) {
-			map.put(cat.getCategoryId(),cat.getCatName());
-//			String name = cat.getCatName();
-//			categories.add(name);
+		List<Category> categories = catService.findAll();
+		List<Category> filtered_categories = new ArrayList<Category>();
+		for(Category cat: categories) {
+			if(!cat.getTopicCategoryMap().isEmpty()) {
+				filtered_categories.add(cat);
+			}
 		}
+		
 		List<Language> langs = lanService.getAllLanguages();
 		List<String> langauges=new ArrayList<String>();
 		for(Language temp:langs) {
 				langauges.add(temp.getLangName());
 		}
+		List<LogManegement> lms = logMangementService.getLogsWithSuperUser();
+		Set<Tutorial> tutorials = new HashSet<Tutorial>();
+		for(LogManegement l:lms) {
+			if(!l.getTutorialInfos().isStatus()) {
+				tutorials.add(l.getTutorialInfos());
+				Tutorial t = l.getTutorialInfos();
+				
+			}
+		}
+		
 		model.addAttribute("langauges", langauges);
-		model.addAttribute("categories", map);
+		model.addAttribute("categories", filtered_categories);
+		model.addAttribute("tutorials", tutorials);
 		model.addAttribute("method", "get");
 		return "unpublishTopic";
 

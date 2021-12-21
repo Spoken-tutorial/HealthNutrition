@@ -37,40 +37,7 @@
 	</section>
 	<nav th:replace="index.html :: navbar"></nav>
 	<div class="container">
-		<div id="search-bar" class="container-lg my-3">
-			<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
-<div class="row" style="width: 100%;">
-<div class="col-md-3 mb-3">
-            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
-              <option>Select Category</option>
-              <option th:each="category : ${categories}"><span th:text="${category}">Title ...</span></option>
-            </select>
-            <div class="invalid-feedback">
-              Please select a valid foss.
-            </div>
-</div>
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
-              <option >Select Topic</option>
-              <option th:each="topic : ${topics}"><span th:text="${topic}">Title ...</span></option>
-            </select>
-</div>
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputL" name="lan">
-              <option >Select Language</option>
-              <option th:each="language : ${languages}"><span th:text="${language}">Title ...</span></option> 
-            </select>
-            <div class="invalid-feedback">
-              Please provide a valid language.
-            </div>
-</div>
-          <div class="col-md-3 mb-3" style="width: 100%;">
-           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
-          </div>
-</div>
-</form>
-
-		</div>
+	<div th:replace="common/commonElements :: search_bar"></div>
 	</div>
 	<main id="tutorialPage" class=" mx-5">
 		<section id="t-video">
@@ -93,11 +60,6 @@
 						<video width="966" height="543" class="video-fluid z-depth-1" loop controls muted>
   <source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4" />
 </video>
-							<!-- <iframe width="966" height="543"
-								th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"
-								frameborder="0"
-								allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-								allowfullscreen></iframe> -->
 						</div>
 					</div>
 				</div>
@@ -109,22 +71,13 @@
 						
 							
 							<div class="col-md-4">
-								<!-- <iframe width="100%" height="80%"
-									th:src="@{/files/}+@{${tutorial.getVideo()}}" frameborder="0"
-									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-									allowfullscreen></iframe> -->
 							</div>
 							<div class="col-md-8">
 								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></span></h4>
 								<h6><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span></h6>
-								<!-- <p class="outline" th:utext="${tutorial.getOutline()}"></p> -->
 							</div>
-							
-						
 					</a>
 					</div>
-
-	
 					</div>
 				</div>
 			</div>
@@ -146,9 +99,7 @@
 						id="pills-script-tab" data-toggle="pill" href="#pills-script"
 						role="tab" aria-controls="pills-script" aria-selected="false"><i
 							class="far fa-file-alt mr-2 t-icon"></i> Resources</a></li>
-					<!-- <li class="nav-item link-style">
-			    <a class="nav-link" id="pills-slides-tab" data-toggle="pill" href="#pills-slides" role="tab" aria-controls="pills-slides" aria-selected="false"><i class="far fa-folder-open mr-2 t-icon"></i> Slides</a>
-			  </li> -->
+					
 				</ul>
 				<div class="tab-content px-5 py-3" id="pills-tabContent-tutorial"
 					style="height: 250px; overflow: auto;">
@@ -168,10 +119,7 @@
 								th:unless="${tutorial.getScript()}"
 								th:href="@{${sm_url}}" name="ScriptPdf"
 								target="_blank" id="ScriptPdf">Original Script</a>
-							<!-- <a
-								th:if="${tutorial.getScriptStatus() != 0}"
-								th:href="@{/files/}+@{${tutorial.getScript()}}" name="ScriptPdf"
-								target="_blank" id="ScriptPdf">Original Script</a> --> <a
+							<a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
 								
 								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a
@@ -220,34 +168,6 @@
 							<p>Outline : Outline Text here</p>
 						</div>
 					</div>
-					<!-- <div class="row rel-vid-b">
-						<div class="col-sm-4">
-							<iframe width="100%" height="80%"
-								src="https://www.youtube.com/embed/UmljXZIypDc" frameborder="0"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-								allowfullscreen></iframe>
-						</div>
-						<div class="col-sm-8">
-							<h4>Topic Name</h4>
-							<h6>Category Name - Language</h6>
-							<p>Outline : Outline Text here</p>
-						</div>
-					</div> -->
-					<!-- <div class="row rel-vid-b">
-						<div class="col-sm-4">
-							<iframe width="100%" height="80%"
-								src="https://www.youtube.com/embed/UmljXZIypDc" frameborder="0"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-								allowfullscreen></iframe>
-						</div>
-						<div class="col-sm-8">
-							<h4>Topic Name</h4>
-							<h6>Category Name - Language</h6>
-							<p>Outline : Outline Text here</p>
-						</div>
-					</div>
- -->
-
 				</div>
 			</div>
 			<div id="t-related" class="col-md-4"></div>
@@ -255,16 +175,9 @@
 
 	</main>
 
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-		integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-		crossorigin="anonymous"></script>
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-		integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-		crossorigin="anonymous"></script>
-	<script
-		src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-		crossorigin="anonymous"></script>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script>
+		var projectPath='[(@{/})]';		
+	</script>
 </body>
 </html>
