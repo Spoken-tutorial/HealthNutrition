@@ -6971,8 +6971,6 @@ private List<Language> getLanguages() {
 		HashMap<Integer,String> map = new HashMap<>();
 		for(Category c: categories_lst) {
 			map.put(c.getCategoryId(),c.getCatName());
-//			String name = cat.getCatName();
-//			categories.add(name);
 		}
 		List<Language> langs = lanService.getAllLanguages();
 		List<String> langauges=new ArrayList<String>();
@@ -6997,10 +6995,6 @@ private List<Language> getLanguages() {
 		model.addAttribute("categories", map);
 		model.addAttribute("method", "post");
 		
-		
-
-		
-//			model.addAttribute("status", t.isStatus());
 			model.addAttribute("status", "can_unpublish");
 		
 		if(t.isStatus()) {
@@ -7021,22 +7015,5 @@ private List<Language> getLanguages() {
 		return "unpublishTopic";
 	}
 	
-	@RequestMapping(value = "/modifyComponentStatus",method = RequestMethod.GET)
-	public String modifyComponentStatus(Model model,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-
-		List<Category> categories = catService.findAll();
-		model.addAttribute("categories", categories);
-
-		return "modifyComponentStatus";
-
-	}
+	
 }
