@@ -3187,30 +3187,6 @@ function validateEmail($email) {
 	  return emailReg.test( $email );
 }
 
-function loadAllLanguages() {
-	component = this;
-	$.ajax({
-		type : "GET",
-		url : projectPath+"loadLanguages",
-		data : {
-//			"id" :tutorialId
-		},
-		contentType : "application/json",
-		success : function(result) {
-			$(component).html('');
-			for (lang in result){
-				$(component).append("<option>"+result[lang]+"</option>");
-			}
-		},
-
-		error : function(err) {
-			alert('error');
-			console.log("not working. ERROR: "+ JSON.stringify(err));
-
-		}
-	});
-}
-
 /*---------------------------------------Profile picture update Ajax call-------------------------------*/
 
 function updateProfilePicture(){

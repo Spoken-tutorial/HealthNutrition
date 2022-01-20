@@ -105,10 +105,8 @@
 					<div class="tab-pane fade" id="tab-1"
 						th:classappend="${classActiveNewAccount}? 'in active'">
 									<div>
-									<div class="alert alert-info" th:if="${emailSent}">An
-										email has been sent to the email address you just registered.
-										Please validate your email address and update your password
-										information.</div>
+									<div class="alert alert-info" th:if="${emailSent}">
+									Thank you for registering. Please use the registered username & password to login.</div>
 									<div class="alert alert-info" style="color:red" th:if="${usernameExists}">
 										Username Already Exist Please Try New Name</div>
 										
