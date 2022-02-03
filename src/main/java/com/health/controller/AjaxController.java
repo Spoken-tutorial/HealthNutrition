@@ -728,6 +728,21 @@ public class AjaxController{
 		return topicName;
 
 	}
+	
+	@RequestMapping("/loadTopicByCategoryInAssignContri")
+	public @ResponseBody HashMap<Integer, String> getTopicByCategoryAssignContri(@RequestParam(value = "id") int id) {
+
+		HashMap<Integer,String> topicName=new HashMap<>();
+
+		Category cat = catService.findByid(id);
+
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		for(TopicCategoryMapping t: local) {
+			topicName.put(t.getTopic().getTopicId(), t.getTopic().getTopicName());
+		}
+		return topicName;
+
+	}
 
 
 	/**

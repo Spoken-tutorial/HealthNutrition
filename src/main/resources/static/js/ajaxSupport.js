@@ -2659,7 +2659,7 @@ $(document).ready(function() {
 						var category = $(this).find("option:selected").val();
 						$.ajax({
 							type : "GET",
-							url : projectPath+"loadTopicByCategory",
+							url : projectPath+"loadTopicByCategoryInAssignContri",
 							data : {
 								"id" : category
 							},
