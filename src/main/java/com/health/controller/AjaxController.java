@@ -401,7 +401,11 @@ public class AjaxController{
 				local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
 			}else {
 				ContributorAssignedTutorial conLocal2 = conService.findByTopicCatAndLanViewPart(preReq.getConAssignedTutorial().getTopicCatId(),lan);
-				local.setPreRequistic(tutService.findAllByContributorAssignedTutorial(conLocal2).get(0));
+				List<Tutorial> t = tutService.findAllByContributorAssignedTutorial(conLocal2);
+				if(!t.isEmpty()) {
+					local.setPreRequistic(t.get(0));
+				}
+				
 				local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
 			}
 			local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
