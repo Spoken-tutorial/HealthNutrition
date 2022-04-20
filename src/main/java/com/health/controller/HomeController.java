@@ -3,6 +3,7 @@ package com.health.controller;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +33,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,6 +60,7 @@ import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
 import com.google.common.collect.Lists;
+import com.health.utility1;
 import com.health.config.Auth;
 import com.health.domain.security.Role;
 import com.health.domain.security.UserRole;
@@ -117,6 +123,8 @@ import com.health.utility.ServiceUtility;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
+
+import net.bytebuddy.utility.RandomString;
 
 /**
  * This Controller Class takes website request and process it accordingly
@@ -220,6 +228,9 @@ public class HomeController {
 	@Autowired
 	private OrganizationRoleService organizationRoleService;
 	
+	@Autowired
+    private JavaMailSender mailVerificationSender;
+	
 	@Value("${scriptmanager_url}")
 	private String scriptmanager_url;
 	
@@ -229,6 +240,9 @@ public class HomeController {
     private static YouTube youtube;
     
 	private static final String VIDEO_FILE_FORMAT = "video/*";
+
+	String emailRandomCode = RandomString.make(64);
+	
 
 	/**
 	 * Index page Url
@@ -883,13 +897,49 @@ public class HomeController {
 		user.setPhone(phoneLongValue);
 		user.setPassword(SecurityUtility.passwordEncoder().encode(password));
 		user.setDateAdded(ServiceUtility.getCurrentTime());
+		user.setEmailVerificationCode(emailRandomCode);
 
 		userService.save(user);
 		model.addAttribute("emailSent", "true");
+		
+		String siteURL = utility1.getSiteURL(request);
+		ServiceUtility serviceUtility = new ServiceUtility();
+		serviceUtility.sendVerficationEmail(user, siteURL);
 
 		return "signup";
 
 	}
+
+	/**
+	 * 	To Verify that user has entered valid email address
+	 * @param user
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	
+//	public void sendVerficationEmail(User user, String siteURL) 
+//			throws UnsupportedEncodingException, MessagingException {
+//		String subject = "Please Verify Your Registration.";
+//		String senderName= "Spoken-Tutorial";
+//		String mailContent = "<p> Dear "+ user.getFullName()+ ",</p>";
+//		mailContent += "<p>Please click the Link below to verify your Registration: </p>";
+//		
+//		String verifyURL = siteURL + "/verify?code=" + user.getEmailVerificationCode() ;
+//		mailContent += "<h3> <a href=\"" + verifyURL + "\">VERIFY</a> </h3>";
+//		
+//		mailContent += "<p>Thank You </br> The Spoken Tutorials. </p>";
+//
+//		MimeMessage message = mailSender.createMimeMessage();
+//		MimeMessageHelper helper = new MimeMessageHelper(message);
+//		
+//		helper.setFrom("mansigundre1@gmail.com", senderName);
+//		helper.setTo(user.getEmail());
+//		helper.setSubject(subject);
+//		helper.setText(mailContent, true);
+//		
+//		mailSender.send(message);
+//		
+//	}
 
 	/**
 	 * Redirects to adduser page
@@ -1061,6 +1111,15 @@ public class HomeController {
 		model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
 		return "addCategory";
 
+	}
+	
+	@GetMapping("/verify")
+	public String verifyAccount(@Param("code") String code, Model model) {
+		boolean verified = ServiceUtility.verify(code);
+		
+		String pageTitle = verified ? "Verification Succeeded!": "Verification Failed";
+		model.addAttribute("pageTitle", pageTitle);
+		return "Register_Validation/" + (verified ? "verify_success" : "verify_fail") ;
 	}
 
 	/************************************END**********************************************/

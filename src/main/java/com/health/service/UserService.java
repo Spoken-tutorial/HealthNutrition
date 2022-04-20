@@ -1,8 +1,13 @@
 package com.health.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.health.domain.security.UserRole;
 import com.health.model.Category;
@@ -23,6 +28,8 @@ import com.health.model.UserIndianLanguageMapping;
  *
  */
 public interface UserService {
+	
+	
 	
 	/**
 	 * Find User object given Token
@@ -144,5 +151,12 @@ public interface UserService {
 	 */
 	List<User> findAll();
 
-	
+	String setEmailVerificationCode();
+
+
+	/**
+	 * 
+	 */
+
+	 ;
 }

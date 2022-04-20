@@ -1,12 +1,18 @@
 package com.health.service.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.health.domain.security.UserRole;
@@ -23,6 +29,7 @@ import com.health.model.UserIndianLanguageMapping;
 import com.health.repository.RoleRepository;
 import com.health.repository.UserRepository;
 import com.health.service.UserService;
+import net.bytebuddy.utility.RandomString;
 
 /**
  * Default implementation of the {@link com.health.service.UserService} interface.  
@@ -39,6 +46,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
 	
 	/**
 	 * @see com.health.service.UserService#findByUsername(String)
@@ -97,7 +105,7 @@ public class UserServiceImpl implements UserService{
 		return userRepository.getNewId()+1;
 		
 	}
-
+	
 	/**
 	 * @see com.health.service.UserService#addUserToCategory(User, Set)
 	 */
@@ -219,6 +227,37 @@ public class UserServiceImpl implements UserService{
 		
 		return users;
 	}
+
+	/**
+	 * 	To Verify that user has entered valid email address
+	 * @param user
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	
+//	public void sendVerficationEmail(User user, String siteURL) 
+//			throws UnsupportedEncodingException, MessagingException {
+//		String subject = "Please Verify Your Registration.";
+//		String senderName= "Spoken-Tutorial";
+//		String mailContent = "<p> Dear "+ user.getFullName()+ ",</p>";
+//		mailContent += "<p>Please click the Link below to verify your Registration: </p>";
+//		
+//		String verifyURL = siteURL + "/verify?code=" + user.getEmailVerificationCode() ;
+//		mailContent += "<h3> <a =\"href=" + verifyURL + "\">VERIFY</a> </h3>";
+//		
+//		mailContent += "<p>Thank You </br> The Spoken Tutorials. </p>";
+//
+//		MimeMessage message = mailSender.createMimeMessage();
+//		MimeMessageHelper helper = new MimeMessageHelper(message);
+//		
+//		helper.setFrom("mansigundre1@gmail.com", senderName);
+//		helper.setTo(user.getEmail());
+//		helper.setSubject(subject);
+//		helper.setText(mailContent, true);
+//		
+//		mailSender.send(message);
+//		
+//	}
 
 
 	

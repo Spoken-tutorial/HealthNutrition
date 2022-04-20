@@ -143,7 +143,11 @@ public class User implements UserDetails{
 	/**
 	 * timestamp when object is created
 	 */
-	@Column(name = "dateAdded",nullable = false,updatable = false)
+	
+	@Column(name="email_verification_code", nullable = false, updatable = false)
+	private String emailVerificationCode;
+	
+	@Column(name = "dateAdded",updatable = false)
 	private Timestamp dateAdded;
 
 	/**
@@ -490,9 +494,12 @@ public class User implements UserDetails{
 	public void setTutorialPreReqUser(Set<Tutorial> tutorialPreReqUser) {
 		this.tutorialPreReqUser = tutorialPreReqUser;
 	}
-
-
-
+	public String getEmailVerificationCode() {
+		return emailVerificationCode;
+	}
+	public void setEmailVerificationCode(String emailVerificationCode) {
+		this.emailVerificationCode = emailVerificationCode;
+	}
 
 
 }

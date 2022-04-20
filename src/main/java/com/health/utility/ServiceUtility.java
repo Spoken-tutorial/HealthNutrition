@@ -1,7 +1,7 @@
 package com.health.utility;
 
 import java.io.File;
-
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,8 +13,16 @@ import java.util.Date;
 
 import java.util.regex.Pattern;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.health.model.User;
+import com.health.repository.UserRepository;
 
 /**
  * Utility class
@@ -28,6 +36,10 @@ public class ServiceUtility {
 	 * To get current time
 	 * @return Timestamp object
 	 */
+	
+	@Autowired
+	private JavaMailSender mailSender;
+	
 	public static Timestamp getCurrentTime() {								// Current Date
 		
 		Date date=new Date();
@@ -310,5 +322,50 @@ public class ServiceUtility {
 		return new java.sql.Date(dateUtil.getTime());
 	}
 	
+	public  void sendVerficationEmail(User user, String siteURL) 
+			throws UnsupportedEncodingException, MessagingException {
+		String subject = "Please Verify Your Registration.";
+		String senderName= "Spoken-Tutorial";
+		String mailContent = "<p> Dear "+ user.getFullName()+ ",</p>";
+		mailContent += "<p>Please click the Link below to verify your Registration: </p>";
+		
+		String verifyURL = siteURL + "/verify?code=" + user.getEmailVerificationCode() ;
+		mailContent += "<h3> <a href=\"" + verifyURL + "\">VERIFY</a> </h3>";
+		
+		mailContent += "<p>Thank You </br> The Spoken Tutorials. </p>";
+
+		MimeMessage message = mailSender.createMimeMessage();
+		
+		try {
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+		
+		helper.setFrom("mansigundre1@gmail.com", senderName);
+		helper.setTo(user.getEmail());
+		helper.setSubject(subject);
+		helper.setText(mailContent, true);
+		
+		mailSender.send(message);
+		}catch(MessagingException ex) {
+			throw new RuntimeException("Error sending mail notification", ex);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param emailVerificationCode
+	 * @return
+	 */
+	
+	public static boolean verify(String emailVerificationCode) {
+		User user = UserRepository.findByVerificationCode(emailVerificationCode);
+		
+		if(user == null || user.isEnabled()) {
+			return false;
+		} else {
+			UserRepository.enable(user.getId());
+			return true;
+		}
+		
+	}
 	
 }

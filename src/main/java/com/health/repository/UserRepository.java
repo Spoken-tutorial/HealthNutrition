@@ -3,6 +3,7 @@ package com.health.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.CrudRepository;
 
 
@@ -43,6 +44,23 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	 * @return user object
 	 */
 	User findBytoken(String token);
+	
+	@Query("UPDATE User c SET c.enabled = true WHERE c.id = ?1")
+	@Modifying 
+	public static void enable(Long Id) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Query("SELECT c FROM User c WHERE c.emailVerificationCode= ?1")
+	public static User findByVerificationCode(String code) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+//	String getEmailVerificationCode();
+
+//	String setEmailVerificationCode();
 	
 
 	 
