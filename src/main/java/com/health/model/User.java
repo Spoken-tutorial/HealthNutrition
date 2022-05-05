@@ -500,6 +500,10 @@ public class User implements UserDetails{
 	public void setEmailVerificationCode(String emailVerificationCode) {
 		this.emailVerificationCode = emailVerificationCode;
 	}
+	public void setEnabled(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 }

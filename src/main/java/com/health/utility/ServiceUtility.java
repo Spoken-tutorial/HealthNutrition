@@ -337,14 +337,15 @@ public class ServiceUtility {
 		MimeMessage message = mailSender.createMimeMessage();
 		
 		try {
+			
 		MimeMessageHelper helper = new MimeMessageHelper(message);
-		
 		helper.setFrom("mansigundre1@gmail.com", senderName);
 		helper.setTo(user.getEmail());
 		helper.setSubject(subject);
 		helper.setText(mailContent, true);
 		
 		mailSender.send(message);
+		
 		}catch(MessagingException ex) {
 			throw new RuntimeException("Error sending mail notification", ex);
 		}
