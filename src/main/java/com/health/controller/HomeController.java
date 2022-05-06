@@ -520,9 +520,7 @@ public class HomeController {
 		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
 			return "redirect:/";
 		}
-		
-		
-		
+
 		
 			 Tutorial tutorial = tutService.findAllByContributorAssignedTutorial(conTut).get(0);
 			 List<Tutorial> relatedTutorial = new ArrayList<>();
@@ -910,36 +908,9 @@ public class HomeController {
 
 	}
 
-	/**
-	 * 	To Verify that user has entered valid email address
-	 * @param user
-	 * @throws MessagingException 
-	 * @throws UnsupportedEncodingException 
-	 */
 	
-//	public void sendVerficationEmail(User user, String siteURL) 
-//			throws UnsupportedEncodingException, MessagingException {
-//		String subject = "Please Verify Your Registration.";
-//		String senderName= "Spoken-Tutorial";
-//		String mailContent = "<p> Dear "+ user.getFullName()+ ",</p>";
-//		mailContent += "<p>Please click the Link below to verify your Registration: </p>";
-//		
-//		String verifyURL = siteURL + "/verify?code=" + user.getEmailVerificationCode() ;
-//		mailContent += "<h3> <a href=\"" + verifyURL + "\">VERIFY</a> </h3>";
-//		
-//		mailContent += "<p>Thank You </br> The Spoken Tutorials. </p>";
-//
-//		MimeMessage message = mailSender.createMimeMessage();
-//		MimeMessageHelper helper = new MimeMessageHelper(message);
-//		
-//		helper.setFrom("mansigundre1@gmail.com", senderName);
-//		helper.setTo(user.getEmail());
-//		helper.setSubject(subject);
-//		helper.setText(mailContent, true);
-//		
-//		mailSender.send(message);
-//		
-//	}
+	
+
 
 	/**
 	 * Redirects to adduser page
@@ -7233,3 +7204,9 @@ public class HomeController {
 
 	}
 }
+
+
+
+
+
+
