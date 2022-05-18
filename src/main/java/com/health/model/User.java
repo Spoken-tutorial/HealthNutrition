@@ -135,11 +135,23 @@ public class User implements UserDetails{
 	 */
 	private long phone;
 
+	@Column ( name =  "is_email_verified" , columnDefinition =  "boolean default false" ) 
+    private  boolean isEmailVerified ;
+	
 	/**
 	 * status of user
 	 */
 	private boolean registered=true;
+	
+	@Column(name="email_verification_code", nullable = false, updatable = false)
+	private String emailVerificationCode;
 
+	public String getEmailVerificationCode() {
+		return emailVerificationCode;
+	}
+	public void setEmailVerificationCode(String emailVerificationCode) {
+		this.emailVerificationCode = emailVerificationCode;
+	}
 	/**
 	 * timestamp when object is created
 	 */

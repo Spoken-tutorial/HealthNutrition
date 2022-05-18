@@ -15,6 +15,8 @@ import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
+import com.health.service.impl.FileNotFoundException;
+import com.health.service.impl.MessagingException;
 
 /**
  * This interface has all the method declaration related to User object database operation
@@ -143,6 +145,11 @@ public interface UserService {
 	 * @return list of User object
 	 */
 	List<User> findAll();
+
+	void sendSimpleEmail(String toAddress, String subject, String message);
+
+	void sendEmailWithAttachment(String toAddress, String subject, String message, String attachment)
+			throws javax.mail.MessagingException, java.io.FileNotFoundException, javax.mail.MessagingException, java.io.FileNotFoundException;
 
 	
 }

@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.core.env.Environment;
 
+import com.google.api.client.util.Value;
 import com.health.domain.security.Role;
 import com.health.domain.security.UserRole;
 import com.health.model.OrganizationRole;
@@ -18,6 +19,7 @@ import com.health.service.OrganizationRoleService;
 import com.health.service.RoleService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.service.impl.DefaultMailService;
 import com.health.utility.CommonData;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
@@ -26,6 +28,9 @@ import com.health.utility.ServiceUtility;
 @SpringBootApplication
 public class HealthNutrition extends org.springframework.boot.web.servlet.support.SpringBootServletInitializer implements CommandLineRunner {
 
+	@Value("${http.port}")
+    private int httpPort;
+	
 	@Autowired
 	private UserService userService;
 
@@ -40,6 +45,9 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 
 	@Autowired
 	private OrganizationRoleService orgRoleService;
+	
+//	@Autowired
+//	private DefaultMailService DefaultMailService; 
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {

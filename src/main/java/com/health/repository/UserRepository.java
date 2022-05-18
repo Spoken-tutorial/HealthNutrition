@@ -42,6 +42,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	 * @param token String object
 	 * @return user object
 	 */
+	
 	User findBytoken(String token);
 	
 
