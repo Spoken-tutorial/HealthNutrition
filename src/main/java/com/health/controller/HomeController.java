@@ -3,6 +3,7 @@ package com.health.controller;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,10 +22,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +38,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,6 +88,7 @@ import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
+import com.health.service.AccountEmailVerification;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -117,6 +124,8 @@ import com.health.utility.ServiceUtility;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
+
+import net.bytebuddy.utility.RandomString;
 
 /**
  * This Controller Class takes website request and process it accordingly
@@ -814,7 +823,8 @@ public class HomeController {
 		model.addAttribute("categories", categories);
 		return "categories";
 	}
-
+	@Autowired
+	private AccountEmailVerification senderService;
 
 	/**************************** USER REGISTRATION *************************************************/
 
@@ -883,14 +893,64 @@ public class HomeController {
 		user.setPhone(phoneLongValue);
 		user.setPassword(SecurityUtility.passwordEncoder().encode(password));
 		user.setDateAdded(ServiceUtility.getCurrentTime());
-
+		String randomCode = RandomString.make(64);
+		user.setEmailVerificationCode(randomCode);
+		user.setEmailVerified(false);
+		
+		String siteURL = "http://localhost:8080/";
+		sendVerificationEmail(user, siteURL);		
+		
 		userService.save(user);
 		model.addAttribute("emailSent", "true");
 
 		return "signup";
 
 	}
+	private void sendVerificationEmail(User user, String siteURL)
+	        throws MessagingException, UnsupportedEncodingException {
+	    String toAddress = user.getEmail();
+	    String fromAddress = "mansigundre1@gmail.com";
+	    String senderName = "FOSSEE Spoken Tutorials";
+	    String subject = "Please verify your registration";
+	    String content = "Dear [[name]],<br>"
+	            + "Please click the link below to verify your registration:<br>"
+	            + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+	            + "Thank you,<br>"
+	            + "FOSSEE Spoken Tutorials.";
+	     
+	    MimeMessage message = mailSender.createMimeMessage();
+	    MimeMessageHelper helper = new MimeMessageHelper(message);
+	     
+	    helper.setFrom(fromAddress, senderName);
+	    helper.setTo(toAddress);
+	    helper.setSubject(subject);
+	     
+	    content = content.replace("[[name]]", user.getFullName());
+	    String verifyURL = siteURL + "/verify?code=" + user.getEmailVerificationCode();
+	     
+	    content = content.replace("[[URL]]", verifyURL);
+	     
+	    helper.setText(content, true);
+	     
+	    mailSender.send(message);
+	     
+	}
 
+	@EventListener(ApplicationReadyEvent.class)
+	public void triggerMail() throws MessagingException {
+		senderService.sendSimpleEmail("mansigundre1@gmail.com",
+				"Verifiy the Account",
+				"Verification: http://localhost:8080/verifyAccount");
+	}
+	
+	@RequestMapping(value = "/verifyAccount", method = RequestMethod.GET)								// in use
+	public String newUserGet () {
+		User user = new User();
+		user.setEmailVerified(true);
+		return "signup";
+
+	}
+	
 	/**
 	 * Redirects to adduser page
 	 * @param model Model Object
@@ -898,14 +958,20 @@ public class HomeController {
 	 */
 	@RequestMapping("/newUser")										// in use
 	public String newUserGet (Model model) {
-
 		model.addAttribute("classActiveNewAccount", true);
 		return "signup";
 
 
 	}
+	
+	
+	
 
 	/************************** END ****************************************************/
+	
+	
+//	@RequestMapping("/verifyAccount")
+	
 
 	/**************************** DASHBAORD PAGE FOR ALL USER *****************************************/
 

@@ -138,10 +138,16 @@ public class User implements UserDetails{
 	@Column ( name =  "is_email_verified" , columnDefinition =  "boolean default false" ) 
     private  boolean isEmailVerified ;
 	
+	public boolean isEmailVerified() {
+		return isEmailVerified;
+	}
+	public void setEmailVerified(boolean isEmailVerified) {
+		this.isEmailVerified = isEmailVerified;
+	}
 	/**
 	 * status of user
 	 */
-	private boolean registered=true;
+	private boolean registered=false;
 	
 	@Column(name="email_verification_code", nullable = false, updatable = false)
 	private String emailVerificationCode;
@@ -502,6 +508,8 @@ public class User implements UserDetails{
 	public void setTutorialPreReqUser(Set<Tutorial> tutorialPreReqUser) {
 		this.tutorialPreReqUser = tutorialPreReqUser;
 	}
+	
+	
 
 
 

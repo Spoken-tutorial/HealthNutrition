@@ -1,5 +1,6 @@
 package com.health.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Set;
 
@@ -15,8 +16,11 @@ import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
+import com.health.repository.UserRepository;
 import com.health.service.impl.FileNotFoundException;
 import com.health.service.impl.MessagingException;
+
+import net.bytebuddy.utility.RandomString;
 
 /**
  * This interface has all the method declaration related to User object database operation
