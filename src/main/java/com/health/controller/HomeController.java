@@ -35,6 +35,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -44,6 +45,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -88,6 +90,7 @@ import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
+import com.health.repository.UserRepository;
 import com.health.service.AccountEmailVerification;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
@@ -823,8 +826,7 @@ public class HomeController {
 		model.addAttribute("categories", categories);
 		return "categories";
 	}
-	@Autowired
-	private AccountEmailVerification senderService;
+
 
 	/**************************** USER REGISTRATION *************************************************/
 
@@ -858,6 +860,7 @@ public class HomeController {
 		model.addAttribute("username", username);
 
 		if (userService.findByUsername(username) != null) {
+			
 			model.addAttribute("usernameExists", true);
 			return "signup";
 		}
@@ -879,7 +882,9 @@ public class HomeController {
 			return "signup";
 
 		}else {
+				
 			phoneLongValue=Long.parseLong(phone);
+			
 
 		}
 		User user = new User();
@@ -895,17 +900,37 @@ public class HomeController {
 		user.setDateAdded(ServiceUtility.getCurrentTime());
 		String randomCode = RandomString.make(64);
 		user.setEmailVerificationCode(randomCode);
+		user.setRegistered(true);
 		user.setEmailVerified(false);
-		
-		String siteURL = "http://localhost:8080/";
-		sendVerificationEmail(user, siteURL);		
-		
+				
 		userService.save(user);
 		model.addAttribute("emailSent", "true");
-
+		
+		String siteURL = "http://localhost:8080";		//to be changed
+		sendVerificationEmail(user, siteURL);
+		
 		return "signup";
 
 	}
+	
+	@PostMapping("/process_register")
+    public String processRegister(User user, HttpServletRequest request)
+            throws Exception {
+		
+		newUserPost(
+				request,
+				  user.getUsername(),   user.getFirstName(),
+				  user.getLastName(),   user.getEmail(),
+				  user.getPassword(),   user.getAddress(),
+				  Long.toString(user.getPhone()),  user.getGender(), user.getEmailVerificationCode());       
+        return "register_success";
+    }
+     
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "");
+    } 
+    
 	private void sendVerificationEmail(User user, String siteURL)
 	        throws MessagingException, UnsupportedEncodingException {
 	    String toAddress = user.getEmail();
@@ -935,20 +960,31 @@ public class HomeController {
 	    mailSender.send(message);
 	     
 	}
-
-	@EventListener(ApplicationReadyEvent.class)
-	public void triggerMail() throws MessagingException {
-		senderService.sendSimpleEmail("mansigundre1@gmail.com",
-				"Verifiy the Account",
-				"Verification: http://localhost:8080/verifyAccount");
-	}
 	
-	@RequestMapping(value = "/verifyAccount", method = RequestMethod.GET)								// in use
-	public String newUserGet () {
-		User user = new User();
-		user.setEmailVerified(true);
-		return "signup";
+	@GetMapping("/verify")
+	public String verifyUser(@Param("code") String code) {
+	    if (verify(code)) {
+	        return "verify_success";
+	    } else {
+	        return "verify_fail";
+	    }
+	}
 
+	public static boolean verify(String verificationCode) {
+		Model model = null;
+	    User user = UserRepository.findByVerificationCode(verificationCode);
+	     
+	    if (user == null || user.isRegistered()) {
+	        return false;
+	    } else {
+			user.getUsername();	
+	        user.setEmailVerificationCode(null);
+	        user.setEmailVerified(true);
+	        user.setRegistered(true);
+//	        userService.save(user);
+	        return true;
+	    }
+	     
 	}
 	
 	/**
@@ -958,9 +994,8 @@ public class HomeController {
 	 */
 	@RequestMapping("/newUser")										// in use
 	public String newUserGet (Model model) {
-		model.addAttribute("classActiveNewAccount", true);
-		return "signup";
-
+		model.addAttribute("classActiveNewAccount", false);
+		return "verify";
 
 	}
 	

@@ -112,15 +112,15 @@
 									<div class="alert alert-info" th:if="${emailSent}">An
 										email has been sent to the email address you just registered.
 										Please validate your email address and update your password
-										information <br>If Email Not Received Verify Here<br><button class="btn c-btn" th:action="@{/verifyAccount}" method="get	">Resend Verification Email</button>  .</div>
+										information <br>If Email Not Received Verify Here<br><button class="btn c-btn" th:action="@{/verify}" method="get">Resend Verification Email</button>.</div>
 									<div class="alert alert-info" style="color:red" th:if="${usernameExists}">
-										Username Already Exist Please Try New Name</div>
+										Username Already Exist Please Try New Name and if not verified <button class="btn c-btn" th:action="@{/verify}" method="get">Resend Verification Email</button> </div>
 										
 									<div class="alert alert-info" style="color:red" th:if="${emailWrong}">
 										Wrong Email.</div>
 										'
 									<div class="alert alert-info" style="color:red" th:if="${emailExists}">
-										With given E-mail user Exists.</div>
+										With given E-mail user Exists and if not verified <button class="btn c-btn" th:action="@{/verify}" method="get">Resend Verification Email</button>.</div>
 										
 									<div class="alert alert-info" style="color:red" th:if="${phoneWrong}">
 										Phone Number must be 10 Digit Number.</div>

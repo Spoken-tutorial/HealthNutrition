@@ -147,7 +147,7 @@ public class User implements UserDetails{
 	/**
 	 * status of user
 	 */
-	private boolean registered=false;
+	private boolean registered=true;
 	
 	@Column(name="email_verification_code", nullable = false, updatable = false)
 	private String emailVerificationCode;

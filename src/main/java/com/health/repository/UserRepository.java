@@ -45,6 +45,15 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	
 	User findBytoken(String token);
 	
-
+	/**
+	 * Find User object given emailVerificationCode
+	 * @param token String object
+	 * @return user object
+	 */
+	@Query("SELECT u FROM User u WHERE u.emailVerificationCode = ?1")
+    public static User findByVerificationCode(String code) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	 
 }

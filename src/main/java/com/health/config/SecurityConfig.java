@@ -88,7 +88,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/cdContentInfo/**",
 			"/getContributorByTutLanUser/**",
 			"/showConsultant/**",
-			"/showLanguages/**"
+			"/showLanguages/**",
+			"/verify",
+			"/register_success",
+			"/process_register"
 	};
 
 	/**
