@@ -91,7 +91,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/showLanguages/**",
 			"/verify",
 			"/register_success",
-			"/process_register"
+			"/process_register",
+			"/serch",
+			"/search_result",
+			"/search?keyword={keyword}"
 	};
 
 	/**

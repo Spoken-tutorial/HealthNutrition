@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 
 import com.health.model.Category;
 import com.health.model.Event;
+import com.health.repository.CategoryRepository;
 
 /**
  * This interface has all the method declaration related to Category object database operation
@@ -61,7 +62,14 @@ public interface CategoryService {
 	 */
 	Category save(Category cat);
 
-	List<Category> findAllByOrder();
+//	List<Category> findAllByOrder();
+//	public static List<Category> search(String keyword){
+//		return CategoryRepository.search(keyword);
+//	}
+//	@Override
+    public static List<Category> getByKeyword(String keyword){
+	  return CategoryRepository.findByKeyword(keyword);
+	 }
 
 	    
 }

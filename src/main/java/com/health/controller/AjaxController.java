@@ -11,9 +11,11 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.repository.query.Param;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -196,6 +198,24 @@ public class AjaxController{
 
 	}
 
+	@GetMapping("/search")
+	public String search(@Param("keyword") String keyword, Model model) {
+		System.out.println("Keyword : " + keyword );
+		model.addAttribute("keyword : ", keyword);
+		model.addAttribute("categoryName", "Search Result for "+ keyword);
+		return "search_result";
+	}
+//	@RequestMapping(path = {"/search"})
+//	 public String home(Category category, Model model, String keyword) {
+//	  if(keyword!=null) {
+//	   List<Category> list = CategoryService.getByKeyword(keyword);
+//	   model.addAttribute("list", list);
+//	  }else {
+//	  List<Category> list = CategoryService.findAll();
+//	  model.addAttribute("list", list);}
+//	  return "index";
+//	 }
+	
 	/**
 	 * make visible/disable Consultant object in system
 	 * @param id int value
