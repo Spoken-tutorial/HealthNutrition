@@ -1,5 +1,6 @@
 package com.health.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +9,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.repository.query.Param;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
@@ -1959,6 +1963,31 @@ public class AjaxController{
 		return CommonData.Script_SAVE_SUCCESS_MSG;
 
 	}
+	
+	//route after clicking the link in mail
+	
+	@PostMapping("/process_register")
+    public String processRegister(User user, HttpServletRequest request)
+            throws UnsupportedEncodingException, MessagingException {
+        usrservice.register(user, getSiteURL(request));       
+        return "register_success";
+    }
+	
+	//route to verify
+	
+	@GetMapping("/verify")
+	public String verifyUser(@Param("code") String code) {
+	    if (UserService.verify(code)) {
+	        return "verify_success";
+	    } else {
+	        return "verify_fail";
+	    }
+	}
+     
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "");
+    }
 	
 	/*********************************** END ********************************************************/
 	

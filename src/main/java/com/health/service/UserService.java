@@ -1,8 +1,13 @@
 package com.health.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.health.domain.security.UserRole;
 import com.health.model.Category;
@@ -15,6 +20,9 @@ import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
+import com.health.repository.UserRepository;
+
+import net.bytebuddy.utility.RandomString;
 
 /**
  * This interface has all the method declaration related to User object database operation
@@ -23,6 +31,8 @@ import com.health.model.UserIndianLanguageMapping;
  *
  */
 public interface UserService {
+	
+	
 	
 	/**
 	 * Find User object given Token
@@ -144,5 +154,32 @@ public interface UserService {
 	 */
 	List<User> findAll();
 
+	String setEmailVerificationCode(User user, String siteURL);
+
+	public default void register(User user, String siteURL)
+	        throws UnsupportedEncodingException, MessagingException {
+		String randomCode = RandomString.make(64);
+	    user.setEmailVerificationCode(randomCode);
+	    user.setEnabled(false);
+	     
+	    UserRepository.save(user);
+	     
+	    setEmailVerificationCode(user, siteURL);
+	}
 	
+	public static boolean verify(String verificationCode) {
+	    User user = UserRepository.findByVerificationCode(verificationCode);
+	     
+	    if (user == null || user.isEnabled()) {
+	        return false;
+	    } else {
+	        user.setEmailVerificationCode(null);
+	        user.setEnabled(true);
+	        UserRepository.save(user);
+	         
+	        return true;
+	    }
+	     
+	}
+	 ;
 }

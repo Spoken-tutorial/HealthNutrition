@@ -703,15 +703,19 @@ private List<Language> getLanguages() {
 					topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 				}
 				
-				List<String> catTempSorted =new ArrayList<String>(catTemp);
-				Collections.sort(catTempSorted);
-				
-				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
-				Collections.sort(lanTempSorted);
+//				List<String> catTempSorted =new ArrayList<String>(catTemp);
+//				Collections.sort(catTempSorted);
+//				
+//				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
+//				Collections.sort(lanTempSorted);
 
+				List<Category> catTempSorted = getCategories();
+				List<Language> lanTempSorted = getLanguages();
+				List<Topic> topicTempSorted = getTopics();
 				model.addAttribute("categories", catTempSorted);
 				model.addAttribute("languages", lanTempSorted);
-				model.addAttribute("topics", topicTemp);
+				model.addAttribute("topics", topicTempSorted);
+//				model.addAttribute("topics", topicTemp);
 				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
 				model.addAttribute("sm_url", sm_url);
 			return "tutorial";
