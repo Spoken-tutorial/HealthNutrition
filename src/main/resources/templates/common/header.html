@@ -68,7 +68,9 @@
 					<a th:href="@{/}"> <img
 									th:src="@{/image/logo.png}" 
 									alt="Smiley face" height="50" width="50"> </img>
-									<span style="color: black;font-size: 2rem;" class="ml-3">Spoken <span style="color: orange;font-size: 2rem;">Tutorials</span> </span>
+									
+								<span style="color: black;font-size: 2rem;margin-left:2rem;">Spoken Tutorial <span style="border-bottom: 2px solid orange;">Health & Nutrition Project</span>
+								</span>
 								</a>
 								
 </div>
@@ -156,6 +158,15 @@
 			<!--/.container-fluid -->
 		</nav>
 	</div>
+	<div th:fragment="alert_msg">
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+								<span th:text="${success_msg}"></span>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+								<span th:text="${error_msg}"></span>
+					</div>
+ 	</div>
 
 	<div th:fragment="body-bottom-scripts">
 	<script

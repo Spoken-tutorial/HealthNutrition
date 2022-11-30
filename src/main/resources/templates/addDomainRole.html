@@ -60,8 +60,7 @@ font-weight:bold!important;
 						<div class="row">
 							<div class="col-lg-6">
 								<form class="form-horizontal"
-							th:action="@{/addDomainRole}" method="post"
-							onsubmit="return submitForm()(this);">
+							th:action="@{/addDomainRole}" method="post">
 						
 						
 							<div class="form-group">
@@ -115,109 +114,6 @@ font-weight:bold!important;
 </div>
 </div>
 </div>
-	<!-- <div style="display: flex;">
-		<div th:replace="common/sidebar :: contributor_sidebar"></div>
-		<div class="row" style='width: 100%;'>
-			<div class="col-lg-10 col-xl-9 mx-auto">
-				<div class="a-update-msg"></div>
-				<div>
-				<div class="alert alert-success" role="alert" th:if="${success_msg}">
-	 				<div id="#test" class="">
-						<div >
-							<span th:text="${success_msg}"></span>
-						</div>
-					</div>
-				</div>
-				<div class="alert alert-danger" role="alert" th:if="${error_msg}">
-	 				<div id="#test" class="">
-						<div >
-							<span th:text="${error_msg}"></span>
-						</div>
-					</div>
-				</div>
-			</div>
-				<div class="card card-signin flex-row a-card">
-					<div class="card-body">
-						<h5 class="card-title text-center a-card-title">Add Quality
-							Language</h5>
-
-						<form class="form-horizontal"
-							th:action="@{/addQualityRole}" method="post"
-							onsubmit="return submitForm()(this);">
-						
-						
-							<div class="form-group">
-								<div class="form-group">
-								
-									<label for="">Select Language </label>	
-									<select id="languageContributerId"
-									class="form-control" name="selectedLan" required="required">
-
-									<option>Select Language</option>
-										<span th:each="lan : ${languages}">
-
-											<option th:value="${lan.getLangName()}"><span th:text="${lan.getLangName()}"></span></option>
-
-									</span>
-								
-								</select>
-									
-								</div>
-					
-							</div>
-							
-						<div class="form-group">
-								<label for="categoryId">Select Category</label> 
-								<select id="categoryDomainId" name="catSelected"
-									class="form-control" required="required">
-									
-									<option>Select Category</option>
-										<span th:each="cat : ${categories}">
-
-											<option th:value="${cat.getCatName()}"><span th:text="${cat.getCatName()}"></span></option>
-
-								</select>
-
-						</div>
-							
-								<div class="form-group">
-								 <span style="color: red;"
-									th:if="${msg}"> Already exists. Choose
-									a different one.</span>
-							</div>
-							
-							<button type="submit" value="showAlert" class="btn btn-success">Submit</button>
-							&nbsp;&nbsp;&nbsp;
-							<button type="reset" class="btn btn-success">Reset</button>
-						</form>
-						
-						<script>
-					$( document ).ready(function() {
-						var msg = localStorage.getItem("domain_role_msg");
-						
-						
-					    if(Boolean(msg)){
-					    	/* alert('here'); */
-					    	var content = '<div class="alert alert-info" role="alert">'+msg+'</div>';
-					    	/* alert('not null'); */
-					    	$(".a-update-msg").html(content);
-						    localStorage.setItem("domain_role_msg", "");
-					    	$('.a-card').css("margin-top", "20px"); 	
-					    }
-					    
-					});
-					function submitForm() {
-						  localStorage.setItem("domain_role_msg", "Request submitted successfully for Domain Reviewer role.");
-						}
-					</script>
-					
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
- -->
-
 	<div th:fragment="body-bottom-scripts">
 		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>

@@ -1,19 +1,25 @@
 package com.health.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.repository.query.Param;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -166,8 +172,265 @@ public class AjaxController{
 	
 	@Autowired
 	private JavaMailSender mailSender;
+	
+	private static final String SUCCESS_TOKEN = "success";
+	private static final String ERROR_TOKEN = "error";
+	private static final String TUTORIAL_UPDATE_ERROR = "Some error occcurred in updating tutorial. Please contact site admin.";
+	private static final String TUTORIAL_UPDATE_SUCCESS = "Component updated successfully.";
+	private static final String TUTORIAL_CREATION_ERROR = "Error in creating tutorial. Please contact site admin.";
+	private static final String ZIP_EXTN_ERROR = "File extension must be in ZIP.";
+	private static final String SLIDE_SIZE_ERROR = "File Size must be under 20 MB";
+	private static final String VIDEO_EXTN_ERROR = "File extension must be in MP4.";
+	private static final String VIDEO_SIZE_ERROR = "File Size must be under 400 MB.";
+	private static final int NULL_TUTORIAL = 0;
+	private static final int ADD_COMPONENT = 0;
+	private static final String DOMAIN = "domain";
+	private static final String QUALITY = "quality";
+	private static final String ADMIN_REVIEWER = "admin-rev";
+	
+	
+			
+	private User getUser(Principal principal) {
+		User usr=new User();
+		if(principal!=null) {
+			usr=usrservice.findByUsername(principal.getName());
+		}
+		return usr;
+	}
+	
+	//private HashMap<Integer, String> updateResponse(String res, String msg, int comp_status, int tutorial_id) {
+	private HashMap<String, String> updateResponse(String res, String msg, int comp_status, int tutorialId, User user) {
+		//0: success/error ; 1:info msg 2:comp status
+		HashMap<String, String> temp = new HashMap<>();
+		temp.put("response", res);
+		temp.put("message", msg);
+		temp.put("component_status", CommonData.tutorialStatus[comp_status]);
+		temp.put("tutorial_id", String.valueOf(tutorialId));
+		String firstName = "";
+		String lastName = "";
+		if(user.getFirstName()!="") {
+			firstName = user.getFirstName();
+			if(firstName.length()>1) {
+				firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1);
+			}
+			else {
+				firstName = firstName.toUpperCase();
+			}
+		}
+		if(user.getLastName()!="") {
+			lastName = user.getLastName();
+			if(lastName.length()>1) {
+				lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1);
+			}else {
+				lastName = lastName.toUpperCase();
+			}
+		}
+		temp.put("user", firstName+" "+lastName);
+		
+		return temp;
+	}
 
+	private HashMap<String, String> addOutlineComp(Tutorial tut, String outline, User usr) {
+		HashMap<String, String> temp = new HashMap<>(); 
+		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, tut.getOutlineStatus(), CommonData.contributorRole, usr, tut);
+		tut.setOutline(outline);
+		tut.setOutlineStatus(CommonData.DOMAIN_STATUS);
+		tut.setOutlineUser(usr);
+		try {
+			tutService.save(tut);
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getOutlineStatus(), tut.getTutorialId(),usr);
+		} catch (Exception e) {
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getOutlineStatus(),tut.getTutorialId(),usr);
+			return temp;
+		}
+		logService.save(log);
+		return temp;
 
+	}
+	
+	private HashMap<String, String> addScriptComp(Tutorial tut, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
+		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.DOMAIN_STATUS, tut.getScriptStatus(), CommonData.contributorRole, usr, tut);
+		tut.setScriptStatus(CommonData.DOMAIN_STATUS);
+		tut.setScriptUser(usr);
+		try {
+			tutService.save(tut);
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getScriptStatus(),tut.getTutorialId(),usr);
+		} catch (Exception e) {
+			e.printStackTrace();
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getScriptStatus(),tut.getTutorialId(),usr);
+			return temp;
+		}
+		logService.save(log);
+		return temp;
+
+	}
+	
+	private String getDocument(Tutorial tut, MultipartFile mediaFile, String comp) {
+		ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp);
+		String pathtoUploadPoster;
+		String document = "";
+		try {
+			pathtoUploadPoster = ServiceUtility.uploadVideoFile(mediaFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp);
+			int indexToStart=pathtoUploadPoster.indexOf("Media");
+			document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return document;
+	}
+	
+	private HashMap<String, String> addSlideComp(Tutorial tut,MultipartFile slideFile, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
+		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.DOMAIN_STATUS, tut.getSlideStatus(), CommonData.contributorRole, usr, tut);
+		try {
+				String  document = getDocument(tut,slideFile,"Slide");
+				
+				if(document!="") {
+					tut.setSlide(document);
+					tut.setSlideStatus(CommonData.DOMAIN_STATUS);
+					tut.setSlideUser(usr);
+					tutService.save(tut);
+					temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getSlideStatus(),tut.getTutorialId(),usr);
+					logService.save(log);
+				}
+		}catch (Exception e) {
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getSlideStatus(),tut.getTutorialId(),usr);
+		}
+		
+		return temp;
+	}
+	
+	private HashMap<String, String> addVideoComp(Tutorial tut,MultipartFile videoFile, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
+		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.ADMIN_STATUS, tut.getVideoStatus(), CommonData.contributorRole, usr, tut);
+
+		try {
+			String  document = getDocument(tut,videoFile,"Video");
+			if(document!="") {
+				tut.setVideo(document);
+				tut.setVideoStatus(CommonData.ADMIN_STATUS);
+				tut.setVideoUser(usr);
+				tutService.save(tut);
+				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus(),tut.getTutorialId(),usr);
+				logService.save(log);
+			}
+		}catch (Exception e) {
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus(),tut.getTutorialId(),usr);
+		}
+		
+		return temp;
+	}
+	
+	
+	
+	
+	private HashMap<String, String> addKeywordComp(Tutorial tut, String keywordData, User usr) {
+		HashMap<String, String> temp = new HashMap<>(); 
+		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.DOMAIN_STATUS, tut.getKeywordStatus(), CommonData.contributorRole, usr, tut);
+		tut.setKeyword(keywordData);
+		tut.setKeywordStatus(CommonData.DOMAIN_STATUS);
+		tut.setKeywordUser(usr);
+		try {
+			tutService.save(tut);
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getKeywordStatus(),tut.getTutorialId(),usr);
+		}catch (Exception e) {
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getKeywordStatus(),tut.getTutorialId(),usr);
+			return temp;
+		}
+		logService.save(log);
+		return temp;
+
+	}
+	
+	private HashMap<String, String> addPreReqComp(Tutorial tut,Tutorial prereq, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
+		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.DOMAIN_STATUS, tut.getPreRequisticStatus(), CommonData.contributorRole, usr, tut);
+
+		try {
+			tut.setPreRequistic(prereq);
+			tut.setPreRequisticStatus(CommonData.DOMAIN_STATUS);
+			tut.setPreRequiticUser(usr);
+			tutService.save(tut);
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
+		} catch (Exception e) {
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
+			return temp;
+		}
+		
+		logService.save(log);
+		return temp;
+
+	}
+	
+	private HashMap<String, String> addNullPreReq(Tutorial tut, User usr) {
+		HashMap<String, String> temp = new HashMap<>();
+		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.DOMAIN_STATUS, tut.getPreRequisticStatus(), CommonData.contributorRole, usr, tut);
+
+		tut.setPreRequistic(null);
+		tut.setPreRequisticStatus(CommonData.DOMAIN_STATUS);
+		tut.setPreRequiticUser(usr);
+		try {
+			tutService.save(tut);
+			temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
+		} catch (Exception e) {
+			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getPreRequisticStatus(),tut.getTutorialId(),usr);
+			return temp;
+		}
+		logService.save(log);
+		return temp;
+	}
+	
+	private Tutorial createTutorial(String catName,int topicId,String lang,User usr) {
+		Category cat = catService.findBycategoryname(catName);
+		Topic topic=topicService.findById(topicId);
+		TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
+		Language lan=lanService.getByLanName(lang);
+		ContributorAssignedTutorial conLocal=conService.findByTopicCatAndLanViewPart(localTopicCat, lan);
+		Tutorial local=new Tutorial();
+		local.setDateAdded(ServiceUtility.getCurrentTime());
+		local.setConAssignedTutorial(conLocal);
+		local.setTutorialId(tutService.getNewId());
+		
+		if(!lan.getLangName().equalsIgnoreCase("English")) {
+			Language lanEng = lanService.getByLanName("English");
+			ContributorAssignedTutorial conLocal1 = conService.findByTopicCatAndLanViewPart(localTopicCat, lanEng);
+			local.setRelatedVideo(tutService.findAllByContributorAssignedTutorial(conLocal1).get(0));
+			
+			Tutorial preReq =tutService.findAllByContributorAssignedTutorial(conLocal1).get(0).getPreRequistic();
+			
+			if(preReq == null) {
+				local.setPreRequistic(null);
+				local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
+			}else {
+				ContributorAssignedTutorial conLocal2 = conService.findByTopicCatAndLanViewPart(preReq.getConAssignedTutorial().getTopicCatId(),lan);
+				List<Tutorial> t = tutService.findAllByContributorAssignedTutorial(conLocal2);
+				if(!t.isEmpty()) {
+					local.setPreRequistic(t.get(0));
+				}
+				
+				local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
+			}
+			local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
+			local.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
+		}
+		try {
+			tutService.save(local);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return local;
+	}
+	
+	private HashMap<String, String> setResponse(Integer status) {
+		HashMap<String, String> temp = new HashMap<String, String>();
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[status]);
+		return temp;
+	}
+	
+	
 	/**
 	 * make visible/disable brochure object in system
 	 * @param id int value
@@ -464,11 +727,26 @@ public class AjaxController{
 		Category cat = catService.findByid(id);
 
 		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		List<ContributorAssignedTutorial> cat_list = conService.findAllByTopicCat(local);
+		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
+		HashSet<Topic> topics = new HashSet<>();
+		for(Tutorial t: tutorials) {
+			topicName.put(t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		}
+		return topicName;
 
-		for(TopicCategoryMapping temp : local) {
+	}
+	
+	@RequestMapping("/loadTopicByCategoryInAssignContri")
+	public @ResponseBody HashMap<Integer, String> getTopicByCategoryAssignContri(@RequestParam(value = "id") int id) {
 
-			topicName.put(temp.getTopic().getTopicId(), temp.getTopic().getTopicName());
-			
+		HashMap<Integer,String> topicName=new HashMap<>();
+
+		Category cat = catService.findByid(id);
+
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		for(TopicCategoryMapping t: local) {
+			topicName.put(t.getTopic().getTopicId(), t.getTopic().getTopicName());
 		}
 		return topicName;
 
@@ -490,7 +768,7 @@ public class AjaxController{
 		HashMap<Integer,String> topicName=new HashMap<>();
 
 		Language lan=lanService.getByLanName(langName);
-		Tutorial tut =tutService.getById(tutorialId);
+		
 		Category cat = catService.findBycategoryname(id);
 
 		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
@@ -508,13 +786,23 @@ public class AjaxController{
 
 		List<Tutorial> tuts = tutService.findAllByContributorAssignedTutorialList(tempCon);
 
-		for(Tutorial temp : tuts) {
-			if(temp.getTutorialId() != tut.getTutorialId()) {
-				if(temp.isStatus()) {
-					topicName.put(temp.getTutorialId(), temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		if(tutorialId!=0) {
+			Tutorial tut =tutService.getById(tutorialId);
+			for(Tutorial temp : tuts) {
+				if(temp.getTutorialId() != tut.getTutorialId()) {
+					if(temp.isStatus()) {
+						topicName.put(temp.getTutorialId(), temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+					}
 				}
 			}
+		}else {
+			for(Tutorial temp : tuts) {
+					if(temp.isStatus()) {
+						topicName.put(temp.getTutorialId(), temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+					}
+			}
 		}
+		
 		return topicName;
 	}
 
@@ -755,94 +1043,30 @@ public class AjaxController{
 	 * @return string
 	 */
 	@RequestMapping("/addOutline")
-	public @ResponseBody HashMap<Integer, String> addOutline(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addOutline(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "saveOutline") String outlineData,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
-											@RequestParam(value = "lanId") String lanId,
+											@RequestParam(value = "lanId") String lang,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
-		User usr=new User();
+		HashMap<String, String> temp = new HashMap<>();
+		User usr=getUser(principal);
+		Tutorial local = null;
 
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
-		if(tutorialId != 0) {
+		if(tutorialId!=0) {
 			Tutorial tut=tutService.getById(tutorialId);
-
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, tut.getOutlineStatus(), CommonData.contributorRole, usr, tut);
-			tut.setOutline(outlineData);
-			tut.setOutlineStatus(CommonData.DOMAIN_STATUS);
-			tut.setOutlineUser(usr);
-
-			try {
-				tutService.save(tut);
-				logService.save(log);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				temp.put(0, "Please Try again");
-				return temp;
-			}
-			temp.put(1, CommonData.Outline_SAVE_SUCCESS_MSG);
-			return temp;
-
+			temp = addOutlineComp(tut,outlineData,usr);
+			return  temp;
 		}else {
-			
-			Category cat = catService.findBycategoryname(catName);
-			Topic topic=topicService.findById(topicId);
-			TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-			Language lan=lanService.getByLanName(lanId);
-			ContributorAssignedTutorial conLocal=conService.findByTopicCatAndLanViewPart(localTopicCat, lan);
-			Tutorial local=new Tutorial();
-			local.setDateAdded(ServiceUtility.getCurrentTime());
-			local.setConAssignedTutorial(conLocal);
-			local.setOutline(outlineData);
-			local.setOutlineStatus(CommonData.DOMAIN_STATUS);
-			local.setOutlineUser(usr);
-			local.setTutorialId(tutService.getNewId());
-			
-			
-			if(!lan.getLangName().equalsIgnoreCase("English")) {
-				Language lanEng = lanService.getByLanName("English");
-				ContributorAssignedTutorial conLocal1 = conService.findByTopicCatAndLanViewPart(localTopicCat, lanEng);
-				local.setRelatedVideo(tutService.findAllByContributorAssignedTutorial(conLocal1).get(0));
-				
-				Tutorial preReq =tutService.findAllByContributorAssignedTutorial(conLocal1).get(0).getPreRequistic();
-				
-				if(preReq == null) {
-					local.setPreRequistic(null);
-					local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
-				}else {
-					
-					ContributorAssignedTutorial conLocal2 = conService.findByTopicCatAndLanViewPart(preReq.getConAssignedTutorial().getTopicCatId(),lan);
-					local.setPreRequistic(tutService.findAllByContributorAssignedTutorial(conLocal2).get(0));
-					local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
-				}
-				
-				
-				
-			}
-
-			try {
-				tutService.save(local);
-				LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-				logService.save(log);
-			}catch (Exception e) {
-				// TODO: handle exception
-				e.printStackTrace();
-				temp.put(0, "Please Try again");
-				return temp;      // throw error
+			local = createTutorial(catName, topicId, lang,usr);
+			if(local!=null) {
+				temp = addOutlineComp(local,outlineData,usr);
+			}else {
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0,usr);
 			}
 		}
-
-		temp.put(1, CommonData.Outline_SAVE_SUCCESS_MSG);
+		
 		return temp;
 	}
 
@@ -873,64 +1097,28 @@ public class AjaxController{
 	 * @return string
 	 */
 	@RequestMapping("/addKeyword")
-	public @ResponseBody HashMap<Integer, String> addKeyword(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addKeyword(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "savekeyword") String keywordData,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
 											@RequestParam(value = "lanId") String lanId,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
-		
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
-		if(tutorialId != 0) {
+		HashMap<String, String> temp = new HashMap<>();
+		User usr = getUser(principal);
+		Tutorial local = null;
+		if(tutorialId!=0) {
 			Tutorial tut=tutService.getById(tutorialId);
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.DOMAIN_STATUS, tut.getKeywordStatus(), CommonData.contributorRole, usr, tut);
-			tut.setKeyword(keywordData);
-			tut.setKeywordStatus(CommonData.DOMAIN_STATUS);
-			tut.setKeywordUser(usr);
-
-			tutService.save(tut);
-
-			logService.save(log);
-			temp.put(1,  CommonData.Keyword_SAVE_SUCCESS_MSG);
-
-		}else {
-
-			Category cat = catService.findBycategoryname(catName);
-			Topic topic=topicService.findById(topicId);
-			TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-			Language lan=lanService.getByLanName(lanId);
-			ContributorAssignedTutorial conLocal=conService.findByTopicCatAndLanViewPart(localTopicCat, lan);
-			Tutorial local=new Tutorial();
-			local.setDateAdded(ServiceUtility.getCurrentTime());
-			local.setConAssignedTutorial(conLocal);
-			local.setKeyword(keywordData);
-			local.setKeywordStatus(CommonData.DOMAIN_STATUS);
-			local.setKeywordUser(usr);
-			local.setTutorialId(tutService.getNewId());
+			temp = addKeywordComp(tut,keywordData,usr);
 			
-
-			try {
-				tutService.save(local);
-
-				LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-				logService.save(log);
-				temp.put(1,  CommonData.Keyword_SAVE_SUCCESS_MSG);
-			}catch (Exception e) {
-				// TODO: handle exception
-				temp.put(0,  "Please try again");      // throw error
+		}else {
+			local = createTutorial(catName, topicId, lanId, usr);
+			if(local!=null) {
+				temp = addKeywordComp(local,keywordData,usr);
+			}else {
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, ADD_COMPONENT,NULL_TUTORIAL,usr);
 			}
-
-
 		}
-
 		return temp;
 
 	}
@@ -943,41 +1131,29 @@ public class AjaxController{
 	 * @return String object
 	 */
 	@RequestMapping("/addPreRequisticWhenNotRequired")
-	public @ResponseBody HashMap<Integer, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
+			@RequestParam(value = "categoryname") String catName,
+			@RequestParam(value = "topicid") int topicId,
+			@RequestParam(value = "lanId") String lanId,
 			Principal principal) {
 		
-		HashMap<Integer, String> temp = new HashMap<>();
-		User usr=new User();
+		HashMap<String, String> temp = new HashMap<>();
+		User usr = getUser(principal);
 
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
 		Tutorial tut = null;
 
 		if(tutorialId != 0) {
 			tut=tutService.getById(tutorialId);
+			temp = addNullPreReq(tut,usr);
+		}else {
+			tut = createTutorial(catName, topicId, lanId, usr);
+			if(tut!=null) {
+				temp = addNullPreReq(tut,usr);
+			}else {
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0,usr);
+			}
 		}
-
-
-		if(tutorialId != 0) {
-
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.DOMAIN_STATUS, tut.getKeywordStatus(), CommonData.contributorRole, usr, tut);
-
-			tut.setPreRequistic(null);
-			tut.setPreRequisticStatus(CommonData.DOMAIN_STATUS);
-			tut.setPreRequiticUser(usr);
-
-			tutService.save(tut);
-
-			logService.save(log);
-			temp.put(1,  CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG);
-
-		}
-
-
 		return temp;
-
 	}
 
 	/**
@@ -990,79 +1166,32 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addPreRequistic")
-	public @ResponseBody HashMap<Integer, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
 			@RequestParam(value = "categoryname") String catName,
 			@RequestParam(value = "topicid") int topicId,
-			@RequestParam(value = "lanId") String lanId,Principal principal) {
+			@RequestParam(value = "lanId") String lanId,
+			@RequestParam(value = "preReqTutId") int preReqTutId,
+			Principal principal) {
 		
-		HashMap<Integer, String> temp = new HashMap<>();
-		User usr=new User();
+		HashMap<String, String> temp = new HashMap<>();
+		User usr = getUser(principal);
 
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
 		Tutorial tut = null;
-
+		Tutorial local = null;
+		Tutorial preReq = tutService.getById(preReqTutId);
 		if(tutorialId != 0) {
 			tut=tutService.getById(tutorialId);
+			temp = addPreReqComp(tut,preReq,usr);
+		}else {
+			local = createTutorial(catName, topicId, lanId, usr);
+			if(local != null) {
+				temp = addPreReqComp(local,preReq,usr);
+			}else {
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR,ADD_COMPONENT,NULL_TUTORIAL,usr);
+			}
 		}
-
-		Tutorial tutorial_temp= tutService.getById(topicId);
-
-		if(tutorialId != 0) {
-
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.DOMAIN_STATUS, tut.getKeywordStatus(), CommonData.contributorRole, usr, tut);
-
-			tut.setPreRequistic(tutorial_temp);
-			tut.setPreRequisticStatus(CommonData.DOMAIN_STATUS);
-			tut.setPreRequiticUser(usr);
-
-			tutService.save(tut);
-
-			logService.save(log);
-			temp.put(1,  CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG);
-
-		}
-
-//		}else {
-//
-
-//			Category cat = catService.findBycategoryname(catName);
-//			Topic topic=topicService.findById(topicId);
-//			TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-//			Language lan=lanService.getByLanName(lanId);
-//			ContributorAssignedTutorial conLocal=conService.findByUserTopicCatLan(usr, localTopicCat, lan);
-//			Tutorial local=new Tutorial();
-//			local.setDateAdded(ServiceUtility.getCurrentTime());
-//			local.setConAssignedTutorial(conLocal);
-//			local.setPreRequistic(tut);
-//			local.setPreRequisticStatus(CommonData.DOMAIN_STATUS);
-//			local.setTutorialId(tutService.getNewId());
-
-//
-//			try {
-//				tutService.save(local);
-//
-//				LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-//				logService.save(log);
-//
-
-//			}catch (Exception e) {
-//				// TODO: handle exception
-//				return "error";       // throw error
-//			}
-
-
-
-//
-//
-//		}
-
-//>>>>>>> c22072d4967124d69c0e3524156a07ce6a2ad4e2
 		return temp;
-
-	}
+}
 
 	/**
 	 * Add video component of tutorial
@@ -1075,7 +1204,7 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addVideo")
-	public @ResponseBody HashMap<Integer, String> addKeyword(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addKeyword(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "videoFileName") MultipartFile videoFile,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
@@ -1083,126 +1212,31 @@ public class AjaxController{
 											Principal principal) {
 
 		
-		HashMap<Integer, String> temp = new HashMap<>();
+		HashMap<String, String> temp = new HashMap<>();
 		
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-		
+		User usr= getUser(principal);
 		
 		if(!ServiceUtility.checkFileExtensionVideo(videoFile)) { // throw error on extension
-			
-			temp.put(0, "File extension must be in MP4") ;
+			temp = updateResponse(ERROR_TOKEN, VIDEO_EXTN_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
-		
 		if(!ServiceUtility.checkVideoSize(videoFile)) {
-			
-			temp.put(0, "File Size must be under 400 MB") ;
+			temp = updateResponse(ERROR_TOKEN, VIDEO_SIZE_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
-
+		Tutorial local = null;
 		if(tutorialId != 0) {
 			Tutorial tut=tutService.getById(tutorialId);
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.ADMIN_STATUS, tut.getVideoStatus(), CommonData.contributorRole, usr, tut);
-
-			try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Video");
-					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Video");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-
-					tut.setVideo(document);
-					tut.setVideoStatus(CommonData.ADMIN_STATUS);
-					tut.setVideoUser(usr);
-
-					logService.save(log);
-					tutService.save(tut);
-
-					temp.put(1, CommonData.Video_SAVE_SUCCESS_MSG) ;
-
-			}catch (Exception e) {
-				// TODO: handle exception
-				// throw error
-				temp.put(0, "Please Try again") ;
-			}
-
+			temp = addVideoComp(tut,videoFile,usr);
 		}else {
-
-			Category cat = catService.findBycategoryname(catName);
-			Topic topic=topicService.findById(topicId);
-			TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-			Language lan=lanService.getByLanName(lanId);
-			ContributorAssignedTutorial conLocal=conService.findByTopicCatAndLanViewPart(localTopicCat,lan);
-			int newTutorialid=tutService.getNewId();
-
-			Tutorial local=new Tutorial();
-			local.setDateAdded(ServiceUtility.getCurrentTime());
-			local.setConAssignedTutorial(conLocal);
-			local.setTutorialId(newTutorialid);
-			
-			
-			if(!lan.getLangName().equalsIgnoreCase("English")) {
-				Language lanEng = lanService.getByLanName("English");
-				ContributorAssignedTutorial conLocal1 = conService.findByTopicCatAndLanViewPart(localTopicCat, lanEng);
-				local.setRelatedVideo(tutService.findAllByContributorAssignedTutorial(conLocal1).get(0));
-				
-				Tutorial preReq =tutService.findAllByContributorAssignedTutorial(conLocal1).get(0).getPreRequistic();
-				
-				if(preReq == null) {
-					local.setPreRequistic(null);
-					local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
-				}else {
-					
-					ContributorAssignedTutorial conLocal2 = conService.findByTopicCatAndLanViewPart(preReq.getConAssignedTutorial().getTopicCatId(),lan);
-					local.setPreRequistic(tutService.findAllByContributorAssignedTutorial(conLocal2).get(0));
-					local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
-				}
+			local = createTutorial(catName, topicId, lanId, usr);
+			if(local!=null){
+				temp = addVideoComp(local,videoFile,usr);
+			}else {
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, ADD_COMPONENT,NULL_TUTORIAL,usr);
 			}
 			
-		
-
-			try {
-				tutService.save(local);
-
-				if(ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Video")) {
-					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Video");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-					Tutorial tut1=tutService.getById(newTutorialid);
-					tut1.setVideo(document);
-					tut1.setVideoStatus(CommonData.ADMIN_STATUS);
-					tut1.setVideoUser(usr);
-					tutService.save(tut1);
-
-					LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-					logService.save(log);
-
-					temp.put(1, CommonData.Video_SAVE_SUCCESS_MSG) ;
-
-				}else {
-
-					temp.put(0, "Please Try again") ; /////////////////  throw error
-				}
-
-
-			}catch (Exception e) {
-				// TODO: handle exception
-				temp.put(0, "Please Try again") ;     // throw error
-			}
-
-
 		}
-
 		return temp;
 
 	}
@@ -1218,106 +1252,36 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addSlide")
-	public @ResponseBody HashMap<Integer, String> addSlide(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addSlide(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "uploadsSlideFile") MultipartFile videoFile,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
 											@RequestParam(value = "lanId") String lanId,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
-		
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+		HashMap<String, String> temp = new HashMap<>();
+		User usr = getUser(principal); 
 		
 		if(!ServiceUtility.checkFileExtensionZip(videoFile)) { // throw error on extension
-			
-			temp.put(0, "File extension must be in ZIP") ;
+			temp = updateResponse(ERROR_TOKEN, ZIP_EXTN_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
-		
 		if(!ServiceUtility.checkScriptSlideProfileQuestion(videoFile)) {
-			
-			temp.put(0, "File Size must be under 20 MB") ;
+			temp = updateResponse(ERROR_TOKEN, SLIDE_SIZE_ERROR, ADD_COMPONENT,tutorialId,usr);
 			return temp;
 		}
-		
+		Tutorial local = null;
 		if(tutorialId != 0) {
 			Tutorial tut=tutService.getById(tutorialId);
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.DOMAIN_STATUS, tut.getSlideStatus(), CommonData.contributorRole, usr, tut);
-
-			try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Slide");
-					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Slide");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-
-					tut.setSlide(document);
-					tut.setSlideStatus(CommonData.DOMAIN_STATUS);
-					tut.setSlideUser(usr);
-					tutService.save(tut);
-					logService.save(log);
-					temp.put(1, CommonData.Slide_SAVE_SUCCESS_MSG) ;
-
-			}catch (Exception e) {
-				// TODO: handle exception
-				temp.put(0, "Please Try again") ;
-				// throw error
-			}
-
+			temp = addSlideComp(tut,videoFile,usr);
 		}else {
-
-			Category cat = catService.findBycategoryname(catName);
-			Topic topic=topicService.findById(topicId);
-			TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-			Language lan=lanService.getByLanName(lanId);
-			ContributorAssignedTutorial conLocal=conService.findByTopicCatAndLanViewPart(localTopicCat, lan);
-			int newTutorialid=tutService.getNewId();
-
-			Tutorial local=new Tutorial();
-			local.setDateAdded(ServiceUtility.getCurrentTime());
-			local.setConAssignedTutorial(conLocal);
-			local.setTutorialId(newTutorialid);
-			
-
-			try {
-				tutService.save(local);
-
-				if(ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Slide")) {
-					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Slide");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-					Tutorial tut1=tutService.getById(newTutorialid);
-					tut1.setSlide(document);
-					tut1.setSlideStatus(CommonData.DOMAIN_STATUS);
-					tut1.setSlideUser(usr);
-					tutService.save(tut1);
-
-					LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-					logService.save(log);
-					temp.put(1, CommonData.Slide_SAVE_SUCCESS_MSG) ;
-
-				}else {
-
-					temp.put(0, "Please Try again") ; /////////////////  throw error
-				}
-
-
-			}catch (Exception e) {
-				// TODO: handle exception
-				temp.put(0, "Please Try again") ;     // throw error
+			local = createTutorial(catName, topicId, lanId, usr);
+			if(local!=null) {
+				temp = addSlideComp(local,videoFile,usr);
+			}else {
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, ADD_COMPONENT,NULL_TUTORIAL,usr);
 			}
-
-
 		}
-
 		return temp;
 
 	}
@@ -1333,145 +1297,26 @@ public class AjaxController{
 	 * @return string 
 	 */
 	@RequestMapping("/addScript")
-	public @ResponseBody HashMap<Integer, String> addScript(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> addScript(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "categoryname") String catName,
 											@RequestParam(value = "topicid") int topicId,
-											@RequestParam(value = "lanId") String lanId,
+											@RequestParam(value = "lanId") String lang,
 											Principal principal) {
 
-		HashMap<Integer, String> temp = new HashMap<>();
-		
-		User usr=new User();
+		HashMap<String, String> temp = new HashMap<>();
+		User usr = getUser(principal);
 
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-		
-		
-//		if(!ServiceUtility.checkFileExtensiononeFilePDF(videoFile)) { // throw error on extension
-//			
-//			temp.put(0, "File extension must be in PDF") ;
-//			return temp;
-//		}
-//		
-//		if(!ServiceUtility.checkScriptSlideProfileQuestion(videoFile)) {
-//			
-//			temp.put(0, "File Size must be under 20 MB") ;
-//			return temp;
-//		}
-
-		if(tutorialId != 0) {
+		if(tutorialId !=0) {
 			Tutorial tut=tutService.getById(tutorialId);
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.DOMAIN_STATUS, tut.getScriptStatus(), CommonData.contributorRole, usr, tut);
-			try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Script");
-//					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/Script");
-//					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-//					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-
-//					tut.setScript(document);
-					tut.setScriptStatus(CommonData.DOMAIN_STATUS);
-					tut.setScriptUser(usr);
-					try {
-						tutService.save(tut);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						temp.put(0, CommonData.GENERAL_ERROR_MSG) ;
-						return temp;
-					}
-
-					logService.save(log);
-					temp.put(1, CommonData.SCRIPT_FOR_DOMAIN_REVIEW);
-					return temp;
-
-			}catch (Exception e) {
-				temp.put(0, CommonData.GENERAL_ERROR_MSG) ;
-				return temp;
-			}
-
+			temp = addScriptComp(tut,usr);
 		}else {
-
-			Category cat = catService.findBycategoryname(catName);
-			Topic topic=topicService.findById(topicId);
-			TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-			Language lan=lanService.getByLanName(lanId);
-			ContributorAssignedTutorial conLocal=conService.findByTopicCatAndLanViewPart( localTopicCat, lan);
-			int newTutorialid=tutService.getNewId();
-
-			Tutorial local=new Tutorial();
-			local.setDateAdded(ServiceUtility.getCurrentTime());
-			local.setConAssignedTutorial(conLocal);
-			local.setTutorialId(newTutorialid);
-			
-			
-			if(!lan.getLangName().equalsIgnoreCase("English")) {
-				Language lanEng = lanService.getByLanName("English");
-				ContributorAssignedTutorial conLocal1 = conService.findByTopicCatAndLanViewPart(localTopicCat, lanEng);
-				local.setRelatedVideo(tutService.findAllByContributorAssignedTutorial(conLocal1).get(0));
-				
-				Tutorial preReq =tutService.findAllByContributorAssignedTutorial(conLocal1).get(0).getPreRequistic();
-				
-				if(preReq == null) {
-					local.setPreRequistic(null);
-					local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
-				}else {
-					
-					ContributorAssignedTutorial conLocal2 = conService.findByTopicCatAndLanViewPart(preReq.getConAssignedTutorial().getTopicCatId(),lan);
-					local.setPreRequistic(tutService.findAllByContributorAssignedTutorial(conLocal2).get(0));
-					local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
-					local.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
-				}
-			}
-			
-
-			try {
-				tutService.save(local);
-
-//				if(ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Script")) {
-//					String pathtoUploadPoster=ServiceUtility.uploadVideoFile(videoFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+newTutorialid+"/Script");
-//					int indexToStart=pathtoUploadPoster.indexOf("Media");
-//
-//					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-					Tutorial tut1=tutService.getById(newTutorialid);
-//					tut1.setScript(document);
-					tut1.setScriptStatus(CommonData.DOMAIN_STATUS);
-					tut1.setScriptUser(usr);
-					tutService.save(tut1);
-
-					LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.DOMAIN_STATUS, 0, CommonData.contributorRole, usr, local);
-					logService.save(log);
-					temp.put(1, CommonData.Script_SAVE_SUCCESS_MSG);
-					return temp;
-
-//				}
-//				else {
-//
-//					temp.put(0, "Please Try again") ;
-//					return temp; /////////////////  throw error
-//				}
-
-
-			}catch (Exception e) {
-				// TODO: handle exception
-				temp.put(0, "Please Try again") ;
-				return temp;       // throw error
-			} 
-		} 
+			Tutorial tut = createTutorial(catName, topicId, lang, usr);
+			temp = addScriptComp(tut,usr);
+		}
+		return temp;
 
 	}
 
-
-
-	/*************************************** END ******************************************************/
-
-
-	/********************************** operation at Admin End *****************************************/
 	
 	/**
 	 * accept video component from admin reviewer
@@ -1480,30 +1325,17 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptAdminVideo")
-	public @ResponseBody String addAdminVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> addAdminVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.DOMAIN_STATUS, tutorial.getVideoStatus(), CommonData.adminReviewerRole, usr, tutorial);
-
 		tutorial.setVideoStatus(CommonData.DOMAIN_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Video_STATUS_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getVideoStatus()); 
+		return temp;
 	}
 
-
-
-	/***********************************END ***************************************************************/
-
-	/********************************** operation at DOMAIN USER *****************************************/
 	
 	/**
 	 * accept outline component from domain reviewer
@@ -1512,8 +1344,9 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainOutline")
-	public @ResponseBody String acceptDomainOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
+	public @ResponseBody HashMap<String, String> acceptDomainOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
 
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1526,7 +1359,13 @@ public class AjaxController{
 		tutorial.setOutlineStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Outline_SAVE_SUCCESS_MSG;
+//		return CommonData.Outline_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
+//		ToDO Add user
+		//temp.put("user", usrservice.);
+		//return CommonData.SUCCESS_STATUS;
+		return temp;
 
 	}
 
@@ -1537,8 +1376,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainScript")
-	public @ResponseBody String acceptDomainScript(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainScript(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1552,8 +1391,10 @@ public class AjaxController{
 		tutorial.setScriptStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-
-		return CommonData.SCRIPT_FOR_QUALITY_REVIEW;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
+//		return CommonData.SCRIPT_FOR_QUALITY_REVIEW;
+		return temp;
 
 	}
 
@@ -1564,8 +1405,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainVideo")
-	public @ResponseBody String acceptDomainVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1579,7 +1420,10 @@ public class AjaxController{
 		tutorial.setVideoStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Video_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
+		//return CommonData.Video_SAVE_SUCCESS_MSG;
+		return temp;
 
 	}
 
@@ -1590,8 +1434,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainSlide")
-	public @ResponseBody String acceptDomainSlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainSlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1604,7 +1448,10 @@ public class AjaxController{
 		tutorial.setSlideStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Slide_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
+//		return CommonData.Slide_SAVE_SUCCESS_MSG;
+		return temp;
 
 	}
 
@@ -1615,8 +1462,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainKeywords")
-	public @ResponseBody String acceptDomainKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1629,7 +1476,9 @@ public class AjaxController{
 		tutorial.setKeywordStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Keyword_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
+		return temp;
 
 	}
 
@@ -1640,8 +1489,8 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptDomainPreRequistic")
-	public @ResponseBody String acceptDomainPreRequistic(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
+	public @ResponseBody HashMap<String, String> acceptDomainPreRequistic(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		HashMap<String, String> temp = new HashMap<String, String>();
 		User usr=new User();
 
 		if(principal!=null) {
@@ -1653,7 +1502,10 @@ public class AjaxController{
 		tutorial.setPreRequisticStatus(CommonData.QUALITY_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG;
+		temp.put("response", CommonData.SUCCESS_STATUS);
+		temp.put("status", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
+		//return CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG;
+		return temp;
 
 	}
 
@@ -1670,24 +1522,18 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityOutline")
-	public @ResponseBody String acceptQualityOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualityOutline(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.WAITING_PUBLISH_STATUS, tutorial.getOutlineStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setOutlineStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Outline_SAVE_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getOutlineStatus()); 
+		return temp;
 	}
 
+	
 	/**
 	 * accept script component from quality reviewer
 	 * @param tutorialId int value
@@ -1695,22 +1541,15 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityScript")
-	public @ResponseBody String acceptQualityScript(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualityScript(@RequestParam(value = "id") int tutorialId,Principal principal) {	
+		User usr= getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.WAITING_PUBLISH_STATUS, tutorial.getScriptStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setScriptStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.SCRIPT_STATUS_UPDATE_SUCCESS;
-
+		HashMap<String, String> temp = setResponse(tutorial.getScriptStatus()); 
+		return temp;
 	}
 
 	/**
@@ -1720,22 +1559,15 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityVideo")
-	public @ResponseBody String acceptQualityVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualityVideo(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.WAITING_PUBLISH_STATUS, tutorial.getVideoStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setVideoStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Video_STATUS_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getVideoStatus()); 
+		return temp;
 	}
 
 	/**
@@ -1745,22 +1577,15 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualitySlide")
-	public @ResponseBody String acceptQualitySlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+	public @ResponseBody HashMap<String, String> acceptQualitySlide(@RequestParam(value = "id") int tutorialId,Principal principal) {
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.WAITING_PUBLISH_STATUS, tutorial.getSlideStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Slide_SAVE_SUCCESS_MSG;
-
+		HashMap<String, String> temp = setResponse(tutorial.getSlideStatus()); 
+		return temp;
 	}
 
 	/**
@@ -1770,21 +1595,16 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityKeywords")
-	public @ResponseBody String acceptQualityKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
+	public @ResponseBody HashMap<String, String> acceptQualityKeywords(@RequestParam(value = "id") int tutorialId,Principal principal) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal); 
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.WAITING_PUBLISH_STATUS, tutorial.getKeywordStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setKeywordStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.Keyword_SAVE_SUCCESS_MSG;
+		HashMap<String, String> temp = setResponse(tutorial.getKeywordStatus()); 
+		return temp;
 
 	}
 
@@ -1795,21 +1615,16 @@ public class AjaxController{
 	 * @return String
 	 */
 	@RequestMapping("/acceptQualityPreRequistic")
-	public @ResponseBody String acceptQualityPreRequistic(@RequestParam(value = "id") int tutorialId, Principal principal) {
+	public @ResponseBody HashMap<String, String> acceptQualityPreRequistic(@RequestParam(value = "id") int tutorialId, Principal principal) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal);
 		Tutorial tutorial=tutService.getById(tutorialId);
 		LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.WAITING_PUBLISH_STATUS, tutorial.getPreRequisticStatus(), CommonData.qualityReviewerRole, usr, tutorial);
 		tutorial.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
 		tutService.save(tutorial);
 		logService.save(log);
-		return CommonData.PRE_REQUISTIC_SAVE_SUCCESS_MSG;
+		HashMap<String, String> temp = setResponse(tutorial.getPreRequisticStatus()); 
+		return temp;
 
 	}
 
@@ -1817,53 +1632,6 @@ public class AjaxController{
 
 	/***********************************END ***************************************************************/
 /******************************* COMMENT MODULE UNDER CREATION PART ********************************/
-
-	/**
-	 * records comment made by user under admin role interface
-	 * @param tutorialId int value
-	 * @param msg string
-	 * @param principal Principal object
-	 * @return string
-	 */
-	@RequestMapping("/commentByAdminReviewer")
-	public @ResponseBody String commentByAdminReviewer(@RequestParam(value = "id") int tutorialId,
-													@RequestParam(value = "msg") String msg, Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
-
-		Tutorial tut = tutService.getById(tutorialId);
-
-		Comment com = new Comment();
-		com.setComment(msg);
-		com.setCommentId(comService.getNewCommendId());
-		com.setDateAdded(ServiceUtility.getCurrentTime());
-		com.setType(CommonData.VIDEO);
-		com.setUser(usr);
-		com.setTutorialInfos(tut);
-		com.setRoleName(CommonData.adminReviewerRole);
-
-		try {
-			comService.save(com);
-
-			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.IMPROVEMENT_STATUS, tut.getVideoStatus(), CommonData.adminReviewerRole, usr, tut);
-			tut.setVideoStatus(CommonData.IMPROVEMENT_STATUS);
-			tutService.save(tut);
-			logService.save(log);
-			return CommonData.COMMENT_SUCCESS;
-
-		}catch (Exception e) {
-			// TODO: handle exception
-			return CommonData.FAILURE;
-		}
-
-
-
-	}
 
 	/**
 	 * records comment made by user given type of component
@@ -1875,27 +1643,25 @@ public class AjaxController{
 	 * @return string
 	 */
 	@RequestMapping("/commentByReviewer")
-	public @ResponseBody String commentByReviewer(@RequestParam(value = "id") int tutorialId,
+	public @ResponseBody HashMap<String, String> commentByReviewer(@RequestParam(value = "id") int tutorialId,
 													@RequestParam(value = "msg") String msg,
 													@RequestParam(value = "type") String type,
 													@RequestParam(value = "role") String role,
 													Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=usrservice.findByUsername(principal.getName());
-		}
+		HashMap<String, String> temp = new HashMap<String, String>();
+		
+		User usr = getUser(principal);
 
 		String roleName = null;
 		int statusvalue=0;
 		String typeValue=null;
 
-		if(role.equalsIgnoreCase("Quality")) {
+		if(role.equalsIgnoreCase(QUALITY)) {
 			roleName=CommonData.qualityReviewerRole;
-		}else if(role.equalsIgnoreCase("Domain")) {
+		}else if(role.equalsIgnoreCase(DOMAIN)) {
 			roleName=CommonData.domainReviewerRole;
+		}else if(role.equalsIgnoreCase(ADMIN_REVIEWER)) {
+			roleName=CommonData.adminReviewerRole;
 		}
 		Tutorial tut = tutService.getById(tutorialId);
 
@@ -1935,20 +1701,17 @@ public class AjaxController{
 			typeValue = CommonData.OUTLINE;
 
 		}else {
-
-			return CommonData.FAILURE;
+			temp.put("response", CommonData.FAILURE_STATUS);
+			temp.put("status", CommonData.tutorialStatus[statusvalue]);
+			return temp;
 		}
 
 		com.setUser(usr);
 		com.setTutorialInfos(tut);
 
-
-
 		try {
 			comService.save(com);
-
 			LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), typeValue, CommonData.IMPROVEMENT_STATUS, statusvalue, roleName, usr, tut);
-
 			if(type.equalsIgnoreCase(CommonData.SCRIPT)) {
 				tut.setScriptStatus(CommonData.IMPROVEMENT_STATUS);
 			}else if(type.equalsIgnoreCase(CommonData.KEYWORD)) {
@@ -1966,15 +1729,15 @@ public class AjaxController{
 			tutService.save(tut);
 			logService.save(log);
 
-			return CommonData.COMMENT_SUCCESS;
+			temp.put("response", CommonData.SUCCESS_STATUS);
+			temp.put("status", CommonData.tutorialStatus[CommonData.IMPROVEMENT_STATUS]);
+			return temp;
 
 		}catch (Exception e) {
-			// TODO: handle exception
-			return CommonData.FAILURE;
+			temp.put("response", CommonData.FAILURE_STATUS);
+			temp.put("status", CommonData.tutorialStatus[statusvalue]);
+			return temp;
 		}
-
-
-
 	}
 
 
@@ -2201,6 +1964,31 @@ public class AjaxController{
 
 	}
 	
+	//route after clicking the link in mail
+	
+	@PostMapping("/process_register")
+    public String processRegister(User user, HttpServletRequest request)
+            throws UnsupportedEncodingException, MessagingException {
+        usrservice.register(user, getSiteURL(request));       
+        return "register_success";
+    }
+	
+	//route to verify
+	
+	@GetMapping("/verify")
+	public String verifyUser(@Param("code") String code) {
+	    if (UserService.verify(code)) {
+	        return "verify_success";
+	    } else {
+	        return "verify_fail";
+	    }
+	}
+     
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "");
+    }
+	
 	/*********************************** END ********************************************************/
 	
 	@RequestMapping("/tutCountOnCat")
@@ -2234,24 +2022,198 @@ public class AjaxController{
 		
 		return "Total number of tutorial under "+id +" Language is "+total;
 	}
+	private void changeAllCompStatus(Tutorial tutorial, User user) {
+		LogManegement log_outline =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.IMPROVEMENT_STATUS, tutorial.getOutlineStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setOutlineStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_outline);
+		LogManegement log_script =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setScriptStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_script);
+		LogManegement log_slide=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setSlideStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_slide);
+		LogManegement log_video=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setVideoStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_video);
+		LogManegement log_keyword=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setKeywordStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_keyword);
+		LogManegement log_pre_req=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.contributorRole, user, tutorial);
+		tutorial.setPreRequisticStatus(CommonData.IMPROVEMENT_STATUS);
+		logService.save(log_pre_req);
+		tutService.save(tutorial);
+	}
+	private Tutorial changeComponentStatus(String components,Tutorial tutorial,User user) {
+		LogManegement log_outline = null;
+		LogManegement log_script = null;
+		LogManegement log_slide = null;
+		LogManegement log_video = null;
+		LogManegement log_keyword = null;
+		LogManegement log_pre_req = null;
+
+			if(components.contains(CommonData.OUTLINE)) {
+				log_outline =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.OUTLINE, CommonData.IMPROVEMENT_STATUS, tutorial.getOutlineStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setOutlineStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_outline);
+				
+			} 
+			if(components.contains(CommonData.SCRIPT)) {
+				log_script =  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT, CommonData.IMPROVEMENT_STATUS, tutorial.getScriptStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setScriptStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_script);
+			} 
+			if(components.contains(CommonData.SLIDE)) {
+				log_slide=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE, CommonData.IMPROVEMENT_STATUS, tutorial.getSlideStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setSlideStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_slide);
+			}
+			if(components.contains(CommonData.VIDEO)) {
+				log_video=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO, CommonData.IMPROVEMENT_STATUS, tutorial.getVideoStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setVideoStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_video);
+			} 
+			if(components.contains(CommonData.KEYWORD)) {
+				log_keyword=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.KEYWORD, CommonData.IMPROVEMENT_STATUS, tutorial.getKeywordStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setKeywordStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_keyword);
+			} 
+			if(components.contains(CommonData.PRE_REQUISTIC)) {
+				log_pre_req=  new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.PRE_REQUISTIC, CommonData.IMPROVEMENT_STATUS, tutorial.getPreRequisticStatus(), CommonData.superUserRole, user, tutorial);
+				tutorial.setPreRequisticStatus(CommonData.IMPROVEMENT_STATUS);
+				logService.save(log_pre_req);
+			}
+		
+		tutService.save(tutorial);
+//		if(log_outline!=null) {
+//			logService.save(log_outline);
+//		} 
+//		if(log_script!=null) {
+//			logService.save(log_script);
+//		} 
+//		if(log_slide!=null) {
+//			logService.save(log_slide);
+//		} 
+//		if(log_video!=null) {
+//			logService.save(log_video);
+//		}
+//		if(log_keyword!=null) {
+//			logService.save(log_keyword);
+//		} 
+//		if(log_pre_req!=null) {
+//			logService.save(log_pre_req);
+//		} 
+		
+		return tutorial;
+	}
 	
 	@RequestMapping("/unpublishTutorial")
-	public @ResponseBody  String unpublishTutorial(@RequestParam(value = "id") int id) {
-
-		Tutorial tut = tutService.getById(id);
-		
-		if(tut.isStatus()) {
-			tut.setStatus(false);
+	public @ResponseBody HashMap<String, String> unpublishTutorial(@RequestParam int category, 
+												  @RequestParam int  topic,
+												  @RequestParam int  language,
+												  @RequestParam String components,
+												  Principal principal) {
+		HashMap<String, String> res = new HashMap<String, String>();
+		User user = getUser(principal);
+		Category cat_ = catService.findByid(category);
+		Topic topic_ = topicService.findById(topic);
+		Language lang = langService.getById(language);
+		TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat_, topic_);
+		ContributorAssignedTutorial conAssignedTut = conService.findByTopicCatAndLanViewPart(tcm, lang);
+		List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conAssignedTut);
+		Tutorial tutorial = null;
+		if(!tutorials.isEmpty()) {
+			tutorial = tutorials.get(0);
+		}
+		if(tutorial!=null) {
+			tutorial = changeComponentStatus(components,tutorial,user);
+			tutorial.setStatus(false);
+			tutService.save(tutorial);
+			res.put("response", "1");
+			res.put(CommonData.OUTLINE, CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
+			res.put(CommonData.SCRIPT, CommonData.tutorialStatus[tutorial.getScriptStatus()]);
+			res.put(CommonData.SLIDE, CommonData.tutorialStatus[tutorial.getSlideStatus()]);
+			res.put(CommonData.KEYWORD, CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
+			res.put(CommonData.VIDEO, CommonData.tutorialStatus[tutorial.getVideoStatus()]);
+			res.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
 		}else {
-			return "0";
+			res.put("response", "0");
 		}
-		try {
-			tutService.save(tut);
-			return "success";
-		}catch (Exception e) {
-			System.err.print(e);
-			return "failed";
+		res.put("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		return res;
+
+	}
+	
+	@RequestMapping("/loadLanguageByCategoryTopic")
+	public @ResponseBody HashMap<Integer, String> getLanguageByContributorRole(@RequestParam(value = "category") int category,
+															@RequestParam(value = "topic") int topic) {
+
+		HashMap<Integer,String> languages=new HashMap<Integer,String>();
+		Category cat = catService.findByid(category);
+		Topic topic_=topicService.findById(topic);
+		TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic_);
+		List<TopicCategoryMapping> tcm = new ArrayList<TopicCategoryMapping>();
+		tcm.add(localTopicCat);
+		List<ContributorAssignedTutorial> catAssgnTut = conService.findAllByTopicCat(tcm);
+		for(ContributorAssignedTutorial c : catAssgnTut) {
+			if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
+				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
+			}
+			
 		}
+		return languages;
+	}
+	
+	@RequestMapping("/loadPublishedTopicsByCategory")
+	public @ResponseBody HashMap<Integer, String> loadPublishedTopicsByCategory(@RequestParam(value = "id") int id) {
+
+		HashMap<Integer,String> topicName=new HashMap<>();
+
+		Category cat = catService.findByid(id);
+
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		List<ContributorAssignedTutorial> conAssignTut = conService.findAllByTopicCat(local);
+		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(conAssignTut);
+		for(Tutorial tut : tutorials) {
+			topicName.put(tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());			
+		}
+
+		return topicName;
+
+	}
+	
+	@RequestMapping("/getComponentDetails")
+	public @ResponseBody HashMap<String, String> getComponentDetails(@RequestParam int category ,@RequestParam int topic, @RequestParam int language) {
+
+		HashMap<String,String> compStatus=new HashMap<>();
+
+		Category category_ = catService.findByid(category);
+		Topic topic_ = topicService.findById(topic);
+		Language langugage_ = lanService.getById(language);
+		TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(category_, topic_);
+		ContributorAssignedTutorial conAssgnTut = conService.findByTopicCatAndLanViewPart(tcm, langugage_);
+		List<Tutorial> tutorial = tutService.findAllByContributorAssignedTutorial(conAssgnTut);
+		if(!tutorial.isEmpty()) {
+			Tutorial t = tutorial.get(0);
+			compStatus.put(CommonData.OUTLINE, CommonData.tutorialStatus[t.getOutlineStatus()]);
+			compStatus.put(CommonData.SCRIPT, CommonData.tutorialStatus[t.getScriptStatus()]);
+			compStatus.put(CommonData.SLIDE, CommonData.tutorialStatus[t.getSlideStatus()]);
+			compStatus.put(CommonData.KEYWORD, CommonData.tutorialStatus[t.getKeywordStatus()]);
+			compStatus.put(CommonData.VIDEO, CommonData.tutorialStatus[t.getVideoStatus()]);
+			compStatus.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[t.getPreRequisticStatus()]);
+			compStatus.put("response", "1");
+			compStatus.put("topic_details", t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName() + " ("+t.getConAssignedTutorial().getLan().getLangName()+" )");
+			
+			compStatus.put("outline-status", String.valueOf(t.getOutlineStatus()));
+			compStatus.put("script-status", String.valueOf(t.getScriptStatus()));
+			compStatus.put("slide-status", String.valueOf(t.getSlideStatus()));
+			compStatus.put("video-status", String.valueOf(t.getVideoStatus()));
+			compStatus.put("keyword-status", String.valueOf(t.getKeywordStatus()));
+			compStatus.put("prerequisite-status", String.valueOf(t.getPreRequisticStatus()));
+		}else {
+			compStatus.put("response", "0");
+		}
+		return compStatus;
+
 	}
 	
 		

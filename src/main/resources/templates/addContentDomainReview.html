@@ -1,120 +1,64 @@
 
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
 
-<head>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
-	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
-	crossorigin="anonymous" />
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-	crossorigin="anonymous">
 <style>
 .fa-user-circle,.fa-comment-alt,.fa-clock{
 color : #014F7A;}
 #sm_url:hover,#slidName:hover{
 background: none!important;}
-.modal-title{
-font-weight : bold!important;
-color: #014F7A;
-font-size: 1rem;
-}
 
-.modal-header{
-border-bottom: 2px solid #014F7A!important;}
 </style>
-</head>
+
 <body>
 <div th:replace="common/sidebar :: top_header"></div>
 <div class="container-fluid">
-<div class="row">
-<div class="col-md-3 col-lg-2 pr-0">
-<div th:replace="common/sidebar :: contributor_sidebar"></div>
-</div>
-<div class="col-md-9 col-lg-10 p-md-5">
-<div>
-				<div class="alert alert-success" role="alert" th:if="${success_msg}">
-	 				<div id="#test" class="">
-						<div >
-							<span th:text="${success_msg}"></span>
-						</div>
-					</div>
-				</div>
-				<div class="alert alert-danger" role="alert" th:if="${error_msg}">
-	 				<div id="#test" class="">
-						<div >
-							<span th:text="${error_msg}"></span>
-						</div>
-					</div>
-				</div>
-</div>
-<div class="card">
-					<div class="card-header">
-						<h4>Review Tutorial</h4>
-					</div>
+	<div class="row">
+		<div class="col-md-3 col-lg-2 pr-0">
+			<div th:replace="common/sidebar :: contributor_sidebar"></div>
+		</div>
+		<div class="col-md-9 col-lg-10 p-md-5">
+			<div class="card">
+				<div class="card-header"><h1 class="title-1">Domain Review</h1></div>
 					<div class="card-body">
 						<div class="row">
 							<div class="col">
-								<form th:action="@{/submitTutorial}" method="post">
-
-							<table class="table table-bordered">
+								<table class="table table-bordered">
 								<thead>
 									<tr>
 										<th>Category</th>
 										<td>
-											 <input
-												class="form-control" id="categoryId" name="categoryName"
-												th:value="${category}"
-												readonly="readonly"></input>
+											 <input class="form-control" id="categoryId" th:value="${category}" readonly="readonly"></input>
 										</td>
-
-
-
 									</tr>
 								</thead>
-
 								<thead>
 									<tr>
-
 										<th>Topic Name</th>
-										<td> <input
-												class="form-control" id="topicId" name="categoryName"
-												th:value="${topic}"
-												readonly="readonly"></input>
+										<td>
+											<input class="form-control" id="topicId"  th:value="${topic}" readonly="readonly"></input>
 										</td>
 									</tr>
-
-
-
 								</thead>
 								<thead>
 									<tr>
 										<th>Language Name</th>
-										<td> <input
-												class="form-control" id="lanId" name="languageName"
-												th:value="${language}"
-												readonly="readonly"></input>
-
+										<td> 
+											<input class="form-control" id="lanId" th:value="${language}" readonly="readonly"></input>
 										</td>
 									</tr>
-									<input type="hidden" id="tutorialId" th:value="${tutorial.getTutorialId()}" />
 								</thead>
 							</table>
-
-							<table class="table table-bordered" style="background: OldLace;">
-
+							<input type="hidden" id="tutorialId" th:value="${tutorial.getTutorialId()}" />
+							<table class="table table-bordered table-domain table-hover" >
 								<thead>
 									<tr>
-
 										<th>Sr No</th>
 										<th>Component</th>
 										<th>Status</th>
 										<th>User</th> 
-										<th><i style="color: purple; width: 30px"
-											class="fas fa-cogs"></i></th>
-
+										<th><i class="fas fa-cogs"></i></th>
 									</tr>
 								</thead>
 
@@ -122,448 +66,124 @@ border-bottom: 2px solid #014F7A!important;}
 									<tr>
 										<td>1</td>
 										<td>Outline</td>
-										<td><span th:each="statusOutline : ${statusOutline}">
-												<span style="color: green;" th:text="${statusOutline}"></span>
-										</span></td>
-										<td>
-												<span style="color: green;" th:if="${tutorial.getOutlineUser()}" th:text="${#strings.capitalizeWords(tutorial.getOutlineUser().getFullName())}"></span>
-										</span></td>
+										<td><span th:text="${statusOutline}" data-comp="outline"></span></td>
+										<td><span th:if="${tutorial.getOutlineUser()}" th:text="${#strings.capitalizeWords(tutorial.getOutlineUser().getFullName())}"></span></td>
 										<th>
-											<button type="button" class="btn btn-info"
-												data-toggle="modal" data-target="#outlineViewModelDomain"
-												data-whatever="@mdo">
-												<i class="fas fa-eye"></i>
-											</button> <!-- <span th:if="${statusOutlineTrue}">
-												<button type="button" class="btn btn-info"
-													data-toggle="modal"
-													data-target="#OutlineAcceptOrNeedTiImprovemenet"
-													data-whatever="@mdo">
-													<i class="fas fa-check-circle"></i>
-												</button>
-										</span> -->
+											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalOutlineDomain"
+												data-whatever="@mdo"> <i class="fas fa-eye"></i>
+											</button> 
 										</th>
-
 									</tr>
 									<tr>
-
 										<td>2</td>
 										<td>Script</td>
-										<td><span th:each="statusScript :${statusScript}">
-												<span style="color: green;" th:text="${statusScript}">Pending</span>
-										</span></td>
-										
-										<td>
-												<span style="color: green;" th:if="${tutorial.getScriptUser()}" th:text="${#strings.capitalizeWords(tutorial.getScriptUser().getFullName())}"></span>
-										</span></td>
-										
-										<th><!-- <span id="scriptIdDomain"
-											th:each="scriptpath : ${tutorialComponenet}"> <a
-												class="btn btn-info" target="_blank" id="cat"
-												name="categoryName" th:href="${'/'+scriptpath.getScript()}"><i
-													class="fas fa-eye"></i></a>
-
-										</span> --> <!--  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#viewScriptIdDomain" data-whatever="@mdo"><i class="fas fa-eye"></i> </button>
-		                             			 --> <!-- <span  th:if="${statusScript == 'Wating for Domain Review'}"><button type="button" class="btn btn-info" data-toggle="modal"  data-target="#scriptStatusAccept" data-whatever="@mdo"><i class="fas fa-check-circle"></i>
-		                                          </button></span> --> <!-- <span
-											th:if="${statusScriptTrue}"><button type="button"
-													class="btn btn-info" data-toggle="modal"
-													data-target="#scriptStatusAcceptDomain"
-													data-whatever="@mdo">
-													<i class="fas fa-check-circle"></i>
-												</button></span> -->
-												<span><button type="button"
-													class="btn btn-info" data-toggle="modal"
-													data-target="#scriptStatusAcceptDomain"
-													data-whatever="@mdo">
-												<i class="fas fa-eye"></i>
-												</button></span>
-												</th>
-
+										<td><span th:text="${statusScript}" data-comp="script"></span></td>
+										<td><span  th:if="${tutorial.getScriptUser()}" th:text="${#strings.capitalizeWords(tutorial.getScriptUser().getFullName())}"></span></td>
+										<th>
+											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalScriptDomain"
+													data-whatever="@mdo"> <i class="fas fa-eye"></i>
+											</button>
+										</th>
 									</tr>
-
-
 									<tr>
-
 										<td>3</td>
 										<td>Video</td>
-										<td><span th:each="statusVideo : ${statusVideo}">
-												<span style="color: green;" th:text="${statusVideo}">Pending</span>
-										</span></td>
-
-										<td>
-												<span style="color: green;" th:if="${tutorial.getVideoUser()}" th:text="${#strings.capitalizeWords(tutorial.getVideoUser().getFullName())}"></span>
-										</span></td>
+										<td><span  th:text="${statusVideo}" data-comp="video"></span></td>
+										<td><span  th:if="${tutorial.getVideoUser()}" th:text="${#strings.capitalizeWords(tutorial.getVideoUser().getFullName())}"></span></td>
 										<th>
-											<button type="button" class="btn btn-info"
-												data-toggle="modal" data-target="#videoViewIdDomain"
-												data-whatever="@mdo">
-												<i class="fas fa-eye"></i>
-											</button> <!-- <span th:if="${statusVideoTrue}">
-												<button type="button" class="btn btn-info"
-													data-toggle="modal" data-target="#VideoStatusAccept"
-													data-whatever="@mdo">
-													<i class="fas fa-check-circle"></i>
-												</button>
-										</span> -->
+											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalVideoDomain"
+												data-whatever="@mdo"><i class="fas fa-eye"></i>
+											</button> 
 										</th>
-
-
-
 									</tr>
-
-									<tr th:if = "${otherLan}">
-
+									<tr th:if = "${isEnglish}">
 										<td>4</td>
 										<td>Slide</td>
-										<td><span th:each="statusSlide: ${statusSlide}"> <span
-												style="color: green;" th:text="${statusSlide}">Pending</span>
-										</span></td>
-										
-										<td>
-												<span style="color: green;" th:if="${tutorial.getSlideUser()}" th:text="${#strings.capitalizeWords(tutorial.getSlideUser().getFullName())}"></span>
-										</span></td>
-										
-										<th><!-- <span id="scriptIdDomain"
-											th:each="scriptpath : ${tutorialComponenet}"> <a
-												class="btn btn-info" target="_blank" id="slidName"
-												name="categoryName" th:href="${'/'+scriptpath.getSlide()}"><i
-													class="fas fa-eye"></i></a>
-										</span>  --> <!-- <span th:if="${statsuSlideTrue}"> -->
-												<button type="button" class="btn btn-info"
-													data-toggle="modal" data-target="#SlideStatusAccept"
-													data-whatever="@mdo">
-											<i class="fas fa-eye"></i>	</button>
-										<!-- </span> -->
+										<td><span th:text="${statusSlide}" data-comp="slide"></span></td>
+										<td><span  th:if="${tutorial.getSlideUser()}" th:text="${#strings.capitalizeWords(tutorial.getSlideUser().getFullName())}"></span></td>
+										<th>
+											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalSlideDomain"
+												data-whatever="@mdo"><i class="fas fa-eye"></i>
+											</button>
 										</th>
-
 									</tr>
 
-									<tr th:if = "${otherLan}">
+									<tr th:if = "${isEnglish}">
 										<td>5</td>
 										<td>Keywords</td>
-										<td><span th:each=" statusKeyword: ${statusKeyword}">
-												<span style="color: green;" th:text="${statusKeyword}">Pending</span>
-										</span></td>
-										
-										<td>
-												<span style="color: green;" th:if="${tutorial.getKeywordUser()}" th:text="${#strings.capitalizeWords(tutorial.getKeywordUser().getFullName())}"></span>
-										</span></td>
-
+										<td><span  th:text="${statusKeyword}" data-comp="keyword"></span></td>
+										<td><span  th:if="${tutorial.getKeywordUser()}" th:text="${#strings.capitalizeWords(tutorial.getKeywordUser().getFullName())}"></span></td>
 										<th>
-											<button type="button" class="btn btn-info"
-												data-toggle="modal" data-target="#keywordModaleViewInDomain"
-												data-whatever="@mdo">
-												<i class="fas fa-eye"></i>
-											</button> <!-- <span th:if="${statusKeywordTrue}">
-												<button type="button" class="btn btn-info"
-													data-toggle="modal" data-target="#KeywordStatusAccept"
-													data-whatever="@mdo">
-													<i class="fas fa-check-circle"></i>
-												</button>
-										</span> -->
-
+											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalKeywordDomain"
+												data-whatever="@mdo"> <i class="fas fa-eye"></i>
+											</button> 
 										</th>
-
 									</tr>
-
-										<tr th:if = "${otherLan}">
+										<tr th:if = "${isEnglish}">
 										<td>6</td>
 										<td>Pre-Requisite</td>
-										<td><span style="color: green;" class="status-contri" th:text="${statusPreReq}"></span></td>
-										<td>
-												<span style="color: green;" th:if="${tutorial.getPreRequiticUser()}" th:text="${#strings.capitalizeWords(tutorial.getPreRequiticUser().getFullName())}"></span>
-										</span></td>
-										
-
+										<td><span th:text="${statusPreReq}" data-comp="prerequisite"></span></td>
+										<td><span  th:if="${tutorial.getPreRequiticUser()}" th:text="${#strings.capitalizeWords(tutorial.getPreRequiticUser().getFullName())}"></span></td>
 										<th>
-								
-											<button type="button" class="btn btn-info"
-												data-toggle="modal" data-target="#PreViewIdDomain"
-												data-whatever="@mdo">
-												<i class="fas fa-eye"></i>
+											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalPreReqDomain"
+												data-whatever="@mdo"> <i class="fas fa-eye"></i>
 											</button>
-										
 										</th>
-
 									</tr>
-                                     	  
-
-
 								</tbody>
 							</table>
-
-
-							<!-- Here is code Domain reviwer Comment-->
-
-							<span th:each="mesComment : ${CommentMsg}"> <span
-								style="color: green;"
-								th:if="${mesComment.getComponenenetDeatail()=='Video'}">
-
-									<div class="alert alert-warning">
-
-										<i style="width: 30px; height: 25px" class="fas fa-comment"></i>
-										<strong style="color: green; text-transform: uppercase;">
-											<span style="color: green;"
-											th:text="${mesComment.getComponenenetDeatail()}"></span>
-										</strong><br></br> &nbsp;&nbsp;&nbsp; <i class="fas fa-arrow-right">
-										</i> <span style="color: green;"
-											th:text="${mesComment.getCommentInfo()}"> </span>
-
-									</div>
-							</span> <span style="color: green;"
-								th:if="${mesComment.getComponenenetDeatail()=='Outline'}">
-
-									<div class="alert alert-warning">
-
-										<i style="width: 30px; height: 25px" class="fas fa-comment"></i>
-
-										<strong style="color: green; text-transform: uppercase;">
-											<span style="color: green;"
-											th:text="${mesComment.getComponenenetDeatail()}"></span>
-										</strong><br></br> &nbsp;&nbsp;&nbsp; <i class="fas fa-arrow-right">
-										</i> <span style="color: green;"
-											th:text="${mesComment.getCommentInfo()}">Pending</span>
-
-									</div>
-
-							</span> <span style="color: green;"
-								th:if="${mesComment.getComponenenetDeatail()=='Script'}">
-
-									<div class="alert alert-warning">
-
-										<i style="width: 30px; height: 25px" class="fas fa-comment"></i>
-										<strong style="color: green; text-transform: uppercase;"><span
-											style="color: green;"
-											th:text="${mesComment.getComponenenetDeatail()}"></span></strong><br></br>
-
-										&nbsp;&nbsp;&nbsp; <i class="fas fa-arrow-right"> </i> <span
-											style="color: green;"
-											th:text="${mesComment.getCommentInfo()}">Pending</span>
-
-									</div>
-
-							</span> <!--   </div> --> <span style="color: green;"
-								th:if="${mesComment.getComponenenetDeatail()=='Slide'}">
-
-									<div class="alert alert-warning">
-
-										<i style="width: 30px; height: 25px" class="fas fa-comment"></i>
-
-										<strong style="color: green; text-transform: uppercase;"><span
-											style="color: green;"
-											th:text="${mesComment.getComponenenetDeatail()}"></span></strong><br></br>
-
-										&nbsp;&nbsp;&nbsp; <i class="fas fa-arrow-right"> </i> <span
-											style="color: green;"
-											th:text="${mesComment.getCommentInfo()}">Pending</span>
-
-									</div>
-
-							</span> <span style="color: green;"
-								th:if="${mesComment.getComponenenetDeatail()=='keyword'}">
-
-									<div class="alert alert-warning">
-
-										<i style="width: 30px; height: 25px" class="fas fa-comment"></i>
-
-										<strong style="color: green; text-transform: uppercase;"><span
-											style="color: green;"
-											th:text="${mesComment.getComponenenetDeatail()}"></span></strong><br></br>
-
-										&nbsp;&nbsp;&nbsp; <i class="fas fa-arrow-right"> </i><span
-											style="color: green;"
-											th:text="${mesComment.getCommentInfo()}">Pending</span>
-
-									</div>
-
-							</span> <!-- 	<span style="color:green;" th:text="${mesComment.getCommentInfo()}">Pending</span> -->
-
-							</span>
-
-
-
-						</form>
-							</div>
 						</div>
-
-						<!-- <h5 class="card-title">Special title treatment</h5>
-						<p class="card-text">With supporting text below as a natural
-							lead-in to additional content.</p>
-						<a href="#" class="btn btn-primary">Go somewhere</a> -->
 					</div>
 				</div>
-</div>
-
+			</div>
+	</div>
 </div>
 </div>
 	
-						<!--  Outline   View-->
-						<div class="modal fade modal-status" id="outlineViewModelDomain" tabindex="-1"
+<!--  Outline  Modal-->
+						<div class="modal fade modal-status" id="modalOutlineDomain" tabindex="-1"
 							role="dialog" aria-labelledby="exampleModalLabelOutlineView"
 							aria-hidden="true" data-backdrop="static" data-keyboard="false">
-							<div
-								class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
-								role="document">
+							<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
 								<div class="modal-content">
-								  
 									<div class="modal-header">
-									<div class="w-100">
-									<h5 class="modal-title" id="exampleModalLabelOutlineView">Domain Review - Outline</h5>
-									</div>
-										<button type="button" class="close ml-0" data-dismiss="modal"
-											aria-label="Close">
+										<div class="w-100">
+											<h5 class="modal-title" id="exampleModalLabelOutlineView">Domain Review - Outline</h5>
+										</div>
+										<button type="button" class="close ml-0" data-dismiss="modal" aria-label="Close">
 											<span aria-hidden="true">&times;</span>
 										</button>
 									</div>
 									<div class="modal-body">
 										<div class="row">
 										<div class="col-12">
-										<div class="alert alert-msg" style="display: none;"></div>
+										<!-- todo --><div class="alert alert-msg" style="display: none;"></div>
 										<div th:if="${tutorial.getOutlineStatus() != 2}"><div class="alert alert-info">Not valid for review</div></div>
 										<div class="card mb-2">
   <div class="card-header">
     <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
   </div>
-  <div class="card-body">
-    <!-- <div class="border border-dark p-2 mb-2"> -->
-										
-											<span th:utext="${tutorial.getOutline()}"></span>
-										<!-- </div> -->
-  </div>
+  <div class="card-body"><span th:utext="${tutorial.getOutline()}"></span></div>
 </div>
+										<div class="alert d-none w-100 mt-3" role="alert"></div>
 										
-										
-										<div class="alert alert-success w-100 d_c_outline mt-3" role="alert" style="display:none;"></div>
-										<div th:if="${tutorial.getOutlineStatus() == 2}">
-										<div class="card border-warning">
-  <div class="card-header border-warning">
-    <span class="font-weight-bold">Review Feedback :</span>
-  </div>
-  <div class="card-body">
-    <form class="form-horizontal" th:action="@{/}"
-											onsubmit="return submitForm(this);" method="post">
-
-											<div class="form-group">
-												 <select id="outlineAcceptOtrNeedImp"
-													class="form-control select-review-feedback">
-
-													<option value="0">Select</option>
-													<option value="1">Accept</option>
-													<option value="2">Need Improvement</option>
-
-												</select>
-											</div>
-											
-											<div class="textarea-comment" id="OutlineNeedImp" style="display: none;">
-											<label for="OutlineNeedImp"><span class="font-weight-bold">Add your comment below :</span></label>
-												<textarea class="form-control" name="msgCommentOutline"
-													id="msgCommentOutline" rows="3" required="required"
-													placeholder="Please enter your suggestions.">	</textarea>
-											</div>
-											
-											<br />
-<div th:if="${tutorial}">
-											<div
-												th:if="${tutorial.getOutlineStatus() == 2}">
-													<button id="outlineAcceptOrNeedToImpClick" type="button"
-											class="btn btn-success">Submit</button>
-											</div>
-											<div
-												th:unless="${tutorial.getOutlineStatus() == 2}">
-													<button id="outlineAcceptOrNeedToImpClick" type="button"
-											class="btn btn-success" disabled="disabled">Submit</button>
-											</div>
-										</div>
-										<div th:unless="${tutorial}">
-											<button id="outlineAcceptOrNeedToImpClick" type="button"
-											class="btn btn-success">Submit</button>
-										</div>
-										</form>
-
-  </div>
-</div>
-
-<!-- <div class="card textarea-comment mt-2" >
-											  <div class="card-header">
-											  
-											    
-											  </div>
-											  <div class="card-body">
-											    <div >
-												<textarea class="form-control" name="msgCommentOutline"
-													id="msgCommentOutline" rows="3" required="required"
-													placeholder="Please enter your suggestions.">	</textarea>
-											</div>
-											  </div>
-											</div> -->
-
-										
+										<div th:if="${tutorial.getOutlineStatus() == 2}" class="col-12 px-0">
+							<div th:replace="common/commonElements :: review_feedback('outline','domain')"></div>
+						</div>
 																				</div>
-										
-										</div>
 										<div class="col-12">
-										<div class="card mt-2">
-  <div class="card-header">
-    <span class="font-weight-bold">Comments</span>
-  </div>
-  <div class="card-body">
-   <div th:if="${not #lists.isEmpty(comOutline)}">
-											    <div th:each="comment : ${comOutline}" class="border-bottom py-2"> 
-											    <span class="my-0">
-											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
-																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
-											    </span><br>
-											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
-											    
-											    </div>
-									
-									</div>
-  </div>
-</div>
-										
-										
+											<div th:replace="common/commonElements :: comment_review(${comOutline})"></div>
 										</div>
-										
-										
 										</div>
 									</div>
 									<div class="modal-footer">
-									<!-- <div th:if="${tutorial}">
-											<div
-												th:if="${tutorial.getOutlineStatus() == 2}">
-													<button id="outlineAcceptOrNeedToImpClick" type="button"
-											class="btn btn-success">Submit</button>
-											</div>
-											<div
-												th:unless="${tutorial.getOutlineStatus() == 2}">
-													<button id="outlineAcceptOrNeedToImpClick" type="button"
-											class="btn btn-success" disabled="disabled">Submit</button>
-											</div>
-										</div>
-										<div th:unless="${tutorial}">
-											<button id="outlineAcceptOrNeedToImpClick" type="button"
-											class="btn btn-success">Submit</button>
-										</div> -->
-									<!-- 	<span th:if="${tutorial.getOutlineStatus() == 2}"><button id="outlineAcceptOrNeedToImpClick" type="button"
-											class="btn btn-success">Submit</button></span> -->
-										
 											<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-										<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
-
 									</div>
 								</div>
 							</div>
 						</div>
-
-
-
-						<!--  Outline   End-->
-
 						
-
-						<!-- Here is modale for keywored -->
-
-						<div class="modal fade modal-status" id="keywordModaleViewInDomain"
+						<div class="modal fade modal-status" id="modalKeywordDomain"
 							tabindex="-1" role="dialog"
 							aria-labelledby="exampleModalLabelKeyWordView" aria-hidden="true" data-backdrop="static" data-keyboard="false">
 
@@ -584,108 +204,47 @@ border-bottom: 2px solid #014F7A!important;}
 									<div class="modal-body">
 									<div class="row">
 									<div class="col-12">
-									<div class="alert alert-msg d_kw_status" style="display: none;"></div>
+									<!-- todo --><div class="alert alert-msg d_kw_status" style="display: none;"></div>
 									<div class="card mb-2">
   <div class="card-header">
     <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
   </div>
   <div class="card-body">
-    <div th:if="${tutorial.getKeywordStatus() != 2}"><div class="alert alert-info">Not valid for review</div></div>
-									<div class="border p-2 mb-5">
-											<span th:utext="${tutorial.getKeyword()}"></span>
+  <div th:if="${tutorial.getKeywordStatus() == 2}">
+  <div class="border p-2 mb-5">
+	<span th:utext="${tutorial.getKeyword()}"></span>
+  </div>
+  </div>
+    <div th:if="${tutorial.getKeywordStatus() != 2}">
+    <div class="alert alert-info">Not valid for review</div>
+    <div class="border p-2 mb-5">
+											<span>No keywords available.</span>
 										</div>
+    </div>
+    
+									
+										
   </div>
 </div>
 									
 										<div>
-										<div class="alert alert-success w-100 d_c_kw mt-3" role="alert" style="display:none;"></div>
-										<div th:if="${tutorial.getKeywordStatus() == 2}">
-										<div class="card border-warning mb-2">
-  <div class="card-header">
-    <span class="font-weight-bold">Review Feedback :</span>
-  </div>
-  <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
-											<div class="form-group">
-												<select id="KeywordAcceptDomain" class="form-control">
-													<option value="0">Select</option>
-													<option value="1">Accept</option>
-													<option value="2">Need Improvement</option>
-												</select>
-											</div>
-											
-											<br />
-											
-											   <div id="keywordNeedImprovement" style="display: none;">
-												<span class="font-weight-bold">Add your comment below : </span>
-												<textarea class="form-control" name="keywordCommentMsg"
-													id="keywordCommentMsg" rows="3" required="required" placeholder="Add comments here."></textarea>
-											</div>
-										</form>
+										<!-- todo --><div class="alert alert-success w-100 d_c_kw mt-3" role="alert" style="display:none;"></div>
+										<div th:if="${tutorial.getKeywordStatus() == 2}" class="col-12 px-0">
 										
-  </div>
-</div>
 
-<!-- <div class="card mt-2">
-  <div class="card-header">
-    
-  </div>
-  <div class="card-body">
- 
-  </div>
-</div> -->
-
-										
+							<div th:replace="common/commonElements :: review_feedback('keyword','domain')"></div>						
 										</div>
 									</div>
 									
 									</div>
 									<div class="col-12">
-									<div class="card">
-  <div class="card-header">
-    <span class="font-weight-bold">Comments</span>
-  </div>
-  <div class="card-body">
-    <div th:if="${not #lists.isEmpty(comKeyword)}">
-											    <div th:each="comment : ${comKeyword}" class="border-bottom py-2"> 
-											    <span class="my-0">
-											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
-																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
-											    </span><br>
-											    
-											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
-											    
-											    </div>
-									
-									</div>
-									<div th:if="${#lists.isEmpty(comKeyword)}"><span>No comments available.</span></div>
-									
-  </div>
-</div>
+									<div th:replace="common/commonElements :: comment_review(${comKeyword})"></div>
 									
 									</div>
 										
 										</div>
 									</div>
 									<div class="modal-footer">
-									<div th:if="${tutorial}">
-											<div
-												th:if="${tutorial.getKeywordStatus() == 2}">
-													<button id="AcceptOrNeedToImprovemenetByDomain" type="button"
-												class="btn btn-success">Submit</button>
-											</div>
-											<div
-												th:unless="${tutorial.getKeywordStatus() == 2}">
-												<button id="AcceptOrNeedToImprovemenetByDomain" type="button"
-												class="btn btn-success" disabled="disabled">Submit</button>
-													
-											</div>
-										</div>
-										<div th:unless="${tutorial}">
-											<button id="AcceptOrNeedToImprovemenetByDomain" type="button"
-												class="btn btn-success">Submit</button>
-										</div>
 											<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> 
 										</div>
 									
@@ -695,15 +254,7 @@ border-bottom: 2px solid #014F7A!important;}
 						</div>
 
 
-						<!-- 	End -->
-
-
-
-						<!-- Video Div	 -->
-
-						
-
-						<div class="modal fade" id="videoViewIdDomain" tabindex="-1"
+						<div class="modal fade" id="modalVideoDomain" tabindex="-1"
 							role="dialog" aria-labelledby="exampleModalLabelKeyWordView"
 							aria-hidden="true" data-backdrop="static" data-keyboard="false">
 
@@ -738,8 +289,7 @@ border-bottom: 2px solid #014F7A!important;}
 												<div th:if="${tutorial.getVideo() != null}" class="embed-responsive embed-responsive-16by9 mb-5">
   											<video id='storedVideoId' 
 														controls="controls" style="width:100%!important;">
-													<!-- <source src="movie.mp4" type="video/mp4"> -->
-													<!-- <source th:src="${tutorial.getVideo()}" type="video/mp4"></source> -->
+													
 													<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
 													</video>
 											</div>
@@ -764,10 +314,6 @@ border-bottom: 2px solid #014F7A!important;}
 											
 											</tbody>
 											</table>
-										<!-- 	<div> Video Duration : <span th:text="${FileDurationInSecond}"/> Seconds </div> 
-											<div> Video File Size : <span th:text="${fileSizeInMB}"/> MB </div>
-											<div> Video Width : <span th:text="${FileWidth}"/> </div> 
-											<div> Video Height : <span th:text="${FileHeight}"/>  </div> -->
 
 											</div>
   </div>
@@ -775,62 +321,14 @@ border-bottom: 2px solid #014F7A!important;}
 									
 											<div>
 											<div class="alert d_video_cmt" style="display: none;"></div>
-											<div class="card mb-2">
-  <div class="card-header">
-    <span class="font-weight-bold">Review Feedback : </span>
-  </div>
-  <div class="card-body">
-    <div th:if="${tutorial.getVideoStatus() == 2}">
-											<form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
-
-											<div class="form-group">
-												<select id="VideoAcceptDomain" class="form-control">
-													<option value="0">Select</option>
-													<option value="1">Accept</option>
-													<option value="2">Need Improvement</option>
-												</select>
+											<div th:if="${tutorial.getVideoStatus() == 2}">
+											<div th:replace="common/commonElements :: review_feedback('video','domain')"></div>
 											</div>
-
-											<div id="videoNeedImprovement" style="display: none">
-											<label for="videoCommentMsg"><span class="font-weight-bold">Add your comment below : </span></label>
-												<textarea class="form-control" name="videoCommentMsg"
-													id="videoCommentMsg" rows="3" required="required" ></textarea>
-
-											</div>
-											<br />
-										</form>
-										</div>
-  </div>
-</div>
-											
 										</div>
 									
 									</div>
 									<div class="col-12">
-									<div class="card">
-  <div class="card-header">
-    <span class="font-weight-bold">Comments</span>
-  </div>
-  <div class="card-body">
-    <div th:if="${not #lists.isEmpty(comVideo)}">
-									
-											    <div th:each="comment : ${comVideo}" class="border-bottom py-2"> 
-											    <span class="my-0">
-											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
-																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
-											    </span><br>
-											    
-											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
-											    
-											    </div>
-									
-									</div>
-									<div th:if="${#lists.isEmpty(comVideo)}"><span>No comments available.</span></div>
-									
-  </div>
-</div>
-									
+									<div th:replace="common/commonElements :: comment_review(${comVideo})"></div>
 									</div>
 									</div>
 											
@@ -838,23 +336,6 @@ border-bottom: 2px solid #014F7A!important;}
 
 									</div>
 									<div class="modal-footer">
-									<div th:if="${tutorial}">
-											<div
-												th:if="${tutorial.getVideoStatus() == 2}">
-													<button id="videoAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success">Submit</button>
-											</div>
-											<div
-												th:unless="${tutorial.getVideoStatus() == 2}">
-												<button id="videoAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success" disabled="disabled">Submit</button>
-													
-											</div>
-										</div>
-										<div th:unless="${tutorial}">
-											<button id="videoAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success">Submit</button>
-										</div>
 									<button type="button" class="btn btn-secondary"
 											data-dismiss="modal">Close</button>
 									</div>
@@ -863,66 +344,7 @@ border-bottom: 2px solid #014F7A!important;}
 							</div>
 						</div>
 
-						<!-- 	End	Video Div	 -->
-
-						<!-- star KeyWord-->
-
-
-
-						<div class="modal fade" id="keywordModale" tabindex="-1"
-							role="dialog" aria-labelledby="exampleModalLabelKeyWord"
-							aria-hidden="true">
-
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelKeyWord">Upload
-											Keyword</h5>
-										<div class="modal-title"></div>
-										<span style="color: green; padding-left: 50px"
-											id="statuskeyword"> </span>
-										<button type="button" class="close" data-dismiss="modal"
-											aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-
-										<form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
-
-											<div class="form-group">
-
-												<label for="message-text" class="col-form-label">Add
-													Keyword</label>
-
-												<textarea class="form-control" name="keywordArea"
-													id="keyword" rows="10" required="required">
-							        
-							            </textarea>
-											</div>
-											<button id="keywordId" type="button" class="btn btn-success">Upload</button>
-											<!-- 	   <button id="keyword" type="submit" class="btn btn-success">Upload</button>   -->
-
-										</form>
-
-										<div class="modal-footer">
-
-											<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
-
-
-										</div>
-
-									</div>
-
-								</div>
-							</div>
-						</div>
-
-						
-
-						<!-- script  review -->
-						<div class="modal fade" id="scriptStatusAcceptDomain"
+				<div class="modal fade" id="modalScriptDomain"
 							tabindex="-1" role="dialog" data-backdrop="static"
 							data-keyboard="false" 
 							aria-labelledby="exampleModalLabelscriptStatus"
@@ -930,13 +352,8 @@ border-bottom: 2px solid #014F7A!important;}
 
 							<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
 								<div class="modal-content">
-								<!-- <div th:if="${tutorial.getScriptStatus()!=2}"><div class="alert alert-info m-3">Not valid for review</div></div> -->
 									<div class="modal-header">
 										<h5 class="modal-title" id="exampleModalLabelscriptStatus">Domain Review - Script</h5>
-
-										<!-- <div style="color: green; padding-left: 20px"
-											id="saveCommentScript"></div> -->
-
 
 										<div class="modal-title"></div>
 
@@ -953,104 +370,20 @@ border-bottom: 2px solid #014F7A!important;}
 									<div class="alert alert-info" role="alert">
   												<i class="fas fa-external-link-alt"></i> <a th:href="${sm_url}" class="alert-link" style="text-decoration: underline;color: #014F7A;" target="_blank" id="sm_url">Click here to proceed to Script Manager</a>
 											</div>
-									<!-- <div class="border border-secondary p-3 mb-3">
-										<span id="scriptIdDomain" th:each="scriptpath : ${tutorial}"> 
-										<a target="_blank" id="cat" th:href="@{/files/}+@{${scriptpath.getScript()}}">
-												<span th:text="${scriptpath.getTopic().getTopicname()}"></span>
-												click to View
-										</a>
-										</span>
-										</div> -->
+									
 										<div class="alert alert-success w-100 d_c_script mt-3" role="alert" style="display:none;"></div>
 										<div th:if="${tutorial.getScriptStatus()==2}">
-										<div class="card border-warning">
-  <div class="card-header">
-    <span class="font-weight-bold">Review Feedback :</span>
-  </div>
-  <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
-
-											<div class="form-group">
-
-												<select id="scriptAcceptDomain" class="form-control">
-
-													<option value="0">Select</option>
-													<option value="1">Accept</option>
-													<option value="2">Need Improvement</option>
-
-												</select>
-
-											</div>
-											<div>
-											
-											</div>
-
-											
-											
-										</form>
-					
-					<div id="scriptNeedImprovement" style="display:none;">
-					<span class="font-weight-bold">Add your comment below : </span>
-												<textarea class="form-control" name="msgScriptDomain"
-													id="msgScriptDomain" rows="3" required="required" ></textarea>
-											</div>
-					
-  </div>
-</div>
-
-<!-- <div class="card mt-2" >
-											  <div class="card-header">
-											    Comment
-											  </div>
-											  <div class="card-body">
-											    <div >
-												<textarea class="form-control" name="msgScriptDomain"
-													id="msgScriptDomain" rows="3" required="required" placeholder="Add your comments here."></textarea>
-											</div>
-											  </div>
-											</div> -->
-										
+										<div th:replace="common/commonElements :: review_feedback('script','domain')"></div>
 										</div>
 									</div>
 									<div class="col-12">
-									<div class="card mt-2">
-  <div class="card-header">
-    <span class="font-weight-bold">Comments</span>
-  </div>
-  <div class="card-body">
-   <div th:if="${not #lists.isEmpty(comScript)}">
-											    <div th:each="comment : ${comScript}" class="border-bottom"> 
-											    <p class="my-0">
-											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
-																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
-											    </p>
-											    <p class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></p>
-											    </div>
-									</div>
-	<div th:if="${ #lists.isEmpty(comScript)}"><span>No comments available.</span></div>									
-									
-  </div>
-</div>
-									
+									<div th:replace="common/commonElements :: comment_review(${comScript})"></div>
+																
 									</div>
 									</div>
 										
 									</div>
 									<div class="modal-footer">
-									<div th:if="${tutorial}">
-											<div
-												th:if="${tutorial.getScriptStatus() == 2}">
-													<button id="scriptAcceptOrNeedToImprovemenetDomain" type="button" class="btn btn-success">Submit</button>
-											</div>
-											<div
-												th:unless="${tutorial.getScriptStatus() == 2}">
-													<button id="scriptAcceptOrNeedToImprovemenetDomain" type="button" class="btn btn-success" disabled="disabled">Submit</button>
-											</div>
-										</div>
-										<div th:unless="${tutorial}">
-											<button id="scriptAcceptOrNeedToImprovemenetDomain" type="button" class="btn btn-success">Submit</button>
-										</div>
 									
 									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 									</div>
@@ -1063,7 +396,7 @@ border-bottom: 2px solid #014F7A!important;}
 
 <!-- here is code for pre
  -->
-<div class="modal fade" id="PreViewIdDomain" tabindex="-1"
+<div class="modal fade" id="modalPreReqDomain" tabindex="-1"
 							role="dialog" aria-labelledby="exampleModalLabelKeyWordView"
 							aria-hidden="true" data-backdrop="static" data-keyboard="false">
 
@@ -1075,8 +408,6 @@ border-bottom: 2px solid #014F7A!important;}
 								  
 									<div class="modal-header">
 										<h5 class="modal-title" id="exampleModalLabelKeyWordView">Domain Review - Prerequisite</h5>
-										<div class="modal-title"></div>
-
 										<button type="button" class="close" data-dismiss="modal"
 											aria-label="Close">
 											<span aria-hidden="true">&times;</span>
@@ -1085,7 +416,7 @@ border-bottom: 2px solid #014F7A!important;}
 									<div class="modal-body">
 										<div class="row">
 											<div class="col-12">
-											<div class="alert alert-msg d_status" style="display: none;"></div>
+											<!-- todo --><div class="alert alert-msg d_status" style="display: none;"></div>
 											<div th:if="${tutorial.getPreRequisticStatus()!=2}"><div class="alert alert-info">Not valid for review</div></div>
 											
 											<div class="card mb-2">
@@ -1106,7 +437,7 @@ border-bottom: 2px solid #014F7A!important;}
 												</video>
 												</div>
 												
-												<div th:unless="${tutorial.getPreRequistic()!=null}" class="alert alert-secondary upload-status" role="alert" >This tutorial has no prerequisite </div>
+												<div th:unless="${tutorial.getPreRequistic()!=null}" class="alert alert-secondary upload-status" role="alert" >This tutorial has no prerequisite. </div>
 												
 
 											</div>
@@ -1114,88 +445,14 @@ border-bottom: 2px solid #014F7A!important;}
 </div>
 
 											
-											<div class="alert alert-success w-100 d_c_pre mt-3" role="alert" style="display:none;"></div>
+											<!-- todo --><div class="alert alert-success w-100 d_c_pre mt-3" role="alert" style="display:none;"></div>
 											<div th:if="${tutorial.getPreRequisticStatus()==2}">
-											<div class="card border-warning mb-2">
-  <div class="card-header">
-    <span class="font-weight-bold">Review Feedback :</span>
-  </div>
-  <div class="card-body">
-    <form class="form-horizontal" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
-
-											<div class="form-group">
-												<select id="preAcceptDomain" class="form-control">
-													<option value="0">Select</option>
-													<option value="1">Accept</option>
-													<option value="2">Need Improvement</option>
-												</select>
-											</div>
-
-								
-											<br />
-											<div id="preNeedImprovement" style="display: none" class="mb-2">
-													<label for="preCommentMsg"><span class="font-weight-bold">Add your comment below : </span></label>
-														<textarea class="form-control" name="preCommentMsg"
-															id="preCommentMsg" rows="3" required="required" ></textarea>
-
-								</div>
-								<div th:if="${tutorial}">
-											<div
-												th:if="${tutorial.getPreRequisticStatus() == 2}">
-													<button id="preAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success">Submit</button>
-											</div>
-											<div
-												th:unless="${tutorial.getPreRequisticStatus() == 2}">
-												<button id="preAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success" disabled="disabled">Submit</button>
-													
-											</div>
-										</div>
-										<div th:unless="${tutorial}">
-											<button id="preAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success">Submit</button>
-										</div>
-										</form>
-  </div>
-</div>
-
-<!-- <div class="card mt-2" >
-  <div class="card-header">
-    <span class="font-weight-bold">Add your comment below :</span>
-  </div>
-  <div class="card-body">
-    <div >
-													<label for="preCommentMsg">Comments: </label>
-														<textarea class="form-control" name="preCommentMsg"
-															id="preCommentMsg" rows="10" required="required" ></textarea>
-
-								</div>
-  </div>
-</div>
- -->											
+											<div th:replace="common/commonElements :: review_feedback('prerequisite','domain')"></div>
+											
 										</div>
 											</div>
 											<div class="col-12">
-											<div class="card mb-2">
-  <div class="card-header">
-    <span class="font-weight-bold">Comments</span>
-  </div>
-  <div class="card-body">
-    <div th:if="${not #lists.isEmpty(comPreReq)}">
-											    <div th:each="comment : ${comPreReq}" class="border-bottom py-2"> 
-											    <span class="my-0">
-											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
-																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
-											    </span>
-											    <p class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></p>
-											    </div>
-									
-									</div>
-									<div th:if="${ #lists.isEmpty(comPreReq)}"><span>No comments available.</span></div>
-  </div>
-</div>
+											<div th:replace="common/commonElements :: comment_review(${comPreReq})"></div>
 												
 											</div>
 										</div>
@@ -1215,31 +472,15 @@ border-bottom: 2px solid #014F7A!important;}
 							</div>
 						</div>
 
-						
-						
-
-						<!-- Here is code for accept or neeed to Improvement slide -->
-
-
-						<div class="modal fade" id="SlideStatusAccept" tabindex="-1"
+						<div class="modal fade" id="modalSlideDomain" tabindex="-1"
 							role="dialog" aria-labelledby="exampleModalLabeSlideStatus"
 							aria-hidden="true" data-backdrop="static"
 							data-keyboard="false">
 
 							<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
 								<div class="modal-content">
-								
 									<div class="modal-header">
 										<h5 class="modal-title" id="exampleModalLabeSlideStatus">Domain Review - Slide</h5>
-
-										<div style="color: green; padding-left: 20px"
-											id="saveCommentSlide"></div>
-
-										<div style="color: green; padding-left: 20px"
-											id="statusSlideByDomain"></div>
-
-										<div class="modal-title"></div>
-
 										<button type="button" class="close" data-dismiss="modal"
 											aria-label="Close">
 											<span aria-hidden="true">&times;</span>
@@ -1249,105 +490,30 @@ border-bottom: 2px solid #014F7A!important;}
 									<div class="row">
 									<div class="col-12">
 									<div th:if="${tutorial.getSlideStatus() != 2}"><div class="alert alert-info">Not valid for review</div></div>
-									<div class="alert alert-msg" style="display: none;"></div>
-									<div class="alert alert-info" role="alert">
+									<!-- todo --><div class="alert alert-msg" style="display: none;"></div>
+									<!-- todo --><div class="alert alert-info" role="alert">
   <div th:if="${tutorial.getSlideStatus()}">
-											 <!--  <div class="card-body">
-											    <div class="form-group"> -->
-												<!-- <a name="ScriptPdf" target="_blank" id="ScriptPdf" >Click To View</a> -->
-												<span id="scriptIdDomain"
-											th:each="scriptpath : ${tutorial}"> <a class="alert-link sm_url"
-												 target="_blank" id="slidName"
-												name="categoryName" th:href="@{/files/}+@{${scriptpath.getSlide()}}" style="text-decoration: underline;color: #014F7A;">
-												<!-- <span th:text="${scriptpath.getTopic().getTopicname()}"></span> -->
+											
+												
+												<span id="scriptIdDomain"> 
+											<a class="alert-link sm_url" target="_blank" id="slidName"
+											th:href="@{/files/}+@{${tutorial.getSlide()}}" style="text-decoration: underline;color: #014F7A;">
+												
 												<i class="fas fa-external-link-alt"></i> Click to download slides for <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span></a>
 										</span>
-											<!-- </div>
-											  </div> -->
-											</div>
-  
-</div>
-									<!-- <div class="card">
-  <div class="card-header">
-    <span class="font-weight-bold"><span th:text="${category}"></span> | <span th:text="${topic}"></span></span>
-  </div>
-  <div class="card-body">
-  
-    
-									
-									
-  </div>
-</div> -->
-									<div class="alert alert-success w-100 d_c_slide mt-3" role="alert" style="display:none;"></div>
-									<div th:if="${tutorial.getSlideStatus()==2}">
-									<div class="card border-warning">
-  <div class="card-header">
-    <span class="font-weight-bold">Review Feedback :</span>
-  </div>
-  <div class="card-body">
-    <form class="form-horizontal mb-3" th:action="@{/addkeyword}"
-											onsubmit="return submitForm(this);" method="post">
-											<div class="form-group">
-												<select id="SlideAcceptDomain" class="form-control">
-													<option value="0">Select</option>
-													<option value="1">Accept</option>
-													<option value="2">Need Improvement</option>
-												</select>
-											</div>
 											
-											<br />
-											<div id="slideNeedImprovement" style="display: none;" class="my-2">
-											<label for="slideCommentMsg"><span class="font-weight-bold">Add your comment below :</span></label>
-												<textarea class="form-control" name="slideCommentMsg"
-													id="slideCommentMsg" rows="3" required="required" placeholder="Enter comments here."></textarea>
 											</div>
-											<div th:if="${tutorial}">
-											<div
-												th:if="${tutorial.getSlideStatus() == 2}">
-													<button id="slideAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success">Submit</button>
-											</div>
-											<div
-												th:unless="${tutorial.getSlideStatus() == 2}">
-												<button id="slideAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success" disabled="disabled">Submit</button>
-													
-											</div>
-										</div>
-										<div th:unless="${tutorial}">
-											<button id="slideAcceptOrNeedToImprovemenetByDomain"
-												type="button" class="btn btn-success">Submit</button>
-										</div>
-										</form>
-  </div>
+  
 </div>
-
-
-
-										
-										</div>
+									
+									<!-- todo --><div class="alert alert-success w-100 d_c_slide mt-3" role="alert" style="display:none;"></div>
+									<div th:if="${tutorial.getSlideStatus()==2}">
+									<div th:replace="common/commonElements :: review_feedback('slide','domain')"></div>
+																			</div>
 									</div>
 									<div class="col-12">
-									<div class="card mt-2">
-  <div class="card-header">
-    <span class="font-weight-bold">Comments</span>
-  </div>
-  <div class="card-body">
-    <div th:if="${not #lists.isEmpty(comSlide)}">
-											    <div th:each="comment : ${comSlide}" class="border-bottom py-2"> 
-											    <span class="my-0">
-											    <i class="far fa-user-circle"></i> <span th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span> <span class="mx-3"></span><i class="far fa-clock"></i> <small>
-																<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>, <span th:text="${#dates.year(comment.getDateAdded())}"></span> , <span th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span></small>
-											    </span><br>
-											    
-											    <span class="my-0 text-muted" ><i class="far fa-comment-alt"></i> <span th:text="${comment.getComment()}"></span></span>
-											    </div>
-									</div>
-									<div th:if="${#lists.isEmpty(comSlide)}"><span>No comments available.</span></div>
-  </div>
-</div>
-									
-									</div>
+									<div th:replace="common/commonElements :: comment_review(${comSlide})"></div>
+																</div>
 									
 									
 									</div>
@@ -1370,261 +536,9 @@ border-bottom: 2px solid #014F7A!important;}
 							</div>
 						</div>
 
-						<div class="modal fade" id="keywordModale" tabindex="-1"
-							role="dialog" aria-labelledby="exampleModalLabelprerequisite"
-							aria-hidden="true">
 
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-								<div th:if="${tutorial.getPreRequisticStatus()!=2}"><div class="alert alert-info m-3">Not valid for reviesw</div></div>
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelprerequisite">Upload
-											Prerequisite</h5>
-										<div class="modal-title"></div>
-										<span style="color: green; padding-left: 50px"
-											id="statusofprerequisite"> </span>
-										<button type="button" class="close" data-dismiss="modal"
-											aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-
-										<form id="upload-file-form-prerequisite"
-											onsubmit="return submitForm(this);" method="post">
-
-											<div class="form-group">
-												<label for="message-text" class="col-form-label">Add
-													Prerequisite</label>
-
-												<textarea class="form-control" name="PrerequisiteVideo"
-													id="PrerequisiteVideo" rows="10" required="required">
-							        
-							            </textarea>
-											</div>
-											<button id="PrerequisiteVideoId" type="button"
-												class="btn btn-success">Upload</button>
-											<!-- 	   <button id="keyword" type="submit" class="btn btn-success">Upload</button>   -->
-
-
-										</form>
-
-										<div class="modal-footer">
-
-											<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
-
-
-										</div>
-
-									</div>
-
-								</div>
-							</div>
-
-						</div>
-						
-					
-						<script>
-							function submitForm() {
-								return confirm('Do you really want to submit the form?');
-
-								alert("Submit form succefully");
-							}
-						</script>
-
-						<!-- End KeyWord-->
-
-						<!-- Start  prerequistic -->
-
-						<div class="modal fade" id="prerequisiteModale" tabindex="-1"
-							role="dialog" aria-labelledby="exampleModalLabelKeyword"
-							aria-hidden="true">
-
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelKeyword">Upload
-											Prerequisite</h5>
-										<button type="button" class="close" data-dismiss="modal"
-											aria-label="Close"></button>
-									</div>
-									<div class="modal-body">
-										<form th:action="@{/}" method="post">
-
-											<div class="form-group">
-												<label for="inputUserame">Add Prerequisite</label> <select
-													id="preRequsite" class="form-control" name="preRequsite"
-													required="required">
-
-													<option selected="selected">Select Category</option>
-													<!-- <span th:each="category: ${categorys}">
-								  								<option th:value="${category.getId()}"><span th:text="${category.categoryname}"></span></option>		
-								  						</span> -->
-
-													<span id="catId" th:each="catgoryName : ${categoryName}">
-
-														<option class="form-control" id="categoryId"
-															name="categoryName"
-															th:text="${catgoryName.getCategoryname()}"
-															readonly="readonly"></option>
-												</span>
-
-												</select>
-											</div>
-
-											<div class="form-group ">
-
-												<label for="inputTopic">Topic Name</label> <select
-													id="inputTopic" class="form-control" name="inputTopic"
-													required="required">
-
-												</select>
-
-											</div>
-
-											<button id="outlineId" type="button" class="btn btn-success">Upload
-											</button>
-
-										</form>
-
-									</div>
-
-								</div>
-							</div>
-
-						</div>
-
-						<!-- End prerequisiteModale-->
-
-						<!-- star script -->
-
-						<div class="modal fade" id="scriptModale" tabindex="-1"
-							role="dialog" aria-labelledby="exampleModalLabelScript"
-							aria-hidden="true">
-
-
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelScript">Upload
-											Script</h5>
-										<span style="color: green; padding-left: 50px"
-											id="statusofScript"> </span>
-
-										<button type="button" class="close" data-dismiss="modal"
-											aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-
-										<form id="upload-file-form-script"
-											submit="return submitForm(this);">
-
-											<!-- <div class="form-group" style="padding-top: 80px">
-
-												<label for="uploadsScriptId">Add Script</label> <input
-													style="padding-left: 300px height: 300px, width:200px; border: red;"
-													type="file" class="form-control-file w-50"
-													id="uploadScriptFile" name="uploadsScriptFile"
-													placeholder="uploadFile" accept=".pdf" required="required"></input>
-
-											</div> -->
-
-											<button id="scriptId" type="button" class="btn btn-success">Upload</button>
-											&nbsp;&nbsp;&nbsp;
-
-										</form>
-									</div>
-								</div>
-							</div>
-
-						</div>
-
-
-						<!-- 
-				end script
-				 -->
-
-
-
-
-						<!-- 	star Slide -->
-
-						<div class="modal fade" id="slideModale" tabindex="-1"
-							role="dialog" aria-labelledby="exampleModalLabelSlide"
-							aria-hidden="true">
-
-
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelSlide">Upload
-											Slide</h5>
-										<span style="color: green; padding-left: 50px"
-											id="statusofSlide"> </span>
-
-
-										<button type="button" class="close" data-dismiss="modal"
-											aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-
-										<form id="upload-file-form" submit="return submitForm(this);">
-
-
-											<!-- <div class="form-group" style="padding-top: 80px">
-
-												<label for="uploadsSlideFileId">Add Slide</label> <input
-													style="padding-left: 300px height: 300px, width:200px; border: red;"
-													type="file" class="form-control-file w-50"
-													id="uploadsSlideFileId" name="uploadsSlideFile"
-													placeholder="uploadFile" accept=".pdf" required="required"></input>
-
-											</div> -->
-
-											<button id="slideId" type="button" class="btn btn-success">Upload</button>
-											&nbsp;&nbsp;&nbsp;
-
-
-
-										</form>
-									</div>
-								</div>
-							</div>
-
-						</div>
-						<!-- 	End Slide -->
-
-
-
-	<div th:fragment="body-bottom-scripts">
-
-
-		<script src="js/moment.min.js"></script>
-		<script src="js/combodate.js"></script>
-		<script src="js/jquery-3.3.1.js"></script>
-
-
-
-		<script th:src="@{static/js/bootstrap.bundle.min.js}"></script>
-		<script th:src="@{static/js/jquery.slim.min}"
-			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-			crossorigin="anonymous"></script>
-		<script th:src="@{/fontawesome-free-5.10.1-web/js/all.js}"></script>
-		<script th:src="@{/s/js/jquery-3.2.1.min.js}"></script>
-		<script th:src="@{/s/js/popper.min.js}"></script>
-		<script th:src="@{/s/js/bootstrap.min.js}"></script>
-		<script src="js/ckeditor.js"></script> 
-		<script th:src="@{/s/js/main.js}"></script>
-		<script th:src="@{/js/ajaxSupport.js}"></script>
-		<script th:src="@{js/jquery-3.3.1.js}"></script>
-
-
-	</div>
-	<script src="https://vjs.zencdn.net/7.6.6/video.js"></script>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	
 	
 	<script th:inline="javascript">
 		var projectPath='[(@{/})]';

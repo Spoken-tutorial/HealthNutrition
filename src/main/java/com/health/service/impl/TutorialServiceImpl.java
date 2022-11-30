@@ -132,6 +132,13 @@ public class TutorialServiceImpl implements TutorialService {
 		return tutorialRepo.findAllByconAssignedTutorialListPagination(con, page);
 	}
 
+	@Override
+	public List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con) {
+		// TODO Auto-generated method stub
+		
+		return tutorialRepo.findAllByconAssignedTutorialAndStatus(con);
+	}
+
 
 
 

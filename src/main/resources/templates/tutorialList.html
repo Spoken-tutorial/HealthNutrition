@@ -30,40 +30,7 @@
   </div>
 </nav>
 <div class="container">
-<div id="search-bar" class="container-lg mb-3 mt-5">
-<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
-<div class="row" style="width: 100%;">
-<div class="col-md-3 mb-3">
-            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
-              <option>Select Category</option>
-              <option th:each="category : ${categories}"><span th:text="${category}">Title ...</span></option>
-            </select>
-            <div class="invalid-feedback">
-              Please select a valid foss.
-            </div>
-</div>
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
-              <option >Select Topic</option>
-              <option th:each="topic : ${topics}"><span th:text="${topic}">Title ...</span></option>
-            </select>
-</div>
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputL" name="lan">
-              <option >Select Language</option>
-              <option th:each="language : ${languages}"><span th:text="${language}">Title ...</span></option> 
-            </select>
-            <div class="invalid-feedback">
-              Please provide a valid language.
-            </div>
-</div>
-          <div class="col-md-3 mb-3" style="width: 100%;">
-           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
-          </div>
-</div>
-</form>
-          
-</div>
+<div th:replace="common/commonElements :: search_bar"></div>
 </div>
 <main id="tutorial_list">
 	<div th:each="tutorial : ${tutorials}" class="row t-wrapper mt-3">
@@ -101,9 +68,9 @@
 		    <li th:if ="${currentPage+1 != totalPages}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage+1}}">Next</a></li>
 		  </ul>
 		</nav>
-
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+<script>
+		var projectPath='[(@{/})]';
+</script>
 </body>
 </html>

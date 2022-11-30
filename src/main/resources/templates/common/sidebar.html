@@ -185,7 +185,7 @@ a:hover {
       <li class="nav-item">
             <a class="nav-link " th:href="@{/profile}" style="border-bottom: 1px solid orange;">
               <i class="fas fa-user sidebar-icon"></i>
-              <span th:text="${userInfo.getFirstName()}"></span>
+             <span th:text="${#strings.capitalizeWords(userInfo.getFullName())}"></span>
             </a>
           </li>
           <li class="nav-item nav-db">
@@ -290,11 +290,6 @@ a:hover {
           <li class="nav-item border-lt nav-assign-contri">
             <a class="nav-link" th:href="@{/unpublishTopic}">
               Unpublish Topic
-            </a>
-          </li>
-          <li class="nav-item border-lt nav-assign-contri">
-            <a class="nav-link" th:href="@{/modifyComponentStatus}">
-              Modify Component Status
             </a>
           </li>
           <li class="nav-item nav-training">
