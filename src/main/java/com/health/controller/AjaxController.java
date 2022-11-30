@@ -1,5 +1,6 @@
 package com.health.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +9,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.repository.query.Param;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
@@ -401,7 +405,11 @@ public class AjaxController{
 				local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
 			}else {
 				ContributorAssignedTutorial conLocal2 = conService.findByTopicCatAndLanViewPart(preReq.getConAssignedTutorial().getTopicCatId(),lan);
-				local.setPreRequistic(tutService.findAllByContributorAssignedTutorial(conLocal2).get(0));
+				List<Tutorial> t = tutService.findAllByContributorAssignedTutorial(conLocal2);
+				if(!t.isEmpty()) {
+					local.setPreRequistic(t.get(0));
+				}
+				
 				local.setPreRequisticStatus(CommonData.WAITING_PUBLISH_STATUS);
 			}
 			local.setSlideStatus(CommonData.WAITING_PUBLISH_STATUS);
@@ -724,6 +732,21 @@ public class AjaxController{
 		HashSet<Topic> topics = new HashSet<>();
 		for(Tutorial t: tutorials) {
 			topicName.put(t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		}
+		return topicName;
+
+	}
+	
+	@RequestMapping("/loadTopicByCategoryInAssignContri")
+	public @ResponseBody HashMap<Integer, String> getTopicByCategoryAssignContri(@RequestParam(value = "id") int id) {
+
+		HashMap<Integer,String> topicName=new HashMap<>();
+
+		Category cat = catService.findByid(id);
+
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		for(TopicCategoryMapping t: local) {
+			topicName.put(t.getTopic().getTopicId(), t.getTopic().getTopicName());
 		}
 		return topicName;
 
@@ -1940,6 +1963,31 @@ public class AjaxController{
 		return CommonData.Script_SAVE_SUCCESS_MSG;
 
 	}
+	
+	//route after clicking the link in mail
+	
+	@PostMapping("/process_register")
+    public String processRegister(User user, HttpServletRequest request)
+            throws UnsupportedEncodingException, MessagingException {
+        usrservice.register(user, getSiteURL(request));       
+        return "register_success";
+    }
+	
+	//route to verify
+	
+	@GetMapping("/verify")
+	public String verifyUser(@Param("code") String code) {
+	    if (UserService.verify(code)) {
+	        return "verify_success";
+	    } else {
+	        return "verify_fail";
+	    }
+	}
+     
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "");
+    }
 	
 	/*********************************** END ********************************************************/
 	

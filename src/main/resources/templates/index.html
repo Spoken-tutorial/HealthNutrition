@@ -58,7 +58,7 @@
 	<div class="px-md-3">
 	<div class="row header-top pt-2">
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
-	<div> <a href="tel:1800-267-7782"> <span class="contact-num p-2" style="font-size:1.5rem;"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></div>
+	<!-- <div> <a href="tel:1800-267-7782"> <span class="contact-num p-2" style="font-size:1.5rem;"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></div> -->
 	</div>
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
 	<div><p class="d-inline-block"><span class="top-banner">
@@ -181,7 +181,7 @@ the globe.
 	<section class="bg-light" id="stats">
 	<div class="container-lg py-3 px-3">
 		<div class="row">
-		<div class="col-md-4">
+		<div class="col-md-6">
 		<a th:href="@{'/tutorials?categoryName='+'Select'+'&topic='+'Select'+'&lan='+'Select'}">
 		<div class="is-shady text-center p-3 stat-card">
 			    <p class="stat-num"><span th:text="${videoCount}"></span>+</p>
@@ -193,7 +193,7 @@ the globe.
 		</a>
 			
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-6">
 		<a th:href="@{/showLanguages}">
 			<div class="is-shady text-center p-3 stat-card">
 			    <p class="stat-num"><span th:text="${languageCount}"></span>+</p>
@@ -204,7 +204,7 @@ the globe.
 			</div>
 		</a>
 		</div>
-		<div class="col-md-4">
+		<!-- <div class="col-md-4">
 		<a th:href="@{/showConsultant}">
 		<div class="is-shady text-center p-3 w-100 stat-card">
 			    <p class="stat-num"><span th:text="${consultantCount}"></span>+</p>
@@ -214,7 +214,7 @@ the globe.
 		        </p>
 		    </div>
 		</a>
-		</div>
+		</div> -->
 		</div>
 		<br>
 		<div class="w-100 text-center"><a th:href="@{/statistics}" target="_blank" class="button catBtn mb-5">View Statistics</a></div>

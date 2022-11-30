@@ -1,12 +1,18 @@
 package com.health.service.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.health.domain.security.UserRole;
@@ -23,6 +29,7 @@ import com.health.model.UserIndianLanguageMapping;
 import com.health.repository.RoleRepository;
 import com.health.repository.UserRepository;
 import com.health.service.UserService;
+import net.bytebuddy.utility.RandomString;
 
 /**
  * Default implementation of the {@link com.health.service.UserService} interface.  
@@ -39,6 +46,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
 	
 	/**
 	 * @see com.health.service.UserService#findByUsername(String)
@@ -97,7 +105,7 @@ public class UserServiceImpl implements UserService{
 		return userRepository.getNewId()+1;
 		
 	}
-
+	
 	/**
 	 * @see com.health.service.UserService#addUserToCategory(User, Set)
 	 */
@@ -219,6 +227,15 @@ public class UserServiceImpl implements UserService{
 		
 		return users;
 	}
+
+	/**
+	 * 	To Verify that user has entered valid email address
+	 * @param user
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	
+
 
 
 	
