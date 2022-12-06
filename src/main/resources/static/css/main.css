@@ -25,25 +25,6 @@
 *{
 	box-sizing: border-box;
 }
-body{
-	/* padding-top: 120px!important; */
-	
-}
-/* .btn{
-	background-color: var(--btn-color);
-	border:2px solid var(--btn-color);
-	padding: 1% 2%;
-	color: var(--white);
-	font-weight: bold;
-	margin: 5% 5% 5% 0;
-}
-.btn:hover{
-	background-color: var(--white);
-	border:2px solid var(--btn-color);
-	padding: 1% 2%;
-	color: var(--btn-color);
-	font-weight: bold;
-} */
 .main-heading{
 	color : var(--heading-color);
 	text-align: center;
@@ -82,6 +63,54 @@ body{
 	background: none!important;
 	/* color: #004F7A!important; */
 	/* font-weight: bold; */
+}
+.title-1{
+	font-weight: bold!important;
+	color: #014F7A;
+	font-size: 1rem;
+}
+.table-cont{
+	background: lightblue;
+}
+.table-domain{
+	background: OldLace;
+}
+.table-quality{
+	background: #FAD0C9FF;
+}
+.loader-wrapper{
+	display: flex;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.loader {
+  border: 5px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 5px solid #3498db;
+  width: 1.5rem;
+  height: 1.5rem;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  margin-right: 10px;
+}
+.modal-title{
+font-weight : bold!important;
+color: #014F7A;
+font-size: 1rem;
+}
+.modal-header{
+border-bottom: 2px solid #014F7A!important;}
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 /*-----------------------------------Common---------------------------*/
 /*-----------------------------------header upper-bar---------------------------*/
@@ -402,7 +431,7 @@ box-shadow: 0 10px 16px rgba(0, 0, 0, .13), 0 6px 6px rgba(0, 0, 0, .19);
     width: 250px!important;
     
 }
-}
+
 .v-item .vid{
 	width: 100%;
 	margin-bottom: 15px;
@@ -667,7 +696,7 @@ footer{
 
 #tutorialPage .link-style:hover::after {
     width: 100%;
-    //transition: width .3s;
+    transition: width .3s;
 }
 #tutorialPage ul{
 	list-style-type: none;

@@ -22,6 +22,10 @@ public class MailConstructor {
 	@Value("${spring.mail.username}")
 	String contact_mail;
 	
+	@Value("${feedback_mail_id}")
+	String feedback_mail_id;
+	
+	
 	/**
 	 * This method used to achieve forget password feature in application
 	 * @param contextPath context path of application
@@ -126,11 +130,12 @@ public class MailConstructor {
 	public SimpleMailMessage feedbackMailSend(String  name, String email, String message) {
 		String mail_body="Feedback Mail : \n"
 				+ "name : "+ name +"\n"
-				+ "email : "+ email;
+				+ "email : "+ email + "\n"
+				+ "message : " + message + "\n";
 		SimpleMailMessage mail=new SimpleMailMessage();
-		mail.setSubject("Feedback Mail");
+		mail.setSubject("Health & Nutrition Feedback Form Mail");
 		mail.setText(mail_body);
-		mail.setTo(contact_mail);
+		mail.setTo(feedback_mail_id);
 		return mail;
 	}
 }

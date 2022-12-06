@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<body>
+	<div th:fragment="my_fragment2(data_id, data_class)">
+		<p th:class="${data_id}" th:id="${data_class}"></p>
+	</div>
+	<div th:fragment="search_bar">
+		<section id="search-bar" class="container-lg my-5">
+<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
+<div class="row" style="width: 100%;">
+<div class="col-md-3 mb-3">
+            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
+              <option value="0">Select Category</option>
+              <option th:each="category : ${categories}" th:value="${category.getCategoryId()}"><span th:text="${category.getCatName()}"></span></option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a valid foss.
+            </div>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
+              <option value="0">Select Topic</option>
+              <option th:each="topic : ${topics}" th:value="${topic.getTopicId()}"><span th:text="${topic.getTopicName()}">Title ...</span></option>
+            </select>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputLanguage" name="lan">
+              <option value="0">Select Language</option>
+              <option th:each="language : ${languages}" th:value="${language.getLanId()}"><span th:text="${language.getLangName()}">Title ...</span></option> 
+            </select>
+            <div class="invalid-feedback">
+              Please provide a valid language.
+            </div>
+</div>
+          <div class="col-md-3 mb-3" style="width: 100%;">
+           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
+          </div>
+</div>
+</form>
+          
+</section>
+	</div>
+	<div th:fragment="comments_fragment(comments,text_id,btn_id)">
+		<div class="card">
+			<div class="card-header">
+				<span class="font-weight-bold">Comments</span>
+			</div>
+			<div class="card-body">
+				<div th:if="${not #lists.isEmpty(comments)}">
+					<div th:each="comment : ${comments}"
+						th:if="${not #lists.isEmpty(comments)}" class="border-bottom py-2">
+						<span class="my-0 text-muted"> <i class="far fa-user-circle"></i> <span
+							th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span>
+							<span th:switch="${comment.getRoleName()}" class="mx-3">
+								    <span th:case="'DOMAIN_REVIEWER'">
+								        <span>( Domain Reviewer )</span>
+								    </span>
+								    <span th:case="'QUALITY_REVIEWER'">
+								        <span>( Quality Reviewer )</span>
+								    </span>
+								    <span th:case="'ADMIN_REVIEWER'">
+								        <span>( Admin Reviewer )</span>
+								    </span>
+								    <span th:case="'CONTRIBUTOR'">
+								        <span>( Contributor )</span>
+								    </span>
+								</span>
+							<span class="mx-3 float-right">
+							<i class="far fa-clock"></i> 
+								<span th:text="${#dates.day(comment.getDateAdded())}"></span> <span
+								th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>,
+								<span th:text="${#dates.year(comment.getDateAdded())}"></span> ,
+								<span
+								th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span>
+							</span>
+								
+								
+
+
+						</span><br> <span class="my-0 text-muted"> <i
+							class="far fa-comment-alt"></i> <span
+							th:text="${comment.getComment()}"></span>
+						</span>
+						<span></span>
+
+					</div>
+				</div>
+				<div th:if="${#lists.isEmpty(comments)}">
+					<span>No comments available.</span>
+				</div>
+			</div>
+		</div>
+		<div class="alert alert-success d-none w-100 commentS mt-2"
+			role="alert"></div>
+		<div class="card mt-2">
+			<div class="card-header">
+				<span class="font-weight-bold">Add your comment below : </span>
+			</div>
+			<div class="card-body">
+				<div class="textarea-comment">
+					<textarea class="form-control msgComment" name="msgCommentOutline"
+						rows="3" required="required" th:id="${text_id}"
+						placeholder="Please enter your suggestions.">	</textarea>
+
+				</div>
+				<button th:id="${btn_id}" type="button" class="btn comment-contri">comment</button>
+			</div>
+		</div>
+
+
+	</div>
+
+	<div th:fragment="review_feedback(componentType, role)">
+		<div class="alert alert-status d-none"></div>
+		<div class="card border-warning">
+			<div class="card-header border-warning">
+				<span class="font-weight-bold">Review Feedback :</span>
+			</div>
+			<div class="card-body">
+				<form class="form-horizontal" th:data-type="${componentType}"
+					th:data-role="${role}">
+					<div class="form-group">
+						<select class="form-control select-review">
+							<option value="0">Select</option>
+							<option value="1">Accept</option>
+							<option value="2">Need Improvement</option>
+						</select>
+					</div>
+					<div class="textarea-comment d-none" id="OutlineNeedImp">
+						<label for="OutlineNeedImp"><span class="font-weight-bold">Add
+								your comment below :</span></label>
+						<textarea class="form-control comment-box"
+							name="msgCommentOutline" id="msgCommentOutline" 
+							required="required">	</textarea>
+					</div>
+
+					<br />
+					<button type="button" class="btn btn-success submit-review">Submit</button>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+	<div th:fragment="comment_review(comments)">
+		<div class="card mt-2">
+			<div class="card-header">
+				<span class="font-weight-bold">Comments</span>
+			</div>
+			<div class="card-body">
+				<div th:if="${not #lists.isEmpty(comments)}">
+					<div th:each="comment : ${comments}" class="border-bottom py-2">
+						<span class="my-0 float-end"> <i class="far fa-user-circle"></i> <span
+							th:text="${#strings.capitalizeWords(comment.getUser().getFullName())}"></span>
+							<span th:switch="${comment.getRoleName()}" class="mx-3">
+								    <span th:case="'DOMAIN_REVIEWER'">
+								        <span>( Domain Reviewer )</span>
+								    </span>
+								    <span th:case="'QUALITY_REVIEWER'">
+								        <span>( Quality Reviewer )</span>
+								    </span>
+								    <span th:case="'ADMIN_REVIEWER'">
+								        <span>( Admin Reviewer )</span>
+								    </span>
+								    <span th:case="'CONTRIBUTOR'">
+								        <span>( Contributor )</span>
+								    </span>
+								</span>
+							<span class="mx-3 float-right">
+							<i class="far fa-clock"></i> <span
+								th:text="${#dates.day(comment.getDateAdded())}"></span> <span
+								th:text="${#dates.monthNameShort(comment.getDateAdded())}"></span>,
+								<span th:text="${#dates.year(comment.getDateAdded())}"></span> ,
+								<span
+								th:text="${#dates.format(comment.getDateAdded(),'HH:mm a')}"></span>
+						</span>
+							</span><br> <span class="my-0 text-muted"> <i
+							class="far fa-comment-alt"></i> <span
+							th:text="${comment.getComment()}"></span>
+						</span>
+					</div>
+				</div>
+				<div th:if="${#lists.isEmpty(comments)}">
+					<span>No comments available.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<td th:fragment="show_status_icons(status)">
+		<span th:if="${status==0}"> <i class="fas fa-minus-circle pending-upload" data-toggle="tooltip" data-placement="top"></i></span>
+		<span th:if="${status==1}"> <i class="fas fa-check-circle admin-review" data-toggle="tooltip" data-placement="top"></i></span> 
+		<span th:if="${status==2}"> <i class="fas fa-check-circle domain-review" data-toggle="tooltip" data-placement="top"></i></span> 
+		<span th:if="${status==3}"> <i class="fas fa-check-circle quality-review" data-toggle="tooltip" data-placement="top"></i></span> 
+		<span th:if="${status==5}"> <i class="fas fa-check-circle review-accepted" data-toggle="tooltip" data-placement="top"></i></span> 
+	 	<span th:if="${status==4}"> <i class="fas fa-times-circle review-improvement" data-toggle="tooltip" data-placement="top"></i></span>
+	</td>
+</body>
+</html>

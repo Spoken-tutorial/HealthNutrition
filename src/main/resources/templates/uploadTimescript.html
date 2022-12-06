@@ -3,25 +3,26 @@
 <html xmlns:th="https://thymeleaf.org">
 <head th:replace="common/trail :: common-trail"></head>
 <style>
-.nav-con-timescript{
-border-right: 5px solid orange;
-font-size:0.9rem;
-/* text-decoration: underline; */
+.nav-con-timescript {
+	border-right: 5px solid orange;
+	font-size: 0.9rem;
+	/* text-decoration: underline; */
 }
-.nav-con-timescript a{
-color: #044F7A!important;
-font-weight:bold!important;
+
+.nav-con-timescript a {
+	color: #044F7A !important;
+	font-weight: bold !important;
 }
 </style>
 <body>
-<div th:replace="common/sidebar :: top_header"></div>
-<div class="container-fluid">
-<div class="row">
-<div class="col-md-3 col-lg-2 pr-0">
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
 				<div th:replace="common/sidebar :: contributor_sidebar"></div>
 			</div>
 			<div class="col-md-9 col-lg-10 p-md-5">
-			<div>
+				<div>
 					<div class="alert alert-success" role="alert"
 						th:if="${success_msg}">
 						<div id="#test" class="">
@@ -38,326 +39,109 @@ font-weight:bold!important;
 						</div>
 					</div>
 				</div>
-								<div class="card">
+				<div class="card">
 					<div class="card-header">
-						<h4>Tutorials</h4>
+						<h1 class="title-1">Upload Timescript</h1>
 					</div>
 					<div class="card-body">
-											<div class="row">
+						<div class="row">
 							<div class="col">
-								 <table id="tableId" class="table table-striped">
-					      
-					        <thead class="">
-					         
-					            <tr>
-						            	<th>Sr No</th>
-						            	<th>Category</th>
-						                <th>Tutorial</th>
-						                <th>Language</th>
-						                <th>Outline</th>
-						               	<th>Script</th>
-						                <th>Slide</th>
-						                <th>Keyword</th>
-						                <th>Video</th>
-						                <th>TimeScript</th>
-						               
-						                <th>Upload TimeScript</th>
-						 
-					            </tr>    			    
-					            </thead>
-					            <tbody>	
-					            
-					            	<tr th:each="componenettutorial : ${tutorial}">
-					  					
-					  					<td th:text="${componenettutorial.getTutorialId()}"><i style="color: green;" class="fas fa-check-circle"></i> </td>  						              	
-						              	<td th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"><i style="color: green;" class="fas fa-check-circle"></i> </td>     
-						                <td th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"><i style="color: green;" class="fas fa-check-circle"></i> </td>  
-						                <td th:text="${componenettutorial.getConAssignedTutorial().getLan().getLangName()}"><i  style="color: maroon;" class="fas fa-check-circle"></i> </td>
-						               
-						               
-						   <td>
-						        
-							 			 <span th:if="${componenettutorial.getOutlineStatus()==0}">
-									                 
-									               			 <i class="fas fa-minus-circle pending-upload" data-toggle="tooltip" data-placement="top"></i>
-									               			 
-									              </span>
-						           
-									                 <span th:if="${componenettutorial.getOutlineStatus()==2}">
-									                 
-									               			 <i class="fas fa-check-circle domain-review" data-toggle="tooltip" data-placement="top"></i>
-									               	</span>	
-									               	
-									             
-									               	
-									               	  <span th:if="${componenettutorial.getOutlineStatus()==3}">
-									               	  
-									               			 <i class="fas fa-check-circle quality-review" data-toggle="tooltip" data-placement="top"></i>
-									               	</span>	
-									               	
-									               	  <span th:if="${componenettutorial.getOutlineStatus()==5}">
-									               	  
-									               			 <i class="fas fa-check-circle review-accepted" data-toggle="tooltip" data-placement="top"></i>
-									               	</span>
-						               		 
-						    
-						    
-						    
-						               		 		 <span th:if="${componenettutorial.getOutlineStatus()==4}">
+								<table id="tableId" class="table table-striped">
 
-									                   <i class="fas fa-times-circle review-improvement" data-toggle="tooltip" data-placement="top"></i>
-									                   
-									                   </span>
+									<thead class="">
 
+										<tr>
+											<th>Id</th>
+											<th>Category</th>
+											<th>Tutorial</th>
+											<th>Language</th>
+											<th>Upload TimeScript</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="componenettutorial : ${tutorial}">
 
+											<td th:text="${componenettutorial.getTutorialId()}"><i
+												style="color: green;" class="fas fa-check-circle"></i></td>
+											<td
+												th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"><i
+												style="color: green;" class="fas fa-check-circle"></i></td>
+											<td
+												th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"><i
+												style="color: green;" class="fas fa-check-circle"></i></td>
+											<td
+												th:text="${componenettutorial.getConAssignedTutorial().getLan().getLangName()}"><i
+												style="color: maroon;" class="fas fa-check-circle"></i></td>
+											<td>
+												<button type="button"
+													class="btn btn-info timeScriptFetchData"
+													th:value="${componenettutorial.getTutorialId()}"
+													data-whatever="@mdo">
+													<i style="color: blue;" class="fas fa-upload"></i>
+												</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
 
-							</td>
-						                
-						     <td>
-						            
-						            <span th:if="${componenettutorial.getScriptStatus()==0}">
-									         
-									       
-									                <i class="fas fa-minus-circle pending-upload" data-toggle="tooltip" data-placement="top"></i>
-									               			  
-									   	  </span>	
-						                
-						                  		 <span th:if="${componenettutorial.getScriptStatus()==2}">
-									                 
-									               			 <i class="fas fa-check-circle domain-review" data-toggle="tooltip" data-placement="top"></i>
-									               	</span>	
-									               		 
-									               	
-									               	  <span th:if="${componenettutorial.getScriptStatus()==3}">
-									               	  
-									               			 <i class="fas fa-check-circle quality-review" data-toggle="tooltip" data-placement="top"></i>
-									               	</span>	
-									               	
-									               	  <span th:if="${componenettutorial.getScriptStatus()==5}">
-									               	  
-									               			 <i class="fas fa-check-circle review-accepted" data-toggle="tooltip" data-placement="top"></i>
-									               	  </span>
-									               	   <span th:if="${componenettutorial.getScriptStatus()==4}">
-
-									                   <i class="fas fa-times-circle review-improvement" data-toggle="tooltip" data-placement="top"></i>
-									                   
-									                   
-									                   </span>      
-						            
-						                
-						                
-						     </td>
-						    <td>
-						    
-						    								             	
-						                   <span th:if="${componenettutorial.getSlideStatus()==0}">
-									                 
-									               			<i class="fas fa-minus-circle pending-upload" data-toggle="tooltip" data-placement="top"></i>
-									        </span>
-						             	
-						                   <span th:if="${componenettutorial.getSlideStatus()==2}">	
-									                 
-									               		<i class="fas fa-check-circle domain-review" data-toggle="tooltip" data-placement="top"></i>
-									        </span>	
-									               	
-				
-									               	
-									               	  <span th:if="${componenettutorial.getSlideStatus()==3}">
-									               	  
-									               			 <i class="fas fa-check-circle quality-review" data-toggle="tooltip" data-placement="top"></i>
-									               	</span>	
-									               	
-									               	  <span th:if="${componenettutorial.getSlideStatus()==5}">
-									               	  
-									               			 <i class="fas fa-check-circle review-accepted" data-toggle="tooltip" data-placement="top"></i>
-									               	  </span>
-												     <span th:if="${componenettutorial.getSlideStatus()==4}">
-	
-									                   <i class="fas fa-times-circle review-improvement" data-toggle="tooltip" data-placement="top"></i>
-									                   
-									                   
-									                   </span>
-						    
-						    
-						    </td>
-						    
-						    <td>
-						    
-						    					    								             	
-						                   <span th:if="${componenettutorial.getKeywordStatus()==0}">
-									                 
-									               			<i class="fas fa-minus-circle pending-upload" data-toggle="tooltip" data-placement="top"></i>
-									        </span>
-						             	
-						                   <span th:if="${componenettutorial.getKeywordStatus()==2}">	
-									                 
-									               		<i class="fas fa-check-circle domain-review" data-toggle="tooltip" data-placement="top"></i>
-									        </span>	
-									               	
-		 
-									               	
-									               	  <span th:if="${componenettutorial.getKeywordStatus()==3}">
-									               	  
-									               			 <i class="fas fa-check-circle quality-review" data-toggle="tooltip" data-placement="top"></i>
-									               	</span>	
-									               	
-									               	  <span th:if="${componenettutorial.getKeywordStatus()==5}">
-									               	  
-									               			 <i class="fas fa-check-circle review-accepted" data-toggle="tooltip" data-placement="top"></i>
-									               	  </span>
-												     <span th:if="${componenettutorial.getKeywordStatus()==4}">
-	
-									                   <i class="fas fa-times-circle review-improvement" data-toggle="tooltip" data-placement="top"></i>
-									                   
-									                   
-									                   </span>
-						    
-						    
-						    </td>
-						    
-						    
-						    <td>
-						    
-													               	   
-						              <span th:if="${componenettutorial.getVideoStatus()==0}">
-									                 
-									               			<i class="fas fa-minus-circle pending-upload" data-toggle="tooltip" data-placement="top"></i>
-									  </span>
-									   
-									    <span th:if="${ componenettutorial.getVideoStatus()== 2}">
-						                   
-						            				<i class="fas fa-check-circle domain-review" data-toggle="tooltip" data-placement="top"></i>
-						                		
-						                 </span>
-									  
-						                   <span th:if="${ componenettutorial.getVideoStatus()== 1}">
-						                   
-						                		<i style="color: orange;" class="fas fa-check-circle"></i>	
-						                		
-						                   </span>
-						                   
-						                      <span th:if="${componenettutorial.getVideoStatus()== 3}">
-						                   
-						                		<i style="color: aqua;" class="fas fa-check-circle"></i>	
-						                		
-						                   </span>
-						                   
-						                     <span th:if="${componenettutorial.getVideoStatus()== 5}">
-						                   
-						                		<i style="color: green; ;" class="fas fa-check-circle"></i>	
-						                		
-						                   </span>
-						                   
-						              		 <span th:if="${componenettutorial.getVideoStatus()== 4}">
-						                   <i class="fas fa-times-circle review-improvement" data-toggle="tooltip" data-placement="top"></i>
-						                   </span>
-						    
-					   </td>			
-					   <td>
-						    <a  th:if="${componenettutorial.getTimeScript()}" th:href="@{/files/}+@{${componenettutorial.getTimeScript()}}"
-								target="_blank" class="pdfclass"><img id="pdfsource"
-								th:src="${componenettutorial.getTimeScript()}" alt="Click here"></img></a>
-						    
-						    </td>
-									    
-						           				                
-						               <td>
-						               		<button type="button" class="btn btn-info timeScriptFetchData"
-													th:value = "${componenettutorial.getTutorialId()}" data-whatever="@mdo">
-														<i style="color: blue;" class="fas fa-upload"></i>
-											</button>
-										
-										</td>
-								
-					
-					            </tr>
-					            </tbody>			            
-					        </table>
-		
 							</div>
 						</div>
 					</div>
 				</div>
-				
 			</div>
-</div>
+		</div>
+	</div>
+	<div class="modal fade" id="uploadTimescript" data-backdrop="static"
+		data-keyboard="false" tabindex="-1" role="dialog"
+		aria-labelledby="exampleModalLabelScript" aria-hidden="true">
+		<div
+			class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+			role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabelScript">Upload
+						TimeScript</h5>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-12">
+							<div class="alert alert-msg" style="display: none;"></div>
 
-
-</div>
-
-
-				<div class="modal fade" id="uploadTimescript" data-backdrop="static"
-							data-keyboard="false" tabindex="-1" role="dialog"
-							aria-labelledby="exampleModalLabelScript" aria-hidden="true">
-							<div
-								class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
-								role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabelScript">Upload
-											TimeScript</h5>
-										<button type="button" class="close" data-dismiss="modal"
-											aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
+							<form id="upload-file-form-script">
+								<div class="form-group">
+									<div class="custom-file">
+										<input type="file" class="custom-file-input"
+											id="uploadScriptFile" name="uploadsScriptFile"
+											placeholder="uploadFile" accept=".pdf" required="required"></input>
+										<label class="custom-file-label" for="uploadsScriptId">Choose
+											file...</label>
+										<div class="invalid-feedback">Example invalid custom
+											file feedback</div>
+										<input type="hidden" id="tutorialId" />
 									</div>
-									<div class="modal-body">
-										<div class="row">
-											<div class="col-12">
-												<div class="alert alert-msg" style="display: none;"></div>
-							
-												<form id="upload-file-form-script"
-													submit="return submitForm(this);">
-													<div class="form-group">
-														<div class="custom-file">
-															<input type="file" class="custom-file-input"
-																id="uploadScriptFile" name="uploadsScriptFile"
-																placeholder="uploadFile" accept=".pdf"
-																required="required"></input> <label
-																class="custom-file-label" for="uploadsScriptId">Choose
-																file...</label>
-															<div class="invalid-feedback">Example invalid
-																custom file feedback</div>
-															<input type="hidden" id="tutorialId" />
-														</div>
-														<!-- here -->
-
-													</div>
-
-
-												</form>
-
-											</div>
-										
-										</div>
-
-
-									</div>
-
-									<div class="modal-footer">
-									
-										
-										<button id="timeScript" type="button" class="btn btn-success">Upload</button>
-										
-
-										<button type="button" class="btn btn-secondary"
-											data-dismiss="modal">Close</button>
-
-									</div>
-
 								</div>
-							</div>
-
+							</form>
 						</div>
-  		
-		
- 
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="timeScript" type="button" class="btn btn-success">Upload</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
- 
- 			<script th:src="@{/js/jquery.min.js}"></script>
-		 	<script type="text/javascript" charset="utf8" th:src="@{/datatables.js}"></script>
-		 
-			<script>
+
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script type="text/javascript" charset="utf8"
+		th:src="@{/datatables.js}"></script>
+
+	<script>
 			
 			
 			$(document).ready( function () {
@@ -365,29 +149,15 @@ font-weight:bold!important;
 			} );
 			
 			</script>
-			
-			
-			<div th:fragment="body-bottom-scripts">
 
-        	 <!-- <script src="static/js/bootstrap.bundle.min.js"></script>
-       		 <script src="static/js/jquery.slim.min" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> -->
-       		 <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-			 	
-			<script th:src="@{/js/ajaxSupport.js}"></script>
-			 	
-			
-			
-			
-			</div>
-			
-				<script th:inline="javascript">
+
+	
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script th:inline="javascript">
     
 		var projectPath='[(@{/})]';
 		
 	</script>
- </body>
+</body>
 </html>
- 
- 
+

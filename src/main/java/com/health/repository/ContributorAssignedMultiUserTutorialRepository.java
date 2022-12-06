@@ -29,4 +29,6 @@ public interface ContributorAssignedMultiUserTutorialRepository extends CrudRepo
 	 * @return list of ContributorAssignedMultiUserTutorial object
 	 */
 	List<ContributorAssignedMultiUserTutorial> findAllByuser(User user);
+	
+	List<ContributorAssignedMultiUserTutorial> findAll();
 }

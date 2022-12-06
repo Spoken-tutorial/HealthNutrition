@@ -4,6 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.health.domain.security.UserRole;
 import com.health.model.Category;
@@ -20,6 +24,7 @@ import com.health.repository.UserRepository;
 import com.health.service.impl.FileNotFoundException;
 import com.health.service.impl.MessagingException;
 
+
 import net.bytebuddy.utility.RandomString;
 
 /**
@@ -29,6 +34,8 @@ import net.bytebuddy.utility.RandomString;
  *
  */
 public interface UserService {
+	
+	
 	
 	/**
 	 * Find User object given Token
@@ -150,10 +157,40 @@ public interface UserService {
 	 */
 	List<User> findAll();
 
+
 	void sendSimpleEmail(String toAddress, String subject, String message);
 
 	void sendEmailWithAttachment(String toAddress, String subject, String message, String attachment)
 			throws javax.mail.MessagingException, java.io.FileNotFoundException, javax.mail.MessagingException, java.io.FileNotFoundException;
 
 	
+	String setEmailVerificationCode(User user, String siteURL);
+
+	public default void register(User user, String siteURL)
+	        throws UnsupportedEncodingException, MessagingException {
+		String randomCode = RandomString.make(64);
+	    user.setEmailVerificationCode(randomCode);
+	    user.setEnabled(false);
+	     
+	    UserRepository.save(user);
+	     
+	    setEmailVerificationCode(user, siteURL);
+	}
+	
+	public static boolean verify(String verificationCode) {
+	    User user = UserRepository.findByVerificationCode(verificationCode);
+	     
+	    if (user == null || user.isEnabled()) {
+	        return false;
+	    } else {
+	        user.setEmailVerificationCode(null);
+	        user.setEnabled(true);
+	        UserRepository.save(user);
+	         
+	        return true;
+	    }
+	     
+	}
+	 ;
+
 }

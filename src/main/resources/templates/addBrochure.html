@@ -6,7 +6,6 @@
 .nav-brochure{
 border-right: 5px solid orange;
 font-size:0.9rem;
-/* text-decoration: underline; */
 }
 .nav-brochure a{
 color: #044F7A!important;
@@ -166,16 +165,13 @@ font-weight:bold!important;
 	</div>
 <div th:replace="common/trail :: body-bottom-scripts"></div>
 <script>
+var projectPath='[(@{/})]';
 $(document).ready( function () {
     $('#myTable').DataTable();
     
     
 } );
 </script>
-
-	<script th:inline="javascript">
-		var projectPath='[(@{/})]';
-	</script>
 </body>
 
 </html>

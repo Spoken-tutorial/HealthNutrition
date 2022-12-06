@@ -1,5 +1,7 @@
 package com.health.service;
 
+import java.util.List;
+
 import com.health.model.LogManegement;
 
 /**
@@ -21,4 +23,6 @@ public interface LogMangementService {
 	 * @param log LogManegement object
 	 */
 	void save(LogManegement log);
+
+	List<LogManegement> getLogsWithSuperUser();
 }

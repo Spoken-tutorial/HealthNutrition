@@ -24,7 +24,7 @@ import com.health.model.User;
  */
 @Entity
 @Table(name="user_role")
-public class UserRole 
+public class UserRole implements Comparable<UserRole>
 {	
 	/**
 	 * unique id of object
@@ -181,6 +181,14 @@ public class UserRole
 
 	public void setRejected(boolean rejected) {
 		this.rejected = rejected;
+	}
+
+	@Override
+	public int compareTo(UserRole o) {
+		// TODO Auto-generated method stub
+		this.getUser().getFirstName();
+		return this.getUser().getFirstName().compareToIgnoreCase(o.getUser().getFirstName());
+		
 	}
 	
 	

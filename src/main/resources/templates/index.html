@@ -9,10 +9,8 @@
     <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
     
   <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
-  <!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />  
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.9.1/css/OverlayScrollbars.min.css' />
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.0/css/bulma.min.css" integrity="sha512-ADrqa2PY1TZtb/MoLZIZu/Z/LlPaWQeDMBV73EMwjGam43/JJ5fqW38Rq8LJOVGCDfrJeOMS3Q/wRUVzW5DkjQ==" crossorigin="anonymous" /> -->
   <link rel="stylesheet" th:href="@{/css/main.css}" /> 
     <link rel="stylesheet" type="text/css" href="../css/hello-parallax.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
@@ -60,7 +58,7 @@
 	<div class="px-md-3">
 	<div class="row header-top pt-2">
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
-	<div> <a href="tel:1800-267-7782"> <span class="contact-num p-2" style="font-size:1.5rem;"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></div>
+	<!-- <div> <a href="tel:1800-267-7782"> <span class="contact-num p-2" style="font-size:1.5rem;"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></div> -->
 	</div>
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
 	<div><p class="d-inline-block"><span class="top-banner">
@@ -107,48 +105,15 @@
   </header>
   <!-- Fixed Header And Menu Bar Ends-->
     <main>
-    <section id="search-bar" class="container-lg my-5">
-<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
-<div class="row" style="width: 100%;">
-<div class="col-md-3 mb-3">
-            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
-              <option>Select Category</option>
-              <option th:each="category : ${categories}"><span th:text="${category}">Title ...</span></option>
-            </select>
-            <div class="invalid-feedback">
-              Please select a valid foss.
-            </div>
-</div>
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
-              <option >Select Topic</option>
-              <option th:each="topic : ${topics}"><span th:text="${topic}">Title ...</span></option>
-            </select>
-</div>
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputL" name="lan">
-              <option >Select Language</option>
-              <option th:each="language : ${languages}"><span th:text="${language}">Title ...</span></option> 
-            </select>
-            <div class="invalid-feedback">
-              Please provide a valid language.
-            </div>
-</div>
-          <div class="col-md-3 mb-3" style="width: 100%;">
-           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
-          </div>
-</div>
-</form>
-          
-</section>
+    <div th:replace="common/commonElements :: search_bar"></div>
 <section>
 <div class="container-lg py-3">
 <div class="row">
 <div class="col-12">
 <span style="line-height: 2rem;font-size:1.2rem;">
 Spoken Tutorial Health and Nutrition project, IIT Bombay, offers valuable advice on <span style="border-bottom: 1.5px solid orange;">Maternal Nutrition</span>, <span style="border-bottom: 1.5px solid orange;">Child
-Nutrition</span>, <span style="border-bottom: 1.5px solid orange;">General Nutrition</span> and <span style="border-bottom: 1.5px solid orange;">Covid</span> related information by a team of emminent<span style="border-bottom: 1.5px solid #1C7871;"> Doctors, Nutritionists and
-field</span> officers with 10+ years of experience
+Nutrition</span>, <span style="border-bottom: 1.5px solid orange;">General Nutrition</span> and <span style="border-bottom: 1.5px solid orange;">Covid</span> related information by a team of emminent Doctors, Nutritionists and
+field officers with 10+ years of experience
 </span>
 </div>
 </div>
@@ -216,25 +181,13 @@ the globe.
 </div>
 </div>
 </div>
-		<!-- <div class="col-md-6 py-5">
-		<div class="row">
-		<div class="col-4"><img src="https://www.w3schools.com/bootstrap/cinqueterre.jpg" class="img-rounded" alt="Cinque Terre" style="max-width:100%;" > </div>
-		<div class="col-4"><img src="https://www.w3schools.com/bootstrap/cinqueterre.jpg" class="img-rounded" alt="Cinque Terre" style="max-width:100%;"> </div>
-		<div class="col-4"><img src="https://www.w3schools.com/bootstrap/cinqueterre.jpg" class="img-rounded" alt="Cinque Terre" style="max-width:100%;"> </div>
-		</div>
-		<div class="row">
-		<div class="col-4"><img src="https://www.w3schools.com/bootstrap/cinqueterre.jpg" class="img-rounded" alt="Cinque Terre" style="max-width:100%;" > </div>
-		<div class="col-4"><img src="https://www.w3schools.com/bootstrap/cinqueterre.jpg" class="img-rounded" alt="Cinque Terre" style="max-width:100%;"> </div>
-		<div class="col-4"><img src="https://www.w3schools.com/bootstrap/cinqueterre.jpg" class="img-rounded" alt="Cinque Terre" style="max-width:100%;"> </div>
-		</div>
-		</div> -->
 		</div>
 	</div>
     </section>
 	<section class="bg-light" id="stats">
 	<div class="container-lg py-3 px-3">
 		<div class="row">
-		<div class="col-md-4">
+		<div class="col-md-6">
 		<a th:href="@{'/tutorials?categoryName='+'Select'+'&topic='+'Select'+'&lan='+'Select'}">
 		<div class="is-shady text-center p-3 stat-card">
 			    <p class="stat-num"><span th:text="${videoCount}"></span>+</p>
@@ -246,7 +199,7 @@ the globe.
 		</a>
 			
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-6">
 		<a th:href="@{/showLanguages}">
 			<div class="is-shady text-center p-3 stat-card">
 			    <p class="stat-num"><span th:text="${languageCount}"></span>+</p>
@@ -257,7 +210,7 @@ the globe.
 			</div>
 		</a>
 		</div>
-		<div class="col-md-4">
+		<!-- <div class="col-md-4">
 		<a th:href="@{/showConsultant}">
 		<div class="is-shady text-center p-3 w-100 stat-card">
 			    <p class="stat-num"><span th:text="${consultantCount}"></span>+</p>
@@ -267,7 +220,7 @@ the globe.
 		        </p>
 		    </div>
 		</a>
-		</div>
+		</div> -->
 		</div>
 		<br>
 		<div class="w-100 text-center"><a th:href="@{/statistics}" target="_blank" class="button catBtn mb-5">View Statistics</a></div>
@@ -281,7 +234,6 @@ the globe.
 	    	<div class="col-md-4 col-lg-3 br-right br-bottom py-3" th:each="category : ${listofCategories}">
 	    	<div class="d-flex flex-column align-items-center ">
 	    		<div>
-	    		<!-- <img  th:src="@{/image/logo.png}" class="d-block"> -->
 	    		<img th:src="@{/files/}+@{${category.getPosterPath()}}" width="80px" style="max-width: 80px;height: auto;" class="d-block"/>
 	    		</div>
 	    		<hr style="border: 1px solid orange; width: 50%;">
@@ -514,15 +466,28 @@ the globe.
 		    <br>
 		    <hr>
 		    <div class="row px-3">
-		    <div class="col-sm-6"><p class="contact-text mx-0"><a href="mailto:someone@example.com"><i class="fas fa-envelope contact-icon mr-2"></i> contact@spoken-tutorial.org</a></p></div>
-		    <div class="col-sm-6"><p class="contact-text mx-0"><a href="tel:+6494461709"><i class="fas fa-phone-alt contact-icon mr-2"></i> + 91 22 25764229</a></p></div>
+		    <div class="col-sm-6"><p class="contact-text mx-0"><a href="mailto:health@spoken-tutorial.org"><i class="fas fa-envelope contact-icon mr-2"></i> health@spoken-tutorial.org</a></p></div>
+		    <div class="col-sm-6"><p class="contact-text mx-0"><a href="tel:02225764229"><i class="fas fa-phone-alt contact-icon mr-2"></i> 022 2576 4229</a></p></div>
 		    </div>
     	</div>
     	</div>
     	<div class="col-lg-6 py-3 is-shady" style="height: 100%;">
     	<div>
     		<h1 class="text-center spk-title" style="font-size: 1.5rem;">Feedback Form</h1>
-  
+    		<div class="alert alert-warning" role="alert" id="feedback_spinner" style="display:none;">
+  <span class="spinner-border spinner-border-sm" role="status">
+  <span class="sr-only">Loading...</span>
+</span><span> Sending Mail, Please wait ....</span>
+</div>
+<div class="alert alert-warning" role="alert" id="statusOnContactForm" style="display: none;">
+  Provide Correct E-mail
+</div>
+<div class="alert alert-warning" role="alert" id="statusOnContactFormAfterAjaxCallSucess" style="display: none;">
+  Query has been recorded.
+</div>
+<div class="alert alert-warning" role="alert" id="statusOnContactFormAfterAjaxCallFailure" style="display: none;">
+  Please Try Again.
+</div>
         <div class="row">
             <div class="col-md-6 mb-3">
               <label for="firstName">Name</label>
@@ -540,13 +505,8 @@ the globe.
           <textarea class="form-control"  id="message" rows="3"></textarea>
           </div>
           
-          <div id="statusOnContactForm" style="color: red; display: none; margin-top: 10px;">Provide Correct E-mail</div>
-		 <div id="statusOnContactFormAfterAjaxCallSucess" style="color: green; display: none; margin-top: 10px;">Query has been recorded.
-		 </div>
-		 <div id="statusOnContactFormAfterAjaxCallFailure" style="color: red; display: none; margin-top: 10px;">Please
-						Try Again
-		 </div>
-          <input type="submit" id="contactForm" name="submit" class="btn" disabled></input>
+         
+          <input type="submit" id="contactForm" name="submit" class="btn" ></input>
          
     	</div>
     	</div>

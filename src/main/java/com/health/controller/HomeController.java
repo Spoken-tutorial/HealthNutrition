@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,6 +78,7 @@ import com.health.model.Event;
 import com.health.model.FeedbackMasterTrainer;
 import com.health.model.IndianLanguage;
 import com.health.model.Language;
+import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
 import com.health.model.PostQuestionaire;
 import com.health.model.Question;
@@ -105,6 +107,7 @@ import com.health.service.EventService;
 import com.health.service.FeedBackMasterTrainerService;
 import com.health.service.IndianLanguageService;
 import com.health.service.LanguageService;
+import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
 import com.health.service.PostQuestionaireService;
 import com.health.service.QuestionService;
@@ -232,6 +235,9 @@ public class HomeController {
 	@Autowired
 	private OrganizationRoleService organizationRoleService;
 	
+	@Autowired
+	private LogMangementService logMangementService;
+	
 	@Value("${scriptmanager_url}")
 	private String scriptmanager_url;
 	
@@ -242,6 +248,180 @@ public class HomeController {
     
 	private static final String VIDEO_FILE_FORMAT = "video/*";
 
+	private User getUser(Principal principal,UserService usrservice) {
+		User usr=new User();
+		if(principal!=null) {
+			usr=usrservice.findByUsername(principal.getName());
+		}
+		return usr;
+	}
+	
+
+	static void setCompStatus(Model model,List<Tutorial> tutorials) {
+		
+		if(tutorials.isEmpty()) {
+
+			model.addAttribute("statusOutline", CommonData.ADD_CONTENT);
+			model.addAttribute("statusScript", CommonData.ADD_CONTENT);
+			model.addAttribute("statusSlide", CommonData.ADD_CONTENT);
+			model.addAttribute("statusVideo", CommonData.ADD_CONTENT);
+			model.addAttribute("statusKeyword", CommonData.ADD_CONTENT);
+			model.addAttribute("statusPreReq", CommonData.ADD_CONTENT);
+			model.addAttribute("statusGraphics", CommonData.ADD_CONTENT);
+			model.addAttribute("tutorial", null);
+		}else {
+			for(Tutorial local:tutorials) {
+				model.addAttribute("statusOutline", CommonData.tutorialStatus[local.getOutlineStatus()]);
+				model.addAttribute("statusScript", CommonData.tutorialStatus[local.getScriptStatus()]);
+				model.addAttribute("statusSlide", CommonData.tutorialStatus[local.getSlideStatus()]);
+				model.addAttribute("statusVideo", CommonData.tutorialStatus[local.getVideoStatus()]);
+				model.addAttribute("statusKeyword", CommonData.tutorialStatus[local.getKeywordStatus()]);
+				model.addAttribute("statusPreReq", CommonData.tutorialStatus[local.getPreRequisticStatus()]);
+
+//				model.addAttribute("tutorial", local);
+				
+				
+				
+			}
+
+		}
+	}
+private void setVideoInfo(Model model, List<Tutorial> tutorials) {
+	
+	HashMap<String, Long> video_data = new HashMap<String, Long>();	
+	if(!tutorials.isEmpty()) {
+		for(Tutorial local:tutorials) {
+			if(local.getVideo() != null) {
+
+				IContainer container = IContainer.make();
+				int result=10;
+				result = container.open(env.getProperty("spring.applicationexternalPath.name")+local.getVideo(),IContainer.Type.READ,null);
+				
+					IStream stream = container.getStream(0);
+					if(stream!=null) {
+					IStreamCoder coder = stream.getStreamCoder();
+					model.addAttribute("FileWidth", coder.getWidth());
+					model.addAttribute("FileHeight", coder.getHeight());
+					model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
+					model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
+					
+					container.close();
+				}
+			}
+		}
+	}
+	
+}
+	
+static void setCompComment(Model model,List<Tutorial> tutorials,CommentService comService) {
+	
+	if(!tutorials.isEmpty()) {
+		for(Tutorial local:tutorials) {
+			List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, local);
+			List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT, local);
+			List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, local);
+
+			List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, local);
+			List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC, local);
+			List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, local);
+
+			model.addAttribute("comOutline", comOutline);
+			model.addAttribute("comScript",comScript );
+			model.addAttribute("comSlide",comSlide );
+			model.addAttribute("comVideo", comVideo);
+			model.addAttribute("comKeyword", comKeyword);
+			model.addAttribute("comPreReq", comPreRequistic);
+			
+		}
+	}
+}
+
+static void setEngLangStatus(Model model,Language lan) {
+	if(!lan.getLangName().equalsIgnoreCase("english")) {
+		model.addAttribute("isEnglish", false);
+	}else {
+		model.addAttribute("isEnglish", true);
+	}
+}
+
+private String setPreReqInfo(Tutorial tut) {
+	String prefix = "Selected prerequisite : ";
+	String pre_req = "";
+	if(tut.getPreRequistic()!=null) {
+		Tutorial local = tut.getPreRequistic();
+		String catName = local.getConAssignedTutorial().getTopicCatId().getCat().getCatName();
+		String topicName = local.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName();
+		pre_req = prefix + catName + " - " + topicName;
+	}else {
+		pre_req = prefix + "This tutorial has no prerequisite.";
+	}
+	return pre_req;
+}
+
+static String setScriptManagerUrl(Model model,String scriptmanager_url,String scriptmanager_path, Tutorial tutorial, Topic topic,Language lan, Category cat) {
+	String topic_name = topic.getTopicName();
+	topic_name	= topic_name.replaceAll(" ", "-");
+	model.addAttribute("topic_name", topic_name);
+	model.addAttribute("script_manager_view_url",scriptmanager_url+scriptmanager_path);
+	model.addAttribute("sm_default_param", CommonData.SM_DEFAULT_PARAM);
+	String tutorial_id="";
+	if(tutorial!=null) {
+		tutorial_id = Integer.toString(tutorial.getTutorialId());
+	}
+	String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(cat.getCategoryId())+"/"
+			+tutorial_id+"/"+Integer.toString(lan.getLanId())+"/"+topic_name+"/"+"1";
+	return sm_url;
+}
+
+private void getUsers() {
+	
+}
+private List<Category> getCategories() {
+	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	Set<Category> catTemp = new HashSet<Category>();
+	for(Tutorial temp :tutorials) {
+		
+		Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+		if(c.isStatus()) {
+			catTemp.add(c);
+		}
+		
+	}
+	
+	List<Category> catTempSorted =new ArrayList<Category>(catTemp);
+	Collections.sort(catTempSorted);
+	
+	return catTempSorted;
+}
+private List<Topic> getTopics() {
+	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	Set<Topic> topicTemp = new HashSet<Topic>();
+	for(Tutorial temp :tutorials) {
+		
+		Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+		if(c.isStatus()) {
+			topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic());
+		}
+	}
+	List<Topic> topicTempSorted =new ArrayList<Topic>(topicTemp);
+	Collections.sort(topicTempSorted);
+	return topicTempSorted;
+}
+private List<Language> getLanguages() {
+	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	Set<Language> langTemp = new HashSet<Language>();
+	for(Tutorial temp :tutorials) {
+		Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+		if(c.isStatus()) {
+			langTemp.add(temp.getConAssignedTutorial().getLan());
+		}
+		
+	}
+	List<Language> lanTempSorted =new ArrayList<Language>(langTemp);
+	Collections.sort(lanTempSorted);
+	
+	return lanTempSorted;
+}
 	/**
 	 * Index page Url
 	 * @param model Model Object
@@ -259,28 +439,11 @@ public class HomeController {
 		List<Brouchure> brochures= broService.findAll();
 		List<Carousel> carousel= caroService.findAll();
 
-		Set<String> catTemp = new HashSet<String>();
-		Set<String> topicTemp = new HashSet<String>();
 		Set<String> lanTemp = new HashSet<String>();
 
-		List<Tutorial> tutorials = tutService.findAllBystatus(true);
-		for(Tutorial temp :tutorials) {
-			
-			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
-			if(c.isStatus()) {
-				catTemp.add(c.getCatName());
-				lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
-				topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-			}
-			
-		}
-		
-		List<String> catTempSorted =new ArrayList<String>(catTemp);
-		Collections.sort(catTempSorted);
-		
-		List<String> lanTempSorted =new ArrayList<String>(lanTemp);
-		Collections.sort(lanTempSorted);
-		
+		List<Category> category_objs = catService.findAllByOrder();
+		Collections.sort(category_objs);
+	
 		List<Event> evnHome = new ArrayList<>();
 		List<Testimonial> testHome = new ArrayList<>();
 		List<Consultant> consulHome = new ArrayList<>();
@@ -350,10 +513,13 @@ public class HomeController {
 		model.addAttribute("consultantCount", consults.size());
 
 
-
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTempSorted = getTopics();
+		
 		model.addAttribute("categories", catTempSorted);
 		model.addAttribute("languages", lanTempSorted);
-		model.addAttribute("topics", topicTemp);
+		model.addAttribute("topics", topicTempSorted);
 
 		if(!carouselHome.isEmpty()) {
 			model.addAttribute("carousel", carouselHome.get(0));
@@ -376,28 +542,15 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/tutorials", method = RequestMethod.GET)
 	public String viewCoursesAvailable(HttpServletRequest req,
-			@RequestParam(name = "categoryName") String cat,
-			@RequestParam(name = "topic") String topic,
-			@RequestParam(name = "lan") String lan,
+			@RequestParam(name = "categoryName") int cat,
+			@RequestParam(name = "topic") int topic,
+			@RequestParam(name = "lan") int lan,
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 
-		Set<String> catTemp = new HashSet<String>();
-		Set<String> topicTemp = new HashSet<String>();
-		Set<String> lanTemp = new HashSet<String>();
-
-		List<Tutorial> tutorials = tutService.findAllBystatus(true);
-		for(Tutorial temp :tutorials) {
-			catTemp.add(temp.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-			lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
-			topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-		}
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTemp = getTopics();
 		
-		List<String> catTempSorted =new ArrayList<String>(catTemp);
-		Collections.sort(catTempSorted);
-		
-		List<String> lanTempSorted =new ArrayList<String>(lanTemp);
-		Collections.sort(lanTempSorted);
-
 		model.addAttribute("categories", catTempSorted);
 		model.addAttribute("languages", lanTempSorted);
 		model.addAttribute("topics", topicTemp);
@@ -424,16 +577,14 @@ public class HomeController {
 		}
 
 		model.addAttribute("userInfo", usr);
-		if(!cat.contentEquals("Select Category")) {
-			localCat = catService.findBycategoryname(cat);
+		if(cat!=0) {
+			localCat = catService.findByid(cat);
 		}
-
-		if(!topic.contentEquals("Select Topic")) {
-			localTopic = topicService.findBytopicName(topic);
-		}
-
-		if(!lan.contentEquals("Select Language")) {
-			localLan= lanService.getByLanName(lan);
+			if(topic!=0) {
+			localTopic = topicService.findById(topic);
+		}		
+			if(lan!=0) {
+			localLan= lanService.getById(lan);
 		}
 
 		if(localCat != null && localTopic != null) {
@@ -564,15 +715,19 @@ public class HomeController {
 					topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 				}
 				
-				List<String> catTempSorted =new ArrayList<String>(catTemp);
-				Collections.sort(catTempSorted);
-				
-				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
-				Collections.sort(lanTempSorted);
+//				List<String> catTempSorted =new ArrayList<String>(catTemp);
+//				Collections.sort(catTempSorted);
+//				
+//				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
+//				Collections.sort(lanTempSorted);
 
+				List<Category> catTempSorted = getCategories();
+				List<Language> lanTempSorted = getLanguages();
+				List<Topic> topicTempSorted = getTopics();
 				model.addAttribute("categories", catTempSorted);
 				model.addAttribute("languages", lanTempSorted);
-				model.addAttribute("topics", topicTemp);
+				model.addAttribute("topics", topicTempSorted);
+//				model.addAttribute("topics", topicTemp);
 				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
 				model.addAttribute("sm_url", sm_url);
 			return "tutorial";
@@ -701,7 +856,6 @@ public class HomeController {
 		}
 		
 		try {
-			
 			String token = UUID.randomUUID().toString();
 			usr.setToken(token);
 			userService.save(usr);
@@ -808,12 +962,12 @@ public class HomeController {
 		usr.setToken(null);
 		userService.save(usr);
 
-		mv.addObject("Success", "Password got updated Successfully");
+		mv.addObject("Success", "Password updated Successfully");
 		mv.setViewName("resetPassword");
 		return mv;
 
 	}
-
+	
 	/**
 	 * redirects to category page
 	 * @param model Model object
@@ -2503,32 +2657,6 @@ public class HomeController {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-
-//			IContainer container = IContainer.make();
-//			int result=10;
-//			result = container.open(pathSampleVideo,IContainer.Type.READ,null);
-//
-//			try {
-//				if(result<0) {
-//
-//					model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-//					return "addConsultant";
-//
-//				}else {
-//						if(container.getDuration()>CommonData.videoDuration) {
-//
-//							model.addAttribute("error_msg",CommonData.VIDEO_DURATION_ERROR);
-//							Path deletePreviousPath=Paths.get(pathSampleVideo);
-//							Files.delete(deletePreviousPath);
-//							return "addConsultant";
-//					}
-//				}
-//			} catch (IOException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//				model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-//				return "updateTestimonial";
-//			}
 
 			    ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
 				String pathtoUploadPoster=ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
@@ -4615,6 +4743,7 @@ public class HomeController {
 		return "updateAssignContributor";
 	}
 
+	
 	/**
 	 * redirects to assign contributor page
 	 * @param model Model object
@@ -4624,14 +4753,7 @@ public class HomeController {
 	@RequestMapping(value = "/assignTutorialToContributor", method = RequestMethod.GET)
 	public String assignTutorialToContributoreGet(Model model,Principal principal) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
+		model.addAttribute("userInfo", getUser(principal, userService));
 
 		Role role=roleService.findByname(CommonData.contributorRole);
 		Role role1=roleService.findByname(CommonData.externalContributorRole);
@@ -4640,16 +4762,15 @@ public class HomeController {
 		
 		List<UserRole> userRolesTemp= usrRoleService.findAllByRoleAndStatusAndRevoked(role, true,false);
 		userRolesTemp.addAll(usrRoleService.findAllByRoleAndStatusAndRevoked(role1, true,false));
-		
-		HashSet<String> userRolesUniqueTemp = new HashSet<>();
-		
+		Collections.sort(userRolesTemp);
+		LinkedHashSet<User> userRolesUniqueTemp = new LinkedHashSet<>();
 		for(UserRole x : userRolesTemp) {
-			userRolesUniqueTemp.add(x.getUser().getUsername());
+			userRolesUniqueTemp.add(x.getUser());
 		}
-
+		model.addAttribute("userByContributors", userRolesUniqueTemp);
 		model.addAttribute("userByContributorsAssigned", userRoles);
 		
-		model.addAttribute("userByContributors", userRolesUniqueTemp);
+		
 
 		return "assignContributorList";
 	}
@@ -4687,13 +4808,16 @@ public class HomeController {
 
 		List<UserRole> userRolesTemp= usrRoleService.findAllByRoleAndStatusAndRevoked(role, true,false);
 		userRolesTemp.addAll(usrRoleService.findAllByRoleAndStatusAndRevoked(role1, true,false));
-		
-		HashSet<String> userRolesUniqueTemp = new HashSet<>();
+		Collections.sort(userRolesTemp);
+		LinkedHashSet<User> userRolesUniqueTemp = new LinkedHashSet<>();
+		for(UserRole x : userRolesTemp) {
+			userRolesUniqueTemp.add(x.getUser());
+		}
 		
 		for(UserRole x : userRolesTemp) {
-			userRolesUniqueTemp.add(x.getUser().getUsername());
+			userRolesUniqueTemp.add(x.getUser());
 		}
-
+		
 		model.addAttribute("userByContributorsAssigned", userRoles);
 		
 		model.addAttribute("userByContributors", userRolesUniqueTemp);
@@ -4752,7 +4876,7 @@ public class HomeController {
 		userRolesTemp= usrRoleService.findAllByRoleAndStatusAndRevoked(role, true,false);
 		
 		for(UserRole x : userRolesTemp) {
-			userRolesUniqueTemp.add(x.getUser().getUsername());
+			userRolesUniqueTemp.add(x.getUser());
 		}
 
 		model.addAttribute("userByContributorsAssigned", userRoles);
@@ -4780,13 +4904,7 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/uploadTutorial", method = RequestMethod.GET)
 	public String uploadTutorialGet(Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 
 		List<String> catName = new ArrayList<String>();
@@ -4795,16 +4913,50 @@ public class HomeController {
 		for(ContributorAssignedMultiUserTutorial temp:con) {
 			ContributorAssignedTutorial conTemp = conRepo.findById(temp.getConAssignedTutorial().getId());
 			catName.add(conTemp.getTopicCatId().getCat().getCatName());
-
 		}
-		HashSet<String> uniqueCatName=new HashSet<String>(catName);    // to return unique value
-
-
-		model.addAttribute("contributorTutorial", uniqueCatName);
+		HashSet<String> uniqueCatName=new HashSet<String>(catName);    
+		List<String> categories = new ArrayList<String>(uniqueCatName);
+		Collections.sort(categories);
+		model.addAttribute("contributorTutorial", categories);
 		return "uploadTutorialPre";
 	}
 
 
+	private List<Category> getPreReqCategories(Language lan){
+		List<Category> categories = new ArrayList<Category>();
+		List<Category> preReqCategories = new ArrayList<Category>();
+		Set<Category> preReqCatSet = new HashSet<Category>();
+//		get all category
+		categories = catService.findAll();
+//		for each category; 
+		for(Category category : categories) {
+			if(category.isStatus()) {
+				List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(category);
+				List<ContributorAssignedTutorial> con_t = new ArrayList<ContributorAssignedTutorial>();
+				if(!tcm.isEmpty()) {
+					if(lan==null) {
+						con_t = conRepo.findAllByTopicCat(tcm);
+					}else {
+						con_t = conRepo.findAllByTopicCatAndLanViewPart(tcm, lan);
+					}
+					for(ContributorAssignedTutorial c : con_t) {
+						List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(c);
+						if(!tut.isEmpty()) {
+							if(tut.get(0).isStatus()) {
+								preReqCatSet.add(category);
+							}
+						}
+						
+					}
+				}
+				
+			}
+		}
+		for(Category c : preReqCatSet) {
+			preReqCategories.add(c);
+		}
+		return preReqCategories;
+	}
 	/**
 	 * load tutorial component page to add various component for the tutorial
 	 * @param model Model object
@@ -4820,143 +4972,78 @@ public class HomeController {
 										@RequestParam(name="inputTopic") int topicId,
 										@RequestParam(name="inputLanguage") String langName) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-		List<Category> categories = catService.findAll();
-		Category cat=catService.findBycategoryname(categoryName);
-		Topic topic=topicService.findById(topicId);
+		model.addAttribute("userInfo", getUser(principal, userService));
 		Language lan=lanService.getByLanName(langName);
+		model.addAttribute("language", lan);
+		List<Category> categories = getPreReqCategories(lan);
+		model.addAttribute("categories", categories);
+		Category cat=catService.findBycategoryname(categoryName);
+		model.addAttribute("category", cat);
+		Topic topic=topicService.findById(topicId);
+		model.addAttribute("topic", topic);
+		
 		TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
 		Tutorial tutorial = null;
+		
+		ContributorAssignedTutorial conTutorial=conRepo.findByTopicCatAndLanViewPart( topicCat, lan);
+		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTutorial);
+		setCompStatus(model,tutorials);
+		setEngLangStatus(model, lan);
+		
 		if(!lan.getLangName().equalsIgnoreCase("english")) {
 			
 			boolean goAhead = false;
 			List<Tutorial> tutTemp = null ;
 			List<ContributorAssignedTutorial> tempCon = conRepo.findByTopicCat(topicCat);
-			for(ContributorAssignedTutorial x : tempCon) {
-				if(x.getLan().getLangName().equalsIgnoreCase("english")) {
-					goAhead =true;
-					tutTemp = tutService.findAllByContributorAssignedTutorial(x);
-					break;
+			List<TopicCategoryMapping> tcm_list = topicCatService.findAllByTopic(topic);
+			
+			for(TopicCategoryMapping tc : tcm_list) {
+				List<ContributorAssignedTutorial> ct = conRepo.findByTopicCat(tc);
+				for(ContributorAssignedTutorial x : ct) {
+					if(x.getLan().getLangName().equalsIgnoreCase("english")) {
+						goAhead =true;
+						tutTemp = tutService.findAllByContributorAssignedTutorial(x);
+						break;
+					}
 				}
 			}
 			
 			if(goAhead == false) {
-				model.addAttribute("error_msg", "Please Add English Verion of tutorial first");
+				model.addAttribute("error_msg", "Please add English version of tutorial first.");
+				model.addAttribute("disable", true);
 				return "uploadTutorialPost";
 			}else {
 				
 				if(tutTemp.isEmpty()) {
-					model.addAttribute("error_msg", "Please Add English Verion of tutorial first");
+					model.addAttribute("error_msg", "Please add English version of tutorial first.");
+					model.addAttribute("disable", true);
 					return "uploadTutorialPost";
 					
 				}else {
 					for(Tutorial x : tutTemp) {
 						if(!x.isStatus()) {
-							model.addAttribute("error_msg", "Please Add English Verion of tutorial first");
+							model.addAttribute("error_msg", "Please publish English version of tutorial first.");
+							model.addAttribute("disable", true);
 							return "uploadTutorialPost";
 						}
 					}
 				}
-				
 			}
-			
 		}
-		
-		ContributorAssignedTutorial conTutorial=conRepo.findByTopicCatAndLanViewPart( topicCat, lan);
-		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTutorial);
-		
-		if(tutorials.isEmpty()) {
-
-			model.addAttribute("statusOutline", CommonData.ADD_CONTENT);
-			model.addAttribute("statusScript", CommonData.ADD_CONTENT);
-			model.addAttribute("statusSlide", CommonData.ADD_CONTENT);
-			model.addAttribute("statusVideo", CommonData.ADD_CONTENT);
-			model.addAttribute("statusKeyword", CommonData.ADD_CONTENT);
-			model.addAttribute("statusPreReq", CommonData.ADD_CONTENT);
-			model.addAttribute("statusGraphics", CommonData.ADD_CONTENT);
-			model.addAttribute("tutorial", null);
-		}else {
-
+		if(!tutorials.isEmpty()) {
+//			set video details
+			setVideoInfo(model,tutorials);
+			setCompComment(model, tutorials, comService);
 			for(Tutorial local:tutorials) {
 				tutorial = local;
-				model.addAttribute("statusOutline", CommonData.tutorialStatus[local.getOutlineStatus()]);
-				model.addAttribute("statusScript", CommonData.tutorialStatus[local.getScriptStatus()]);
-				model.addAttribute("statusSlide", CommonData.tutorialStatus[local.getSlideStatus()]);
-				model.addAttribute("statusVideo", CommonData.tutorialStatus[local.getVideoStatus()]);
-				model.addAttribute("statusKeyword", CommonData.tutorialStatus[local.getKeywordStatus()]);
-				model.addAttribute("statusPreReq", CommonData.tutorialStatus[local.getPreRequisticStatus()]);
-
+				String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, lan, cat);
+				model.addAttribute("sm_url", sm_url);
 				model.addAttribute("tutorial", local);
-				
-				if(local.getVideo() != null) {
-
-				IContainer container = IContainer.make();
-				int result=10;
-				result = container.open(env.getProperty("spring.applicationexternalPath.name")+local.getVideo(),IContainer.Type.READ,null);
-				
-					IStream stream = container.getStream(0);
-					if(stream!=null) {
-					IStreamCoder coder = stream.getStreamCoder();
-					
-					model.addAttribute("FileWidth", coder.getWidth());
-					model.addAttribute("FileHeight", coder.getHeight());
-					model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-					model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-					container.close();
+				if(local.getPreRequisticStatus()!=0 ) {
+					model.addAttribute("pre_req", setPreReqInfo(local));
 				}
-
-				}
-
-				
-
-				List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, local);
-				List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT, local);
-				List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, local);
-
-				List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, local);
-				List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC, local);
-				List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, local);
-
-				model.addAttribute("comOutline", comOutline);
-				model.addAttribute("comScript",comScript );
-				model.addAttribute("comSlide",comSlide );
-				model.addAttribute("comVideo", comVideo);
-				model.addAttribute("comKeyword", comKeyword);
-				model.addAttribute("comPreReq", comPreRequistic);
 			}
 		}
-
-		model.addAttribute("category", cat);
-		model.addAttribute("topic", topic);
-		model.addAttribute("language", lan);
-		model.addAttribute("categories", categories);
-		if(!lan.getLangName().equalsIgnoreCase("english")) {
-			model.addAttribute("otherLan", false);
-		}else {
-			model.addAttribute("otherLan", true);
-		}
-		
-		String topic_name = topic.getTopicName();
-		topic_name	= topic_name.replaceAll(" ", "-");
-		model.addAttribute("topic_name", topic_name);
-		model.addAttribute("script_manager_view_url",scriptmanager_url+scriptmanager_path);
-		model.addAttribute("sm_default_param", CommonData.SM_DEFAULT_PARAM);
-		String tutorial_id="";
-		if(tutorial!=null) {
-			tutorial_id = Integer.toString(tutorial.getTutorialId());
-		}
-		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(cat.getCategoryId())+"/"
-				+tutorial_id+"/"+Integer.toString(lan.getLanId())+"/"+topic_name+"/"+"1";
-		model.addAttribute("sm_url", sm_url);
-		
-		model.addAttribute("comment_success", CommonData.COMMENT_SUCCESS);
 		return "uploadTutorialPost";
 	}
 
@@ -5120,13 +5207,7 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "listTutorialForAdminReview", method = RequestMethod.GET)
 	public String listAdminReviewTutorialGet(Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		HashSet<Tutorial> toReview = new HashSet<>();
 		HashSet<Tutorial> reviewed = new HashSet<>();
@@ -5139,7 +5220,6 @@ public class HomeController {
 
 		List<Tutorial> tutorials =  tutService.findAllByContributorAssignedTutorialList(conTutorials);
 		for(Tutorial temp:tutorials) {
-
 			if(temp.getVideoStatus() == CommonData.ADMIN_STATUS) {
 				toReview.add(temp);
 			}else if(temp.getVideoStatus() > CommonData.ADMIN_STATUS) {
@@ -5150,9 +5230,6 @@ public class HomeController {
 		model.addAttribute("tutorialToReview", toReview);
 		model.addAttribute("tutorialReviewed", reviewed);
 		return "listTutorialAdminReviwer";
-
-
-
 	}
 
 	/**
@@ -5166,13 +5243,7 @@ public class HomeController {
 	public String listAdminReviewTutorialGet(@PathVariable(name = "catName") String cat,
 			@PathVariable (name = "topicName") String topic,
 			@PathVariable (name = "language") String lan,Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
 		Category catName = catService.findBycategoryname(cat);
@@ -5184,61 +5255,25 @@ public class HomeController {
 		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
 			return "redirect:/listTutorialForAdminReview";
 		}
-		
+		List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTut);
 		Tutorial tutorial=tutService.findAllByContributorAssignedTutorial(conTut).get(0);
+		if(tutorial == null) {
+			return "redirect:/listTutorialForAdminReview";
+		}
 
 		if(tutorial.getVideoStatus() != CommonData.ADMIN_STATUS) {
-			 // return some error
 			return "redirect:/listTutorialForAdminReview";
 		}
-
-		if(tutorial == null) {
-			// throw a error
-			return "redirect:/listTutorialForAdminReview";
-
-		}
-
-
-		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, tutorial);
-
-		model.addAttribute("comVideo", comVideo);
-
 
 		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
 		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
 		model.addAttribute("tutorial", tutorial);
 		
-
-		if(tutorial.getVideo() != null) {
-		IContainer container = IContainer.make();
-		int result=10;
-		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
+		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, tutorial);
+		model.addAttribute("comVideo", comVideo);
+		setVideoInfo(model, tutorials);
 		
-		IStream stream = container.getStream(0);
-		if(stream!=null) {
-			IStreamCoder coder = stream.getStreamCoder();
-			
-			model.addAttribute("FileWidth", coder.getWidth());
-			model.addAttribute("FileHeight", coder.getHeight());
-			
-			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-		}else {
-			model.addAttribute("FileWidth", "");
-			model.addAttribute("FileHeight", "");
-			
-			model.addAttribute("fileSizeInMB", "");
-			model.addAttribute("FileDurationInSecond", "");
-		}
-		
-		
-		container.close();
-		
-		}
-		
-
-		model.addAttribute("success_msg", CommonData.Video_STATUS_SUCCESS_MSG);
 		return "addContentAdminReview";
 
 
@@ -5305,106 +5340,40 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "domainreview/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
 	public String listDomainReviewTutorialGet(@PathVariable(name = "catName") String cat,
-			@PathVariable (name = "topicName") String topic,
+			@PathVariable (name = "topicName") String topicName,
 			@PathVariable (name = "language") String lan,Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
-		Category catName = catService.findBycategoryname(cat);
-		Topic topicName = topicService.findBytopicName(topic);
-		Language lanName = lanService.getByLanName(lan);
-		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
-		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+		Category category = catService.findBycategoryname(cat);
+		Topic topic = topicService.findBytopicName(topicName);
+		Language language = lanService.getByLanName(lan);
+		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
+		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
+		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTut);
+		Tutorial tutorial = tutorials.get(0);
 		
-		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
-			return "redirect:/listTutorialForDomainReview";
-		}
-		
-		Tutorial tutorial=tutService.findAllByContributorAssignedTutorial(conTut).get(0);
-
-
-		if(tutorial == null) {
-
-			return "redirect:/listTutorialForDomainReview";
-
-		}
-
-		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
-		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
-		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE, tutorial);
-
-		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD, tutorial);
-		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
-		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
-
-		model.addAttribute("comOutline", comOutline);
-		model.addAttribute("comScript",comScript );
-		model.addAttribute("comSlide",comSlide );
-		model.addAttribute("comVideo", comVideo);
-		model.addAttribute("comKeyword", comKeyword);
-		model.addAttribute("comPreReq", comPreRequistic);
-
-
-		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
-		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
-		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
-		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
-		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
-		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
-
-		model.addAttribute("tutorial", tutorial); 
-		
-
-		if(tutorial.getVideo() != null) {
-		IContainer container = IContainer.make();
-		int result=10;
-		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-
-		IStream stream = container.getStream(0);
-		if(stream!=null) {
-			IStreamCoder coder = stream.getStreamCoder();
-			
-			model.addAttribute("FileWidth", coder.getWidth());
-			model.addAttribute("FileHeight", coder.getHeight());
-			
-			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-		}else {
-			model.addAttribute("FileWidth", "");
-			model.addAttribute("FileHeight", "");
-			
-			model.addAttribute("fileSizeInMB", "");
-			model.addAttribute("FileDurationInSecond", "");
-		}
-		
-		container.close();
-		}
-
-
 		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
 		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
 		
-		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
-			model.addAttribute("otherLan", false);
-		}else {
-			model.addAttribute("otherLan", true);
+		if(category == null || topic == null || language == null || topicCatMap == null || conTut == null) {
+			return "redirect:/listTutorialForDomainReview";
 		}
-		String tutorial_id="";
-		if(tutorial!=null) {
-			tutorial_id = Integer.toString(tutorial.getTutorialId());
+		
+		
+		if(tutorials.get(0) == null) {
+			return "redirect:/listTutorialForDomainReview";
 		}
-		String topic_name = topicName.getTopicName();
-		topic_name	= topic_name.replaceAll(" ", "-");
-		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(catName.getCategoryId())+"/"
-				+tutorial_id+"/"+Integer.toString(lanName.getLanId())+"/"+topic_name+"/"+"1";
+
+		setCompComment(model, tutorials, comService);
+		setCompStatus(model, tutorials);
+		setVideoInfo(model, tutorials);
+		model.addAttribute("tutorial", tutorial);
+		setEngLangStatus(model, language);
+		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
+		
 		return "addContentDomainReview";
 
 
@@ -5675,109 +5644,40 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "qualityreview/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
 	public String listQualityReviewTutorialGet(@PathVariable(name = "catName") String cat,
-			@PathVariable (name = "topicName") String topic,
+			@PathVariable (name = "topicName") String topicName,
 			@PathVariable (name = "language") String lan,Model model,Principal principal) {
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
+		
+		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
-		Category catName = catService.findBycategoryname(cat);
-		Topic topicName = topicService.findBytopicName(topic);
-		Language lanName = lanService.getByLanName(lan);
-		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
-		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+		Category category = catService.findBycategoryname(cat);
+		Topic topic = topicService.findBytopicName(topicName);
+		Language language = lanService.getByLanName(lan);
+		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
+		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
 		
-		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
+		if(category == null || topicName == null || language == null || topicCatMap == null || conTut == null) {
 			return "redirect:/listTutorialForQualityReview";
 		}
 		
-		Tutorial tutorial=tutService.findAllByContributorAssignedTutorial(conTut).get(0);
-		
-
-		if(tutorial == null) {
+		List<Tutorial> tutorials =tutService.findAllByContributorAssignedTutorial(conTut);
+		if(tutorials == null) {
 			return "redirect:/listTutorialForQualityReview";
-
 		}
 
-
-		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO,  tutorial);
-		List<Comment> comScript = comService.getCommentBasedOnTutorialType(CommonData.SCRIPT,tutorial);
-		List<Comment> comSlide = comService.getCommentBasedOnTutorialType(CommonData.SLIDE,  tutorial);
-
-		List<Comment> comKeyword = comService.getCommentBasedOnTutorialType(CommonData.KEYWORD,  tutorial);
-		List<Comment> comPreRequistic = comService.getCommentBasedOnTutorialType(CommonData.PRE_REQUISTIC,  tutorial);
-		List<Comment> comOutline = comService.getCommentBasedOnTutorialType(CommonData.OUTLINE, tutorial);
-
-		model.addAttribute("comOutline", comOutline);
-		model.addAttribute("comScript",comScript );
-		model.addAttribute("comSlide",comSlide );
-		model.addAttribute("comVideo", comVideo);
-		model.addAttribute("comKeyword", comKeyword);
-		model.addAttribute("comPreReq", comPreRequistic);
-
-
-		model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
-		model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
-		model.addAttribute("statusSlide", CommonData.tutorialStatus[tutorial.getSlideStatus()]);
-		model.addAttribute("statusVideo", CommonData.tutorialStatus[tutorial.getVideoStatus()]);
-		model.addAttribute("statusKeyword", CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
-		model.addAttribute("statusPreReq", CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
-
-		model.addAttribute("tutorial", tutorial);
-		
-
-		if(tutorial.getVideo() != null) {
-		IContainer container = IContainer.make();
-		int result=10;
-		result = container.open(env.getProperty("spring.applicationexternalPath.name")+tutorial.getVideo(),IContainer.Type.READ,null);
-		
-		System.out.println("Video Duration"+container.getDuration()/1000000);
-		System.out.println("file Size"+container.getFileSize()/1000000);
-		
-
-		IStream stream = container.getStream(0);
-		if(stream!=null) {
-			IStreamCoder coder = stream.getStreamCoder();
-			model.addAttribute("FileWidth", coder.getWidth());
-			model.addAttribute("FileHeight", coder.getHeight());
-			model.addAttribute("fileSizeInMB", container.getFileSize()/1000000);
-			model.addAttribute("FileDurationInSecond", container.getDuration()/1000000);
-		}else {
-			model.addAttribute("FileWidth", "");
-			model.addAttribute("FileHeight", "");
-			model.addAttribute("fileSizeInMB", "");
-			model.addAttribute("FileDurationInSecond", "");
-		}
-		
-		
-		container.close();
-
-		}
-
-
+		Tutorial tutorial =tutService.findAllByContributorAssignedTutorial(conTut).get(0);
 		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
 		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
 		
-		if(!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
-			model.addAttribute("otherLan", false);
-		}else {
-			model.addAttribute("otherLan", true);
-		}
-		String tutorial_id="";
-		if(tutorial!=null) {
-			tutorial_id = Integer.toString(tutorial.getTutorialId());
-		}
-		String topic_name = topicName.getTopicName();
-		topic_name	= topic_name.replaceAll(" ", "-");
-		String sm_url = scriptmanager_url+scriptmanager_path+Integer.toString(catName.getCategoryId())+"/"
-				+tutorial_id+"/"+Integer.toString(lanName.getLanId())+"/"+topic_name+"/"+"1";
+		model.addAttribute("tutorial", tutorial);
+		setCompComment(model, tutorials, comService);
+		setCompStatus(model, tutorials);
+		setVideoInfo(model, tutorials);
+		setEngLangStatus(model, language);
+		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
+		
 		return "addContentQualityReview";
 
 
@@ -6091,41 +5991,17 @@ public class HomeController {
 			return "masterTrainerOperation";
 		}
 
-//		if(trainingInfoService.findByTopicName(titleName) != null) {
-//
-//			// throw error on output
-//			model.addAttribute("error_msg",CommonData.NAME_ERROR);
-//			return "masterTrainerOperation";
-//		}
-
-//		Language lan=lanService.getByLanName(lanName);
-
-
-//		Topic topic=topicService.findById(topicId);
-//		TopicCategoryMapping topicCatMap=topicCatService.findAllByCategoryAndTopic(cat, topic);
-
 		int newTrainingdata=trainingInfoService.getNewId();
 		TrainingInformation trainingData=new TrainingInformation();
 		trainingData.setDateAdded(ServiceUtility.getCurrentTime());
 		trainingData.setTrainingId(newTrainingdata);
 		trainingData.setTotalParticipant(totaltrainee);
-//		trainingData.setLan(lan);
-//		trainingData.setAddress(address);
 		trainingData.setUser(usr);
 		trainingData.setEvent(event);
 
 		try {
 			trainingInfoService.save(trainingData);
 			int trainingTopicId=trainingTopicServ.getNewId();
-//			for(int topicID : topicId) {
-//				Topic topicTemp=topicService.findById(topicID);
-//				TopicCategoryMapping topicCatMap=topicCatService.findAllByCategoryAndTopic(cat, topicTemp);
-//				TrainingTopic trainingTemp=new TrainingTopic(trainingTopicId++, topicCatMap, trainingData);
-//				trainingTopicTemp.add(trainingTemp);
-//
-//			}
-//
-//			trainingData.setTrainingTopicId(trainingTopicTemp);
 			trainingInfoService.save(trainingData);
 
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryMasterTrainer+newTrainingdata);
@@ -6385,12 +6261,7 @@ public class HomeController {
 		Role role = roleService.findByname(CommonData.adminReviewerRole);
 
 		if(usrRoleService.findByLanCatUser(language, category, usr, role)!=null) {
-
-			// throw error
-			//model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
-
 			model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR);
-
 			return "assignRoleToDomain";
 		}
 
@@ -6770,13 +6641,6 @@ public class HomeController {
 
 		model.addAttribute("training",trainingData);
 
-//		if(trainingInfoService.findByTopicName(titleName) != null) {
-//
-//			// throw error on output
-//			model.addAttribute("error_msg",CommonData.NAME_ERROR);
-//			return "updateTraining";
-//		}
-
 		trainingData.setTotalParticipant(totaltrainee);
 
 		trainingData.setAddress(address);
@@ -7150,29 +7014,35 @@ public class HomeController {
 	@RequestMapping(value = "/unpublishTopic",method = RequestMethod.GET)
 	public String unpublishTopic(Model model,Principal principal) {
 
-		User usr=new User();
+		User usr = getUser(principal, userService);
 
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
 		model.addAttribute("userInfo", usr);
-		model.addAttribute("status", "get");
-		List<Category> categories_lst = catService.findAll();
-		List<String> categories = new ArrayList<String>();;
-		HashMap<Integer,String> map = new HashMap<>();
-		for(Category cat: categories_lst) {
-			map.put(cat.getCategoryId(),cat.getCatName());
-//			String name = cat.getCatName();
-//			categories.add(name);
+		List<Category> categories = catService.findAll();
+		List<Category> filtered_categories = new ArrayList<Category>();
+		for(Category cat: categories) {
+			if(!cat.getTopicCategoryMap().isEmpty()) {
+				filtered_categories.add(cat);
+			}
 		}
+		
 		List<Language> langs = lanService.getAllLanguages();
 		List<String> langauges=new ArrayList<String>();
 		for(Language temp:langs) {
 				langauges.add(temp.getLangName());
 		}
+		List<LogManegement> lms = logMangementService.getLogsWithSuperUser();
+		Set<Tutorial> tutorials = new HashSet<Tutorial>();
+		for(LogManegement l:lms) {
+			if(!l.getTutorialInfos().isStatus()) {
+				tutorials.add(l.getTutorialInfos());
+				Tutorial t = l.getTutorialInfos();
+				
+			}
+		}
+		
 		model.addAttribute("langauges", langauges);
-		model.addAttribute("categories", map);
+		model.addAttribute("categories", filtered_categories);
+		model.addAttribute("tutorials", tutorials);
 		model.addAttribute("method", "get");
 		return "unpublishTopic";
 
@@ -7206,8 +7076,6 @@ public class HomeController {
 		HashMap<Integer,String> map = new HashMap<>();
 		for(Category c: categories_lst) {
 			map.put(c.getCategoryId(),c.getCatName());
-//			String name = cat.getCatName();
-//			categories.add(name);
 		}
 		List<Language> langs = lanService.getAllLanguages();
 		List<String> langauges=new ArrayList<String>();
@@ -7232,10 +7100,6 @@ public class HomeController {
 		model.addAttribute("categories", map);
 		model.addAttribute("method", "post");
 		
-		
-
-		
-//			model.addAttribute("status", t.isStatus());
 			model.addAttribute("status", "can_unpublish");
 		
 		if(t.isStatus()) {
@@ -7256,22 +7120,5 @@ public class HomeController {
 		return "unpublishTopic";
 	}
 	
-	@RequestMapping(value = "/modifyComponentStatus",method = RequestMethod.GET)
-	public String modifyComponentStatus(Model model,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-
-		List<Category> categories = catService.findAll();
-		model.addAttribute("categories", categories);
-
-		return "modifyComponentStatus";
-
-	}
+	
 }

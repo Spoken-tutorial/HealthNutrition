@@ -95,6 +95,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/serch",
 			"/search_result",
 			"/search?keyword={keyword}"
+			"/unpublishTutorial/**",
+			"/loadTopicByCategory/**",
+			"/loadLanguageByCategoryTopic/**"
 	};
 
 	/**
@@ -130,7 +133,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/viewTrainee/**",
 			"/details/**",
 			"/tutorialStatus/**",
-			"/users/**"
+			"/users/**",
+			"/unpublishTopic/**",
+//			"/unpublishTutorial/**"
 			
 
 	};
