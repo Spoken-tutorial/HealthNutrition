@@ -1965,25 +1965,25 @@ public class AjaxController{
 	}
 	
 	//route after clicking the link in mail
-	
-	@PostMapping("/process_register")
-    public String processRegister(User user, HttpServletRequest request)
-            throws UnsupportedEncodingException, MessagingException {
-        usrservice.register(user, getSiteURL(request));       
-        return "register_success";
-    }
-	
-	//route to verify
-	
-	@GetMapping("/verify")
-	public String verifyUser(@Param("code") String code) {
-	    if (UserService.verify(code)) {
-	        return "verify_success";
-	    } else {
-	        return "verify_fail";
-	    }
-	}
-     
+//	intern start
+//	@PostMapping("/process_register")
+//    public String processRegister(User user, HttpServletRequest request)
+//            throws UnsupportedEncodingException, MessagingException {
+//        usrservice.register(user, getSiteURL(request));       
+//        return "register_success";
+//    }
+//	
+//	//route to verify
+//	
+//	@GetMapping("/verify")
+//	public String verifyUser(@Param("code") String code) {
+//	    if (UserService.verify(code)) {
+//	        return "verify_success";
+//	    } else {
+//	        return "verify_fail";
+//	    }
+//	}
+//	intern end
     private String getSiteURL(HttpServletRequest request) {
         String siteURL = request.getRequestURL().toString();
         return siteURL.replace(request.getServletPath(), "");

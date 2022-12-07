@@ -153,33 +153,34 @@ public interface UserService {
 	 * @return list of User object
 	 */
 	List<User> findAll();
+//intern start
+//	String setEmailVerificationCode(User user, String siteURL);
 
-	String setEmailVerificationCode(User user, String siteURL);
-
-	public default void register(User user, String siteURL)
-	        throws UnsupportedEncodingException, MessagingException {
-		String randomCode = RandomString.make(64);
-	    user.setEmailVerificationCode(randomCode);
-	    user.setEnabled(false);
-	     
-	    UserRepository.save(user);
-	     
-	    setEmailVerificationCode(user, siteURL);
-	}
+//	public default void register(User user, String siteURL)
+//	        throws UnsupportedEncodingException, MessagingException {
+//		String randomCode = RandomString.make(64);
+//	    user.setEmailVerificationCode(randomCode);
+//	    user.setEnabled(false);
+//	     
+//	    UserRepository.save(user);
+//	     
+//	    setEmailVerificationCode(user, siteURL);
+//	}
 	
-	public static boolean verify(String verificationCode) {
-	    User user = UserRepository.findByVerificationCode(verificationCode);
-	     
-	    if (user == null || user.isEnabled()) {
-	        return false;
-	    } else {
-	        user.setEmailVerificationCode(null);
-	        user.setEnabled(true);
-	        UserRepository.save(user);
-	         
-	        return true;
-	    }
-	     
-	}
+//	public static boolean verify(String verificationCode) {
+//	    User user = UserRepository.findByVerificationCode(verificationCode);
+//	     
+//	    if (user == null || user.isEnabled()) {
+//	        return false;
+//	    } else {
+//	        user.setEmailVerificationCode(null);
+//	        user.setEnabled(true);
+//	        UserRepository.save(user);
+//	         
+//	        return true;
+//	    }
+//	     
+//	}
+	//intern end
 	 ;
 }
