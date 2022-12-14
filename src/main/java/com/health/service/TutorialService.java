@@ -52,6 +52,9 @@ public interface TutorialService {
 	 * @return primitive integer value
 	 */
 	int getNewId();
+	
+	
+	
 
 	/**
 	 * List of Tutorial Object given ContributorAssignedTutorial object

@@ -2156,6 +2156,7 @@ public class AjaxController{
 		List<ContributorAssignedTutorial> catAssgnTut = conService.findAllByTopicCat(tcm);
 		for(ContributorAssignedTutorial c : catAssgnTut) {
 			if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
+				
 				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
 			}
 			
@@ -2163,6 +2164,54 @@ public class AjaxController{
 		return languages;
 	}
 	
+	/*
+	//author alok func start
+	
+	 @RequestMapping("/loadLanguageByCategory")
+	public @ResponseBody HashMap<Integer, String> getLanguageByContributorRoleCategory(@RequestParam(value = "category") int category) {
+
+		HashMap<Integer,String> languages=new HashMap<Integer,String>();
+		Category cat = catService.findByid(category);
+		List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+		List<ContributorAssignedTutorial> catAssgnTut = conService.findAllByTopicCat(tcm);
+		for(ContributorAssignedTutorial c : catAssgnTut) {
+			if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
+				
+				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
+			}
+			
+		}
+		return languages;
+	} 
+	
+	 //func end
+	 
+	 
+	 //author alok func start
+	 
+	 @RequestMapping("/loadLanguageByTopic")
+		public @ResponseBody HashMap<Integer, String> getLanguageByContributorRole1(@RequestParam(value = "topic") int topic) {
+
+			HashMap<Integer,String> languages=new HashMap<Integer,String>();
+			Topic top = topicService.findById(topic);
+			List<TopicCategoryMapping> tcm = topicCatService.findAllByTopic(top);
+			List<ContributorAssignedTutorial> catAssgnTut = conService.findAllByTopicCat(tcm);
+			for(ContributorAssignedTutorial c : catAssgnTut) {
+				if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
+					
+					languages.put(c.getLan().getLanId(), c.getLan().getLangName());
+				}
+				
+			}
+			return languages;
+		} 
+		
+	 
+	 //func end
+	  * 
+	  */
+	 
+	 
 	@RequestMapping("/loadPublishedTopicsByCategory")
 	public @ResponseBody HashMap<Integer, String> loadPublishedTopicsByCategory(@RequestParam(value = "id") int id) {
 
