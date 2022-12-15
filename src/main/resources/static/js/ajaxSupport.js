@@ -3462,11 +3462,13 @@ $("#select-topic").change(function(){
 				alert('No components are uploaded for this tutorial. ');
 			}
 			
+			
 		},
 		error : function(err) {
 			console.log(err);
 		}
 	});
+	
 	}else{
 		language.disabled = true;
 		language.value = "0";
