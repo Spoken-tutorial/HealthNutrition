@@ -129,6 +129,9 @@ import com.xuggle.xuggler.IStreamCoder;
  */
 @Controller
 public class HomeController {
+	
+	@Autowired
+	private ContributorAssignedTutorialService conService;
 
 	@Autowired
 	private JavaMailSender mailSender;
@@ -6924,6 +6927,16 @@ private List<Language> getLanguages() {
 			}
 		}
 		
+		//alok code start
+		List<Topic> tops=topicService.findAll();
+		List<String> topics=new ArrayList<String>();
+		for(Topic t: tops) {
+			topics.add(t.getTopicName());
+			
+		}
+		
+		//alok code ends
+		
 		List<Language> langs = lanService.getAllLanguages();
 		List<String> langauges=new ArrayList<String>();
 		for(Language temp:langs) {
@@ -6941,7 +6954,9 @@ private List<Language> getLanguages() {
 		
 		model.addAttribute("langauges", langauges);
 		model.addAttribute("categories", filtered_categories);
+		model.addAttribute("topics",topics);
 		model.addAttribute("tutorials", tutorials);
+		
 		model.addAttribute("method", "get");
 		return "unpublishTopic";
 
@@ -6970,12 +6985,14 @@ private List<Language> getLanguages() {
 		Tutorial t = tut.get(0);
 		model.addAttribute("tut", tut);
 		model.addAttribute("tutorial_id", t.getTutorialId());
+		
 		List<Category> categories_lst = catService.findAll();
 		List<String> categories = new ArrayList<String>();;
 		HashMap<Integer,String> map = new HashMap<>();
 		for(Category c: categories_lst) {
 			map.put(c.getCategoryId(),c.getCatName());
 		}
+		
 		List<Language> langs = lanService.getAllLanguages();
 		List<String> langauges=new ArrayList<String>();
 		for(Language temp:langs) {
@@ -6993,6 +7010,20 @@ private List<Language> getLanguages() {
 			topicName.put(temp.getTopic().getTopicId(), temp.getTopic().getTopicName());
 			
 		}
+		/*
+		//alok code starts
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		List<ContributorAssignedTutorial> cat_list = conService.findAllByTopicCat(local);
+		
+		//To find Topics
+		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
+		
+		for(Tutorial t1: tutorials) {
+			topicName.put(t1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),t1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		}
+		
+		*/
+		//alok code ends
 		
 		model.addAttribute("topics", topicName);
 		model.addAttribute("langauges", langauges);

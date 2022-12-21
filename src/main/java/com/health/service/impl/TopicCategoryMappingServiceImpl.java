@@ -110,5 +110,11 @@ public class TopicCategoryMappingServiceImpl implements TopicCategoryMappingServ
 		return null;
 	}
 
+	@Override
+	public List<TopicCategoryMapping> findAll() {
+		
+		return (List<TopicCategoryMapping>) topicCatRepo.findAll();
+	}
+
 
 }

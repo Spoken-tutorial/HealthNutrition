@@ -28,6 +28,12 @@ public interface TopicCategoryMappingService {
 	int getNewId();
 	
 	/**
+	 * Find list of TopicCategoryMapping object 
+	 * @return list of TopicCategoryMapping object
+	 */
+	List<TopicCategoryMapping> findAll();
+	
+	/**
 	 * Find list of TopicCategoryMapping object given category object
 	 * @param cat category object
 	 * @return list of TopicCategoryMapping object
