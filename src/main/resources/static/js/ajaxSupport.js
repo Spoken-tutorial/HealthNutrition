@@ -1705,12 +1705,8 @@ $(document).ready(function() {
     author: alok
     
      */
-     
-    $( "#categoryname" ).change(function() {
-				var catgoryid = $(this).val();
-				var topicid = $("#inputTopicName").val();
-				var languageid=$("#inputLanguage").val();
-				
+
+	function loadTopicAndLanguageByCategory(catgoryid, topicid, languageid) {
 				$.ajax({
 					type : "GET",
 					url : projectPath+"loadTopicAndLanguageByCategory",
@@ -1744,12 +1740,32 @@ $(document).ready(function() {
 			  	  			     })
 						$("#inputLanguage").prop('disabled',false);
 						$('#inputLanguage').html(html);
+						
 
 					},
 					error : function(err) {
 						console.log("not working. ERROR: "+ JSON.stringify(err));
 					}
 				});
+	}
+     
+    $( "#categoryname" ).change(function() {
+			
+				var catgoryid = $(this).val();
+				var topicid = $("#inputTopicName").val();
+				var languageid=$("#inputLanguage").val();
+				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				
+			});
+			
+			   $( "#catreset" ).click(function() {
+			
+				var catgoryid = 0;
+				var topicid = $("#inputTopicName").val();
+				var languageid=$("#inputLanguage").val();
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				return false;
+				
 			});
 			
 			
@@ -1758,12 +1774,9 @@ $(document).ready(function() {
      		author:alok
      
     	 */
-     	 $( "#inputTopicName" ).change(function() {
-				var topicid = $(this).val();
-				var catgoryid = $("#categoryname").val();
-				var languageid=$("#inputLanguage").val();
-				
-				$.ajax({
+    	 
+    	 function loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid){
+			$.ajax({
 					type : "GET",
 					url : projectPath+"loadCategoryAndLanguageByTopic",
 					data : {
@@ -1802,7 +1815,29 @@ $(document).ready(function() {
 						console.log("not working. ERROR: "+ JSON.stringify(err));
 					}
 				});
+	
+		}
+
+     	 $( "#inputTopicName" ).change(function() {
+				var topicid = $(this).val();
+				var catgoryid = $("#categoryname").val();
+				var languageid=$("#inputLanguage").val();
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				
+				
+				
 			});
+			
+			$( "#topicreset" ).click(function() {
+			
+				var topicid = 0;
+				var languageid = $("#inputLanguage").val();
+				var catgoryid=$("#categoryname").val();
+				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				return false;
+				
+			});
+			
 			
 			
 				/* 
@@ -1811,12 +1846,9 @@ $(document).ready(function() {
      
     	 */
     	 
-    	  $('#inputLanguage').change(function() {
-				var languageid = $(this).val();
-				var catgoryid = $("#categoryname").val();
-				var topicid=$("#inputTopicName").val();
-				
-				$.ajax({
+    	 function loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid){
+			
+			$.ajax({
 					type : "GET",
 					url : projectPath+"loadCategoryAndTopicByLanguage",
 					data : {
@@ -1856,6 +1888,26 @@ $(document).ready(function() {
 						console.log("not working. ERROR: "+ JSON.stringify(err));
 					}
 				});
+	
+ 			}
+    	 
+    	  $('#inputLanguage').change(function() {
+				var languageid = $(this).val();
+				var catgoryid = $("#categoryname").val();
+				var topicid=$("#inputTopicName").val();
+				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				
+				
+			});
+			
+			 $( "#langreset" ).click(function() {
+			
+				var languageid = 0;
+				var topicid = $("#inputTopicName").val();
+				var catgoryid=$("#categoryname").val();
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				return false;
+				
 			});
 
 		/*	$('#inputTopicName').change(function() {
