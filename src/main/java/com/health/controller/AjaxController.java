@@ -779,7 +779,7 @@ public class AjaxController{
 		
 		//To find Languages
 		for(ContributorAssignedTutorial c : cat_list) {
-			if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
+			if(!tutService.findAllByContributorAssignedTutorial1(c).isEmpty()) {
 				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
 			}
 		}
@@ -837,7 +837,7 @@ public class AjaxController{
 		
 		//To find Languages
 		for(ContributorAssignedTutorial c : topic_list) {
-			if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
+			if(!tutService.findAllByContributorAssignedTutorial1(c).isEmpty()) {
 				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
 			}
 		}
@@ -1228,10 +1228,41 @@ public class AjaxController{
 											Principal principal) {
 		
 		System.out.println("id "+tutorialId+" data "+ outlineData + " catname " + catName + " topicid " + topicId + " lanId " + lang +" Principal "+ principal);
+		//System.out.println(tutService.getById(tutorialId)+ "alok sp");
 		HashMap<String, String> temp = new HashMap<>();
+		//alok
+		Category cat=catService.findBycategoryname(catName);
+		int catId=cat.getCategoryId();
+		Topic topic=topicService.findById(topicId);
+		TopicCategoryMapping tcm=topicCatService.findAllByCategoryAndTopic(cat, topic);
+		Language language=langService.getByLanName(lang);
+		ContributorAssignedTutorial cnn=conService.findByTopicCatAndLanViewPart(tcm, language);
+		List<Tutorial> tut= tutService.findAllByContributorAssignedTutorial(cnn);
+		Tutorial tut1= tut.get(0);
+		int tutId1=tut1.getTutorialId();
+		System.out.println(tutService.getById(tutId1)+ "aloksp1");
+		
 		User usr=getUser(principal);
 		Tutorial local = null;
-
+		System.out.println(tutService.getById(tutId1)+ "alok sp");
+		if(tutId1!=0) {
+			Tutorial tut2=tutService.getById(tutId1);
+			temp = addOutlineComp(tut2,outlineData,usr);
+			return  temp;
+		}else {
+			local = createTutorial(catName, topicId, lang,usr);
+			if(local!=null) {
+				temp = addOutlineComp(local,outlineData,usr);
+			}else {
+				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0,usr);
+			}
+		}
+		
+		
+		//alok
+	/*	User usr=getUser(principal);
+		Tutorial local = null;
+		System.out.println(tutService.getById(tutorialId)+ "alok sp");
 		if(tutorialId!=0) {
 			Tutorial tut=tutService.getById(tutorialId);
 			temp = addOutlineComp(tut,outlineData,usr);
@@ -1244,7 +1275,7 @@ public class AjaxController{
 				temp = updateResponse(ERROR_TOKEN, TUTORIAL_CREATION_ERROR, 0,0,usr);
 			}
 		}
-		
+		*/
 		return temp;
 	}
 

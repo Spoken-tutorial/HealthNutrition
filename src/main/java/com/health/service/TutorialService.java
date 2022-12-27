@@ -62,6 +62,9 @@ public interface TutorialService {
 	 * @return list of Tutorial object
 	 */
 	List<Tutorial> findAllByContributorAssignedTutorial(ContributorAssignedTutorial con);
+	
+	//New Function By Alok
+	List<Tutorial> findAllByContributorAssignedTutorial1(ContributorAssignedTutorial con);
 
 	/**
 	 * List of Tutorial Object given list of ContributorAssignedTutorial object
@@ -69,6 +72,9 @@ public interface TutorialService {
 	 * @return list of Tutorial object
 	 */
 	List<Tutorial> findAllByContributorAssignedTutorialList(List<ContributorAssignedTutorial> con);
+	
+	//New Function by Alok
+	List<Tutorial> findAllByContributorAssignedTutorialList1(List<ContributorAssignedTutorial> con);
 
 	/**
 	 * Persist Tutorial object into database
