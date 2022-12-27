@@ -90,7 +90,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/showLanguages/**",
 			"/unpublishTutorial/**",
 			"/loadTopicByCategory/**",
-			"/loadLanguageByCategoryTopic/**"
+			"/loadLanguageByCategoryTopic/**",
+			"/loadTopicAndLanguageByCategory/**",
+			"/loadCategoryAndLanguageByTopic/**",
+			"/loadCategoryAndTopicByLanguage/**"
 	};
 
 	/**

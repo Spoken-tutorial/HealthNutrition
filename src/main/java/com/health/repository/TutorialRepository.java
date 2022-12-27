@@ -37,9 +37,15 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> {
 	 * @param con ContributorAssignedTutorial object
 	 * @return list of Tutorial object
 	 */
-	//Changes are done by alok
-	@Query("from Tutorial t where t.status = true and t.conAssignedTutorial = ?1")
+	//Changes are done by Alok
+	//@Query("from Tutorial t where t.status = true and t.conAssignedTutorial = ?1")
+	@Query("from Tutorial t where  t.conAssignedTutorial = ?1")
 	List<Tutorial> findAllByconAssignedTutorial(ContributorAssignedTutorial con);
+	
+	//New Function By Alok
+	@Query("from Tutorial t where t.status = true and t.conAssignedTutorial = ?1")
+	List<Tutorial> findAllByconAssignedTutorial1(ContributorAssignedTutorial con);
+	
 	
 	/**
 	 * List of Tutorial Object given status value

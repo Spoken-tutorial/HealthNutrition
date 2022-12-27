@@ -57,6 +57,13 @@ public class TutorialServiceImpl implements TutorialService {
 		// TODO Auto-generated method stub
 		return tutorialRepo.findAllByconAssignedTutorial(con);
 	}
+	
+	//New Function By Alok
+	@Override
+	public List<Tutorial> findAllByContributorAssignedTutorial1(ContributorAssignedTutorial con) {
+		// TODO Auto-generated method stub
+		return tutorialRepo.findAllByconAssignedTutorial1(con);
+	}
 
 	/**
 	 * @see com.health.service.TutorialService#save(Tutorial)
@@ -92,6 +99,18 @@ public class TutorialServiceImpl implements TutorialService {
 		List<Tutorial> localList=new ArrayList<Tutorial>();
 		for(ContributorAssignedTutorial conTemp:con) {
 			localList.addAll(tutorialRepo.findAllByconAssignedTutorial(conTemp));
+		}
+		return localList;
+
+	}
+	
+	//New Function By Alok
+	@Override
+	public List<Tutorial> findAllByContributorAssignedTutorialList1(List<ContributorAssignedTutorial> con) {
+		// TODO Auto-generated method stub
+		List<Tutorial> localList=new ArrayList<Tutorial>();
+		for(ContributorAssignedTutorial conTemp:con) {
+			localList.addAll(tutorialRepo.findAllByconAssignedTutorial1(conTemp));
 		}
 		return localList;
 

@@ -1482,7 +1482,7 @@ $(document).ready(function() {
 			 * master trainer depending on language wet topic
 			 */
 
-			$('#inputLanguage')
+		/*	$('#inputLanguage')
 			.change(
 					function() {
 
@@ -1531,6 +1531,8 @@ $(document).ready(function() {
 						});
 
 					});
+					
+					*/
 
 			
 			$('#fetch_questions').click(
@@ -1669,7 +1671,7 @@ $(document).ready(function() {
 						});
 
 					});
-			$( "#categoryname" ).change(function() {
+		/*	$( "#categoryname" ).change(function() {
 				var catgoryid = $(this).val();
 				
 				$.ajax({
@@ -1679,7 +1681,8 @@ $(document).ready(function() {
 						"id" : catgoryid
 					},
 					contentType : "application/json",
-					success : function(result) {
+					success : function(topicName) {
+						var result = topicName;
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Topic</option>';
@@ -1695,9 +1698,219 @@ $(document).ready(function() {
 					}
 				});
 			});
+			
+    */
+    /**
+    function to load topic and language by category 
+    author: alok
+    
+     */
 
+	function loadTopicAndLanguageByCategory(catgoryid, topicid, languageid) {
+				$.ajax({
+					type : "GET",
+					url : projectPath+"loadTopicAndLanguageByCategory",
+					data : {
+						"catId" : catgoryid,
+						"topicId":topicid,
+						"languageId":languageid
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Topic</option>';
+						$.each(result , function( key, value ) {
+							var selected=(topicid==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputTopicName").prop('disabled',false);
+						$('#inputTopicName').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Language</option>';
+						$.each(result, function( key, value ) {
+							var selected=(languageid==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputLanguage").prop('disabled',false);
+						$('#inputLanguage').html(html);
+						
 
-			$('#inputTopicName').change(function() {
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	}
+     
+    $( "#categoryname" ).change(function() {
+			
+				var catgoryid = $(this).val();
+				var topicid = $("#inputTopicName").val();
+				var languageid=$("#inputLanguage").val();
+				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				
+			});
+			
+			   $( "#catreset" ).click(function() {
+			
+				var catgoryid = 0;
+				var topicid = $("#inputTopicName").val();
+				var languageid=$("#inputLanguage").val();
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				return false;
+				
+			});
+			
+			
+     	/* 
+     		Function to load Category and language by topic
+     		author:alok
+     
+    	 */
+    	 
+    	 function loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid){
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadCategoryAndLanguageByTopic",
+					data : {
+						"topicId":topicid,
+						"catId" : catgoryid,
+						"languageId":languageid
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Category</option>';
+						$.each(result , function( key, value ) {
+							var selected=(catgoryid==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#categoryname").prop('disabled',false);
+						$('#categoryname').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Language</option>';
+						$.each(result, function( key, value ) {
+							var selected=(languageid==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputLanguage").prop('disabled',false);
+						$('#inputLanguage').html(html);
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+		}
+
+     	 $( "#inputTopicName" ).change(function() {
+				var topicid = $(this).val();
+				var catgoryid = $("#categoryname").val();
+				var languageid=$("#inputLanguage").val();
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				
+				
+				
+			});
+			
+			$( "#topicreset" ).click(function() {
+			
+				var topicid = 0;
+				var languageid = $("#inputLanguage").val();
+				var catgoryid=$("#categoryname").val();
+				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				return false;
+				
+			});
+			
+			
+			
+				/* 
+     		Function to load Category and Topic by Language
+     		author:alok
+     
+    	 */
+    	 
+    	 function loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadCategoryAndTopicByLanguage",
+					data : {
+						"languageId":languageid,
+						"catId" : catgoryid,
+						"topicId":topicid
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Category</option>';
+						$.each(result , function( key, value ) {
+							var selected=(catgoryid==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#categoryname").prop('disabled',false);
+						$('#categoryname').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Topic</option>';
+						$.each(result, function( key, value ) {
+							var selected=(topicid==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputTopicName").prop('disabled',false);
+						$('#inputTopicName').html(html);
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#inputLanguage').change(function() {
+				var languageid = $(this).val();
+				var catgoryid = $("#categoryname").val();
+				var topicid=$("#inputTopicName").val();
+				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				
+				
+			});
+			
+			 $( "#langreset" ).click(function() {
+			
+				var languageid = 0;
+				var topicid = $("#inputTopicName").val();
+				var catgoryid=$("#categoryname").val();
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				return false;
+				
+			});
+
+		/*	$('#inputTopicName').change(function() {
 				var topic = $(this).val();
 				var categoryName = $("#categoryname").val();
 				console.log(`${categoryName} - ${topic}`)
@@ -1725,7 +1938,12 @@ $(document).ready(function() {
 					}
 				});
 
-			});
+			}); 
+			*/
+			
+			
+			
+			
 
 			/* here we write code for calling Topic */
 
@@ -1931,7 +2149,8 @@ $(document).ready(function() {
 			 * master trainer depending on language wet topic
 			 */
 
-			$('#inputLanguage')
+		
+		/*	$('#inputLanguage')
 			.change(
 					function() {
 
@@ -1980,6 +2199,8 @@ $(document).ready(function() {
 						});
 
 					});
+					
+					*/
 
 			// chages according to individual table by languge
 
@@ -3272,7 +3493,7 @@ function set_alert_status(elem,result ){
 	if(result == DOMAIN_REVIEW_SUCCESS){
 		elem.classList.add('alert-success');
 		elem.innerText = COMPONENT_STATUS_SUCCESS;
-	}else if(result = DOMAIN_REVIEW_FAIL){
+	}else if(result = DOMAIN_REVIEW_FAIL){Ha
 		elem.classList.add('alert-danger');
 		elem.innerText = COMPONENT_STATUS_FAILED;
 	}
