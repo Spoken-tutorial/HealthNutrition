@@ -62,7 +62,7 @@ public class TutorialServiceImpl implements TutorialService {
 	@Override
 	public List<Tutorial> findAllByContributorAssignedTutorial1(ContributorAssignedTutorial con) {
 		// TODO Auto-generated method stub
-		return tutorialRepo.findAllByconAssignedTutorial1(con);
+		return tutorialRepo.findAllByconAssignedTutorialByStatusTrue(con);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class TutorialServiceImpl implements TutorialService {
 		// TODO Auto-generated method stub
 		List<Tutorial> localList=new ArrayList<Tutorial>();
 		for(ContributorAssignedTutorial conTemp:con) {
-			localList.addAll(tutorialRepo.findAllByconAssignedTutorial1(conTemp));
+			localList.addAll(tutorialRepo.findAllByconAssignedTutorialByStatusTrue(conTemp));
 		}
 		return localList;
 

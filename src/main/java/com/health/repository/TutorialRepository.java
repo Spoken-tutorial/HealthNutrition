@@ -44,7 +44,7 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> {
 	
 	//New Function By Alok
 	@Query("from Tutorial t where t.status = true and t.conAssignedTutorial = ?1")
-	List<Tutorial> findAllByconAssignedTutorial1(ContributorAssignedTutorial con);
+	List<Tutorial> findAllByconAssignedTutorialByStatusTrue(ContributorAssignedTutorial con);
 	
 	
 	/**

@@ -1722,7 +1722,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Topic</option>';
-						$.each(result , function( key, value ) {
+						$.each(result , function( value ,key) {
 							var selected=(topicid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1734,7 +1734,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Language</option>';
-						$.each(result, function( key, value ) {
+						$.each(result, function( value ,key ) {
 							var selected=(languageid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1791,7 +1791,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Category</option>';
-						$.each(result , function( key, value ) {
+						$.each(result , function(  value ,key) {
 							var selected=(catgoryid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1803,7 +1803,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Language</option>';
-						$.each(result, function( key, value ) {
+						$.each(result, function(  value,key ) {
 							var selected=(languageid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1864,7 +1864,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Category</option>';
-						$.each(result , function( key, value ) {
+						$.each(result , function( value ,key ) {
 							var selected=(catgoryid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1876,7 +1876,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Topic</option>';
-						$.each(result, function( key, value ) {
+						$.each(result, function( value ,key ) {
 							var selected=(topicid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
