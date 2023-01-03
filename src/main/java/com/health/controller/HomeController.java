@@ -536,6 +536,7 @@ private List<Language> getLanguages() {
 			@RequestParam(name = "categoryName") int cat,
 			@RequestParam(name = "topic") int topic,
 			@RequestParam(name = "lan") int lan,
+			
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 
 		List<Category> catTempSorted = getCategories();
@@ -637,6 +638,71 @@ private List<Language> getLanguages() {
 
 		return "tutorialList";   // add view name (filename)
 	}
+	
+	
+	/*
+	 * Function to Search Tutorial By Outline Query
+	 * Author: Alok Kumar
+	 */
+	
+	@RequestMapping(value = "/tutorialsSearch", method = RequestMethod.GET)
+	public String viewCoursesAvailableBySearch(HttpServletRequest req,
+			@RequestParam(name = "query") String query,
+			
+			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
+		
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTemp = getTopics();
+		
+		model.addAttribute("categories", catTempSorted);
+		model.addAttribute("languages", lanTempSorted);
+		model.addAttribute("topics", topicTemp);
+		
+
+		Page<Tutorial> tut = null;
+		List<Tutorial> tutToView = new ArrayList<Tutorial>();
+
+		User usr=new User();
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+        
+		Pageable pageable = PageRequest.of(page, 20);
+
+		if(query != null) {
+			tut = tutService.SearchOutlineByQuerPagination(query, pageable);
+			
+		}else {
+			tut = tutService.findAllPagination(pageable);
+	
+		}
+
+		for(Tutorial temp :tut) {
+			if(temp.isStatus()) {
+				tutToView.add(temp);
+			}
+		}
+		
+		for(Tutorial temp :tutToView) {
+			System.out.println(temp.getTutorialId() +"***********");
+		}
+		
+		Collections.sort(tutToView);  // sorting based on order value
+		
+		model.addAttribute("tutorials", tutToView);
+		model.addAttribute("currentPage",page);
+		model.addAttribute("totalPages",tut.getTotalPages());
+		model.addAttribute("query", query);
+
+		return "tutorialList";   // add view name (filename)
+	}
+	
+	
 
 	/**
 	 * redirects to tutorial specific page

@@ -1768,7 +1768,28 @@ $(document).ready(function() {
 				
 			});
 			
-			
+		/*
+		Funtion to reset search input
+		*/	
+		/*$(".btnClear").click(function(){
+       		 $("#myForm").trigger("reset");
+       
+        	return false;
+        });
+        	
+        	*/
+        	
+        
+
+		$(".btnClear").click(function() {
+    		$("#myForm").find("input[type=text], textarea").val("");
+    		
+		});
+
+
+      
+   
+    
      	/* 
      		Function to load Category and language by topic
      		author:alok
@@ -1908,6 +1929,16 @@ $(document).ready(function() {
 				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
 				return false;
 				
+			});
+			
+			$("#btnClear").click(function(){
+   			 $(".btnClear").click(function(){
+       		 $("#searchForm").trigger("reset");
+    		});
+			});
+			
+			$("#reset2").click(function(){
+ 			 $(":reset").css("background-color", "red");
 			});
 
 		/*	$('#inputTopicName').change(function() {

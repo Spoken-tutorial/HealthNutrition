@@ -157,6 +157,21 @@ public class TutorialServiceImpl implements TutorialService {
 		
 		return tutorialRepo.findAllByconAssignedTutorialAndStatus(con);
 	}
+	
+	@Override
+	public List<Tutorial> SearchOutlineByQuery(String query){
+	       if(query !=null)
+			return tutorialRepo.findByOutlineByQuery(query);
+	       else
+	    	   return tutorialRepo.findAll();
+		
+		}
+	
+	@Override
+	public Page<Tutorial>  SearchOutlineByQuerPagination(String query,Pageable page){
+		
+		return tutorialRepo.findByOutlineByQueryPagination(query, page);
+	}
 
 
 

@@ -5,17 +5,12 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Tutorial;
-import com.health.model.User;
-import com.health.model.Language;
-import com.health.model.Topic;
 
 /**
  * This Interface Extend CrudRepository to handle all database operation related to Tutorial object
@@ -23,7 +18,7 @@ import com.health.model.Topic;
  * @version 1.0
  *
  */
-public interface TutorialRepository extends JpaRepository<Tutorial, Integer> {
+public interface TutorialRepository extends JpaRepository<Tutorial, Integer> , JpaSpecificationExecutor<Tutorial>{
 
 	/**
 	 * Find the next unique id for the object
@@ -45,6 +40,15 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> {
 	//New Function By Alok
 	@Query("from Tutorial t where t.status = true and t.conAssignedTutorial = ?1")
 	List<Tutorial> findAllByconAssignedTutorialByStatusTrue(ContributorAssignedTutorial con);
+	
+	//New function By Alok to find tutorial by search outline
+	@Query("select t from Tutorial t where t.outline  LIKE %?1%")
+	List<Tutorial> findByOutlineByQuery(String query);
+	
+	//New function By Alok to find tutorial by search outline query and page
+	@Query("from Tutorial t where t.outline  LIKE %?1%")
+	Page<Tutorial> findByOutlineByQueryPagination( String query,Pageable page);
+	
 	
 	
 	/**
