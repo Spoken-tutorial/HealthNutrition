@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Tutorial;
@@ -81,6 +82,14 @@ public interface TutorialService {
 	
 	//New Function to search by outline query and page
 	Page<Tutorial>  SearchOutlineByQuerPagination(String query,Pageable page);
+	
+	public Page<Tutorial> findBySearchCriteria(Specification<Tutorial> spec, Pageable page);
+	
+	
+	/* New Function to Search By Combination of words
+	 Author: Alok Kumar
+	 */
+	public Page<Tutorial>  SearchOutlineByCombinationOfWords(String query,Pageable page);
 	
 
 	/**

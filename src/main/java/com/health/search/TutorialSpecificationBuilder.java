@@ -14,8 +14,8 @@ public class TutorialSpecificationBuilder {
         this.params = new ArrayList<>();
     }
 
-    public final TutorialSpecificationBuilder with(String key, String operation, Object value){
-        params.add(new SearchCriteria(key, operation, value));
+    public final TutorialSpecificationBuilder with(String key, String value){
+        params.add(new SearchCriteria(key, value));
         return this;
     }
 
@@ -32,9 +32,8 @@ public class TutorialSpecificationBuilder {
         Specification<Tutorial> result = new TutorialSpecification(params.get(0));
         for (int idx = 1; idx < params.size(); idx++){
             SearchCriteria criteria = params.get(idx);
-            result = SearchOperation.getDataOption(criteria.getDataOption()) == SearchOperation.ALL
-                    ? Specification.where(result).and(new TutorialSpecification(criteria))
-                    : Specification.where(result).or(new TutorialSpecification(criteria));
+            result =  Specification.where(result).and(new TutorialSpecification(criteria));
+                    
         }
 
         return result;

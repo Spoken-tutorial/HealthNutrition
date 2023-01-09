@@ -9,18 +9,18 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import com.health.search1.SearchByWord;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,9 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -84,6 +85,10 @@ import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
+import com.health.repository.TutorialRepository;
+import com.health.search.TutorialSearchDto;
+import com.health.search.TutorialSpecificationBuilder;
+import com.health.search1.TutorialSearchDto1;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -131,6 +136,9 @@ import com.xuggle.xuggler.IStreamCoder;
 public class HomeController {
 	
 	@Autowired
+	private TutorialRepository tutRepository;
+	
+	@Autowired
 	private ContributorAssignedTutorialService conService;
 
 	@Autowired
@@ -147,6 +155,9 @@ public class HomeController {
 
 	@Autowired
 	private CategoryService catService;
+	
+	@Autowired
+	private SearchByWord searchByWord;
 
 	@Autowired
 	private RoleService roleService;
@@ -648,7 +659,6 @@ private List<Language> getLanguages() {
 	@RequestMapping(value = "/tutorialsSearch", method = RequestMethod.GET)
 	public String viewCoursesAvailableBySearch(HttpServletRequest req,
 			@RequestParam(name = "query") String query,
-			
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 		
 		List<Category> catTempSorted = getCategories();
@@ -675,7 +685,7 @@ private List<Language> getLanguages() {
 		Pageable pageable = PageRequest.of(page, 20);
 
 		if(query != null) {
-			tut = tutService.SearchOutlineByQuerPagination(query, pageable);
+			tut = tutService.SearchOutlineByCombinationOfWords(query, pageable);
 			
 		}else {
 			tut = tutService.findAllPagination(pageable);
@@ -692,12 +702,164 @@ private List<Language> getLanguages() {
 			System.out.println(temp.getTutorialId() +"***********");
 		}
 		
+
+		
 		Collections.sort(tutToView);  // sorting based on order value
 		
 		model.addAttribute("tutorials", tutToView);
 		model.addAttribute("currentPage",page);
 		model.addAttribute("totalPages",tut.getTotalPages());
-		model.addAttribute("query", query);
+		model.addAttribute("query", "");
+		
+
+		return "tutorialList";   // add view name (filename)
+	}
+	
+	
+	
+	
+	
+  
+	//This function is created to work and debugged for new algorithm
+	@RequestMapping(value = "/tutorialsSearch1", method = RequestMethod.GET)
+	public String viewCoursesAvailableBySearch1(HttpServletRequest req,
+			@RequestParam(name = "query") String query,
+			@RequestParam(name ="page",defaultValue = "0") int page,
+            TutorialSearchDto1 tutorialSearchDto1 , Principal principal,Model model) {
+		
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTemp = getTopics();
+		
+		model.addAttribute("categories", catTempSorted);
+		model.addAttribute("languages", lanTempSorted);
+		model.addAttribute("topics", topicTemp);
+		
+
+		Page<Tutorial> tut = null;
+		List<Tutorial> tutToView = new ArrayList<Tutorial>();
+
+		User usr=new User();
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+       
+		Pageable pageable = PageRequest.of(page, 20);
+
+		if(query != null) {
+			
+			//tut=searchByWord.searchByWord2(query, pageable);
+			tut=searchByWord.SearchOutlineByWords(query, pageable);
+			//tut = tutService.SearchOutlineByQuerPagination(query, pageable);
+			
+		}else {
+			tut = tutService.findAllPagination(pageable);
+	
+		}
+
+		for(Tutorial temp :tut) {
+			if(temp.isStatus()) {
+				tutToView.add(temp);
+			}
+		}
+		
+		for(Tutorial temp :tutToView) {
+			System.out.println(temp.getTutorialId() +"***********");
+		}
+		
+		
+		
+		 //Pageable pageable = PageRequest.of(page, 20);
+
+		
+		 /* TutorialSpecificationsBuilder1 builder = new TutorialSpecificationsBuilder1();
+		  Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
+	        Matcher matcher = pattern.matcher(query + ",");
+	        while (matcher.find()) {
+	            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
+	        }
+	        
+	        Specification<Tutorial> spec=builder.build(); */
+		
+		/* TutorialSpecificationsBuilder1 builder = new TutorialSpecificationsBuilder1();
+	        String operationSetExper = Joiner.on("|")
+	            .join(SearchOperation1.SIMPLE_OPERATION_SET);
+	        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
+	        Matcher matcher = pattern.matcher(query + ",");
+	        while (matcher.find()) {
+	            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
+	        }
+	        */
+	        
+	        //Specification<Tutorial> spec=builder.build(); 
+	       // TutorialSpecification1 spec =  new TutorialSpecification1(new SpecSearchCriteria1("outline", SearchOperation1.getSimpleOperation('~'), query));
+	       // Specification<Tutorial> spec = resolveSpecification(query);
+	       
+	        //Page<Tutorial> tutorialPage = tutRepository.findAll(spec, pageable);;
+	       
+		/* List<String> queryList = new ArrayList<String>(Arrays.asList(query.split(" ")));
+		
+		 Page<Tutorial> tutorialPage=null;
+		
+		 Page<Tutorial> tutorialP1= tutRepository.findByOutlineContainingIgnoreCase(query, pageable);
+		 if(!tutorialP1.isEmpty()){
+			 tutorialPage=tutorialP1;
+		 }
+		 else {
+			 if(queryList == null || queryList.isEmpty())
+		            throw new RuntimeException("List of words cannot be empty.");
+		        Specification<Tutorial> spec= (root, query1, builder) -> queryList.stream()
+		                .map(String::toLowerCase)
+		                .map(word -> "%" + word + "%")
+		                .map(word -> builder.like(builder.lower(root.get("outline")), word))
+		                .reduce(builder::or)
+		                .get();
+		        
+		        tutorialPage= tutRepository.findAll(spec, pageable);
+		       // List<Tutorial> tutList=tutRepository.findAll(spec);
+		        //tutorialPage=new PageImpl<Tutorial>(tutList, pageable, tutList.size());
+		        
+		 }
+		 
+		 tutorialPage=searchByWord.SearchOutlineByWords(query, pageable);
+	    
+    
+        if(tutorialPage !=null) {
+        	tut=tutorialPage;
+        }else {
+			tut = tutService.findAllPagination(pageable);
+	
+		}
+
+		for(Tutorial temp :tut) {
+			if(temp.isStatus()) {
+				tutToView.add(temp);
+			}
+		}
+       
+       
+		
+		for(Tutorial temp :tutToView) {
+			System.out.println(temp.getTutorialId() +"***********");
+		}
+		*/
+		
+
+		
+		Collections.sort(tutToView);  // sorting based on order value
+		
+		model.addAttribute("tutorials", tutToView);
+		model.addAttribute("currentPage",page);
+		model.addAttribute("totalPages",tut.getTotalPages());
+		model.addAttribute("query", "");
+		//model.addAttribute("tutorialSearchDto1", tutorialSearchDto1);
+		
+		
+		
 
 		return "tutorialList";   // add view name (filename)
 	}
