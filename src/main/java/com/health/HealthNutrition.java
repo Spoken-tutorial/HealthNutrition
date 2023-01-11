@@ -71,8 +71,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 //		Role role=new Role();
 //		role.setRoleId(1);
 //		role.setName("SUPER_USER");
-//		roleService.save(role);
-//
+//		roleService.save(role);		
 //		Role role1=new Role();
 //		role1.setRoleId(2);
 //		role1.setName("CREATION_ADMIN");

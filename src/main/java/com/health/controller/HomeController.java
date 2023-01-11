@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import com.health.search1.SearchByWord;
+
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -86,9 +86,7 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.repository.TutorialRepository;
-import com.health.search.TutorialSearchDto;
-import com.health.search.TutorialSpecificationBuilder;
-import com.health.search1.TutorialSearchDto1;
+
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -155,9 +153,6 @@ public class HomeController {
 
 	@Autowired
 	private CategoryService catService;
-	
-	@Autowired
-	private SearchByWord searchByWord;
 
 	@Autowired
 	private RoleService roleService;
@@ -725,7 +720,7 @@ private List<Language> getLanguages() {
 	public String viewCoursesAvailableBySearch1(HttpServletRequest req,
 			@RequestParam(name = "query") String query,
 			@RequestParam(name ="page",defaultValue = "0") int page,
-            TutorialSearchDto1 tutorialSearchDto1 , Principal principal,Model model) {
+             Principal principal,Model model) {
 		
 		List<Category> catTempSorted = getCategories();
 		List<Language> lanTempSorted = getLanguages();
@@ -753,7 +748,7 @@ private List<Language> getLanguages() {
 		if(query != null) {
 			
 			//tut=searchByWord.searchByWord2(query, pageable);
-			tut=searchByWord.SearchOutlineByWords(query, pageable);
+			
 			//tut = tutService.SearchOutlineByQuerPagination(query, pageable);
 			
 		}else {

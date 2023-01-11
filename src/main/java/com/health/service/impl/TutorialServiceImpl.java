@@ -173,38 +173,8 @@ public class TutorialServiceImpl implements TutorialService {
 	@Override
 	public Page<Tutorial>  SearchOutlineByQuerPagination(String query,Pageable page){
 		
-		Page<Tutorial> tutorialPageList=null;
-		Page<Tutorial> temp=null;
-		List<String> queryList = new ArrayList<String>(Arrays.asList(query.split(" ")));
 		
-		tutorialPageList= tutorialRepo.findByOutlineByQueryPagination(query, page);
-		
-		if(!tutorialPageList.isEmpty()) {
-			return tutorialPageList;
-		}
-		
-		else {
-				
-		       temp= tutorialRepo.findByOutlineByQueryPagination(queryList.get(0), page);	
-				for (int i = 0; i <queryList.size();i++) 
-			      { 
-					if(!temp.isEmpty()) {
-						if(tutorialRepo.findByOutlineByQueryPagination(queryList.get(i), page)==temp) {
-			    	    	temp=tutorialRepo.findByOutlineByQueryPagination(queryList.get(i), page);
-			    	    	break;
-			    	    }
-						
-					}else {
-						temp= tutorialRepo.findByOutlineByQueryPagination(queryList.get(i), page);
-						
-					}
-		    	   
-			      }
-				return temp;
-		}
-		
-		
-		//return tutorialRepo.findByOutlineByQueryPagination(query, page);
+		return tutorialRepo.findByOutlineByQueryPagination(query, page);
 	}
 	
 	@Override

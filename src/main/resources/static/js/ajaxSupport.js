@@ -1771,20 +1771,21 @@ $(document).ready(function() {
 		/*
 		Funtion to reset search input
 		*/	
-		/*$(".btnClear").click(function(){
+		$(".btnClear").click(function(){
        		 $("#myForm").trigger("reset");
        
         	return false;
         });
         	
-        	*/
+        	
         	
         
 
-		$(".btnClear").click(function() {
+	/*	$(".btnClear").click(function() {
     		$("#myForm").find("input[type=text], textarea").val("");
     		
 		});
+		*/
 
 
       
