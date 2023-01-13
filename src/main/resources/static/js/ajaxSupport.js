@@ -1773,6 +1773,7 @@ $(document).ready(function() {
 		*/	
 		$(".btnClear").click(function(){
        		 $("#myForm").trigger("reset");
+       		 $("#query").setVal("");
        
         	return false;
         });

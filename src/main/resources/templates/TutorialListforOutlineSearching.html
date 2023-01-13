@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<html>
+<head>
+<head th:replace="common/trail :: common-trail"></head>
+<body>
+  <section th:replace="index.html :: header-bar"></section>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light ">
+  <a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+								<span style="color: black;font-size: 2rem;" class="ml-3">Spoken <span style="color: orange;font-size: 2rem;">Tutorial </span><span style="border-bottom:2px solid orange;">Health & Nutrition Project</span> </span>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavBar">
+    <div class="navbar-nav ml-auto">
+      <a class="nav-item nav-link active" th:href="@{/}" >Home <span class="sr-only">(current)</span></a>
+      <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    About Us
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" th:href="@{/#about}">About</a>
+    <a class="dropdown-item" th:href="@{/#consultants}">Consultants</a>
+    <a class="dropdown-item" th:href="@{/#events}">Events</a>
+    <a class="dropdown-item" th:href="@{/#testimonial}">Testimonials</a>
+  </div>
+</div>
+      <a class="nav-item nav-link " href="#contact" tabindex="-1">Contact Us</a>
+    </div>
+  </div>
+</nav>
+<div class="container">
+<div th:replace="common/commonElements :: search_bar"></div>
+</div>
+<main id="tutorial_list">
+	<div th:each="tutorial : ${tutorials}" class="row t-wrapper mt-3">
+		<div class="col-sm-4">
+			<video id='storedVideoId' 
+				controls="controls" style="width:100%!important;">
+				<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
+			</video>
+		</div>
+		<div class="col-sm-8">
+		<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" style="color: black;text-decoration: none;">
+			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
+			<h6 style="color: #014F7A;font-size: 1rem;">
+			<span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span>
+			<span>(</span><i th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}" class=""></i><span>)</span>
+			
+			</h6>
+				<!-- <p th:utext="${tutorial.getOutline()}" class="mx-0"> </p> -->
+				<p th:utext="${#strings.abbreviate(tutorial.getOutline(),600)}" class="mx-0"></p>
+				
+			
+		</a>
+		</div>
+	</div>
+	
+	
+</main>
+
+		<nav aria-label="Page navigation example" style="float: right;padding-right:10%">
+		  <ul class="pagination">
+		  
+		    <li th:if ="${currentPage != 0}" class="page-item"><a class="page-link" th:href="@{'/tutorialsSearch?query='+${query}+'&page='+${currentPage-1}}">Previous</a></li>
+		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(1,totalPages)}" class="page-item"><a class="page-link" th:href="@{'/tutorialsSearch?query='+${query}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
+		  
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item"><a class="page-link" th:href="@{'/tutorialsSearch?query='+${query}+'&page='+${currentPage+1}}">Next</a></li>
+		  </ul>
+		</nav>
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+<script>
+		var projectPath='[(@{/})]';
+</script>
+</body>
+</html>
