@@ -7014,34 +7014,59 @@ private List<Language> getLanguages() {
 			usr=userService.findByUsername(principal.getName());
 		}
 		model.addAttribute("userInfo", usr);
-		List<Category> cat = catService.findAll();
+		//List<Category> cat = catService.findAll();
+		List<Category> cat = getCategories();
 		
-		List<Category> categories = catService.findAllByOrder();
-		List<Language> lan =lanService.getAllLanguages();
-		List<Tutorial> tut ;
+		//List<Category> categories = catService.findAllByOrder();
+		//List<Language> lan =lanService.getAllLanguages();
+		List<Language> lan =getLanguages();
+		
 		List<ContributorAssignedTutorial> contributor_Role = conRepo.findAll();
 		 
 		Collections.sort(cat);
 		Collections.sort(lan);
 		LinkedHashMap<Integer,String> catMap = new LinkedHashMap<>();
 		LinkedHashMap<Integer,String> lanMap = new LinkedHashMap<>();
-		for(Category c: categories) {
-			catMap.put(c.getCategoryId(), c.getCatName());
+		for(Category c: cat) {
+			
+				catMap.put(c.getCategoryId(), c.getCatName());
+			
+			
 		}
 		for(Language l: lan) {
 			lanMap.put(l.getLanId(), l.getLangName());
+		}
+		
+		List<Tutorial> tutorilaListForCount=tutService.findAllBystatus(true);
+		List<Tutorial> finaltutoriallistforcount=new ArrayList<>();
+		for(Tutorial temp :tutorilaListForCount) {
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				finaltutoriallistforcount.add(temp);
+			}
 		}
 		
 		model.addAttribute("catMap", catMap);
 		model.addAttribute("lanMap", lanMap);
 
 		List<Tutorial> tutorials;
+		List<Tutorial> finalTutorials=new ArrayList<>();
 		if(categoryId!=0 & languageId!=0) {
 			Language language = lanService.getById(languageId);
 			Category category = catService.findByid(categoryId);
 			List<TopicCategoryMapping> topicCategoryMappings = topicCatService.findAllByCategory(category);
 			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCatAndLanViewPart(topicCategoryMappings, language);
 			tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+			
+			for(Tutorial temp :tutorials) {
+				
+			  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+				if(c.isStatus()) {
+					finalTutorials.add(temp);
+				}
+			}
+			
 			model.addAttribute("cat_value", category.getCategoryId());
 			model.addAttribute("lan_value", language.getLanId());
 		}else if(categoryId!=0) {
@@ -7050,8 +7075,16 @@ private List<Language> getLanguages() {
 			if(!topicCategoryMappings.isEmpty()){
 				List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCat(topicCategoryMappings);
 				tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+				for(Tutorial temp :tutorials) {
+					
+					  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+						if(c.isStatus()) {
+							finalTutorials.add(temp);
+						}
+					}
 			}else {
 				tutorials = null;
+				finalTutorials=null;
 			}
 			
 			model.addAttribute("cat_value", category.getCategoryId());
@@ -7060,10 +7093,26 @@ private List<Language> getLanguages() {
 			Language language = lanService.getById(languageId);
 			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByLan(language);
 			tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+			
+			for(Tutorial temp :tutorials) {
+				
+				  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+					if(c.isStatus()) {
+						finalTutorials.add(temp);
+					}
+				}
+			
 			model.addAttribute("cat_value", 0);
 			model.addAttribute("lan_value", language.getLanId());
 		}else {
 			tutorials = tutService.findAllBystatus(true);
+			for(Tutorial temp :tutorials) {
+				
+				  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+					if(c.isStatus()) {
+						finalTutorials.add(temp);
+					}
+				}
 			model.addAttribute("cat_value", 0);
 			model.addAttribute("lan_value", 0);
 		}
@@ -7072,8 +7121,8 @@ private List<Language> getLanguages() {
 		model.addAttribute("languages", lan);
 		model.addAttribute("catTotal", cat.size());
 		model.addAttribute("lanTotal", lan.size());
-		model.addAttribute("tutTotal", tutService.findAllBystatus(true).size());
-		model.addAttribute("tutorials", tutorials);
+		model.addAttribute("tutTotal",  finaltutoriallistforcount.size());
+		model.addAttribute("tutorials",finalTutorials);
 		model.addAttribute("contributor_Role", contributor_Role);
 		
 		HashMap<String,Integer> cat_count = new HashMap<>();
