@@ -9,12 +9,11 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,15 +21,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -84,6 +85,8 @@ import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
+import com.health.repository.TutorialRepository;
+
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -129,6 +132,9 @@ import com.xuggle.xuggler.IStreamCoder;
  */
 @Controller
 public class HomeController {
+	
+	@Autowired
+	private TutorialRepository tutRepository;
 	
 	@Autowired
 	private ContributorAssignedTutorialService conService;
@@ -441,6 +447,10 @@ private List<Language> getLanguages() {
 		List<Category> categoryHome = new ArrayList<>();
 		List<Brouchure> brochureHome = new ArrayList<>();
 		List<Carousel> carouselHome = new ArrayList<>();
+		
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTempSorted = getTopics();
 
 
 
@@ -474,7 +484,8 @@ private List<Language> getLanguages() {
 		}
 //		set upper limit for categories count
 		upperlimit = 4 ;
-		categoryHome=(categories.size()>upperlimit) ? categories.subList(0, upperlimit):categories;
+		//categoryHome=(categories.size()>upperlimit) ? categories.subList(0, upperlimit):categories;
+		categoryHome=(catTempSorted.size()>upperlimit) ? catTempSorted.subList(0, upperlimit):catTempSorted;
 		brochureHome=(brochures.size()>upperlimit) ? brochures.subList(0, upperlimit):brochures;
 		carouselHome=(carousel.size()>upperlimit) ? carousel.subList(0, upperlimit):carousel;
 
@@ -497,16 +508,26 @@ private List<Language> getLanguages() {
 		if(!brochureHome.isEmpty()) {
 			model.addAttribute("listofBrochures", brochureHome);
 		}
+		
+		
+		List<Tutorial> tutorials=tutService.findAllBystatus(true);
+		List<Tutorial> finalTutorials=new ArrayList<>();
+		for(Tutorial temp :tutorials) {
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				finalTutorials.add(temp);
+			}
+		}
+		
 
 
-		model.addAttribute("languageCount", languages.size());
-		model.addAttribute("videoCount", tutService.findAll().size());
+		model.addAttribute("languageCount", getLanguages().size());
+		model.addAttribute("videoCount", finalTutorials.size());
 		model.addAttribute("consultantCount", consults.size());
 
 
-		List<Category> catTempSorted = getCategories();
-		List<Language> lanTempSorted = getLanguages();
-		List<Topic> topicTempSorted = getTopics();
+		
 		
 		model.addAttribute("categories", catTempSorted);
 		model.addAttribute("languages", lanTempSorted);
@@ -536,6 +557,7 @@ private List<Language> getLanguages() {
 			@RequestParam(name = "categoryName") int cat,
 			@RequestParam(name = "topic") int topic,
 			@RequestParam(name = "lan") int lan,
+			
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 
 		List<Category> catTempSorted = getCategories();
@@ -560,6 +582,7 @@ private List<Language> getLanguages() {
 
 		Page<Tutorial> tut = null;
 		List<Tutorial> tutToView = new ArrayList<Tutorial>();
+		List<Tutorial> tutToView1 = new ArrayList<Tutorial>();
 
 		User usr=new User();
 		if(principal!=null) {
@@ -626,17 +649,242 @@ private List<Language> getLanguages() {
 		}
 
 		for(Tutorial temp :tutToView) {
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				tutToView1.add(temp);
+			}
 			System.out.println(temp.getTutorialId() +"***********");
 		}
+		
+		Collections.sort(tutToView1);  // sorting based on order value
+		
+		model.addAttribute("tutorials", tutToView1);
+		model.addAttribute("currentPage",page);
+		model.addAttribute("totalPages",tut.getTotalPages());
+
+		return "tutorialList";   // add view name (filename)
+	}
+	
+	
+	/*
+	 * Function to Search Tutorial By Outline Query
+	 * Author: Alok Kumar
+	 */
+	
+	@RequestMapping(value = "/tutorialsSearch", method = RequestMethod.GET)
+	public String viewCoursesAvailableBySearch(HttpServletRequest req,
+			@RequestParam(name = "query") String query,
+			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
+		
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTemp = getTopics();
+		
+		model.addAttribute("categories", catTempSorted);
+		model.addAttribute("languages", lanTempSorted);
+		model.addAttribute("topics", topicTemp);
+		
+
+		Page<Tutorial> tut = null;
+		List<Tutorial> tutToView = new ArrayList<Tutorial>();
+		List<Tutorial> tutToView1= new ArrayList<Tutorial>();
+
+		User usr=new User();
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+        
+		Pageable pageable = PageRequest.of(page, 20);
+
+		if(query != null) {
+			tut = tutService.SearchOutlineByCombinationOfWords(query, pageable);
+			
+		}else {
+			tut = tutService.findAllPagination(pageable);
+	
+		}
+
+		for(Tutorial temp :tut) {
+			if(temp.isStatus()) {
+				tutToView.add(temp);
+			}
+		}
+		
+		for(Tutorial temp :tutToView) {
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				tutToView1.add(temp);
+			}
+			System.out.println(temp.getTutorialId() +"***********");
+		}
+		
+		Collections.sort(tutToView1);  
+		model.addAttribute("tutorials", tutToView1);
+		model.addAttribute("currentPage",page);
+		model.addAttribute("totalPages",tut.getTotalPages());
+		model.addAttribute("query", query);
+		
+
+		//return "tutorialList";  
+		return "TutorialListforOutlineSearching";   // add view name (filename)
+	}
+	
+	
+	
+	
+	
+  
+	//This function is created to work and debugged for new algorithm
+	@RequestMapping(value = "/tutorialsSearch1", method = RequestMethod.GET)
+	public String viewCoursesAvailableBySearch1(HttpServletRequest req,
+			@RequestParam(name = "query") String query,
+			@RequestParam(name ="page",defaultValue = "0") int page,
+             Principal principal,Model model) {
+		
+		List<Category> catTempSorted = getCategories();
+		List<Language> lanTempSorted = getLanguages();
+		List<Topic> topicTemp = getTopics();
+		
+		model.addAttribute("categories", catTempSorted);
+		model.addAttribute("languages", lanTempSorted);
+		model.addAttribute("topics", topicTemp);
+		
+
+		Page<Tutorial> tut = null;
+		List<Tutorial> tutToView = new ArrayList<Tutorial>();
+
+		User usr=new User();
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+       
+		Pageable pageable = PageRequest.of(page, 20);
+
+		if(query != null) {
+			
+			//tut=searchByWord.searchByWord2(query, pageable);
+			
+			//tut = tutService.SearchOutlineByQuerPagination(query, pageable);
+			
+		}else {
+			tut = tutService.findAllPagination(pageable);
+	
+		}
+
+		for(Tutorial temp :tut) {
+			if(temp.isStatus()) {
+				tutToView.add(temp);
+			}
+		}
+		
+		for(Tutorial temp :tutToView) {
+			System.out.println(temp.getTutorialId() +"***********");
+		}
+		
+		
+		
+		 //Pageable pageable = PageRequest.of(page, 20);
+
+		
+		 /* TutorialSpecificationsBuilder1 builder = new TutorialSpecificationsBuilder1();
+		  Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
+	        Matcher matcher = pattern.matcher(query + ",");
+	        while (matcher.find()) {
+	            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
+	        }
+	        
+	        Specification<Tutorial> spec=builder.build(); */
+		
+		/* TutorialSpecificationsBuilder1 builder = new TutorialSpecificationsBuilder1();
+	        String operationSetExper = Joiner.on("|")
+	            .join(SearchOperation1.SIMPLE_OPERATION_SET);
+	        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
+	        Matcher matcher = pattern.matcher(query + ",");
+	        while (matcher.find()) {
+	            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
+	        }
+	        */
+	        
+	        //Specification<Tutorial> spec=builder.build(); 
+	       // TutorialSpecification1 spec =  new TutorialSpecification1(new SpecSearchCriteria1("outline", SearchOperation1.getSimpleOperation('~'), query));
+	       // Specification<Tutorial> spec = resolveSpecification(query);
+	       
+	        //Page<Tutorial> tutorialPage = tutRepository.findAll(spec, pageable);;
+	       
+		/* List<String> queryList = new ArrayList<String>(Arrays.asList(query.split(" ")));
+		
+		 Page<Tutorial> tutorialPage=null;
+		
+		 Page<Tutorial> tutorialP1= tutRepository.findByOutlineContainingIgnoreCase(query, pageable);
+		 if(!tutorialP1.isEmpty()){
+			 tutorialPage=tutorialP1;
+		 }
+		 else {
+			 if(queryList == null || queryList.isEmpty())
+		            throw new RuntimeException("List of words cannot be empty.");
+		        Specification<Tutorial> spec= (root, query1, builder) -> queryList.stream()
+		                .map(String::toLowerCase)
+		                .map(word -> "%" + word + "%")
+		                .map(word -> builder.like(builder.lower(root.get("outline")), word))
+		                .reduce(builder::or)
+		                .get();
+		        
+		        tutorialPage= tutRepository.findAll(spec, pageable);
+		       // List<Tutorial> tutList=tutRepository.findAll(spec);
+		        //tutorialPage=new PageImpl<Tutorial>(tutList, pageable, tutList.size());
+		        
+		 }
+		 
+		 tutorialPage=searchByWord.SearchOutlineByWords(query, pageable);
+	    
+    
+        if(tutorialPage !=null) {
+        	tut=tutorialPage;
+        }else {
+			tut = tutService.findAllPagination(pageable);
+	
+		}
+
+		for(Tutorial temp :tut) {
+			if(temp.isStatus()) {
+				tutToView.add(temp);
+			}
+		}
+       
+       
+		
+		for(Tutorial temp :tutToView) {
+			System.out.println(temp.getTutorialId() +"***********");
+		}
+		*/
+		
+
 		
 		Collections.sort(tutToView);  // sorting based on order value
 		
 		model.addAttribute("tutorials", tutToView);
 		model.addAttribute("currentPage",page);
 		model.addAttribute("totalPages",tut.getTotalPages());
+		model.addAttribute("query", "");
+		//model.addAttribute("tutorialSearchDto1", tutorialSearchDto1);
+		
+		
+		
 
 		return "tutorialList";   // add view name (filename)
 	}
+	
+	
 
 	/**
 	 * redirects to tutorial specific page
@@ -783,10 +1031,22 @@ private List<Language> getLanguages() {
 	public String showLanguagesGet(Model model) {
 
 		HashMap<String, Integer> map = new HashMap<>();
-		List<Language> langs = lanService.getAllLanguages();
+		//List<Language> langs = lanService.getAllLanguages();
+		List<Language> langs = getLanguages();
 		for(Language lang:langs) {
-			List<ContributorAssignedTutorial> tutorials = conRepo.findAllByLan(lang);
-			map.put(lang.getLangName(), tutorials.size());
+			List<ContributorAssignedTutorial> con = conRepo.findAllByLan(lang);
+			List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorialList1(con);
+			List<Tutorial> finalTutorials=new ArrayList<>();
+			
+			for(Tutorial temp :tutorials) {
+				
+				Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+				if(c.isStatus()) {
+					finalTutorials.add(temp);
+				}
+			}
+			
+			map.put(lang.getLangName(), finalTutorials.size());
 		}
 		model.addAttribute("map", map);
 		
@@ -967,7 +1227,8 @@ private List<Language> getLanguages() {
 	@RequestMapping(value = "/categories",method = RequestMethod.GET)
 	public String showCategoriesGet(Model model) {
 
-		List<Category> categories=catService.findAll();
+		//List<Category> categories=catService.findAll();
+		List<Category> categories=getCategories();
 		model.addAttribute("categories", categories);
 		return "categories";
 	}
@@ -6753,34 +7014,59 @@ private List<Language> getLanguages() {
 			usr=userService.findByUsername(principal.getName());
 		}
 		model.addAttribute("userInfo", usr);
-		List<Category> cat = catService.findAll();
+		//List<Category> cat = catService.findAll();
+		List<Category> cat = getCategories();
 		
-		List<Category> categories = catService.findAllByOrder();
-		List<Language> lan =lanService.getAllLanguages();
-		List<Tutorial> tut ;
+		//List<Category> categories = catService.findAllByOrder();
+		//List<Language> lan =lanService.getAllLanguages();
+		List<Language> lan =getLanguages();
+		
 		List<ContributorAssignedTutorial> contributor_Role = conRepo.findAll();
 		 
 		Collections.sort(cat);
 		Collections.sort(lan);
 		LinkedHashMap<Integer,String> catMap = new LinkedHashMap<>();
 		LinkedHashMap<Integer,String> lanMap = new LinkedHashMap<>();
-		for(Category c: categories) {
-			catMap.put(c.getCategoryId(), c.getCatName());
+		for(Category c: cat) {
+			
+				catMap.put(c.getCategoryId(), c.getCatName());
+			
+			
 		}
 		for(Language l: lan) {
 			lanMap.put(l.getLanId(), l.getLangName());
+		}
+		
+		List<Tutorial> tutorilaListForCount=tutService.findAllBystatus(true);
+		List<Tutorial> finaltutoriallistforcount=new ArrayList<>();
+		for(Tutorial temp :tutorilaListForCount) {
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				finaltutoriallistforcount.add(temp);
+			}
 		}
 		
 		model.addAttribute("catMap", catMap);
 		model.addAttribute("lanMap", lanMap);
 
 		List<Tutorial> tutorials;
+		List<Tutorial> finalTutorials=new ArrayList<>();
 		if(categoryId!=0 & languageId!=0) {
 			Language language = lanService.getById(languageId);
 			Category category = catService.findByid(categoryId);
 			List<TopicCategoryMapping> topicCategoryMappings = topicCatService.findAllByCategory(category);
 			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCatAndLanViewPart(topicCategoryMappings, language);
 			tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+			
+			for(Tutorial temp :tutorials) {
+				
+			  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+				if(c.isStatus()) {
+					finalTutorials.add(temp);
+				}
+			}
+			
 			model.addAttribute("cat_value", category.getCategoryId());
 			model.addAttribute("lan_value", language.getLanId());
 		}else if(categoryId!=0) {
@@ -6789,8 +7075,16 @@ private List<Language> getLanguages() {
 			if(!topicCategoryMappings.isEmpty()){
 				List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCat(topicCategoryMappings);
 				tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+				for(Tutorial temp :tutorials) {
+					
+					  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+						if(c.isStatus()) {
+							finalTutorials.add(temp);
+						}
+					}
 			}else {
 				tutorials = null;
+				finalTutorials=null;
 			}
 			
 			model.addAttribute("cat_value", category.getCategoryId());
@@ -6799,10 +7093,26 @@ private List<Language> getLanguages() {
 			Language language = lanService.getById(languageId);
 			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByLan(language);
 			tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
+			
+			for(Tutorial temp :tutorials) {
+				
+				  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+					if(c.isStatus()) {
+						finalTutorials.add(temp);
+					}
+				}
+			
 			model.addAttribute("cat_value", 0);
 			model.addAttribute("lan_value", language.getLanId());
 		}else {
 			tutorials = tutService.findAllBystatus(true);
+			for(Tutorial temp :tutorials) {
+				
+				  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+					if(c.isStatus()) {
+						finalTutorials.add(temp);
+					}
+				}
 			model.addAttribute("cat_value", 0);
 			model.addAttribute("lan_value", 0);
 		}
@@ -6811,8 +7121,8 @@ private List<Language> getLanguages() {
 		model.addAttribute("languages", lan);
 		model.addAttribute("catTotal", cat.size());
 		model.addAttribute("lanTotal", lan.size());
-		model.addAttribute("tutTotal", tutService.findAllBystatus(true).size());
-		model.addAttribute("tutorials", tutorials);
+		model.addAttribute("tutTotal",  finaltutoriallistforcount.size());
+		model.addAttribute("tutorials",finalTutorials);
 		model.addAttribute("contributor_Role", contributor_Role);
 		
 		HashMap<String,Integer> cat_count = new HashMap<>();

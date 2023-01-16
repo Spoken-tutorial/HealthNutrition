@@ -62,10 +62,10 @@
 		<nav aria-label="Page navigation example" style="float: right;padding-right:10%">
 		  <ul class="pagination">
 		  
-		    <li th:if ="${currentPage != 0}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage-1}}">Previous</a></li>
-		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(1,totalPages)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item"><a class="page-link" th:href="@{'/tutorialsSearch?query='+${query}+'&page='+${currentPage-1}}">Previous</a></li>
+		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(1,totalPages)}" class="page-item"><a class="page-link" th:href="@{'/tutorialsSearch?query='+${query}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
 		  
-		    <li th:if ="${currentPage+1 != totalPages}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage+1}}">Next</a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item"><a class="page-link" th:href="@{'/tutorialsSearch?query='+${query}+'&page='+${currentPage+1}}">Next</a></li>
 		  </ul>
 		</nav>
 <div th:replace="common/trail :: body-bottom-scripts"></div>

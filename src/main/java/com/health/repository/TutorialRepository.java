@@ -5,17 +5,12 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Tutorial;
-import com.health.model.User;
-import com.health.model.Language;
-import com.health.model.Topic;
 
 /**
  * This Interface Extend CrudRepository to handle all database operation related to Tutorial object
@@ -23,7 +18,7 @@ import com.health.model.Topic;
  * @version 1.0
  *
  */
-public interface TutorialRepository extends JpaRepository<Tutorial, Integer> {
+public interface TutorialRepository extends JpaRepository<Tutorial, Integer> , JpaSpecificationExecutor<Tutorial>{
 
 	/**
 	 * Find the next unique id for the object
@@ -44,7 +39,33 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> {
 	
 	//New Function By Alok
 	@Query("from Tutorial t where t.status = true and t.conAssignedTutorial = ?1")
-	List<Tutorial> findAllByconAssignedTutorial1(ContributorAssignedTutorial con);
+	List<Tutorial> findAllByconAssignedTutorialByStatusTrue(ContributorAssignedTutorial con);
+	
+	//New function By Alok to find tutorial by search outline
+	@Query("select t from Tutorial t where t.outline  LIKE %?1%")
+	List<Tutorial> findByOutlineByQuery(String query);
+	
+	//New function By Alok to find tutorial by search outline query and page
+	//@Query("SELECT t FROM Tutorial t WHERE " + "t.outline LIKE CONCAT('%',:query, '%')" +"Or t.topicName LIKE CONCAT('%', :query, '%')")
+	@Query("from Tutorial t where t.outline  LIKE %?1%") 
+	Page<Tutorial> findByOutlineByQueryPagination(String query, Pageable page);
+	
+	@Query("from Tutorial t where t.outline  LIKE %:query1% and  t.outline  LIKE %:query2%") 
+	Page<Tutorial> findByOutlineByQuerywords2(@Param("query1") String query1, @Param("query2") String query2, Pageable page);
+	
+	@Query("from Tutorial t where t.outline  LIKE %:query1%  and  t.outline  LIKE %:query2%   and t.outline LIKE %:query3%") 
+	Page<Tutorial> findByOutlineByQuerywords3(@Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3, Pageable page);
+	
+	@Query("from Tutorial t where t.outline LIKE %:query1% and  t.outline  LIKE %:query2%  and t.outline LIKE %:query3% and t.outline  LIKE %:query4%") 
+	Page<Tutorial> findByOutlineByQuerywords4(@Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3, @Param("query4") String query4, Pageable page);
+	
+	@Query("from Tutorial t where t.outline  LIKE %:query1% and  t.outline  LIKE %:query2% and t.outline  LIKE %:query3% and t.outline  LIKE %:query4% and t.outline LIKE %:query5%") 
+	Page<Tutorial> findByOutlineByQuerywords5(@Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3,@Param("query4") String query4, @Param("query5") String query5, Pageable page);
+	
+	
+	
+	Page<Tutorial> findByOutlineContainingIgnoreCase(String query, Pageable pageable);
+	
 	
 	
 	/**

@@ -73,7 +73,7 @@
 	</section>
   <nav class="navbar navbar-expand-lg navbar-light bg-light " th:fragment="navbar">
   <a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
-								<span style="color: rgba(0,0,0,0.9);font-size: 1.5rem;" class="ml-3">Spoken Tutorial <span style="border-bottom:2px solid orange;">Health
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.5rem;" class="ml-3">Spoken <span style="color: orange;font-size:1.5rem;">Tutorial</span> <span style="border-bottom:2px solid orange;">Health
 & Nutrition Project</span><span style="color: orange;font-size: 2rem;"></span> </span>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -182,7 +182,7 @@ the globe.
 	<div class="container-lg py-3 px-3">
 		<div class="row">
 		<div class="col-md-6">
-		<a th:href="@{'/tutorials?categoryName='+'Select'+'&topic='+'Select'+'&lan='+'Select'}">
+		<a th:href="@{'/tutorials?categoryName='+'0'+'&topic='+'0'+'&lan='+'0'}">
 		<div class="is-shady text-center p-3 stat-card">
 			    <p class="stat-num"><span th:text="${videoCount}"></span>+</p>
 				<p class="">Videos</p>

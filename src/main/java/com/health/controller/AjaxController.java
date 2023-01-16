@@ -4,15 +4,22 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.logging.log4j.util.PropertySource.Comparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.repository.query.Param;
@@ -79,6 +86,8 @@ import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
+
+import javassist.bytecode.Descriptor.Iterator;
 
 /**
  * This Controller Class takes website AJAX request and process it accordingly
@@ -172,6 +181,8 @@ public class AjaxController{
 	
 	@Autowired
 	private JavaMailSender mailSender;
+	
+	
 	
 	private static final String SUCCESS_TOKEN = "success";
 	private static final String ERROR_TOKEN = "error";
@@ -737,18 +748,22 @@ public class AjaxController{
 
 	}
 	
+	
+	
+	
+	
 	/* 
 	 * Function to load Topic and Language by category
 	 * Author: Alok Kumar
 	 * */
 	@RequestMapping("/loadTopicAndLanguageByCategory")
-	public @ResponseBody ArrayList<HashMap<Integer, String>> getTopicAndLanguageByCategory(@RequestParam(value = "catId") int catId, @RequestParam(value="topicId") int topicId, 
+	public @ResponseBody ArrayList<Map< String,Integer>> getTopicAndLanguageByCategory(@RequestParam(value = "catId") int catId, @RequestParam(value="topicId") int topicId, 
 			@RequestParam(value="languageId") int languageId) {
 		
-		ArrayList<HashMap<Integer, String>> arlist=new ArrayList<>();
+		ArrayList<Map<String, Integer>> arlist=new ArrayList<>();
 
-		HashMap<Integer,String> topics=new HashMap<>();
-		HashMap<Integer, String> languages=new HashMap<>();
+		Map<String,Integer> topics=new TreeMap<>();
+		Map<String,Integer> languages=new TreeMap<>();
 
 		Category cat = catId != 0 ? catService.findByid(catId) : null;
 		Topic topic= topicId != 0 ? topicService.findById(topicId) : null;
@@ -762,8 +777,14 @@ public class AjaxController{
 			
 		for(Tutorial t: tutorials) {
 			Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
-			topics.put(topic2.getTopicId(), topic2.getTopicName());
+			if(topic2.isStatus()) {
+				topics.put( topic2.getTopicName(),topic2.getTopicId());
+			}
+			
 		}
+		
+		//Collections.sort((List<Topic>) topics);
+		//topics=HashMapSorting.sortByValue(topics);
 		arlist.add(topics);
 		
 		if (topic != null) {
@@ -780,9 +801,11 @@ public class AjaxController{
 		//To find Languages
 		for(ContributorAssignedTutorial c : cat_list) {
 			if(!tutService.findAllByContributorAssignedTutorial1(c).isEmpty()) {
-				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
+				languages.put( c.getLan().getLangName(),c.getLan().getLanId());
 			}
 		}
+		//Collections.sort((List<Language>) languages);
+		//languages=HashMapSorting.sortByValue(languages);
 		arlist.add(languages);	
 		
 		
@@ -800,12 +823,12 @@ public class AjaxController{
 	 * */
 	
 	@RequestMapping("/loadCategoryAndLanguageByTopic")
-	public @ResponseBody ArrayList<HashMap<Integer, String>> getCategoryAndLanguageByTopic( @RequestParam(value="topicId") int topicId, @RequestParam(value = "catId") int catId,
+	public @ResponseBody ArrayList<Map< String,Integer>> getCategoryAndLanguageByTopic( @RequestParam(value="topicId") int topicId, @RequestParam(value = "catId") int catId,
 			@RequestParam(value="languageId") int languageId) {
-		ArrayList<HashMap<Integer, String>> arlist=new ArrayList<>();
+		ArrayList<Map<String,Integer>> arlist=new ArrayList<>();
 		
-		HashMap<Integer,String> cats=new HashMap<>();
-		HashMap<Integer, String> languages=new HashMap<>();
+		Map<String,Integer> cats=new TreeMap<>();
+		Map< String,Integer> languages=new TreeMap<>();
 		
 		Category cat = catId != 0 ? catService.findByid(catId) : null;
 		Topic topic= topicId != 0 ? topicService.findById(topicId) : null;
@@ -820,8 +843,14 @@ public class AjaxController{
 		
 		for(Tutorial t: tutorials) {
 			Category cat2 = t.getConAssignedTutorial().getTopicCatId().getCat();
-			cats.put(cat2.getCategoryId(), cat2.getCatName());
+			if(cat2.isStatus()) {
+				cats.put(cat2.getCatName(),cat2.getCategoryId());
+			}
+			
+			
 		}
+		//Collections.sort((List<Category>) cats);
+		//cats=HashMapSorting.sortByValue(cats);
 		arlist.add(cats);
 		
 		if (cat != null) {
@@ -838,9 +867,11 @@ public class AjaxController{
 		//To find Languages
 		for(ContributorAssignedTutorial c : topic_list) {
 			if(!tutService.findAllByContributorAssignedTutorial1(c).isEmpty()) {
-				languages.put(c.getLan().getLanId(), c.getLan().getLangName());
+				languages.put( c.getLan().getLangName(),c.getLan().getLanId());
 			}
 		}
+		//Collections.sort((List<Language>) languages);
+		//languages=HashMapSorting.sortByValue(languages);
 		arlist.add(languages);	
 	
 		return arlist;
@@ -854,12 +885,12 @@ public class AjaxController{
 	 * */
 	
 	@RequestMapping("/loadCategoryAndTopicByLanguage")
-	public @ResponseBody ArrayList<HashMap<Integer, String>> getCategoryAndTopicByLanguage(@RequestParam(value="languageId") int languageId, @RequestParam(value = "catId") int catId,
+	public @ResponseBody ArrayList<Map<String,Integer>> getCategoryAndTopicByLanguage(@RequestParam(value="languageId") int languageId, @RequestParam(value = "catId") int catId,
 			@RequestParam(value="topicId") int topicId) {
 		
-		ArrayList<HashMap<Integer, String>> arlist=new ArrayList<>();
-		HashMap<Integer,String> cats=new HashMap<>();
-		HashMap<Integer, String> topics=new HashMap<>();
+		ArrayList<Map<String,Integer>> arlist=new ArrayList<>();
+		Map<String,Integer> cats=new TreeMap<>();
+		Map<String,Integer> topics=new TreeMap<>();
 		
 		Category cat = catId != 0 ? catService.findByid(catId) : null;
 		Topic topic= topicId != 0 ? topicService.findById(topicId) : null;
@@ -886,21 +917,30 @@ public class AjaxController{
 				
 		for(Tutorial t: tutorials) {
 			Category cat2 = t.getConAssignedTutorial().getTopicCatId().getCat();
-			cats.put(cat2.getCategoryId(), cat2.getCatName());
+			if(cat2.isStatus()) {
+				cats.put(cat2.getCatName(),cat2.getCategoryId());
+			}
+			
 		}
+		//Collections.sort((List<Category>) cats);
+		//cats=HashMapSorting.sortByValue(cats);
 		arlist.add(cats);
 				
 				
 				
-				//To find Topics
-				List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list);
+		//To find Topics
+		List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list);
 					
-				for(Tutorial t: tutorials2) {
-					Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
-					topics.put(topic2.getTopicId(), topic2.getTopicName());
-				}
-				
-				arlist.add(topics);
+		for(Tutorial t: tutorials2) {
+			Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
+			if(topic2.isStatus()) {
+				topics.put( topic2.getTopicName(),topic2.getTopicId());
+			}
+			
+			}
+		//Collections.sort((List<Topic>) topics);
+		//topics=HashMapSorting.sortByValue(topics);
+			arlist.add(topics);
 				
 				
 	

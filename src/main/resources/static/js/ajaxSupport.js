@@ -1722,7 +1722,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Topic</option>';
-						$.each(result , function( key, value ) {
+						$.each(result , function( value ,key) {
 							var selected=(topicid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1734,7 +1734,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Language</option>';
-						$.each(result, function( key, value ) {
+						$.each(result, function( value ,key ) {
 							var selected=(languageid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1768,7 +1768,30 @@ $(document).ready(function() {
 				
 			});
 			
-			
+		/*
+		Funtion to reset search input
+		*/	
+		$(".btnClear").click(function(){
+       		 $("#myForm").trigger("reset");
+       		 $("#query").setVal("");
+       
+        	return false;
+        });
+        	
+        	
+        	
+        
+
+	/*	$(".btnClear").click(function() {
+    		$("#myForm").find("input[type=text], textarea").val("");
+    		
+		});
+		*/
+
+
+      
+   
+    
      	/* 
      		Function to load Category and language by topic
      		author:alok
@@ -1791,7 +1814,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Category</option>';
-						$.each(result , function( key, value ) {
+						$.each(result , function(  value ,key) {
 							var selected=(catgoryid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1803,7 +1826,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Language</option>';
-						$.each(result, function( key, value ) {
+						$.each(result, function(  value,key ) {
 							var selected=(languageid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1864,7 +1887,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Category</option>';
-						$.each(result , function( key, value ) {
+						$.each(result , function( value ,key ) {
 							var selected=(catgoryid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1876,7 +1899,7 @@ $(document).ready(function() {
 						console.log(result);
 						var html = '';
 						html += '<option value="0">Select Topic</option>';
-						$.each(result, function( key, value ) {
+						$.each(result, function( value ,key ) {
 							var selected=(topicid==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
 			  	  			     })
@@ -1908,6 +1931,16 @@ $(document).ready(function() {
 				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
 				return false;
 				
+			});
+			
+			$("#btnClear").click(function(){
+   			 $(".btnClear").click(function(){
+       		 $("#searchForm").trigger("reset");
+    		});
+			});
+			
+			$("#reset2").click(function(){
+ 			 $(":reset").css("background-color", "red");
 			});
 
 		/*	$('#inputTopicName').change(function() {
