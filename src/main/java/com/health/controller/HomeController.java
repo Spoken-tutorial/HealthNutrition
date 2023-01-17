@@ -1008,21 +1008,30 @@ private List<Language> getLanguages() {
 		model.addAttribute("listConsultant", consults);
 		
 		HashMap<Integer, String> map = new HashMap<>();
+		
 		User user = userService.findByEmail("bellatonyp@gmail.com");
 		Set<UserRole> roles = user.getUserRoles();
 		Set<Category> categorys = user.getCategories();
 		for(Consultant c:consults) {
 			String s="";
+			
 			Set<UserRole> userRoles = c.getUser().getUserRoles();
 			for(UserRole ur:userRoles) {
 				if(ur.getRole().getName().equals(CommonData.domainReviewerRole)) {
 					s= s+ ur.getCategory().getCatName()+" , ";
+					
 				}
+				
 			}
+			if(s.length()==0) {
+				continue;
+			}
+			
 			map.put(c.getConsultantId(),s.substring(0, s.length()-2));
 			
+			
 		}
-		map.put(100,"teststring");
+		//map.put(100,"teststring");
 
 		model.addAttribute("map", map);
 		return "Consultants";
@@ -6714,7 +6723,7 @@ private List<Language> getLanguages() {
 
 		model.addAttribute("userInfo", usr);
 
-		List<Category> cat = catService.findAll();
+		/*List<Category> cat = catService.findAll();
 
 		Map<Category, List<TopicCategoryMapping>> dataToSend = new HashMap<Category, List<TopicCategoryMapping>>();
 
@@ -6723,7 +6732,14 @@ private List<Language> getLanguages() {
 			dataToSend.put(temp, tempTopic);
 
 		}
+		
 		model.addAttribute("brochuresData", dataToSend);
+		
+		*/
+		
+		List<Brouchure> brouchures= broService.findAll();
+		
+		model.addAttribute("brouchures", brouchures);
 
 		return "brochures";  // view name
 	}
