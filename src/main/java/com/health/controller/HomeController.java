@@ -3638,6 +3638,123 @@ private List<Language> getLanguages() {
 
 
 	/************************************END**********************************************/
+	
+	
+	
+	/**************************************Edit section of Carousel ************************************************/
+	
+	/*
+	 * Author: Alok Kumar
+	 */
+	
+	@RequestMapping(value = "/carousel/edit/{id}", method = RequestMethod.GET)
+	public String editCarouselGet(@PathVariable int id,Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		
+		Carousel carousel=caroService.findById(id);
+		
+		if(carousel == null) {
+
+			return "redirect:/addEvent";
+		}
+
+		/*if(carousel.getUser().getId() != usr.getId()) {
+
+			return "redirect:/addEvent";
+		}*/
+		model.addAttribute("carousels", carousel);
+
+		return "updateCarousel";
+	}
+	
+	/*
+	 * Author:Alok Kumar 
+	 */
+	
+	@RequestMapping(value = "/updateCarousel", method = RequestMethod.POST)
+	public String updateCaroUselGet(HttpServletRequest req,Model model,Principal principal,
+			@RequestParam("Image") MultipartFile files) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		String carouselId=req.getParameter("carouselId");
+		String eventName = req.getParameter("eventname");
+		String desc = req.getParameter("description");
+		
+		
+
+		
+		Carousel carousel=caroService.findById(Integer.parseInt(carouselId));
+
+		model.addAttribute("carousels", carousel);
+
+		if(carousel==null) {
+			model.addAttribute("error_msg","Event doesn't exist");
+			return "updateCarousel";
+		}
+
+		try {
+			
+
+			if(!files.isEmpty()) {
+				if(!ServiceUtility.checkFileExtensionImage(files)) { // throw error on extension
+					model.addAttribute("error_msg",CommonData.JPG_PNG_EXT);
+					return "updateEvent";
+			}
+			}
+
+
+			
+
+			carousel.setEventName(eventName);
+			carousel.setDescription(desc);
+			
+			if(!files.isEmpty()) {
+				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadCarousel+carousel.getId());
+				int indexToStart=pathtoUploadPoster.indexOf("Media");
+
+				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+
+				carousel.setPosterPath(document);
+
+			}
+
+			caroService.save(carousel);
+
+		}catch (Exception e) {
+			// TODO: handle exception
+			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+			model.addAttribute("carousels", carousel);
+			return "updateEvent";        // need to add some error message
+		}
+
+
+		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
+		model.addAttribute("carousels", carousel);
+
+		return "updateCarousel";
+	}
+	
+	
+	
+	/************************************************END***********************************************************/
+	
 
 	/************************************VIEW SECTION OF LANGAUAGE**********************************************/
 

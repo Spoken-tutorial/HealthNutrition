@@ -11,6 +11,8 @@ import com.health.model.Carousel;
  *
  */
 public interface CarouselService {
+	
+	Carousel findById(int id); 
 
 	/**
 	 * Find the next unique id for brochure object
