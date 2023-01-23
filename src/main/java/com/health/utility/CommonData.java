@@ -193,7 +193,7 @@ public class CommonData {
 
 	public static String TESTIMONIAL_NOT_ERROR= "Testimonial doesn't exist";
 	
-	public static String VIDEO_DURATION_ERROR= "Video durastion must be less than 5 min";
+	public static String VIDEO_DURATION_ERROR= "Video duration must be less than 5 min";
 	
 	public static String ADD_PROFILE_PIC_CONSTRAINT= "Please Add profile pic and user deatils before Requesting Master Trainer Role";
 	

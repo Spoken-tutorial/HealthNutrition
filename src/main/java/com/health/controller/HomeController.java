@@ -86,6 +86,7 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.repository.TutorialRepository;
+import com.health.repository.TopicCategoryMappingRepository;
 
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
@@ -135,6 +136,9 @@ public class HomeController {
 	
 	@Autowired
 	private TutorialRepository tutRepository;
+	
+	@Autowired
+	private TopicCategoryMappingRepository tcmRepository;
 	
 	@Autowired
 	private ContributorAssignedTutorialService conService;
@@ -1310,6 +1314,7 @@ private List<Language> getLanguages() {
 		user.setPhone(phoneLongValue);
 		user.setPassword(SecurityUtility.passwordEncoder().encode(password));
 		user.setDateAdded(ServiceUtility.getCurrentTime());
+		user.setEmailVerificationCode("");
 
 		userService.save(user);
 		model.addAttribute("emailSent", "true");
@@ -2703,6 +2708,7 @@ private List<Language> getLanguages() {
 		userTemp.setUsername(email);
 		userTemp.setDateAdded(ServiceUtility.getCurrentTime());
 		userTemp.setPassword(SecurityUtility.passwordEncoder().encode(CommonData.COMMON_PASSWORD));
+		userTemp.setEmailVerificationCode("");
 
 		userService.save(userTemp);
 
@@ -3638,6 +3644,166 @@ private List<Language> getLanguages() {
 
 
 	/************************************END**********************************************/
+	
+	
+	
+	
+	
+	/***************************************Edit Section of Brochure*******************************************/
+
+	/*
+	 * Author: Alok Kumar
+	 */
+
+	@RequestMapping(value = "/brochure/edit/{id}", method = RequestMethod.GET)
+	public String BrochureGet(@PathVariable int id,Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		//Event event= eventservice.findById(id);
+		Brouchure brouchure=broService.findById(id);
+		
+		
+		if(brouchure == null) {
+
+			return "redirect:/addBrochure";
+		}
+		
+		List<Language> languages=lanService.getAllLanguages();
+		List<Category> categories=catService.findAll();
+		model.addAttribute("categories", categories);
+		model.addAttribute("languages", languages);
+	
+		Language langByBrouchure= brouchure.getLan();
+		TopicCategoryMapping tcm=brouchure.getTopicCatId();
+		Category catBrouchure=tcm.getCat();
+		Topic topicBrouchure=tcm.getTopic();
+		model.addAttribute("catBrouchure", catBrouchure);
+		model.addAttribute("topicBrouchure", topicBrouchure);
+		model.addAttribute("langByBrouchure",langByBrouchure);
+
+		
+		model.addAttribute("brouchures", brouchure);
+
+		return "updateBrochure";
+	}
+
+	
+	/*
+	 * Author: Alok Kumar
+	 * 
+	 */
+	@RequestMapping(value = "/updateBrochure", method = RequestMethod.POST)
+	public String updatBrochureGet(HttpServletRequest req,Model model,Principal principal,
+			@RequestParam("Image") MultipartFile files) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+		
+
+		String brochureId=req.getParameter("brochureId");
+		/*
+		String cat = req.getParameter("categoryName");
+		String topic = req.getParameter("inputTopic");
+		String lang = req.getParameter("languageyName");
+		*/
+		
+
+		Brouchure brouchure= broService.findById(Integer.parseInt(brochureId));
+
+		model.addAttribute("brouchures", brouchure);
+		
+		
+		
+
+
+		if(brouchure==null) {
+			model.addAttribute("error_msg","Event doesn't exist");
+			return "updateBrochure";
+		}
+
+		try {
+			
+
+			if(!files.isEmpty()) {
+				if(!ServiceUtility.checkFileExtensionImage(files)) { // throw error on extension
+					model.addAttribute("error_msg",CommonData.JPG_PNG_EXT);
+					return "updateBrochure";
+			}
+			}
+
+			
+			//Category cat1=catService.findByid(Integer.parseInt(cat));
+			//Topic topic1=topicService.findById(Integer.parseInt(topic));
+			
+			/* if(cat == null) {  // throw error
+				//model.addAttribute("error_msg","Please Try again");
+				//return "updateBrochure";
+			}
+			
+			if(topic == null) {  // throw error
+				//model.addAttribute("error_msg","Please Try again");
+				//return "updateBrochure";
+			}
+			
+			
+			TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat1, topic1);
+			
+			Language lan=lanService.getById(Integer.parseInt(lang));
+			
+			brouchure.setLan(lan);
+			brouchure.setTopicCatId(topicCat);
+			*/
+			
+			
+			
+
+			if(!files.isEmpty()) {
+				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brouchure.getId());
+				int indexToStart=pathtoUploadPoster.indexOf("Media");
+
+				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+
+				brouchure.setPosterPath(document);
+
+			}
+
+			broService.save(brouchure);
+
+		}catch (Exception e) {
+			// TODO: handle exception
+			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+			model.addAttribute("brouchures", brouchure);
+			return "updateBrochure";        // need to add some error message
+		}
+
+
+		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
+		model.addAttribute("brouchures", brouchure);
+
+		return "updateBrochure";
+	}
+
+	
+	
+	
+	
+	/************************************END******************************************************************/
+	
 	
 	
 	
