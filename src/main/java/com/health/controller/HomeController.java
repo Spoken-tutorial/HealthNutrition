@@ -539,7 +539,8 @@ private List<Language> getLanguages() {
 
 		if(!carouselHome.isEmpty()) {
 			model.addAttribute("carousel", carouselHome.get(0));
-			model.addAttribute("carouselList", carouselHome.subList(1, carousel.size()));
+			model.addAttribute("carouselList", carouselHome.subList(1, carouselHome.size()));
+			//model.addAttribute("carouselList", carouselHome.size());
 		}
 
 		return "index";
@@ -936,12 +937,20 @@ private List<Language> getLanguages() {
 			 Category category = catService.findByid(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
 			 List<TopicCategoryMapping> topicCatMapping = topicCatService.findAllByCategory(category);
 			 List<ContributorAssignedTutorial> contriAssignedTut = conRepo.findAllByTopicCat(topicCatMapping);
-			 List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(contriAssignedTut);
+			 List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList1(contriAssignedTut);
 			 
 			 for(Tutorial x: tutorials) {
-				 if(x.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase(tutorial.getConAssignedTutorial().getLan().getLangName())) {
-					 relatedTutorial.add(x);
+				 if(x==tutorial) {
+					 continue;
 				 }
+				 Category cat1 = x.getConAssignedTutorial().getTopicCatId().getCat();
+					if(cat1.isStatus()) {
+						 if(x.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase(tutorial.getConAssignedTutorial().getLan().getLangName())) {
+							 relatedTutorial.add(x);
+						 }
+					}
+				 
+				
 			 }
 			 Collections.sort(relatedTutorial);
 			 
