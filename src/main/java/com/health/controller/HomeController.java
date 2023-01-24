@@ -905,6 +905,10 @@ private List<Language> getLanguages() {
 			@PathVariable (name = "language") String lan,Principal principal,Model model) {
 		
 		Category catName = catService.findBycategoryname(cat);
+		if(!catName.isStatus()) {
+			catName=null;
+		}
+		
 		Topic topicName = topicService.findBytopicName(topic);
 		Language lanName = lanService.getByLanName(lan);
 		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
@@ -944,11 +948,11 @@ private List<Language> getLanguages() {
 					 continue;
 				 }
 				 Category cat1 = x.getConAssignedTutorial().getTopicCatId().getCat();
-					if(cat1.isStatus()) {
+					
 						 if(x.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase(tutorial.getConAssignedTutorial().getLan().getLangName())) {
 							 relatedTutorial.add(x);
 						 }
-					}
+					
 				 
 				
 			 }

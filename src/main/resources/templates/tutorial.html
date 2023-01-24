@@ -101,6 +101,7 @@
 					<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+				
 					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
 						
 							
@@ -135,15 +136,15 @@
 							class="far fa-file-alt mr-2 t-icon"></i> Resources</a></li>
 					
 				</ul>
-				<div class="tab-content px-5 py-3" id="pills-tabContent-tutorial"
+				<div class="tab-content px-0 py-3" id="pills-tabContent-tutorial"
 					style="height: 250px; overflow: auto;">
-					<div class="tab-pane fade show active px-5" id="pills-home" 
+					<div class="tab-pane fade show active px-1" id="pills-home" 
 						role="tabpanel" aria-labelledby="pills-home-tab">
 						<p th:utext="${tutorial.getOutline()}"></p>
 					</div>
 					<div class="tab-pane fade px-5" id="pills-script" role="tabpanel"
 						aria-labelledby="pills-script-tab">
-						<ul class="pl-0">
+						<ul class="pl-10">
 							<li class="mb-3"><i class="fas fa-file-download mr-3"></i> 
 							<a
 								th:if="${tutorial.getScript()}"
@@ -189,6 +190,7 @@
 				<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+				
 					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
 						
 							
