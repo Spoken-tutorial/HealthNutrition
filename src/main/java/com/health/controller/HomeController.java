@@ -956,7 +956,9 @@ private List<Language> getLanguages() {
 				 
 				
 			 }
-			 Collections.sort(relatedTutorial);
+			
+			 Collections.sort(relatedTutorial, Tutorial.UserVisitComp);
+			 //Collections.sort(relatedTutorial);
 			 
 			 model.addAttribute("tutorials", relatedTutorial);
 

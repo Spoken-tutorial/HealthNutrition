@@ -97,17 +97,26 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-4 px-5 d-none d-md-block">
+				<div class="col-md-4 px-4 d-none d-md-block" >
 					<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
-				
+					<video id='storedVideoId' 
+				controls="controls" style="width:70%!important;">
+				<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
+			</video>
+			
+			
 					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
 						
 							
-							<div class="col-md-4">
-							</div>
-							<div class="col-md-8">
+							
+							<!--<div class="col-md-4">
+							</div>  -->
+							
+							
+								<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >
+								
 								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></span></h4>
 								<h6><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span></h6>
 							</div>
@@ -186,17 +195,19 @@
 
 				</div>
 				
-				<div class="px-1 d-md-none">
+				<div class="px-0 d-md-none">
 				<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
-				
+					<video id='storedVideoId' 
+				controls="controls" style="width:60%!important;">
+				<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
+			</video>
 					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
 						
 							
-							<div class="col-md-4">
-							</div>
-							<div class="col-md-8">
+							<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >
+								
 								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></span></h4>
 								<h6><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span></h6>
 							</div>
