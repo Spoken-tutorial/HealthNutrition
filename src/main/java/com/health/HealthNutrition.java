@@ -80,7 +80,6 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 //		role2.setRoleId(3);
 //		role2.setName("TRAINING_ADMIN");
 //		roleService.save(role2);
-//
 //		Role role3=new Role();
 //		role3.setRoleId(4);
 //		role3.setName("DOMAIN_REVIEWER");
@@ -90,12 +89,11 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 //		role4.setRoleId(5);
 //		role4.setName("QUALITY_REVIEWER");
 //		roleService.save(role4);
-//
+//    
 //		Role role5=new Role();
 //		role5.setRoleId(6);
 //		role5.setName("ADMIN_REVIEWER");
 //		roleService.save(role5);
-//
 //		Role role6=new Role();
 //		role6.setRoleId(7);
 //		role6.setName("MASTER_TRAINER");

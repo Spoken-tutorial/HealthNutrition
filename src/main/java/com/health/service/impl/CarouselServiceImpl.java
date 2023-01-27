@@ -1,11 +1,13 @@
 package com.health.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.health.model.Carousel;
+import com.health.model.Event;
 import com.health.repository.CarouselRepository;
 import com.health.service.CarouselService;
 
@@ -69,6 +71,18 @@ public class CarouselServiceImpl implements CarouselService{
 	public void delete(Carousel temp) {
 		// TODO Auto-generated method stub
 		repo.delete(temp);
+	}
+	
+	@Override
+	public Carousel findById(int id) {
+		try {
+			Optional<Carousel> local=repo.findById(id);
+			return local.get();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

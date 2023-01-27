@@ -124,7 +124,8 @@ font-weight:bold!important;
       <th scope="col">Topic Name</th>
       <th scope="col">Language</th>
       <th scope="col">Brochure</th>
-      <th scope="col">Enable/Disable</th>
+      <th scope="col">Enable / Disable</th>
+       <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
@@ -147,6 +148,7 @@ font-weight:bold!important;
 	   		
 	  
 	  </td>
+	   <td><a th:href="@{${'/brochure/edit/' + bro.getId()}}">Edit</a></td>
     </tr>
    
   </tbody>

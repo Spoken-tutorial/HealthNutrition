@@ -101,6 +101,7 @@ font-weight:bold!important;
 									<th scope="col">Event Name</th>
 									<th scope="col">Short Description</th>
 									<th scope="col">Poster</th>
+									 <th scope="col">Action</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -111,6 +112,7 @@ font-weight:bold!important;
 							      <td><img id="imagesource" th:src="@{/files/}+@{${cara.getPosterPath()}}"
 										style="width: 150px; height: 100px" />
 								  </td>
+								   <td><a th:href="@{${'/carousel/edit/' + cara.getId()}}">Edit</a></td>
 								
 							    </tr>
 
