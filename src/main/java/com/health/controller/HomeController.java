@@ -694,6 +694,7 @@ private List<Language> getLanguages() {
 		Page<Tutorial> tut = null;
 		List<Tutorial> tutToView = new ArrayList<Tutorial>();
 		List<Tutorial> tutToView1= new ArrayList<Tutorial>();
+		
 
 		User usr=new User();
 		if(principal!=null) {
@@ -708,6 +709,10 @@ private List<Language> getLanguages() {
 
 		if(query != null) {
 			tut = tutService.SearchOutlineByCombinationOfWords(query, pageable);
+			
+			if(tut.isEmpty()) {
+				return "redirect:/";
+			}
 			
 		}else {
 			tut = tutService.findAllPagination(pageable);
@@ -729,7 +734,8 @@ private List<Language> getLanguages() {
 			System.out.println(temp.getTutorialId() +"***********");
 		}
 		
-		Collections.sort(tutToView1);  
+		Collections.sort(tutToView1); 
+		
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
 		model.addAttribute("totalPages",tut.getTotalPages());
@@ -968,9 +974,10 @@ private List<Language> getLanguages() {
 
 				List<Tutorial> tutorialse = tutService.findAllBystatus(true);
 				for(Tutorial temp :tutorialse) {
-					catTemp.add(temp.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-					lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
-					topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+					ContributorAssignedTutorial conAssignedTutorial = temp.getConAssignedTutorial();
+					catTemp.add(conAssignedTutorial.getTopicCatId().getCat().getCatName());
+					lanTemp.add(conAssignedTutorial.getLan().getLangName());
+					topicTemp.add(conAssignedTutorial.getTopicCatId().getTopic().getTopicName());
 				}
 				
 //				List<String> catTempSorted =new ArrayList<String>(catTemp);

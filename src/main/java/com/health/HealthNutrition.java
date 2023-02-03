@@ -1,29 +1,26 @@
 package com.health;
 
 import java.io.File;
-import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.env.Environment;
 
-import com.health.domain.security.Role;
-import com.health.domain.security.UserRole;
-import com.health.model.OrganizationRole;
-import com.health.model.User;
 import com.health.service.OrganizationRoleService;
 import com.health.service.RoleService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.utility.CommonData;
-import com.health.utility.SecurityUtility;
-import com.health.utility.ServiceUtility;
 
 
 @SpringBootApplication
+@EnableCaching
 public class HealthNutrition extends org.springframework.boot.web.servlet.support.SpringBootServletInitializer implements CommandLineRunner {
 
 	@Autowired

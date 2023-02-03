@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.io.Serializable;
 
 import com.health.domain.security.UserRole;
 
@@ -22,7 +23,7 @@ import com.health.domain.security.UserRole;
  * @version 1.0
  */
 @Entity
-public class Language implements Comparable<Language>{
+public class Language implements Comparable<Language>, Serializable{
 
 	/**
 	 * unique id of object

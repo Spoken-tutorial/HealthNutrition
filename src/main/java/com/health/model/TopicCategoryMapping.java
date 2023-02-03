@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "topic_category")
-public class TopicCategoryMapping {
+public class TopicCategoryMapping implements  Serializable {
 
 	/**
 	 * unique id of object

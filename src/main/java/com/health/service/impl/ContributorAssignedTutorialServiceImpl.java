@@ -5,12 +5,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.health.domain.security.UserRole;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Language;
 import com.health.model.TopicCategoryMapping;
-import com.health.model.User;
+
 import com.health.repository.ContributorAssignedTutorialRepository;
 import com.health.service.ContributorAssignedTutorialService;
 
@@ -133,6 +132,7 @@ public class ContributorAssignedTutorialServiceImpl implements ContributorAssign
 	 * @see com.health.service.ContributorAssignedTutorialService#findById(int)
 	 */
 	@Override
+	
 	public ContributorAssignedTutorial findById(int id) {
 		// TODO Auto-generated method stub
 		return conRepo.findById(id).get();

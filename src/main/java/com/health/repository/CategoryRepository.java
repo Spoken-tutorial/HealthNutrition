@@ -2,12 +2,13 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.Category;
+import java.util.Optional;
 
 /**
  * This Interface Extend CrudRepository to handle all database operation related to Category object
@@ -21,6 +22,7 @@ public interface CategoryRepository extends JpaRepository<Category,Integer>{
 	 * Find the next unique id for the object
 	 * @return primitive integer value
 	 */
+	//@Cacheable(cacheNames = "categories")
 	@Query("select max(categoryId) from Category")
 	int getNewId();
 	
@@ -29,9 +31,18 @@ public interface CategoryRepository extends JpaRepository<Category,Integer>{
 	 * @param catname string object
 	 * @return category object
 	 */
+	@CacheEvict(cacheNames = "categories", key = "#id")
+	void deleteById(int id);
+	
+	@Cacheable(cacheNames = "categories", key="#catname")
 	Category findBycatName(String catname);
+	
+	@Cacheable(cacheNames = "categories", key="#id")
+	Optional<Category> findById(int id);
 	
 	@Query(value="select category from Category category order by category.catName")
 	List<Category> findAllByOrderBy();
+	
+	
 
 }

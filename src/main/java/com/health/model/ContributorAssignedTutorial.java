@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +22,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="contributor_Role")
-public class ContributorAssignedTutorial {
+public class ContributorAssignedTutorial implements  Serializable {
 	
 	/**
 	 * unique id of object

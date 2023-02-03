@@ -1,7 +1,9 @@
 package com.health.repository;
 
-import java.util.ArrayList;
+import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,6 +21,7 @@ public interface LangaugeRepository extends JpaRepository<Language,Integer> {
 	 * Find the next unique id for the object
 	 * @return primitive integer value
 	 */
+	//@Cacheable(cacheNames = "languages")
 	@Query("select max(lanId) from Language")
 	int getNewId();
 	
@@ -27,6 +30,15 @@ public interface LangaugeRepository extends JpaRepository<Language,Integer> {
 	 * @param langName String value
 	 * @return Langauge object
 	 */
+	
+	@Cacheable(cacheNames = "languages", key="#langName")
 	Language findBylangName(String langName);
-
+	
+	@CacheEvict(cacheNames = "languages", key = "#lanId")
+	void deleteById(int lanId);
+	
+	@Cacheable(cacheNames = "languages", key="#lanId")
+	Optional<Language> findById( int lanId);
+	
+	
 }

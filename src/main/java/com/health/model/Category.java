@@ -1,15 +1,14 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
-
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -25,7 +24,7 @@ import com.health.domain.security.UserRole;
  */
 @Entity
 @Table(name = "category")
-public class Category implements Comparable<Category>{
+public class Category implements Comparable<Category>,  Serializable{
 
 	/**
 	 * unique id to identify object

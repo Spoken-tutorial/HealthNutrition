@@ -1,18 +1,13 @@
 package com.health.service.impl;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
-
-import com.health.model.Category;
 import com.health.model.Language;
-import com.health.model.User;
 import com.health.repository.LangaugeRepository;
 import com.health.service.LanguageService;
 
@@ -25,6 +20,8 @@ import com.health.service.LanguageService;
 public class LanguageServiceImp implements LanguageService
 {
 
+	private static final Logger logger = LoggerFactory.getLogger(LanguageServiceImp.class);
+	
 	@Autowired
 	private LangaugeRepository languageRepo;
 
@@ -75,11 +72,12 @@ public class LanguageServiceImp implements LanguageService
 	 * @see com.health.service.LanguageService#getById(int)
 	 */
 	@Override
+	
 	public Language getById(int lanId) {
 		// TODO Auto-generated method stub
 		try {
 			Optional<Language> local=languageRepo.findById(lanId);
-			
+			logger.info("Fetching Language from db by id {}", lanId);
 			return local.get();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -92,6 +90,7 @@ public class LanguageServiceImp implements LanguageService
 	 * @see com.health.service.LanguageService#save(Language)
 	 */
 	@Override
+	@CachePut(cacheNames = "languages", key="#lan.lanId")
 	public void save(Language lan) {
 		// TODO Auto-generated method stub
 		languageRepo.save(lan);

@@ -16,6 +16,7 @@ import java.util.Set;
 	  javax.persistence.OneToMany;
 	import javax.persistence.OneToOne;
 	import javax.persistence.Table;
+	import java.io.Serializable;
 
 	/**
 	 * This modal add topic object into database  
@@ -25,7 +26,7 @@ import java.util.Set;
 	 */
 @Entity
 @Table(name="topic")
-public class Topic implements Comparable<Topic>{
+public class Topic implements Comparable<Topic>, Serializable{
 	
 	/**
 	 * unique id

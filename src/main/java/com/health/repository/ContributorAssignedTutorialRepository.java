@@ -60,4 +60,3 @@ public interface ContributorAssignedTutorialRepository extends CrudRepository<Co
 	@Query("from ContributorAssignedTutorial where topicCatId IN (:TopicCat)")
 	List<ContributorAssignedTutorial> findByTopicCat(@Param("TopicCat")List<TopicCategoryMapping> topCat);
 }
-

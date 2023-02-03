@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +24,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "tutorial_resource")
-public class Tutorial implements Comparable<Tutorial>{
+public class Tutorial implements Comparable<Tutorial>, Serializable {
 
 	/**
 	 * unique id of object
