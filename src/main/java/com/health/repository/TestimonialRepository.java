@@ -2,12 +2,14 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.health.domain.security.Role;
 import com.health.domain.security.UserRole;
+import com.health.model.Event;
 import com.health.model.Testimonial;
 
 /**
@@ -30,6 +32,10 @@ public interface TestimonialRepository extends CrudRepository<Testimonial, Integ
 	 * @param value boolean value
 	 * @return list of Testimonial object
 	 */
+	//@Cacheable(cacheNames ="testimonials", key="#value")
 	List<Testimonial> findByapproved(boolean value);
+	
+	//@Cacheable(cacheNames ="testimonials")
+	List<Testimonial> findAll();
 
 }

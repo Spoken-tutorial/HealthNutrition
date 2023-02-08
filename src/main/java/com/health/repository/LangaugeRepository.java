@@ -31,13 +31,13 @@ public interface LangaugeRepository extends JpaRepository<Language,Integer> {
 	 * @return Langauge object
 	 */
 	
-	@Cacheable(cacheNames = "languages", key="#langName")
+	//@Cacheable(cacheNames = "languages", key="#langName")
 	Language findBylangName(String langName);
 	
-	@CacheEvict(cacheNames = "languages", key = "#lanId")
+	//@CacheEvict(cacheNames = "languages", key = "#lanId")
 	void deleteById(int lanId);
 	
-	@Cacheable(cacheNames = "languages", key="#lanId")
+	//@Cacheable(cacheNames = "languages", key="#lanId")
 	Optional<Language> findById( int lanId);
 	
 	

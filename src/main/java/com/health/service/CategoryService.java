@@ -62,6 +62,10 @@ public interface CategoryService {
 	Category save(Category cat);
 
 	List<Category> findAllByOrder();
+	
+	List<Category> findAllCategoryByOrderForCache();
+	
+	List<Category> getCategoriesForCache();
 
 	    
 }

@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +21,7 @@ import javax.persistence.OneToMany;
  *
  */
 @Entity
-public class TrainingInformation{
+public class TrainingInformation implements  Serializable{
 
 	/**
 	 * unique id of object

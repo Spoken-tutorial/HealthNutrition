@@ -1,15 +1,22 @@
 package com.health.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.health.model.Category;
+import com.health.model.Tutorial;
 import com.health.repository.CategoryRepository;
+import com.health.repository.TutorialRepository;
 import com.health.service.CategoryService;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -24,6 +31,9 @@ public class CatgoryServiceImpl implements CategoryService {
 
 	@Autowired 
 	private CategoryRepository  categoryRepo;
+	
+	@Autowired 
+	private TutorialRepository  tutRepo;
 	
 	/**
 	 * @see com.health.service.CategoryService#findAll()
@@ -124,7 +134,7 @@ public class CatgoryServiceImpl implements CategoryService {
 	 * @see com.health.service.CategoryService#save(Category)
 	 */
 	@Override
-	@CachePut(cacheNames = "categories", key = "#cat.id")
+	//@CachePut(cacheNames = "categories", key = "#cat.id")
 	public Category save(Category cat) {
 		// TODO Auto-generated method stub
 		categoryRepo.save(cat);
@@ -136,6 +146,36 @@ public class CatgoryServiceImpl implements CategoryService {
 		// TODO Auto-generated method stub
 		return categoryRepo.findAllByOrderBy();
 		
+	}
+	
+	@Override
+	//@Cacheable(cacheNames ="categories" )
+	public List<Category> findAllCategoryByOrderForCache(){
+		System.out.println("CategoryByOrderCheck");
+		
+		return categoryRepo.findAllByOrderBy();
+	}
+	
+	@Override
+	@Cacheable(cacheNames ="categories" )
+	public List<Category> getCategoriesForCache() {
+		System.out.println("Category_check");
+		List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
+		///List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
+		Set<Category> catTemp = new HashSet<Category>();
+		for(Tutorial temp :tutorials) {
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				catTemp.add(c);
+			}
+			
+		}
+		
+		List<Category> catTempSorted =new ArrayList<Category>(catTemp);
+		Collections.sort(catTempSorted);
+		System.out.println("Category_check_end");
+		return catTempSorted;
 	}
 
 	

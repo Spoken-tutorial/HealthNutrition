@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.Brouchure;
 import com.health.model.TopicCategoryMapping;
+import org.springframework.cache.annotation.Cacheable;
 
 /**
  * This Interface Extend CrudRepository to handle all database operation related to Brochure object
@@ -37,4 +38,7 @@ public interface BrouchureRepository extends CrudRepository<Brouchure, Integer> 
 	 */
 	@Query("from Brouchure where topicCatId = ?1")
 	List<Brouchure> findByTopicCat(TopicCategoryMapping topicCat);
+	
+	//@Cacheable(cacheNames ="brouchures" )
+	List<Brouchure> findAll();
 }

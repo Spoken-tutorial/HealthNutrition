@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import javax.persistence.OneToMany;
  * @version 1.0
  */
 @Entity
-public class City implements Comparable<City>{
+public class City implements Comparable<City>, Serializable{
 
 	/**
 	 * unique id of object

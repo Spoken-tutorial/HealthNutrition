@@ -58,6 +58,8 @@ public interface ConsultantService {
 	 * @return list of Consultant object
 	 */
 	List<Consultant> findByOnHome(boolean value);
+	 
+	List<Consultant>findAllConsultHomeTrueForCache();
 	
 
 }

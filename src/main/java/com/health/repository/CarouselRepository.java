@@ -2,9 +2,11 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import com.health.model.Brouchure;
 import com.health.model.Carousel;
 
 /**
@@ -28,4 +30,7 @@ public interface CarouselRepository extends CrudRepository<Carousel, Integer> {
 	 * @return List of Carousel object
 	 */
 	List<Carousel> findAllByshowOnHomepage(boolean value);
+	
+	//@Cacheable(cacheNames ="carousels")
+	List<Carousel> findAll();
 }

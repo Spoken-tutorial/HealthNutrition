@@ -1,14 +1,23 @@
 package com.health.service.impl;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import com.health.model.Category;
 import com.health.model.Language;
+import com.health.model.Tutorial;
 import com.health.repository.LangaugeRepository;
+import com.health.repository.TutorialRepository;
 import com.health.service.LanguageService;
 
 /**
@@ -24,6 +33,9 @@ public class LanguageServiceImp implements LanguageService
 	
 	@Autowired
 	private LangaugeRepository languageRepo;
+	
+	@Autowired 
+	private TutorialRepository  tutRepo;
 
 	/**
 	 * @see com.health.service.LanguageService#getAllLanguages()
@@ -97,6 +109,27 @@ public class LanguageServiceImp implements LanguageService
 		
 	}
 	
+	@Override
+	@Cacheable(cacheNames ="languages" )
+	public List<Language> getLanguagesForCache() {
+		System.out.println("Language_check");
+		List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
+		//List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
+		
+		Set<Language> langTemp = new HashSet<Language>();
+		for(Tutorial temp :tutorials) {
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				langTemp.add(temp.getConAssignedTutorial().getLan());
+			}
+			
+		}
+		List<Language> lanTempSorted =new ArrayList<Language>(langTemp);
+		Collections.sort(lanTempSorted);
+		System.out.println("Language_check_end");
+		
+		return lanTempSorted;
+	}
 	
 	
 	

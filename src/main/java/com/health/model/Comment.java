@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.CascadeType;
@@ -20,7 +21,7 @@ import org.hibernate.annotations.ManyToAny;
  * @version 1.0
  */
 @Entity
-public class Comment{
+public class Comment implements  Serializable{
 	
 	/**
 	 * unique id of object

@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -17,7 +18,7 @@ import javax.persistence.ManyToOne;
  * @version 1.0
  */
 @Entity
-public class Consultant{
+public class Consultant implements  Serializable{
 	
 	/**
 	 * unique id of object

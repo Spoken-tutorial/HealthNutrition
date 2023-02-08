@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -21,7 +22,7 @@ import javax.persistence.OneToMany;
  *
  */
 @Entity
-public class Event {
+public class Event implements  Serializable {
 
 	/**
 	 * unique id of object

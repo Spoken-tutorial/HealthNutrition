@@ -31,17 +31,21 @@ public interface CategoryRepository extends JpaRepository<Category,Integer>{
 	 * @param catname string object
 	 * @return category object
 	 */
-	@CacheEvict(cacheNames = "categories", key = "#id")
+	//@CacheEvict(cacheNames = "categories", key = "#id")
 	void deleteById(int id);
 	
-	@Cacheable(cacheNames = "categories", key="#catname")
+	//@Cacheable(cacheNames = "categories", key="#catname")
 	Category findBycatName(String catname);
 	
-	@Cacheable(cacheNames = "categories", key="#id")
+	//@Cacheable(cacheNames = "categories", key="#id")
 	Optional<Category> findById(int id);
 	
 	@Query(value="select category from Category category order by category.catName")
+	//@Cacheable(cacheNames = "categories")
 	List<Category> findAllByOrderBy();
+	
+	//@Cacheable(cacheNames = "categories")
+	//List<Category> findAll();
 	
 	
 

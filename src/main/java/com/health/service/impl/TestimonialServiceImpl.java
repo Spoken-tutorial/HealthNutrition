@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.health.model.Testimonial;
@@ -30,7 +31,8 @@ public class TestimonialServiceImpl implements  TestimonialService {
 	@Override
 	public List<Testimonial> findAll() {
 		// TODO Auto-generated method stub
-		List<Testimonial> test=(List<Testimonial>) testRepo.findAll();
+		//List<Testimonial> test=(List<Testimonial>) testRepo.findAll();
+		List<Testimonial> test=testRepo.findAll();
 		return test;
 	}
 
@@ -94,5 +96,11 @@ public class TestimonialServiceImpl implements  TestimonialService {
 		return testRepo.findByapproved(value);
 	}
 	
+	@Override
+	@Cacheable(cacheNames ="testimonials" )
+	public List<Testimonial> findAllTestimonialByapprovedForCache(){
+		System.out.println("TestimonialCheck");
+		return testRepo.findByapproved(true);
+	}
 	
 }

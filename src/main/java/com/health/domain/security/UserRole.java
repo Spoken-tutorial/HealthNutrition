@@ -1,5 +1,6 @@
 package com.health.domain.security;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.CascadeType;
@@ -24,7 +25,7 @@ import com.health.model.User;
  */
 @Entity
 @Table(name="user_role")
-public class UserRole implements Comparable<UserRole>
+public class UserRole implements Comparable <UserRole>, Serializable 
 {	
 	/**
 	 * unique id of object

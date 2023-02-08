@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import org.springframework.cache.annotation.Cacheable;
 
 import org.apache.logging.log4j.util.PropertySource.Comparator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -757,6 +758,7 @@ public class AjaxController{
 	 * Author: Alok Kumar
 	 * */
 	@RequestMapping("/loadTopicAndLanguageByCategory")
+	@Cacheable(cacheNames ="categories", key="{#root.methodName, #catId, #topicId, #languageId }" )
 	public @ResponseBody ArrayList<Map< String,Integer>> getTopicAndLanguageByCategory(@RequestParam(value = "catId") int catId, @RequestParam(value="topicId") int topicId, 
 			@RequestParam(value="languageId") int languageId) {
 		
@@ -776,10 +778,17 @@ public class AjaxController{
 		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
 			
 		for(Tutorial t: tutorials) {
+			
+			Category c = t.getConAssignedTutorial().getTopicCatId().getCat();
 			Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
-			if(topic2.isStatus()) {
-				topics.put( topic2.getTopicName(),topic2.getTopicId());
+			if(c.isStatus()) {
+				if(topic2.isStatus()) {
+					topics.put( topic2.getTopicName(),topic2.getTopicId());
+				}
 			}
+			
+			
+			
 			
 		}
 		
@@ -823,6 +832,7 @@ public class AjaxController{
 	 * */
 	
 	@RequestMapping("/loadCategoryAndLanguageByTopic")
+	@Cacheable(cacheNames ="topics", key="{#root.methodName, #topicId, #catId, #languageId }" )
 	public @ResponseBody ArrayList<Map< String,Integer>> getCategoryAndLanguageByTopic( @RequestParam(value="topicId") int topicId, @RequestParam(value = "catId") int catId,
 			@RequestParam(value="languageId") int languageId) {
 		ArrayList<Map<String,Integer>> arlist=new ArrayList<>();
@@ -885,6 +895,7 @@ public class AjaxController{
 	 * */
 	
 	@RequestMapping("/loadCategoryAndTopicByLanguage")
+	@Cacheable(cacheNames ="languages", key="{#root.methodName, #languageId, #catId, #topicId }" )
 	public @ResponseBody ArrayList<Map<String,Integer>> getCategoryAndTopicByLanguage(@RequestParam(value="languageId") int languageId, @RequestParam(value = "catId") int catId,
 			@RequestParam(value="topicId") int topicId) {
 		
@@ -2245,7 +2256,7 @@ public class AjaxController{
 
 		Category cat = catService.findBycategoryname(id);
 		int total = 0;
-		List<Tutorial> tutorials = tutService.findAllBystatus(true);
+		List<Tutorial> tutorials = tutService.findAllByStatus(true);
 		
 		for(Tutorial temp :tutorials) {
 			if(temp.getConAssignedTutorial().getTopicCatId().getCat().getCatName().equalsIgnoreCase(cat.getCatName())) {
@@ -2261,7 +2272,7 @@ public class AjaxController{
 
 		Language lan = lanService.getByLanName(id);
 		int total = 0;
-		List<Tutorial> tutorials = tutService.findAllBystatus(true);
+		List<Tutorial> tutorials = tutService.findAllByStatus(true);
 		
 		for(Tutorial temp :tutorials) {
 			if(temp.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase(lan.getLangName())) {

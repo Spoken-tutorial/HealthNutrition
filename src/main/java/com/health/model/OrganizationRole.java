@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -13,7 +14,7 @@ import javax.persistence.Id;
  *
  */
 @Entity
-public class OrganizationRole implements Comparable<OrganizationRole> {
+public class OrganizationRole implements Comparable<OrganizationRole>,  Serializable {
 
 	/**
 	 * unique id of object

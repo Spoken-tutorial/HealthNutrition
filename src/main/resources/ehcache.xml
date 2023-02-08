@@ -6,10 +6,13 @@
          updateCheck="true"
          monitoring="autodetect"
          dynamicConfig="true"
-         diskPersistent="true">
+          diskPersistent="true"
+         >
 
 <!--    <diskStore path="java.io.tmpdir" />-->
     <diskStore path="user.dir" />
+    
+ 
 
     <cache name="categories"
            maxEntriesLocalHeap="5"
@@ -20,7 +23,7 @@
            timeToLiveSeconds="6000"
            memoryStoreEvictionPolicy="LFU"
            transactionalMode="off"
-
+		
            >
         <persistence strategy="localTempSwap" />
 <!--        <persistence strategy="LOCALRESTARTABLE" />-->
@@ -55,7 +58,97 @@
     </cache>
     
 
- 
+ 	 <cache name="tutorials"
+           maxEntriesLocalHeap="5"
+           maxEntriesLocalDisk="10"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+           timeToIdleSeconds="3000"
+           timeToLiveSeconds="6000"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+
+           >
+        <persistence strategy="localTempSwap" />
+<!--        <persistence strategy="LOCALRESTARTABLE" />-->
+    </cache>
+    
+    <cache name="brouchures"
+           maxEntriesLocalHeap="5"
+           maxEntriesLocalDisk="10"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+           timeToIdleSeconds="3000"
+           timeToLiveSeconds="6000"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+
+           >
+        <persistence strategy="localTempSwap" />
+<!--        <persistence strategy="LOCALRESTARTABLE" />-->
+    </cache>
+    
+    <cache name="carousels"
+           maxEntriesLocalHeap="5"
+           maxEntriesLocalDisk="10"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+           timeToIdleSeconds="3000"
+           timeToLiveSeconds="6000"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+
+           >
+        <persistence strategy="localTempSwap" />
+<!--        <persistence strategy="LOCALRESTARTABLE" />-->
+    </cache>
+    
+      <cache name="events"
+           maxEntriesLocalHeap="5"
+           maxEntriesLocalDisk="10"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+           timeToIdleSeconds="3000"
+           timeToLiveSeconds="6000"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+
+           >
+        <persistence strategy="localTempSwap" />
+<!--        <persistence strategy="LOCALRESTARTABLE" />-->
+    </cache>
+    
+      <cache name="testimonials"
+           maxEntriesLocalHeap="5"
+           maxEntriesLocalDisk="10"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+           timeToIdleSeconds="3000"
+           timeToLiveSeconds="6000"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+        
+
+           >
+        <persistence strategy="localTempSwap" />
+<!--        <persistence strategy="LOCALRESTARTABLE" />-->
+    </cache>
+    
+         <cache name="consultants"
+           maxEntriesLocalHeap="5"
+           maxEntriesLocalDisk="10"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+           timeToIdleSeconds="3000"
+           timeToLiveSeconds="6000"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+         
+
+           >
+        <persistence strategy="localTempSwap" />
+<!--        <persistence strategy="LOCALRESTARTABLE" />-->
+    </cache>
     
 
 

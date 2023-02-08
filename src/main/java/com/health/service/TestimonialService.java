@@ -49,4 +49,6 @@ public interface TestimonialService {
 	 */
 	List<Testimonial> findByApproved(boolean value);
 	
+	 List<Testimonial> findAllTestimonialByapprovedForCache();
+	
 }

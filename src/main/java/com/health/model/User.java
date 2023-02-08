@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -29,7 +30,7 @@ import com.health.domain.security.UserRole;
  *
  */
 @Entity
-public class User implements UserDetails{
+public class User implements UserDetails,  Serializable {
 
 	/**
 	 * unique id

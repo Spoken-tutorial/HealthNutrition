@@ -1,5 +1,7 @@
 package com.health.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -13,7 +15,7 @@ import javax.persistence.ManyToOne;
  *
  */
 @Entity
-public class TrainingTopic {
+public class TrainingTopic implements  Serializable {
 
 	/**
 	 * unique id of object

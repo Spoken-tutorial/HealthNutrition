@@ -44,5 +44,7 @@ public interface LanguageService {
 	 * @param lan Language object
 	 */
 	void save(Language lan);
+	
+	List<Language> getLanguagesForCache();
 
 }

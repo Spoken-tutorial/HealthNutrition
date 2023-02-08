@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.health.model.Carousel;
@@ -84,5 +85,11 @@ public class CarouselServiceImpl implements CarouselService{
 			return null;
 		}
 	}
-
+	
+	@Override
+	@Cacheable(cacheNames ="carousels" )
+	public List<Carousel> findCarouselForCache() {
+		System.out.println("CarouselCheck");
+		return repo.findAll();
+	}
 }

@@ -2,6 +2,7 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -36,6 +37,10 @@ public interface EventRepository extends  CrudRepository<Event, Integer> {
 	 * @return List of Event object
 	 */
 	@Query("from Event e order by e.startDate desc")  // fetching list of event
+	//@Cacheable(cacheNames ="events" )
 	List<Event> getAllEvent();
+	
+	//@Cacheable(cacheNames ="events" )
+	List<Event> findAll();
 
 }

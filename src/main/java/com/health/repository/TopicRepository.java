@@ -32,13 +32,13 @@ public interface TopicRepository extends CrudRepository<Topic , Integer>{
 	 * @param topicName String object
 	 * @return Topic object
 	 */
-	@Cacheable(cacheNames = "topics", key="#topicName")
+	//@Cacheable(cacheNames = "topics", key="#topicName")
 	Topic findBytopicName(String topicName);
 	
-	@CacheEvict(cacheNames = "topics", key = "#id")
+	//@CacheEvict(cacheNames = "topics", key = "#id")
 	void deleteById(int id);
 	
-	@Cacheable(cacheNames = "topics", key="#id")
+	//@Cacheable(cacheNames = "topics", key="#id")
 	Optional<Topic> findById(int id);
 	
 	
