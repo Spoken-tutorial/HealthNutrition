@@ -8,7 +8,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.health.model.Category;
 import com.health.model.Topic;
 
 /**
@@ -35,8 +34,11 @@ public interface TopicRepository extends CrudRepository<Topic , Integer>{
 	//@Cacheable(cacheNames = "topics", key="#topicName")
 	Topic findBytopicName(String topicName);
 	
-	//@CacheEvict(cacheNames = "topics", key = "#id")
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
 	void deleteById(int id);
+	
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	<S extends Topic> S save(S entity);
 	
 	//@Cacheable(cacheNames = "topics", key="#id")
 	Optional<Topic> findById(int id);

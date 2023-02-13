@@ -2,12 +2,13 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.health.model.Brouchure;
 import com.health.model.Carousel;
+
 
 /**
  * This Interface Extend CrudRepository to handle all database operation related to Carousel object
@@ -23,6 +24,12 @@ public interface CarouselRepository extends CrudRepository<Carousel, Integer> {
 	 */
 	@Query("select max(id) from Carousel")
 	int getNewId();
+	
+	@CacheEvict(cacheNames = "carousels", allEntries=true)
+	void deleteById(int id);
+	
+	@CacheEvict(cacheNames = "carousels", allEntries=true)
+	<S extends Carousel> S save(S entity);
 	
 	/**
 	 * Find all the Carousel based on given showOnHomePage field 

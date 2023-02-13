@@ -49,6 +49,7 @@ public class TutorialServiceImpl implements TutorialService {
 			
 			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
 			if(c.isStatus()) {
+				
 				finalTutorials.add(temp);
 			}
 		}

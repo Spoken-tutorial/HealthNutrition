@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.health.model.Language;
+import com.health.model.Topic;
 
 /**
  * This Interface Extend JpaRepository to handle all database operation related to Language object
@@ -34,8 +35,11 @@ public interface LangaugeRepository extends JpaRepository<Language,Integer> {
 	//@Cacheable(cacheNames = "languages", key="#langName")
 	Language findBylangName(String langName);
 	
-	//@CacheEvict(cacheNames = "languages", key = "#lanId")
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
 	void deleteById(int lanId);
+	
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	<S extends Language> S save(S entity);
 	
 	//@Cacheable(cacheNames = "languages", key="#lanId")
 	Optional<Language> findById( int lanId);

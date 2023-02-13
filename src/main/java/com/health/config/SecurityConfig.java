@@ -133,6 +133,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/tutorialStatus/**",
 			"/users/**",
 			"/unpublishTopic/**",
+			"/clearAllCaches/**",
 //			"/unpublishTutorial/**"
 			
 

@@ -48,27 +48,27 @@ public class TopicCategoryMapping implements  Serializable {
 	/**
 	 * category 
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category cat;
 	
 	/**
 	 * topic
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "topic_id")
 	private Topic topic;
 	
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<Question> questions=new HashSet<Question>();
 	
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<ContributorAssignedTutorial> conAssignedTutorial=new HashSet<ContributorAssignedTutorial>();
 		
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch= FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<TrainingTopic> trainingTopic=new HashSet<TrainingTopic>();
 	
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch= FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<Brouchure> brochures=new HashSet<Brouchure>();
 	
 

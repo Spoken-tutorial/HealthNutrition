@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.cache.annotation.Cacheable;
 
+import org.springframework.cache.CacheManager;
+
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -238,6 +240,9 @@ public class HomeController {
 	private OrganizationRoleService organizationRoleService;
 	
 	@Autowired
+	private CacheManager cacheManager;
+	
+	@Autowired
 	private LogMangementService logMangementService;
 	
 	@Value("${scriptmanager_url}")
@@ -445,6 +450,7 @@ private void getModelData(Model model) {
 	model.addAttribute("categories", catTempSorted);
 	model.addAttribute("languages", lanTempSorted);
 	model.addAttribute("topics", topicTemp);
+	model.addAttribute("languageCount",lanTempSorted.size());
 }
 	
 
@@ -465,12 +471,10 @@ private void getModelData(Model model) {
 		List<Carousel> carouselHome = new ArrayList<>();
 		
 		List<Category> catTempSorted = catService.getCategoriesForCache(); // getCategories(); 
-		List<Language> lanTempSorted = lanService.getLanguagesForCache();//getLanguages(); 
-		List<Topic> topicTempSorted = topicService.getTopicsForcache(); //getTopics();
+	
+		
 
-		model.addAttribute("categories", catTempSorted);
-		model.addAttribute("languages", lanTempSorted);
-		model.addAttribute("topics", topicTempSorted);
+		getModelData(model);
 
 
 
@@ -534,8 +538,8 @@ private void getModelData(Model model) {
 		
 
 
-		//model.addAttribute("languageCount", getLanguages().size());
-		model.addAttribute("languageCount",lanTempSorted.size());
+		
+		
 		model.addAttribute("videoCount", finalTutorials.size());
 		model.addAttribute("consultantCount", consults.size());
 
@@ -554,8 +558,28 @@ private void getModelData(Model model) {
 	
 
 
+	/*
+	 * A controller to clear all caches
+	 * Author: Alok Kumar
+	 */
 	
-	
+	@RequestMapping(value = "/clearAllCaches", method = RequestMethod.GET)
+	public String ClearAllCache(Principal principal,Model model ) {
+		
+		for(String name:cacheManager.getCacheNames()){
+			cacheManager.getCache(name).clear(); // clear cache by name
+			}
+		
+		User usr=new User();
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		model.addAttribute("success_msg",CommonData.All_Caches_Clear_MSG); 
+		return "ClearAllCaches";
+	}
 	
 
 

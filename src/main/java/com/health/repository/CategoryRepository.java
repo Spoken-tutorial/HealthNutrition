@@ -31,8 +31,12 @@ public interface CategoryRepository extends JpaRepository<Category,Integer>{
 	 * @param catname string object
 	 * @return category object
 	 */
-	//@CacheEvict(cacheNames = "categories", key = "#id")
+	@CacheEvict(cacheNames = "categories", allEntries=true)
 	void deleteById(int id);
+	
+	
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	<S extends Category> S save(S entity);
 	
 	//@Cacheable(cacheNames = "categories", key="#catname")
 	Category findBycatName(String catname);
@@ -44,8 +48,6 @@ public interface CategoryRepository extends JpaRepository<Category,Integer>{
 	//@Cacheable(cacheNames = "categories")
 	List<Category> findAllByOrderBy();
 	
-	//@Cacheable(cacheNames = "categories")
-	//List<Category> findAll();
 	
 	
 

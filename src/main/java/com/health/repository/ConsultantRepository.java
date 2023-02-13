@@ -2,9 +2,11 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+
 
 import com.health.model.Consultant;
 import com.health.model.User;
@@ -24,6 +26,12 @@ public interface ConsultantRepository extends CrudRepository<Consultant,Integer>
 	 */
 	@Query("select max(consultantId) from Consultant")
 	int getNewId();
+	
+	@CacheEvict(cacheNames = "consultants", allEntries=true)
+	void deleteById(int id);
+	
+	@CacheEvict(cacheNames = "consultants", allEntries=true)
+	<S extends Consultant> S save(S entity);
 
 	/**
 	 * find Consultant object given user object

@@ -36,14 +36,14 @@ public class Brouchure implements  Serializable {
 	/**
 	 * Language mapped object it is associated with
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "lan_id")
 	private Language lan;
 	
 	/**
 	 * Topic category Mapped object to which it belongs
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "topicCat_id")
 	private TopicCategoryMapping topicCatId;
 

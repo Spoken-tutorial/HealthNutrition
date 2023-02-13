@@ -47,6 +47,8 @@ public class EhcacheConfig {
 
 	        return cacheManagerFactoryBean;
 	    }
+	    
+	    
     	
 	 
 }

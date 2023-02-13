@@ -34,27 +34,27 @@ public class ContributorAssignedTutorial implements  Serializable {
 	/**
 	 * topicCategory Object
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="topicCat_ID")
 	private TopicCategoryMapping topicCatId;
 	 
 	/**
 	 * language object
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="language_id")
 	private Language lan;
 	
 	/**
 	 * tutorial associated with it
 	 */
-	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
 	private Set<Tutorial> tutorials=new HashSet<Tutorial>();
 	
 	/**
 	 * user to which tutorial is assigned
 	 */
-	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
 	private Set<ContributorAssignedMultiUserTutorial> multiUserAssigned=new HashSet<ContributorAssignedMultiUserTutorial>();
 
 	public int getId() {

@@ -57,7 +57,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * user object added script
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_script")
 	private User scriptUser;
 
@@ -79,7 +79,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_slide")
 	private User slideUser;
 
@@ -101,7 +101,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_keyword")
 	private User keywordUser;
 
@@ -123,14 +123,14 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_outline")
 	private User outlineUser;
 
 	/**
 	 * tutorial object for pre-rrquisite
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "preRequistics")
 	private Tutorial preRequistic;
 
@@ -143,7 +143,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_preRequistic")
 	private User preRequiticUser;
 	
@@ -158,7 +158,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * tutorial object when other language except English used
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "relatedVideo")
 	private Tutorial relatedVideo;
 
@@ -204,27 +204,27 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_video")
 	private User videoUser;
 
 	/**
 	 * tutorial topic category information
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "conAssignedTutorial")
 	private ContributorAssignedTutorial conAssignedTutorial;
 
-	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL)
 	private Set<Comment> comments =new HashSet<Comment>();
 
-	@OneToMany(mappedBy = "preRequistic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "preRequistic", cascade = CascadeType.ALL)
 	private Set<Tutorial> preRequisticTutorial =new HashSet<Tutorial>();
 	
-	@OneToMany(mappedBy = "relatedVideo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "relatedVideo", cascade = CascadeType.ALL)
 	private Set<Tutorial> relatedTutorial =new HashSet<Tutorial>();
 
-	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL)
 	private Set<LogManegement> logs =new HashSet<LogManegement>();
 
 	public int getTutorialId() {

@@ -7,6 +7,9 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.Brouchure;
 import com.health.model.TopicCategoryMapping;
+
+
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 /**
@@ -30,6 +33,12 @@ public interface BrouchureRepository extends CrudRepository<Brouchure, Integer> 
 	 * @return List of brochure object
 	 */
 	List<Brouchure> findAllByshowOnHomepage(boolean value);
+	
+	@CacheEvict(cacheNames = "brouchures", allEntries=true)
+	void deleteById(int id);
+	
+	@CacheEvict(cacheNames = "brouchures", allEntries=true)
+	<S extends Brouchure> S save(S entity);
 
 	/**
 	 * Find all the brochure based on given TopicCategory Object

@@ -2,10 +2,12 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.Category;
+import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
 
@@ -30,6 +32,13 @@ public interface TopicCategoryMappingRepository extends CrudRepository<TopicCate
 	 * @return list of TopicCategoryMapping object
 	 */
 	List<TopicCategoryMapping> findAllBycat(Category cat);
+	
+	
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	void deleteById(int id);
+	
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	<S extends TopicCategoryMapping> S save(S entity);
 	
 	/**
 	 * Find list of TopicCategoryMapping object given Topic object
