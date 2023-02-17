@@ -77,6 +77,101 @@
 <div th:replace="common/trail :: body-bottom-scripts"></div>
 <script>
 		var projectPath='[(@{/})]';
+		
+		var videos = document.querySelectorAll('video');
+		for(var i=0; i<videos.length; i++){
+			if(i==0){
+				videos[i].play();
+				videos[i].muted=true;
+			}
+			
+		  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+		    videos[i].addEventListener('mouseover', playMutedVideoMouseOver);
+		    videos[i].addEventListener('click', playUnmutedVideoOnClick);
+		    videos[i].addEventListener('mouseout', pauseWithUnmutedVideoMouseOut);
+		   
+		}
+		
+
+		function pauseAll(elem){
+		        
+			for(var i=0; i<videos.length; i++){
+		                if(videos[i] == elem) continue;
+		                if(videos[i].played.length > 0 && !videos[i].paused){
+		                  videos[i].pause();
+		                }
+		        }
+		  }
+		
+		
+		
+		
+		   // Functions to play the video with/without sound
+			function playMutedVideoMouseOver(event) {
+				var video = event.target;
+			 	var flag=0;
+			 	for (var j = 0; j < videos.length; j++){
+					 if(!videos[j].paused && !videos[j].muted)
+			 			flag=flag+1;
+				 }
+			 	if(flag==0){
+			 	video.play();
+			 	video.muted = true;
+				}
+			 
+			}
+		   
+
+			function playUnmutedVideoOnClick(event) {
+			 var video = event.target;
+			 video.muted = false;
+			 video.play();
+			}
+			
+			function pauseWithUnmutedVideoMouseOut(event) {
+				 var video = event.target;
+					if(video.muted){
+						video.pause();
+						video.muted=!video.muted;
+					}
+				 
+				}
+				
+			
+		
+		
+			
+			
+		
+	/*	window.addEventListener('load', videoScroll);
+		window.addEventListener('scroll', videoScroll);
+
+		 function videoScroll() {
+			
+		  if ( videos.length > 0) {
+		    var windowHeight = window.innerHeight;
+	 
+		  for (var i = 0; i < videos.length; i++) {
+
+		      var thisVideos = videos[i],
+		          videoHeight = thisVideos.clientHeight,
+		          videoClientRect = thisVideos.getBoundingClientRect().top;
+				
+		      
+		    	  if ( videoClientRect <= ( (windowHeight) - (videoHeight*.5) ) && videoClientRect >= ( 0 - ( videoHeight*.5) ) ) {
+		    		  thisVideos.play();
+		    		  thisVideos.muted=true;
+				      } else {
+				    	  thisVideos.pause();
+				      }
+		    	  
+		    	  break;
+		      
+		    }
+		  }
+
+		} */
+		
 </script>
 </body>
 </html>

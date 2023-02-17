@@ -93,7 +93,7 @@
 					<div style="width: 100%; margin: auto;">
 
 						<div class="embed-responsive embed-responsive-16by9">
-						<video width="966" height="543" class="video-fluid z-depth-1" loop controls muted>
+						<video width="966" height="543" class="video-fluid z-depth-1"  controls autoplay >
   <source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4" />
 </video>
 						</div>
@@ -200,10 +200,6 @@
 				<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
-					<video id='storedVideoId' 
-				controls="controls" style="width:50%!important;">
-				<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
-			</video>
 					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
 						
 							

@@ -1942,6 +1942,10 @@ $(document).ready(function() {
 			$("#reset2").click(function(){
  			 $(":reset").css("background-color", "red");
 			});
+			
+			
+			
+
 
 		/*	$('#inputTopicName').change(function() {
 				var topic = $(this).val();
