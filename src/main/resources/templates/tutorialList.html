@@ -72,6 +72,8 @@
 
 <script>
 		var projectPath='[(@{/})]';
+		 
+var isPlaying = [];
 		
 		var videos = document.querySelectorAll('video');
 		for(var i=0; i<videos.length; i++){
@@ -83,9 +85,38 @@
 		  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
 		    videos[i].addEventListener('mouseover', playMutedVideoMouseOver);
 		    videos[i].addEventListener('click', playUnmutedVideoOnClick);
-		    videos[i].addEventListener('mouseout', pauseWithUnmutedVideoMouseOut);
+		    videos[i].addEventListener('mouseout', pauseWithMutedVideoMouseOut);
+		    
+		    
+		    isPlaying.push(false);
+		    
+		    videos[i].addEventListener("touchstart", function() {
+		      var index = Array.from(videos).indexOf(this);
+		      var flagCheck=0;
+			 	for (var j = 0; j < videos.length; j++){
+					 if(!videos[j].paused && !videos[j].muted)
+						 flagCheck=flagCheck+1;
+				 }
+			 	
+			 	if(flagCheck==0){
+			 		if (!isPlaying[index]) {
+				        videos[index].play();
+				        videos[index].muted=true;
+				        isPlaying[index] = true;
+				      }
+			 		}
+		   		 });
+
+		     videos[i].addEventListener("touchend", function() {
+		      	var index = Array.from(videos).indexOf(this);
+		      	if (isPlaying[index]) {
+		        	videos[index].pause();
+		        	isPlaying[index] = false;
+		     		 }
+		   		 });
 		   
-		}
+			}
+		
 		
 
 		function pauseAll(elem){
@@ -123,18 +154,18 @@
 			 video.play();
 			}
 			
-			function pauseWithUnmutedVideoMouseOut(event) {
+			function pauseWithMutedVideoMouseOut(event) {
 				 var video = event.target;
 					if(video.muted){
 						video.pause();
-						video.muted=!video.muted;
+						//video.muted=!video.muted;
 					}
 				 
 				}
 				
 			
 		
-		
+			 
 			
 			
 		
@@ -166,6 +197,8 @@
 		  }
 
 		} */
+		
+		
 		
 </script>
 </body>
