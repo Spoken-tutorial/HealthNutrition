@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 import org.springframework.cache.CacheManager;
@@ -5810,12 +5812,15 @@ private void getModelData(Model model) {
 
 		List<Tutorial> tutorials =  tutService.findAllByContributorAssignedTutorialList(conTutorials);
 		for(Tutorial temp:tutorials) {
-
+			
+			
+			
+			
 			if(temp.getOutlineStatus() >= CommonData.WAITING_PUBLISH_STATUS && temp.getScriptStatus() >= CommonData.WAITING_PUBLISH_STATUS &&
 					temp.getSlideStatus() >= CommonData.WAITING_PUBLISH_STATUS && temp.getKeywordStatus() >= CommonData.WAITING_PUBLISH_STATUS &&
 					temp.getVideoStatus() >= CommonData.WAITING_PUBLISH_STATUS &&
 					temp.getPreRequisticStatus() >= CommonData.WAITING_PUBLISH_STATUS) {
-
+				
 				published.add(temp);
 			}
 
@@ -5827,6 +5832,7 @@ private void getModelData(Model model) {
 
 
 	}
+	//getStreamCoder()
 
 	/**
 	 * publish the tutorial under quality role

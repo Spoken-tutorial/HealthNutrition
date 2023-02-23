@@ -81,10 +81,12 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> , J
 	//@Cacheable(cacheNames ="tutorials" )
 	List<Tutorial> findAllByStatus(boolean status);
 	
-	@CacheEvict(cacheNames = "tutorials", allEntries=true)
+	//@CacheEvict(cacheNames = "tutorials", allEntries=true)
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
 	void deleteById(int id);
 	
-	@CacheEvict(cacheNames = "tutorials", allEntries=true)
+	//@CacheEvict(cacheNames = "tutorials", allEntries=true)
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
 	<S extends Tutorial> S save(S entity);
 	/**
 	 * List out all the tutorial based on pagination
