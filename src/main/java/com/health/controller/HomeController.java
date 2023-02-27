@@ -1956,6 +1956,11 @@ private void getModelData(Model model) {
 		}
 
 		model.addAttribute("userInfo", usr);
+		
+		List<Topic> topicsTemp1= new ArrayList<>();
+		
+		model.addAttribute("topics1", topicsTemp1);
+		
 		List<Topic> topicsTemp = topicService.findAll();
 
 		model.addAttribute("topics", topicsTemp);

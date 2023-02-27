@@ -58,7 +58,7 @@ font-weight:bold!important;
 							method="post" enctype="multipart/form-data">
 
 							<div class="form-group">
-								<label for="categoryId">Select Category</label> <select id="categoryId"
+								<label for="categoryId1">Select Category</label> <select id="categoryId1"
 									class="form-control" name="categoryName" required="required">
 
 									<option value='0'>Select Category</option>
@@ -69,6 +69,9 @@ font-weight:bold!important;
 								</select>
 
 							</div>
+							
+							
+							
 
 							<div class="form-group">
 
@@ -85,9 +88,27 @@ font-weight:bold!important;
 									required="required" placeholder="Enter Order Value" />
 
 							</div>
+						
 
 							<button type="submit" value="showAlert" class="btn a-btn">Submit</button>
-						</form>				
+						</form>	
+						<br>
+						<h5>Topics in the selected category</h5>
+						
+						<div id="topicId1">
+						<table class="table table-striped" id="topicTable" >
+						<thead>
+						<tr>
+						<th> Topic Name</th>
+						<th> Order value</th>
+						</tr>
+						</thead>
+						<tbody  id="topicTable1">
+						
+						</tbody>
+						</table>
+						</div>
+									
 						</div>
 						</div>
 					</div>
@@ -131,8 +152,10 @@ font-weight:bold!important;
 	
 <div th:replace="common/trail :: body-bottom-scripts"></div>		
 <script type="text/javascript">
+var projectPath='[(@{/})]';
 $(document).ready( function () {
     $('#myTable').DataTable();
+    
 } );
 </script>
 

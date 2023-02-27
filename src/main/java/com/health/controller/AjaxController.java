@@ -980,6 +980,27 @@ public class AjaxController{
 	}
 
 
+	/*
+	 * A new function by to load topic by Category
+	 * 
+	 */
+	@RequestMapping("/loadTopicByCategoryInAddTopic")
+	public @ResponseBody TreeMap<String, Integer> getTopicByCategoryAddTopic(@RequestParam(value = "id") int id) {
+
+		TreeMap<String, Integer> topicName=new TreeMap<>();
+
+		Category cat = catService.findByid(id);
+
+		List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat) ;
+		for(TopicCategoryMapping t: local) {
+			
+			topicName.put( t.getTopic().getTopicName(), t.getOrder());
+		}
+		
+		return topicName;
+
+	}
+
 	/**
 	 * return published tutorial 
 	 * @param id int value
