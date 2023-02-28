@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
+import java.util.Optional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -1916,6 +1916,7 @@ private void getModelData(Model model) {
 
 			usr=userService.findByUsername(principal.getName());
 		}
+		List<TopicCategoryMapping> tcm=topicCatService.findAll();
 
 		model.addAttribute("userInfo", usr);
 
@@ -1928,7 +1929,7 @@ private void getModelData(Model model) {
 		List<Topic> topics = topicService.findAll();
 
 		model.addAttribute("topics", topics);
-
+		model.addAttribute("tcm", tcm);
 		return "addTopic";
 
 	}
@@ -1944,6 +1945,7 @@ private void getModelData(Model model) {
 	 */
 	@RequestMapping(value = "/addTopic",method = RequestMethod.POST)
 	public String addTopicPost(Model model,Principal principal,
+							   @RequestParam(name = "topicId") int topicId,
 							   @RequestParam(name = "categoryName") int categoryId,
 							   @RequestParam(name = "topicName") String topicName,
 							   @RequestParam(name = "orderValue") int orderValue) {
@@ -1951,32 +1953,28 @@ private void getModelData(Model model) {
 		User usr=new User();
 
 		if(principal!=null) {
-
 			usr=userService.findByUsername(principal.getName());
 		}
-
-		model.addAttribute("userInfo", usr);
-		
-		List<Topic> topicsTemp1= new ArrayList<>();
-		
-		model.addAttribute("topics1", topicsTemp1);
-		
-		List<Topic> topicsTemp = topicService.findAll();
-
-		model.addAttribute("topics", topicsTemp);
-
-		List<Category> category = catService.findAll();
-
-		model.addAttribute("categories", category);
 
 		Category cat =catService.findByid(categoryId);
 
 		if(cat == null) {
 			model.addAttribute("error_msg", "Category Doesn't Exist");
-			return "addTopic";
+			return addTopicGet(model,principal);
+		}
+		
+		Topic topicTemp;
+				
+		System.out.println("Alok_Kumar Topic ID Test" + topicId);
+		
+		if(topicId==-1) {
+			topicTemp = topicService.findBytopicName(topicName);
+		}
+		else {
+			topicTemp = topicService.findById(topicId);
 		}
 
-		Topic topicTemp = topicService.findBytopicName(topicName);
+		
 
 		if(topicTemp!=null) {
 
@@ -1985,12 +1983,12 @@ private void getModelData(Model model) {
 				TopicCategoryMapping localTopicMap=new TopicCategoryMapping(topicCatService.getNewId(), true, cat, topicTemp,orderValue);
 				topicCatService.save(localTopicMap);
 				model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
-				return "addTopic";
+				return addTopicGet(model,principal);
 
 			}else {
 
 				model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-				return "addTopic";
+				return addTopicGet(model,principal);
 			}
 		}
 
@@ -2013,15 +2011,16 @@ private void getModelData(Model model) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-			return "addTopic";
+			return addTopicGet(model,principal);
 		}
 		
-		topicsTemp = topicService.findAll();
-
-		model.addAttribute("topics", topicsTemp);
+		
 
 		model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
-		return "addTopic";
+		
+		
+		
+		return addTopicGet(model,principal);
 
 	}
 
@@ -2032,7 +2031,7 @@ private void getModelData(Model model) {
 	 * @param id int value
 	 * @return String object (webpage)
 	 */
-	@RequestMapping(value = "/topic/edit/{topicName}", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/topic/edit/{topicName}", method = RequestMethod.GET)
 	public String editTopicGet(@PathVariable(name = "topicName") String topicTemp,Model model,Principal principal) {
 
 		User usr=new User();
@@ -2051,6 +2050,37 @@ private void getModelData(Model model) {
 		}
 
 		model.addAttribute("topic",topic);
+
+		return "updateTopic";  // need to accomdate view part
+	}
+	*/
+	
+	@RequestMapping(value = "/topic/edit/{topicCatId}", method = RequestMethod.GET)
+	public String editTopicGet(@PathVariable(name = "topicCatId") int topicCatId, Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+		TopicCategoryMapping tcp= tcmRepository.findById(topicCatId).get();
+		
+		Topic topic=tcp.getTopic();
+		
+		
+		if(topic == null) {
+			return "redirect:/addTopic";
+		}
+
+		model.addAttribute("topic",topic);
+		model.addAttribute("topicCatMap",tcp);
+		
+		
+		
 
 		return "updateTopic";  // need to accomdate view part
 	}
@@ -2077,43 +2107,74 @@ private void getModelData(Model model) {
 		String topicname=req.getParameter("topicName");
 		String topicIdInString = req.getParameter("TopicId");
 		int topicId = Integer.parseInt(topicIdInString);
-
+		
+		String orderVal=req.getParameter("orderValue");
+		int orderValue = Integer.parseInt(orderVal);
+		String topicCatIdInString = req.getParameter("TopicCatId");
+		int topicCatId = Integer.parseInt(topicCatIdInString);
+		
+		TopicCategoryMapping tcp= tcmRepository.findById(topicCatId).get();
 		Topic topic = topicService.findById(topicId);
 
-		if(topic == null) {
+		if(topic == null || tcp == null) {
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("topic",topic);
+			System.out.println("1st Error Checking");
 			return "updateTopic";  //  accomodate view part
 		}
 
-		if(topicname==null) {
+		if(topicname==null ) {
 
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("topic",topic);
+			System.out.println("2nd Error Checking");
 			return "updateTopic";  //  accomodate view part
 		}
-
-		if(topicService.findBytopicName(topicname)!=null) {
-
+		
+		
+		  if(topicService.findBytopicName(topicname)!=null &&  topicService.findBytopicName(topicname)!= topic) {
+			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("error_msg", CommonData.RECORD_EXISTS);
 			model.addAttribute("topic",topic);
 			return "updateTopic";   //  accomodate view part
 		}
+		 
+		
+		
+		
 
 		topic.setTopicName(topicname);
+		tcp.setOrder(orderValue);
 
 		try {
 			topicService.save(topic);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			model.addAttribute("topic",topic);
-			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-			return "updateTopic";  //  accomodate view part
+			//e.printStackTrace();
+			
+			//model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			System.out.println("3rd Error Checking");
+			
+		}
+		try {
+			
+			topicCatService.save(tcp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			
+			//model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			System.out.println("3rd Error Checking");
+			
 		}
 
 		topic = topicService.findById(topicId);
+		tcp= tcmRepository.findById(topicCatId).get();
 		model.addAttribute("topic",topic);
+		model.addAttribute("topicCatMap",tcp);
 
 		model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
 

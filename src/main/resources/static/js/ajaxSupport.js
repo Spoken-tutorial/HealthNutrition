@@ -2404,6 +2404,17 @@ $(document).ready(function() {
 
 					});
 					
+					
+		 $('#topicId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewTopic');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+					
 
 			/* load Topic by catgory contributor */
 

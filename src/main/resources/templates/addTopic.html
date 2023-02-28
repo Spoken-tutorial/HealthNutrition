@@ -70,14 +70,26 @@ font-weight:bold!important;
 
 							</div>
 							
+							<div class="form-group">
+								<label for="topicId">Select Topic</label> <select id="topicId"
+									class="form-control" name="topicId" required="required">
+
+									<option value='0'>Select Topic</option>
+									<option value='-1'>Enter New Topic</option>
+										<option th:each="topic: ${topics}" th:value="${topic.getTopicId()}" th:text="${topic.getTopicName()}">
+												</option>
+								
+								</select>
+
+							</div>
 							
 							
 
-							<div class="form-group">
+							<div class="form-group" id="enterNewTopic">
 
 								<label for="topicId">Topic</label> <input type="text"
 									class="form-control" id="topicId" name="topicName"
-									required="required" placeholder="Enter topic name" />
+									 placeholder="Enter topic name" />
 
 							</div>
 							
@@ -127,12 +139,13 @@ font-weight:bold!important;
     </tr>
   </thead>
   <tbody>
-      <div th:each="topic : ${topics}">
-      <tr th:each="topicTemp : ${topic.getTopicCategoryMap()}">
+      <div >
+      <tr th:each="topicTemp : ${tcm}">
       <td scope="row"><span th:text = "${topicTemp.getCat().getCatName()}"></span></td>
 	  <td><span th:text = "${topicTemp.getTopic().getTopicName()}"></span></td>
       <td><span th:text = "${topicTemp.getOrder()}"></span></td>
-      <td><a th:href="@{${'/topic/edit/' + topicTemp.getTopic().getTopicName()}}">Edit</a></td>
+      <!-- <td><a th:href="@{${'/topic/edit/' + topicTemp.getTopic().getTopicName()}}">Edit</a></td>  -->
+      <td><a th:href="@{${'/topic/edit/' + topicTemp.getTopicCategoryId()}}">Edit</a></td>
       </tr>
     </div>
    
