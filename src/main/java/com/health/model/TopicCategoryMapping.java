@@ -2,6 +2,7 @@ package com.health.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class TopicCategoryMapping implements  Serializable {
 	 * order value
 	 */
 	@Column(name = "orderValue")
-	private int order = 0;
+	private int order= 0;
 	
 	/**
 	 * category 
@@ -103,6 +104,44 @@ public class TopicCategoryMapping implements  Serializable {
 	public void setTopic(Topic topic) {
 		this.topic = topic;
 	}
+	
+	/*
+	 * Sort by OrderValue
+	 * Author: Alok Kumar
+	 */
+	 public static Comparator<TopicCategoryMapping> SortByOrderValue = new Comparator<TopicCategoryMapping>() {
+		  
+	        // Method
+	        public int compare(TopicCategoryMapping t1,TopicCategoryMapping t2) {
+	        	
+	        	if(t1.getOrder()==t2.getOrder()) {
+	        		return t1.getTopic().getTopicName().compareTo(
+	        				t2.getTopic().getTopicName());
+	        	}
+	 
+	        	else if(t1.getOrder() > t2.getOrder()) {
+	        	  return 1;
+	          }
+	          else {
+	        	  return -1;
+	          }
+	            
+	        }
+	    };
+	    
+	    
+	    public static Comparator<TopicCategoryMapping> SortByTopicName = new Comparator<TopicCategoryMapping>() {
+			  
+	        // Method
+	        public int compare(TopicCategoryMapping t1,TopicCategoryMapping t2) {
+	        	
+	        	
+	        		return t1.getTopic().getTopicName().compareTo(
+	        				t2.getTopic().getTopicName());
+	        	
+	            
+	        }
+	    };
 
 	public TopicCategoryMapping() {
 		
@@ -152,6 +191,7 @@ public class TopicCategoryMapping implements  Serializable {
 
 	public int getOrder() {
 		return order;
+		
 	}
 
 	public void setOrder(int order) {

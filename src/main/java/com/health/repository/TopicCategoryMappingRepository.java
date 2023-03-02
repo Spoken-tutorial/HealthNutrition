@@ -31,7 +31,11 @@ public interface TopicCategoryMappingRepository extends CrudRepository<TopicCate
 	 * @param cat category object
 	 * @return list of TopicCategoryMapping object
 	 */
+	@Query("from TopicCategoryMapping where cat=?1 order by order")
 	List<TopicCategoryMapping> findAllBycat(Category cat);
+	
+	
+
 	
 	
 	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)

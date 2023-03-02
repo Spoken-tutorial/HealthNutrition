@@ -1921,10 +1921,30 @@ private void getModelData(Model model) {
 		model.addAttribute("userInfo", usr);
 
 		List<Category> category = catService.findAll();
-		
 		Collections.sort(category);
+		
+		List<Category> getcats= getCategories();
+		
+		List<Category>newCategories1=new ArrayList<>();
+		List<Category>newCategories2=new ArrayList<>();
+		
+		for(Category cat1: category) {
+			for(Category cat2: getcats)
+				if(cat1==cat2)
+					continue;
+			
+			if(cat1.isStatus()) {
+				newCategories1.add(cat1);
+			}
+			else {
+				newCategories2.add(cat1);		
+		}
+			
+		}
+		newCategories1.addAll(newCategories2);
+		getcats.addAll(newCategories1);
 
-		model.addAttribute("categories", category);
+		model.addAttribute("categories",getcats);
 
 		List<Topic> topics = topicService.findAll();
 
@@ -1965,7 +1985,7 @@ private void getModelData(Model model) {
 		
 		Topic topicTemp;
 				
-		System.out.println("Alok_Kumar Topic ID Test" + topicId);
+		
 		
 		if(topicId==-1) {
 			topicTemp = topicService.findBytopicName(topicName);
@@ -2120,7 +2140,6 @@ private void getModelData(Model model) {
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("topic",topic);
-			System.out.println("1st Error Checking");
 			return "updateTopic";  //  accomodate view part
 		}
 
@@ -2129,7 +2148,6 @@ private void getModelData(Model model) {
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("topic",topic);
-			System.out.println("2nd Error Checking");
 			return "updateTopic";  //  accomodate view part
 		}
 		
@@ -2156,7 +2174,7 @@ private void getModelData(Model model) {
 			//e.printStackTrace();
 			
 			//model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-			System.out.println("3rd Error Checking");
+			
 			
 		}
 		try {
@@ -2167,7 +2185,7 @@ private void getModelData(Model model) {
 			//e.printStackTrace();
 			
 			//model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-			System.out.println("3rd Error Checking");
+			
 			
 		}
 

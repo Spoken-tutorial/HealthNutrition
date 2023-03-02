@@ -763,8 +763,9 @@ public class AjaxController{
 			@RequestParam(value="languageId") int languageId) {
 		
 		ArrayList<Map<String, Integer>> arlist=new ArrayList<>();
-
-		Map<String,Integer> topics=new TreeMap<>();
+		
+		Map<String,Integer> topics=new LinkedHashMap<>();
+		//HashMap<String,Integer> topics=new LinkedHashMap<>();
 		Map<String,Integer> languages=new TreeMap<>();
 
 		Category cat = catId != 0 ? catService.findByid(catId) : null;
@@ -772,18 +773,29 @@ public class AjaxController{
 		Language language=languageId!=0? langService.getById(languageId):null;
 		
 		List<TopicCategoryMapping> localcat = cat != null ? topicCatService.findAllByCategory(cat) : topicCatService.findAll();
+		System.out.println("*******Checking Sorting of TopicCat by order");
+		for(TopicCategoryMapping tcm : localcat) {
+			System.out.println(tcm.getOrder() + " " + tcm.getTopic().getTopicName());
+		}
 		List<ContributorAssignedTutorial> cat_list = language != null ? conService.findAllByTopicCatAndLanViewPart(localcat, language) : conService.findAllByTopicCat(localcat);
 
 		//To find Topics
 		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
-			
-		for(Tutorial t: tutorials) {
+		
+		System.out.println("****Load By Category****");
+		
+		/*for(Tutorial t: tutorials) {
 			
 			Category c = t.getConAssignedTutorial().getTopicCatId().getCat();
-			Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
+			//Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
+			TopicCategoryMapping tcp=t.getConAssignedTutorial().getTopicCatId();
+			Topic topic2= tcp.getTopic();
 			if(c.isStatus()) {
 				if(topic2.isStatus()) {
 					topics.put( topic2.getTopicName(),topic2.getTopicId());
+					//topics.put( topic2.getTopicName(),tcp.getOrder());
+					
+					System.out.println(topic2.getTopicName()+" " + topic2.getTopicId() );
 				}
 			}
 			
@@ -791,9 +803,38 @@ public class AjaxController{
 			
 			
 		}
+		*/
 		
-		//Collections.sort((List<Topic>) topics);
-		//topics=HashMapSorting.sortByValue(topics);
+		 List<TopicCategoryMapping> tcmList = new ArrayList<>();
+			for(Tutorial t: tutorials) {
+				Category c = t.getConAssignedTutorial().getTopicCatId().getCat();
+				TopicCategoryMapping tcp=t.getConAssignedTutorial().getTopicCatId();
+				if(c.isStatus()) {
+					
+					if(tcp.getTopic().isStatus()) {
+						tcmList.add(tcp);
+					}
+				}
+				
+				}
+			
+			
+			if(cat==null ) {
+				Collections.sort(tcmList, TopicCategoryMapping.SortByTopicName);
+			}else {
+				Collections.sort(tcmList, TopicCategoryMapping.SortByOrderValue);
+			}
+			
+			
+			for(TopicCategoryMapping tcm: tcmList) {
+				Topic topic2= tcm.getTopic();
+				System.out.println(tcm.getOrder() + " " + topic2.getTopicName());
+				topics.put( topic2.getTopicName(),topic2.getTopicId());
+			}
+		
+		
+		//topics=HashMapSorting.sortHashMapByValue(topics);
+		
 		arlist.add(topics);
 		
 		if (topic != null) {
@@ -813,8 +854,7 @@ public class AjaxController{
 				languages.put( c.getLan().getLangName(),c.getLan().getLanId());
 			}
 		}
-		//Collections.sort((List<Language>) languages);
-		//languages=HashMapSorting.sortByValue(languages);
+		
 		arlist.add(languages);	
 		
 		
@@ -859,8 +899,7 @@ public class AjaxController{
 			
 			
 		}
-		//Collections.sort((List<Category>) cats);
-		//cats=HashMapSorting.sortByValue(cats);
+		
 		arlist.add(cats);
 		
 		if (cat != null) {
@@ -880,8 +919,7 @@ public class AjaxController{
 				languages.put( c.getLan().getLangName(),c.getLan().getLanId());
 			}
 		}
-		//Collections.sort((List<Language>) languages);
-		//languages=HashMapSorting.sortByValue(languages);
+		
 		arlist.add(languages);	
 	
 		return arlist;
@@ -901,14 +939,16 @@ public class AjaxController{
 		
 		ArrayList<Map<String,Integer>> arlist=new ArrayList<>();
 		Map<String,Integer> cats=new TreeMap<>();
-		Map<String,Integer> topics=new TreeMap<>();
+		Map<String,Integer> topics=new LinkedHashMap<>();
+		//HashMap<String,Integer> topics=new LinkedHashMap<>();
 		
 		Category cat = catId != 0 ? catService.findByid(catId) : null;
 		Topic topic= topicId != 0 ? topicService.findById(topicId) : null;
 		Language language=languageId!=0? langService.getById(languageId):null;
 		
 		List<TopicCategoryMapping> local = cat!=null ? topicCatService.findAllByCategory(cat) : topicCatService.findAll();
-		System.out.println(local);
+		
+		
 		
 		if(topic!=null) {
 			local.clear();
@@ -933,24 +973,59 @@ public class AjaxController{
 			}
 			
 		}
-		//Collections.sort((List<Category>) cats);
-		//cats=HashMapSorting.sortByValue(cats);
+		
 		arlist.add(cats);
 				
 				
 				
 		//To find Topics
 		List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list);
-					
-		for(Tutorial t: tutorials2) {
-			Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
+		
+		System.out.println("****Load By Langauge****");			
+		
+		/*for(Tutorial t: tutorials2) {
+			//Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
+			TopicCategoryMapping tcp=t.getConAssignedTutorial().getTopicCatId();
+			Topic topic2= tcp.getTopic();
+			
 			if(topic2.isStatus()) {
 				topics.put( topic2.getTopicName(),topic2.getTopicId());
+				//topics.put( topic2.getTopicName(),tcp.getOrder());
+				System.out.println(topic2.getTopicName()+" " + topic2.getTopicId() );
 			}
 			
 			}
-		//Collections.sort((List<Topic>) topics);
-		//topics=HashMapSorting.sortByValue(topics);
+		
+		*/
+		 List<TopicCategoryMapping> tcmList = new ArrayList<>();
+			for(Tutorial t: tutorials2) {
+				Category c = t.getConAssignedTutorial().getTopicCatId().getCat();
+				TopicCategoryMapping tcp=t.getConAssignedTutorial().getTopicCatId();
+				if(c.isStatus()) {
+					
+					if(tcp.getTopic().isStatus()) {
+						tcmList.add(tcp);
+					}
+				}
+				
+				}
+		
+		if(cat==null ) {
+			Collections.sort(tcmList, TopicCategoryMapping.SortByTopicName);
+		}else {
+			Collections.sort(tcmList, TopicCategoryMapping.SortByOrderValue);
+		}
+		
+		
+		for(TopicCategoryMapping tcm: tcmList) {
+			Topic topic2= tcm.getTopic();
+			System.out.println(tcm.getOrder() + " " + topic2.getTopicName());
+			topics.put( topic2.getTopicName(),topic2.getTopicId());
+		}
+		
+			//topics=HashMapSorting.sortHashMapByValue(topics);
+		
+		
 			arlist.add(topics);
 				
 				
