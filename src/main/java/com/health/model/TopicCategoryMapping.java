@@ -130,6 +130,10 @@ public class TopicCategoryMapping implements  Serializable {
 	    };
 	    
 	    
+	    /*
+		 * Sort by TopicName
+		 * Author: Alok Kumar
+		 */
 	    public static Comparator<TopicCategoryMapping> SortByTopicName = new Comparator<TopicCategoryMapping>() {
 			  
 	        // Method

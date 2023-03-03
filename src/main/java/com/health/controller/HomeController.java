@@ -694,7 +694,26 @@ private void getModelData(Model model) {
 			}
 		}
 		
-		Collections.sort(tutToView1);  // sorting based on order value
+		if(localCat==null) {
+			Collections.sort(tutToView1, Tutorial.UserVisitComp);
+		}
+		else {
+			Collections.sort(tutToView1, Tutorial.SortByOrderValue);
+		}
+		
+		if(localCat==null) {
+			System.out.println("********Checking Sort by userVisit in Tutorial*********");
+			for(Tutorial tv: tutToView1) {
+				System.out.println(tv.getUserVisit() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+			}
+		}else {
+			System.out.println("********Checking Sort by orderValue in Tutorial*********");
+			for(Tutorial tv: tutToView1) {
+				System.out.println(tv.getConAssignedTutorial().getTopicCatId().getOrder() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+			}
+		}
+		
+		 // sorting based on order value
 		
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
@@ -760,7 +779,12 @@ private void getModelData(Model model) {
 			System.out.println(temp.getTutorialId() +"***********");
 		}
 		
-		Collections.sort(tutToView1); 
+		//Collections.sort(tutToView1); 
+		Collections.sort(tutToView1, Tutorial.UserVisitComp);
+		System.out.println("********Checking Sort by userVisit in Tutorial*********");
+		for(Tutorial tv: tutToView1) {
+			System.out.println(tv.getUserVisit() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		}
 		
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);

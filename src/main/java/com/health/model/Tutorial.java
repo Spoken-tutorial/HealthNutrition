@@ -476,8 +476,35 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	        		return t1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName().compareTo(
 	        				t2.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 	        	}
+	        	
 	 
 	        	else if(t1.getUserVisit() < t2.getUserVisit()) {
+	        	  return 1;
+	          }
+	          else {
+	        	  return -1;
+	          }
+	            
+	        }
+	    };
+	    
+
+		/*
+		 * A function to Sort Tutorial BY OrderValue in Ascending order
+		 * Author: Alok Kumar
+		 */
+	    public static Comparator<Tutorial> SortByOrderValue = new Comparator<Tutorial>() {
+			  
+	        // Method
+	        public int compare(Tutorial t1,Tutorial t2) {
+	        	
+	        	if(t1.getConAssignedTutorial().getTopicCatId().getOrder() == t2.getConAssignedTutorial().getTopicCatId().getOrder()) {
+	        		return t1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName().compareTo(
+	        				t2.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+	        	}
+	        	
+	 
+	        	else if(t1.getConAssignedTutorial().getTopicCatId().getOrder() > t2.getConAssignedTutorial().getTopicCatId().getOrder()) {
 	        	  return 1;
 	          }
 	          else {
