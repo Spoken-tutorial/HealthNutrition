@@ -379,6 +379,37 @@ a:hover {
               Upload Timescript
             </a>
           </li>
+           <li class="nav-item border-lt nav-brochure">
+            <a class="nav-link" th:href="@{/addBrochure}">
+              <span data-feather="bar-chart-2"></span>
+              Brochure
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-carousel">
+            <a class="nav-link" th:href="@{/addCarousel}">
+              <span data-feather="bar-chart-2"></span>
+              Carousel
+            </a>
+          </li>
+           
+          <li class="nav-item border-lt nav-consultants">
+            <a class="nav-link" th:href="@{/addConsultant}">
+              <span data-feather="shopping-cart"></span>
+              Consultants
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-events">
+            <a class="nav-link" th:href="@{/addEvent}">
+              <span data-feather="users"></span>
+              Events
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-testimonials">
+            <a class="nav-link" th:href="@{/addTestimonial}">
+              <span data-feather="bar-chart-2"></span>
+              Testimonials
+            </a>
+          </li>
         </ul>
          <ul class="nav flex-column" sec:authorize="hasAnyAuthority('DOMAIN_REVIEWER')">
         	<li class="nav-item ">

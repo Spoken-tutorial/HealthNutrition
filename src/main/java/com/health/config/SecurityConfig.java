@@ -134,6 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/users/**",
 			"/unpublishTopic/**",
 			"/clearAllCaches/**",
+			"/addConsultant/**",
 			
 //			"/unpublishTutorial/**"
 			
@@ -174,6 +175,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/listTutorialForContributorReview/**",
 			"/Contributor/review/**",
 			"/uploadTimescript/**",
+			
+			
 
 
 
@@ -257,6 +260,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers(DOMAIN_URL).hasAnyAuthority("DOMAIN_REVIEWER")
 			.antMatchers(QUALITY_URL).hasAnyAuthority("QUALITY_REVIEWER")
 			.antMatchers("/addEvent/**","/addTestimonial/**","/event/edit/**","/updateEvent/**","/testimonial/edit/**","/updateTestimonial/**","/viewTrainee/**","/downloadQuestion/**").hasAnyAuthority("SUPER_USER","MASTER_TRAINER")
+			.antMatchers("/addBrochure/**",
+					"/addCarousel/**",
+					"/addConsultant/**",
+					"/addEvent/**",
+					"/addTestimonial/**",
+					"/brochure/edit/**",
+					"/carousel/edit/**",
+					"/event/edit/**",
+					"/testimonial/edit/**").hasAnyAuthority("SUPER_USER","CONTRIBUTOR")
 			.antMatchers(PUBLIC_MATCHERS).
 				permitAll().anyRequest().authenticated().
 				and()

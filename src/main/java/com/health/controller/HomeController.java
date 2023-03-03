@@ -2933,6 +2933,13 @@ private void getModelData(Model model) {
 
 		List<Event> eventsTemp = eventservice.findAll();
 		model.addAttribute("events", eventsTemp);
+		
+		List<State> states = stateService.findAll();
+		model.addAttribute("states", states);
+		List<Category> categories = catService.findAll();
+		model.addAttribute("categories", categories);
+		List<Language> lans = lanService.getAllLanguages();
+		model.addAttribute("lans", lans);
 
 		String eventName = req.getParameter("eventname");
 		String desc = req.getParameter("description");
