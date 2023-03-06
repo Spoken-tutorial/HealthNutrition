@@ -1941,6 +1941,9 @@ private void getModelData(Model model) {
 			usr=userService.findByUsername(principal.getName());
 		}
 		List<TopicCategoryMapping> tcm=topicCatService.findAll();
+		
+		TopicCategoryMapping tcp=new TopicCategoryMapping();
+		
 
 		model.addAttribute("userInfo", usr);
 

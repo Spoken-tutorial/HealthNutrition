@@ -131,6 +131,7 @@ font-weight:bold!important;
   <table class="table table-striped" id="myTable">
   <thead>
     <tr>
+      <th scope="col">Category Status</th>
       <th scope="col">Category</th>
       <th scope="col">Topic Name</th>
       <th scope="col">Order</th>
@@ -141,6 +142,7 @@ font-weight:bold!important;
   <tbody>
       <div >
       <tr th:each="topicTemp : ${tcm}">
+      <td scope="row"><span th:text = "${topicTemp.getCat().isStatus()}"></span></td>
       <td scope="row"><span th:text = "${topicTemp.getCat().getCatName()}"></span></td>
 	  <td><span th:text = "${topicTemp.getTopic().getTopicName()}"></span></td>
       <td><span th:text = "${topicTemp.getOrder()}"></span></td>
