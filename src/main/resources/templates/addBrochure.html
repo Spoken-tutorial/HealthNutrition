@@ -59,9 +59,9 @@ font-weight:bold!important;
 								<form th:action="@{/addBrochure}"
 									method="post" enctype="multipart/form-data">
 									<div class="form-group">
-										<label for="MasterCategoryId">Select Category *</label> <select
+										<label for="MasterCategoryId">Select Category </label> <select
 											id="MasterCategoryId" class="form-control"
-											name="categoryName" required>
+											name="categoryName" >
 
 											<option value="0">Select any one category</option>
 											
@@ -74,11 +74,13 @@ font-weight:bold!important;
 									</div>
 
 									<div class="form-group">
-										<label for="inputTopic">Select Topic *</label> <select
+										<label for="inputTopic">Select Topic </label> <select
 											id="inputTopic" class="form-control" name="inputTopicName"
-											required="required">
+											>
+											<option value="0">Select Topic</option>
 										</select>
 									</div>
+									
 									<div class="form-group">
 										<label for="languageNameId">Select Language *</label> <select
 											id="languageNameId" class="form-control" name="languageyName"
@@ -88,13 +90,29 @@ font-weight:bold!important;
 										</select>
 									</div>
 
+									<div class="form-group">
 
+										<label for="title">Title *</label> <input type="text"
+											class="form-control" id="title" name="title"
+											 required="required"/>
+										
+									</div>
+									
+									<div class="form-group">
+
+										<label for="primaryVersion">Primary Version *</label> <input type="number"
+											class="form-control" id="primaryVersion" name="primaryVersion"
+											 th:value=1 readonly required="required"/>
+										
+									</div>
+									
+									
 
 									<div class="form-group">
 
-										<label for="brouchure">Brochure *</label><small> (.jpg or .png Format Only)</small> <input type="file"
+										<label for="brouchure">Brochure *</label><small> (.jpg or .png or.pdf Format Only)</small> <input type="file"
 											class="form-control" id="brouchure" name="brouchure"
-											accept=" .jpeg,.jpg,.png" required="required" onchange="validate_file_size(this,1024000)"/>
+											accept=" .jpeg,.jpg,.png, .pdf" required="required" onchange="validate_file_size(this,1024000)"/>
 										<small>Max file size : 1 MB</small>
 									</div>
 
@@ -123,32 +141,46 @@ font-weight:bold!important;
       <th scope="col">Category Name</th>
       <th scope="col">Topic Name</th>
       <th scope="col">Language</th>
+      <th scope="col">Title</th>
       <th scope="col">Brochure</th>
       <th scope="col">Enable / Disable</th>
        <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
-     <tr th:each="bro : ${brouchures}">
-      <td scope="row"><span th:text = "${bro.getTopicCatId().getCat().getCatName()}"></span></td>
-      <td><span th:text = "${bro.getTopicCatId().getTopic().getTopicName()}"></span></td>
-      <td><span th:text = "${bro.getLan().getLangName()}"> </span>
+     <tr th:each="ver : ${versions}">
+      <td scope="row">
+       <span th:if="${ver.getBrouchure().getTopicCatId()== null}">NA</span>
+       <span th:unless="${ver.getBrouchure().getTopicCatId()== null}"> <span th:text = "${ver.getBrouchure().getTopicCatId().getCat().getCatName()}"></span> </span>
+      </td>
+      <td>
+      <span th:if="${ver.getBrouchure().getTopicCatId()== null}">NA</span>
+       <span th:unless="${ver.getBrouchure().getTopicCatId()== null}"> <span th:text = "${ver.getBrouchure().getTopicCatId().getTopic().getTopicName()}"></span></span>
+     </td>
+      <td><span th:text = "${ver.getBrouchure().getLan().getLangName()}"> </span>
 	  </td>
-      <td><img id="imagesource" th:src="@{/files/}+@{${bro.getPosterPath()}}"
+	   <td><span th:text = "${ver.getBrouchure().getTitle()}"> </span>
+	  </td>
+      <td>
+      <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
+													target="_blank" class="pdfclass"><img id="pdfsource"
+													th:src="${ver.getVersionPosterPath()}" alt="Click here"></img></a>
+	 <embed style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}" type="application/pdf" />
+      <img th:unless="${ver.getVersionPosterPath().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
 			style="width: 150px; height: 100px" />
 	  </td>
 	  <td>
 	  		
-	   			<div th:if="${bro.isShowOnHomepage()}">
-	   				<a class="disableBrouchure" th:value="${bro.getId()}" title="Click to Disable Brochure"><i class="fas fa-times-circle" th:id="${bro.getId()}" style="color:red"></i></a>
+	   			<div th:if="${ver.getBrouchure().isShowOnHomepage()}">
+	   				<a class="disableBrouchure" th:value="${ver.getBrouchure().getId()}" title="Click to Disable Brochure"><i class="fas fa-times-circle" th:id="${ver.getBrouchure().getId()}" style="color:red"></i></a>
 	   			</div>
-	   			<div th:unless="${bro.isShowOnHomepage()}">
-	   				<a class="enableBrouchure" th:value="${bro.getId()}" title="Click to Enable Brochure"><i class="fas fa-check-circle" th:id="${bro.getId()}" style="color:green"></i> </a>
+	   			<div th:unless="${ver.getBrouchure().isShowOnHomepage()}">
+	   				<a class="enableBrouchure" th:value="${ver.getBrouchure().getId()}" title="Click to Enable Brochure"><i class="fas fa-check-circle" th:id="${ver.getBrouchure().getId()}" style="color:green"></i> </a>
 	   			</div>
 	   		
 	  
 	  </td>
-	   <td><a th:href="@{${'/brochure/edit/' + bro.getId()}}">Edit</a></td>
+	   <td><a th:href="@{${'/brochure/edit/' + ver.getBrouchure().getId()}}">Edit</a></td>
     </tr>
    
   </tbody>

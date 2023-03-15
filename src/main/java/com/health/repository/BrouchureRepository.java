@@ -26,6 +26,9 @@ public interface BrouchureRepository extends CrudRepository<Brouchure, Integer> 
 	 */
 	@Query("select max(id) from Brouchure")
 	int getNewId();
+	
+	
+	Brouchure findByTitle(String title);
 
 	/**
 	 * Find all the brochure based on given showOnHomePage field 

@@ -43,7 +43,7 @@
 										<form class="form-horizontal" th:action="@{/updateBrochure}"
 											method="post" enctype="multipart/form-data">
 											
-											<input type="hidden"  name="brochureId"  th:value="${brouchures.getId()}"/>
+											<input type="hidden"  name="brochureId"  th:value="${brouchure.getId()}"/>
 											
 											
 							<!--  
@@ -85,20 +85,75 @@
 											
 											 
   											
-											
-											
 											<div class="form-group">
-												<label for="Image" style="padding-top: 8px">Brouchure Image </label> <input type="file" style="padding-right: 50px"
+
+										<label for="title">Title *</label> <input type="text"
+											class="form-control" id="title" name="title"
+											 required="required" th:value="${brouchure.getTitle()}"/>
+										
+											</div>
+											
+									
+											<div class="form-group">
+												<label for="Image" style="padding-top: 8px">Brouchure File* </label> <input type="file" style="padding-right: 50px"
 													class="form-control-file " id="Image"
-													name="Image" placeholder="uploadFile"
-													accept=".jpg, .jpeg ,.png"/>
+													name="Image" placeholder="uploadFile" required="required"
+													accept=".jpg, .jpeg ,.png, .pdf"/>
 
 											</div>
+											
+											<div class="form-group">
+
+											<label for="overwrite">Do you want overwrite </label> <br>
+											<input type="checkbox" id="overwrite" name="overwrite" th:text=" Overwrite"
+											  th:value=1  checked/>
+										
+											</div>
+											<div class="form-group">
+
+										<label for="primaryVersion">Primary Version </label> <input type="number"
+											class="form-control" id="primaryVersion" name="primaryVersion"
+											 th:value="${brouchure.getPrimaryVersion()}" readonly />
+										
+									</div>
 
 											<button type="submit" class="btn a-btn">Submit</button>
 										</form>
+<br>
+<br>
+<table class="table table-striped" id="myTable">								
+<thead>
+    <tr>
+      <th scope="col">Date Added</th>
+      <th scope="col">Files</th>
+      <th scope="col">Brouchure_Version</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+     <tr th:each="ver : ${listofVersions}">
+      <td scope="row">
+       <span th:text="${ver.getDateAdded()}"></span>
+      </td>
+     
+      <td>
+      <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
+													target="_blank" class="pdfclass"><img id="pdfsource"
+													th:src="${ver.getVersionPosterPath()}" alt="Click here"></img></a>
+	 <embed style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}" type="application/pdf" />
+      <img th:unless="${ver.getVersionPosterPath().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
+			style="width: 150px; height: 100px" />
+	  </td>
+	 
+	   <td><span th:text="${ver.getBroVersion()}"></span></td>
+    </tr>
+   
+  </tbody>
+</table>
 									</div>
+
 								</div>
+								
 							</div>
 						</div>
 
@@ -118,6 +173,7 @@ $(document).ready( function () {
 </script>
 	<script th:inline="javascript">
 		var projectPath='[(@{/})]';
+		
 	</script>
 </body>
 </html>

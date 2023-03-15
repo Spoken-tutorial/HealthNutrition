@@ -470,7 +470,12 @@ public class AjaxController{
 		}
 
 	}
+	
+	@GetMapping("/primaryVersionWithoutOverwrite")
+	public @ResponseBody int getPrimaryVersionwithoutOverwrite(int primaryVersion){
+		return primaryVersion +1;
 
+	}
 	/**
 	 * make visible/disable Consultant object in system
 	 * @param id int value

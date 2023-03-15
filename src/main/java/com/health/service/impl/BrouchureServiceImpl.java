@@ -115,7 +115,7 @@ public class BrouchureServiceImpl implements BrouchureService{
 	@Cacheable(cacheNames ="brouchures" )
 	public List<Brouchure> findAllBrouchuresForCache(){
 		System.out.println("BrouchureCheck");
-		return repo.findAll();
+		return repo.findAllByshowOnHomepage(true);
 		
 	}
 

@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,26 +16,20 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Optional;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
-import org.springframework.cache.CacheManager;
-
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -90,9 +83,10 @@ import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
-import com.health.repository.TutorialRepository;
+import com.health.model.Version;
+import com.health.repository.BrouchureRepository;
 import com.health.repository.TopicCategoryMappingRepository;
-
+import com.health.repository.TutorialRepository;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -122,7 +116,9 @@ import com.health.service.TutorialService;
 import com.health.service.UserIndianLanguageMappingService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.service.VersionService;
 import com.health.utility.CommonData;
+import com.health.repository.*;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
@@ -143,7 +139,17 @@ public class HomeController {
 	private TutorialRepository tutRepository;
 	
 	@Autowired
+	private VersionRepository verRepository;
+	
+	@Autowired
+	private BrouchureRepository broRepository;
+	
+	@Autowired
 	private TopicCategoryMappingRepository tcmRepository;
+	
+
+	@Autowired
+	private VersionService verService;
 	
 	@Autowired
 	private ContributorAssignedTutorialService conService;
@@ -469,10 +475,24 @@ private void getModelData(Model model) {
 		List<Testimonial> testHome = new ArrayList<>();
 		List<Consultant> consulHome = new ArrayList<>();
 		List<Category> categoryHome = new ArrayList<>();
-		List<Brouchure> brochureHome = new ArrayList<>();
+		//List<Brouchure> brochureHome = new ArrayList<>();
+		List<Version> versionHome= new ArrayList<>();
 		List<Carousel> carouselHome = new ArrayList<>();
 		
 		List<Category> catTempSorted = catService.getCategoriesForCache(); // getCategories(); 
+		
+
+		
+		List<Version> allVersions=verService.findAll();
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brochures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		//model.addAttribute("brouchures", brochures);
+		//model.addAttribute("versions", versions);
 	
 		
 
@@ -512,7 +532,8 @@ private void getModelData(Model model) {
 		upperlimit = 4 ;
 		//categoryHome=(categories.size()>upperlimit) ? categories.subList(0, upperlimit):categories;
 		categoryHome=(catTempSorted.size()>upperlimit) ? catTempSorted.subList(0, upperlimit):catTempSorted;
-		brochureHome=(brochures.size()>upperlimit) ? brochures.subList(0, upperlimit):brochures;
+		//brochureHome=(brochures.size()>upperlimit) ? brochures.subList(0, upperlimit):brochures;
+		versionHome=(versions.size()>upperlimit) ? versions.subList(0, upperlimit):versions;
 		carouselHome=(carousel.size()>upperlimit) ? carousel.subList(0, upperlimit):carousel;
 
 		if(!consulHome.isEmpty()) {
@@ -531,8 +552,8 @@ private void getModelData(Model model) {
 			model.addAttribute("events", evnHome);
 		}
 
-		if(!brochureHome.isEmpty()) {
-			model.addAttribute("listofBrochures", brochureHome);
+		if(!versionHome.isEmpty()) {
+			model.addAttribute("listofVesrsions", versionHome);
 		}
 		
 		
@@ -1820,7 +1841,32 @@ private void getModelData(Model model) {
 		List<Language> lans = lanService.getAllLanguages();
 		model.addAttribute("languages", lans);
 		List<Brouchure> brouchures = broService.findAll();
+		List<Version> allVersions= verService.findAll();
+		
+		
+		//List<Version> versions= new ArrayList<>();
+		//Set<Version> verList= new TreeSet<>();
+		//List<Version> list1= new ArrayList<>();
+		/*for(Brouchure bro: brouchures) {
+			 verList= bro.getVersions();
+			 list1=new ArrayList<>( verList);
+			Collections.sort(list1, Version.SortByBroVersionInDesc);
+			if(list1.size()>0)
+				versions.add(list1.get(0));
+			System.out.println(versions +"Alok Kumar");
+			
+		}
+	*/
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
 		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
+		
 		return "addBrochure";
 	}
 
@@ -1839,7 +1885,9 @@ private void getModelData(Model model) {
 								  @RequestParam("brouchure") MultipartFile brochure,
 								  @RequestParam(value = "categoryName") int categoryId,
 								  @RequestParam(name = "inputTopicName") int topicId,
-								  @RequestParam(name = "languageyName") int languageId) {
+								  @RequestParam(name = "languageyName") int languageId,
+								  @RequestParam(value = "primaryVersion") int primaryVersion,
+								  @RequestParam(name = "title") String title) {
 
 		User usr=new User();
 
@@ -1849,22 +1897,33 @@ private void getModelData(Model model) {
 		}
 
 		model.addAttribute("userInfo", usr);
-		List<Brouchure> brouchures = broService.findAll();
-		model.addAttribute("brouchures", brouchures);
 		List<Language> languages=lanService.getAllLanguages();
 		List<Category> categories=catService.findAll();
 		model.addAttribute("categories", categories);
 		model.addAttribute("languages", languages);
+		List<Brouchure> brouchures = broService.findAll();
+		List<Version> allVersions= verService.findAll();
+		List<Version> versions= new ArrayList<>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
 		
-		if(!ServiceUtility.checkFileExtensionImage(brochure)) {  // throw error
-			model.addAttribute("error_msg",CommonData.JPG_PNG_EXT);
+		
+		if(!ServiceUtility.checkFileExtensionImage(brochure) && !ServiceUtility.checkFileExtensiononeFilePDF(brochure)){  // throw error
+			model.addAttribute("error_msg","Only image and pdf files are supported");
 			return "addBrochure";
 		}
 		
 		Category cat=catService.findByid(categoryId);
+		
 		Topic topic=topicService.findById(topicId);
 		
-		if(cat == null) {  // throw error
+		/*if(cat == null) {  // throw error
 			model.addAttribute("error_msg","Please Try again");
 			return "addBrochure";
 		}
@@ -1873,15 +1932,40 @@ private void getModelData(Model model) {
 			model.addAttribute("error_msg","Please Try again");
 			return "addBrochure";
 		}
+		*/
+		//int versionInt = Integer.parseInt(version);
+		String versionStr=Integer.toString(primaryVersion);
 		
-		TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
+		if(versionStr == null) {  // throw error
+		model.addAttribute("error_msg","Please Try again");
+		System.out.println("AlokSP Error1");
+		return "addBrochure";
+		}
+	
+		if(title == null) {  // throw error
+		model.addAttribute("error_msg","Please Try again");
+		return "addBrochure";
+		}
+	   
 		Language lan=lanService.getById(languageId);
-
+		
+		
 		int newBroId=broService.getNewId();
+		int newVerid= verService.getNewId();
 		Brouchure brochureTemp = new Brouchure();
 		brochureTemp.setId(newBroId);
 		brochureTemp.setLan(lan);
-		brochureTemp.setTopicCatId(topicCat);
+		brochureTemp.setTitle(title);
+		brochureTemp.setPrimaryVersion(primaryVersion);
+		
+		
+		if(cat !=null && topic !=null) 
+		
+		{
+			TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
+			brochureTemp.setTopicCatId(topicCat);
+		}
+		
 
 		try {
 			broService.save(brochureTemp);
@@ -1890,32 +1974,76 @@ private void getModelData(Model model) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+			System.out.println("AlokSP Error2");
 			return "addBrochure";
 		}
 
+
+		Version version= new Version();
+		
 		try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(brochure, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion);
+			String pathtoUploadPoster1=ServiceUtility.uploadFile(brochure, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId +"/" +primaryVersion);
+			int indexToStart1=pathtoUploadPoster1.indexOf("Media");
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+			String document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
 
-				brochureTemp.setPosterPath(document);
+			version.setVerId(newVerid);
+			version.setBrouchure(brochureTemp);
+			version.setBroVersion(primaryVersion);
+			version.setDateAdded(ServiceUtility.getCurrentTime());
+			version.setVersionPosterPath(document1);
+			verService.save(version);
+			
+			brouchures = broService.findAll();
+			allVersions= verService.findAll();
+			versions= new ArrayList<>();
+			for(Brouchure bro: brouchures) {
+				for(Version ver: allVersions) {
+					if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+						versions.add(ver);
+				}
+			}
+			model.addAttribute("brouchures", brouchures);
+			model.addAttribute("versions", versions);
+			//brochureTemp.getPosterPath().endsWith(".pdf");
 
-				broService.save(brochureTemp);
+			
 
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-			broService.delete(brochureTemp);
-			return "addBrochure";
-		}
-
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+		verService.delete(version);
+		System.out.println(" AlokSP  Error4");
 		brouchures = broService.findAll();
+		allVersions= verService.findAll();
+		versions= new ArrayList<>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
 		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
+		return "addBrochure";
+		
+	}
+		
+       
 		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
-
+		brouchures = broService.findAll();
+		allVersions= verService.findAll();
+		versions= new ArrayList<>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
 		return "addBrochure";
 
 
@@ -2072,7 +2200,8 @@ private void getModelData(Model model) {
 	}
 
 	/**
-	 * redirects to edit page of topic given id
+	 * redirects to 
+ page of topic given id
 	 * @param model Model object
 	 * @param principal principal object
 	 * @param id int value
@@ -3699,16 +3828,32 @@ private void getModelData(Model model) {
 		model.addAttribute("languages", languages);
 	
 		Language langByBrouchure= brouchure.getLan();
-		TopicCategoryMapping tcm=brouchure.getTopicCatId();
+	/* 
+	    TopicCategoryMapping tcm=brouchure.getTopicCatId();
 		Category catBrouchure=tcm.getCat();
 		Topic topicBrouchure=tcm.getTopic();
 		model.addAttribute("catBrouchure", catBrouchure);
 		model.addAttribute("topicBrouchure", topicBrouchure);
-		model.addAttribute("langByBrouchure",langByBrouchure);
-
 		
-		model.addAttribute("brouchures", brouchure);
-
+	*/	
+	
+		Set<Version> verSet= brouchure.getVersions();
+		
+		Version version= new Version();
+		
+			for(Version ver: verSet) {
+				if(brouchure.getId()==ver.getBrouchure().getId() && brouchure.getPrimaryVersion()==ver.getBroVersion())
+					version=ver;
+				break;	
+			}
+		
+		List<Version> listofVersions= new ArrayList<>(verSet);
+		model.addAttribute("listofVersions", listofVersions);
+		model.addAttribute("version", version);
+		model.addAttribute("brouchure", brouchure);
+		model.addAttribute("langByBrouchure",langByBrouchure);
+		
+		
 		return "updateBrochure";
 	}
 
@@ -3731,8 +3876,13 @@ private void getModelData(Model model) {
 		model.addAttribute("userInfo", usr);
 		
 		
-
+		String title= req.getParameter("title");
 		String brochureId=req.getParameter("brochureId");
+		
+		String overwrite=req.getParameter("overwrite");
+		int overwriteValue=0;
+		if(overwrite!=null)
+			overwriteValue = Integer.parseInt(overwrite);
 		/*
 		String cat = req.getParameter("categoryName");
 		String topic = req.getParameter("inputTopic");
@@ -3741,24 +3891,45 @@ private void getModelData(Model model) {
 		
 
 		Brouchure brouchure= broService.findById(Integer.parseInt(brochureId));
-
-		model.addAttribute("brouchures", brouchure);
+		Version version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+		
+		
+		
+		model.addAttribute("version", version);
+		
+		model.addAttribute("brouchure", brouchure);
 		
 		
 		
 
 
 		if(brouchure==null) {
-			model.addAttribute("error_msg","Event doesn't exist");
+			model.addAttribute("error_msg","Brouchure doesn't exist");
 			return "updateBrochure";
 		}
+		
+		Set<Version> verSet= brouchure.getVersions();
+		List<Version> listofVersions= new ArrayList<>(verSet);
+		model.addAttribute("listofVersions", listofVersions);
+		
+		if(title.isEmpty()){
+			model.addAttribute("error_msg","Title doesn't exist with empty");
+			return "updateBrochure";
+		}
+		
+		
+		int newVerId= verService.getNewId();
+		int versionValue=brouchure.getPrimaryVersion();
+		int newVersionValue=versionValue+1;
+		
+		
 
 		try {
 			
 
 			if(!files.isEmpty()) {
-				if(!ServiceUtility.checkFileExtensionImage(files)) { // throw error on extension
-					model.addAttribute("error_msg",CommonData.JPG_PNG_EXT);
+				if(ServiceUtility.checkFileExtensionVideo(files)) { // throw error on extension
+					model.addAttribute("error_msg", "Only image and pdf files are supported");
 					return "updateBrochure";
 			}
 			}
@@ -3788,29 +3959,72 @@ private void getModelData(Model model) {
 			
 			
 			
+			
 
 			if(!files.isEmpty()) {
-				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brouchure.getId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+				
+				if(overwriteValue==1) {
+					String pathtoUploadPoster1=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure + brochureId+ "/" + versionValue);
+					int indexToStart1=pathtoUploadPoster1.indexOf("Media");
+					String document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+					version.setVersionPosterPath(document1);
+					verService.save(version);
+					brouchure.setTitle(title);
+					broService.save(brouchure);
+					
+					
+				}
+					
+					else {
+						
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
+						String pathtoUploadPoster2=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
+						int indexToStart2=pathtoUploadPoster2.indexOf("Media");
+						String document2=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
+						
+						brouchure.setTitle(title);
+						brouchure.setPrimaryVersion(version.getBroVersion()+1);
+						broService.save(brouchure);
+						
+						Version newVer= new Version();
+						newVer.setVerId(newVerId);
+						newVer.setBrouchure(brouchure);
+						newVer.setDateAdded(ServiceUtility.getCurrentTime());
+						newVer.setBroVersion(version.getBroVersion()+1);
+						newVer.setVersionPosterPath(document2);
+						verService.save(newVer);
+						
+						
+					}
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+			} 
+			
 
-				brouchure.setPosterPath(document);
-
-			}
-
-			broService.save(brouchure);
-
-		}catch (Exception e) {
+			} catch (Exception e) {
 			// TODO: handle exception
 			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-			model.addAttribute("brouchures", brouchure);
+			System.out.println("Check path error");
+			
+			
+			version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+			model.addAttribute("version", version);
+			model.addAttribute("brouchure", brouchure);
+			verSet= brouchure.getVersions();
+			listofVersions= new ArrayList<>(verSet);
+			model.addAttribute("listofVersions", listofVersions);
 			return "updateBrochure";        // need to add some error message
 		}
+		
+		
 
 
 		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
-		model.addAttribute("brouchures", brouchure);
+		version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+		model.addAttribute("version", version);
+		model.addAttribute("brouchure", brouchure);
+		verSet= brouchure.getVersions();
+		listofVersions= new ArrayList<>(verSet);
+		model.addAttribute("listofVersions", listofVersions);
 
 		return "updateBrochure";
 	}
@@ -7044,8 +7258,16 @@ private void getModelData(Model model) {
 		*/
 		
 		List<Brouchure> brouchures= broService.findAll();
-		
+		List<Version> allVersions=verService.findAll();
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
 		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
 
 		return "brochures";  // view name
 	}
