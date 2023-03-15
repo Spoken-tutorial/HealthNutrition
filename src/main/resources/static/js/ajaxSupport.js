@@ -221,6 +221,9 @@ $(document).ready(function() {
 			});
 			
 			
+		
+			
+			
 			$('.enableTest').click(function() {
 				
 				var test_id=$(this).attr('value');
@@ -2372,6 +2375,10 @@ $(document).ready(function() {
 	*/
 	
 	
+	/* A java Script funtion to load topics by Category in Add Topic page 
+	*Author: Alok Kumar
+	*/
+	
 	$('#categoryId1').on('change',function() {
 						var catId = $(this).find("option:selected").val();
 						$.ajax({
@@ -2403,6 +2410,57 @@ $(document).ready(function() {
 						});
 
 					});
+					
+					
+	
+	
+	/* A java Script funtion to load primary version b y checked or unchecked checkbox 
+	*Author: Alok Kumar
+	*/
+		$('#overwrite').change(function() {
+				
+						//var flag=$("#overwrite").prop("checked", true);
+						var flag;
+						if($("#overwrite").is(':checked')){
+							flag=1;
+						}
+						else{
+							flag=0;
+						}
+						var broId = $('#overwrite').val();
+						
+						$.ajax({
+
+							type : "GET",
+							url : projectPath+"primaryVersionWithoutOverwrite",
+							data : {
+								"id" : broId,
+								"checkedValue": flag
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+									  	  			     
+			  	  			       html += '<h6>' + 'Primary Version: ' + result +  '</h6>' ;
+			  	  			 		
+			  	  			 	
+			  	  			 	$('#pVersionbeforeJS').hide();
+								$("#pVersion").prop('disabled', false);
+								$('#pVersion').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "	+ JSON.stringify(err));
+							}
+
+						});
+
+					});
+	
+			
+					
 					
 					
 		 $('#topicId').on('change', function() {

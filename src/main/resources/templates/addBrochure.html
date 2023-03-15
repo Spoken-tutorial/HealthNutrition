@@ -162,12 +162,14 @@ font-weight:bold!important;
 	   <td><span th:text = "${ver.getBrouchure().getTitle()}"> </span>
 	  </td>
       <td>
-      <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
+       <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
+       <a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
 													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${ver.getVersionPosterPath()}" alt="Click here"></img></a>
-	 <embed style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}" type="application/pdf" />
-      <img th:unless="${ver.getVersionPosterPath().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
-			style="width: 150px; height: 100px" />
+													th:src="${ver.getVersionPosterPath()}" alt="Download"></img></a>
+      <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
+													target="_blank" class="pdfclass">
+      <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
+			style="width: 150px; height: 100px" /></a>
 	  </td>
 	  <td>
 	  		

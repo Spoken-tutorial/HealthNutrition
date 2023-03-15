@@ -3963,7 +3963,7 @@ private void getModelData(Model model) {
 
 			if(!files.isEmpty()) {
 				
-				if(overwriteValue==1) {
+				if(overwriteValue !=0) {
 					String pathtoUploadPoster1=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure + brochureId+ "/" + versionValue);
 					int indexToStart1=pathtoUploadPoster1.indexOf("Media");
 					String document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
@@ -3994,7 +3994,10 @@ private void getModelData(Model model) {
 						newVer.setVersionPosterPath(document2);
 						verService.save(newVer);
 						
-						
+						brouchure= broService.findById(Integer.parseInt(brochureId));
+						verSet= brouchure.getVersions();
+						listofVersions= new ArrayList<>(verSet);
+						model.addAttribute("listofVersions", listofVersions);
 					}
 
 			} 
@@ -4022,9 +4025,12 @@ private void getModelData(Model model) {
 		version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
 		model.addAttribute("version", version);
 		model.addAttribute("brouchure", brouchure);
+		brouchure= broService.findById(Integer.parseInt(brochureId));
 		verSet= brouchure.getVersions();
 		listofVersions= new ArrayList<>(verSet);
 		model.addAttribute("listofVersions", listofVersions);
+		for(Version ver: listofVersions)
+		System.out.println(ver);
 
 		return "updateBrochure";
 	}

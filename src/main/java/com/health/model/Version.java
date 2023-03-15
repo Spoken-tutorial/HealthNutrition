@@ -30,6 +30,12 @@ public class Version {
 	
 	
 
+	@Override
+	public String toString() {
+		return "Version [verId=" + verId + ", dateAdded=" + dateAdded + ", versionPosterPath=" + versionPosterPath
+				+ ", broVersion=" + broVersion + "]";
+	}
+
 	public Version(int verId, Timestamp dateAdded, String versionPosterPath, Brouchure brouchure, int broVersion) {
 		super();
 		this.verId = verId;

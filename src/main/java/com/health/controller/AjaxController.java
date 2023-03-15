@@ -471,9 +471,23 @@ public class AjaxController{
 
 	}
 	
+	
+	/*
+	 * A function to get primary version by checked and unchecked checkbox
+	 * Author: Alok Kumar
+	 * 
+	 */
+	
 	@GetMapping("/primaryVersionWithoutOverwrite")
-	public @ResponseBody int getPrimaryVersionwithoutOverwrite(int primaryVersion){
-		return primaryVersion +1;
+	public @ResponseBody int getPrimaryVersionwithoutOverwrite(int id, int checkedValue){
+			
+			Brouchure bro = broService.findById(id);
+			if(checkedValue==1)
+			return bro.getPrimaryVersion();
+			else
+				return bro.getPrimaryVersion() +1;
+		
+		
 
 	}
 	/**
