@@ -130,7 +130,7 @@ font-weight:bold!important;
 				</div>
   </div>
   <div class="tab-pane fade py-3" id="view" role="tabpanel" aria-labelledby="profile-tab">
-  <table class="table table-striped" id="myTable">
+  <table class="table table-striped" id="myTable"  data-order='[[ 0, "desc" ]]'>
   	<div id="Success"
 										style="display: none; color: green; font-size: 16px; text-align: center">Changes Updated Successfully</div>
 								<div id="Failure"
@@ -138,6 +138,7 @@ font-weight:bold!important;
                             	 </div>
   <thead>
     <tr>
+    <th scope="col">Date Added</th>
       <th scope="col">Category Name</th>
       <th scope="col">Topic Name</th>
       <th scope="col">Language</th>
@@ -149,7 +150,12 @@ font-weight:bold!important;
   </thead>
   <tbody>
      <tr th:each="ver : ${versions}">
-      <td scope="row">
+     
+     <td scope="row">
+       <span th:text="${ver.getDateAdded()}"></span>
+       
+      </td>
+      <td >
        <span th:if="${ver.getBrouchure().getTopicCatId()== null}">NA</span>
        <span th:unless="${ver.getBrouchure().getTopicCatId()== null}"> <span th:text = "${ver.getBrouchure().getTopicCatId().getCat().getCatName()}"></span> </span>
       </td>
@@ -163,7 +169,7 @@ font-weight:bold!important;
 	  </td>
       <td>
        <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
-       <a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
+       <br><a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
 													target="_blank" class="pdfclass"><img id="pdfsource"
 													th:src="${ver.getVersionPosterPath()}" alt="Download"></img></a>
       <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"

@@ -82,6 +82,15 @@ public class Version {
 	        }
 	    };
 	    
+	    public static Comparator<Version> SortByBroVersionTime = new Comparator<Version>() {
+			  
+	        // Method
+	        public int compare(Version v1, Version v2) {
+	        	return v2.getDateAdded().compareTo(v1.getDateAdded());
+	            
+	        }
+	    };
+	    
 	
 	public Brouchure getBrouchure() {
 		return brouchure;

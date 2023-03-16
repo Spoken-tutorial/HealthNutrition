@@ -491,6 +491,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		//model.addAttribute("brouchures", brochures);
 		//model.addAttribute("versions", versions);
 	
@@ -551,8 +552,11 @@ private void getModelData(Model model) {
 		if(!evnHome.isEmpty()) {
 			model.addAttribute("events", evnHome);
 		}
+		
+		
 
 		if(!versionHome.isEmpty()) {
+			Collections.sort(versionHome, Version.SortByBroVersionTime);
 			model.addAttribute("listofVesrsions", versionHome);
 		}
 		
@@ -1864,6 +1868,10 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
+		for(Version ver: versions) {
+			System.out.println(ver.getDateAdded());
+		}
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		
@@ -1910,6 +1918,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		
@@ -2004,6 +2013,7 @@ private void getModelData(Model model) {
 						versions.add(ver);
 				}
 			}
+			Collections.sort(versions, Version.SortByBroVersionTime);
 			model.addAttribute("brouchures", brouchures);
 			model.addAttribute("versions", versions);
 			//brochureTemp.getPosterPath().endsWith(".pdf");
@@ -2025,6 +2035,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		return "addBrochure";
@@ -2042,6 +2053,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		return "addBrochure";
@@ -3848,7 +3860,18 @@ private void getModelData(Model model) {
 			}
 		
 		List<Version> listofVersions= new ArrayList<>(verSet);
-		model.addAttribute("listofVersions", listofVersions);
+		
+		Collections.sort(listofVersions, Version.SortByBroVersionTime);
+		
+		List<Version> newlistofVesrion= new ArrayList<>();
+		int temp=0;
+		for(Version ver: listofVersions) {
+			newlistofVesrion.add(ver);
+			temp++;
+			if(temp==3)
+				break;
+		}
+		model.addAttribute("listofVersions", newlistofVesrion);
 		model.addAttribute("version", version);
 		model.addAttribute("brouchure", brouchure);
 		model.addAttribute("langByBrouchure",langByBrouchure);
@@ -3910,7 +3933,17 @@ private void getModelData(Model model) {
 		
 		Set<Version> verSet= brouchure.getVersions();
 		List<Version> listofVersions= new ArrayList<>(verSet);
-		model.addAttribute("listofVersions", listofVersions);
+		Collections.sort(listofVersions, Version.SortByBroVersionTime);
+		List<Version> newlistofVesrion= new ArrayList<>();
+		int temp=0;
+		for(Version ver: listofVersions) {
+			newlistofVesrion.add(ver);
+			temp++;
+			if(temp==3)
+				break;
+		}
+		
+		model.addAttribute("listofVersions", newlistofVesrion);
 		
 		if(title.isEmpty()){
 			model.addAttribute("error_msg","Title doesn't exist with empty");
@@ -4012,9 +4045,19 @@ private void getModelData(Model model) {
 			version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
 			model.addAttribute("version", version);
 			model.addAttribute("brouchure", brouchure);
+		
 			verSet= brouchure.getVersions();
 			listofVersions= new ArrayList<>(verSet);
-			model.addAttribute("listofVersions", listofVersions);
+			Collections.sort(listofVersions, Version.SortByBroVersionTime);
+			newlistofVesrion= new ArrayList<>();
+			temp=0;
+			for(Version ver: listofVersions) {
+				newlistofVesrion.add(ver);
+				temp++;
+				if(temp==3)
+					break;
+			}
+			model.addAttribute("listofVersions", newlistofVesrion);
 			return "updateBrochure";        // need to add some error message
 		}
 		
@@ -4028,7 +4071,17 @@ private void getModelData(Model model) {
 		brouchure= broService.findById(Integer.parseInt(brochureId));
 		verSet= brouchure.getVersions();
 		listofVersions= new ArrayList<>(verSet);
-		model.addAttribute("listofVersions", listofVersions);
+		listofVersions= new ArrayList<>(verSet);
+		Collections.sort(listofVersions, Version.SortByBroVersionTime);
+		newlistofVesrion= new ArrayList<>();
+		temp=0;
+		for(Version ver: listofVersions) {
+			newlistofVesrion.add(ver);
+			temp++;
+			if(temp==3)
+				break;
+		}
+		model.addAttribute("listofVersions", newlistofVesrion);
 		for(Version ver: listofVersions)
 		System.out.println(ver);
 
@@ -7272,6 +7325,9 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
+		for(Version ver: versions)
+			System.out.println(ver.getDateAdded() + " " + ver.getBrouchure().getTitle());
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 
