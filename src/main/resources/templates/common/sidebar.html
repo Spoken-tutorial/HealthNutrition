@@ -209,6 +209,12 @@ a:hover {
               <i class="fas fa-user-tag sidebar-icon"></i>Users 
             </a>
           </li>
+           <li class="nav-item ">
+            <a class="nav-link" th:href="@{/clearAllCaches}">
+              
+              <i class="fas fa-trash sidebar-icon"></i>Clear All Caches
+            </a>
+          </li>
           <li class="nav-item">
             <span class="nav-link" >
               
@@ -371,6 +377,37 @@ a:hover {
           <li class="nav-item border-lt nav-con-timescript">
             <a class="nav-link" th:href="@{/uploadTimescript}">
               Upload Timescript
+            </a>
+          </li>
+           <li class="nav-item border-lt nav-brochure">
+            <a class="nav-link" th:href="@{/addBrochure}">
+              <span data-feather="bar-chart-2"></span>
+              Brochure
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-carousel">
+            <a class="nav-link" th:href="@{/addCarousel}">
+              <span data-feather="bar-chart-2"></span>
+              Carousel
+            </a>
+          </li>
+           
+          <li class="nav-item border-lt nav-consultants">
+            <a class="nav-link" th:href="@{/addConsultant}">
+              <span data-feather="shopping-cart"></span>
+              Consultants
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-events">
+            <a class="nav-link" th:href="@{/addEvent}">
+              <span data-feather="users"></span>
+              Events
+            </a>
+          </li>
+          <li class="nav-item border-lt nav-testimonials">
+            <a class="nav-link" th:href="@{/addTestimonial}">
+              <span data-feather="bar-chart-2"></span>
+              Testimonials
             </a>
           </li>
         </ul>

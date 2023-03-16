@@ -1,5 +1,6 @@
 package com.health.domain.security;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +20,7 @@ import org.hibernate.annotations.GeneratorType;
  * @version 1.0
  */
 @Entity
-public class Role {
+public class Role implements  Serializable {
 
 	/**
 	 * unique id of object

@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -16,7 +17,7 @@ import javax.persistence.ManyToOne;
  *
  */
 @Entity
-public class FeedbackMasterTrainer {
+public class FeedbackMasterTrainer implements  Serializable {
 
 	/**
 	 * unique id of object

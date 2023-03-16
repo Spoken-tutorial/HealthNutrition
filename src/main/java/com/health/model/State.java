@@ -1,6 +1,7 @@
 package com.health.model;
 
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +20,7 @@ import javax.persistence.OneToMany;
  *
  */
 @Entity
-public class State implements Comparable<State> {
+public class State implements Comparable<State>, Serializable {
 
 	/**
 	 * unique id of object

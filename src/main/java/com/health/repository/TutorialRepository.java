@@ -2,6 +2,8 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -73,8 +75,19 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> , J
 	 * @param status boolean value
 	 * @return list of Tutorial object
 	 */
-	List<Tutorial> findAllBystatus(boolean status);
+	//@Cacheable(cacheNames ="tutorials" )
+	//List<Tutorial> findAllByStatusTrue();
 	
+	//@Cacheable(cacheNames ="tutorials" )
+	List<Tutorial> findAllByStatus(boolean status);
+	
+	//@CacheEvict(cacheNames = "tutorials", allEntries=true)
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	void deleteById(int id);
+	
+	//@CacheEvict(cacheNames = "tutorials", allEntries=true)
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	<S extends Tutorial> S save(S entity);
 	/**
 	 * List out all the tutorial based on pagination
 	 * @param page Pageable object

@@ -43,4 +43,6 @@ public interface TopicService {
 	 * @param topic Topic object
 	 */
 	void save(Topic topic);
+	
+	List<Topic> getTopicsForcache(); 
 }

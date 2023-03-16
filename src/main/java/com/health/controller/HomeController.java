@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,21 +16,20 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -85,9 +83,10 @@ import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
-import com.health.repository.TutorialRepository;
+import com.health.model.Version;
+import com.health.repository.BrouchureRepository;
 import com.health.repository.TopicCategoryMappingRepository;
-
+import com.health.repository.TutorialRepository;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -117,7 +116,9 @@ import com.health.service.TutorialService;
 import com.health.service.UserIndianLanguageMappingService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.service.VersionService;
 import com.health.utility.CommonData;
+import com.health.repository.*;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
@@ -138,7 +139,17 @@ public class HomeController {
 	private TutorialRepository tutRepository;
 	
 	@Autowired
+	private VersionRepository verRepository;
+	
+	@Autowired
+	private BrouchureRepository broRepository;
+	
+	@Autowired
 	private TopicCategoryMappingRepository tcmRepository;
+	
+
+	@Autowired
+	private VersionService verService;
 	
 	@Autowired
 	private ContributorAssignedTutorialService conService;
@@ -235,6 +246,9 @@ public class HomeController {
 
 	@Autowired
 	private OrganizationRoleService organizationRoleService;
+	
+	@Autowired
+	private CacheManager cacheManager;
 	
 	@Autowired
 	private LogMangementService logMangementService;
@@ -337,6 +351,7 @@ static void setCompComment(Model model,List<Tutorial> tutorials,CommentService c
 	}
 }
 
+//1***********
 static void setEngLangStatus(Model model,Language lan) {
 	if(!lan.getLangName().equalsIgnoreCase("english")) {
 		model.addAttribute("isEnglish", false);
@@ -377,8 +392,10 @@ static String setScriptManagerUrl(Model model,String scriptmanager_url,String sc
 private void getUsers() {
 	
 }
+
+
 private List<Category> getCategories() {
-	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	List<Tutorial> tutorials = tutService.findAllByStatus(true);
 	Set<Category> catTemp = new HashSet<Category>();
 	for(Tutorial temp :tutorials) {
 		
@@ -394,8 +411,10 @@ private List<Category> getCategories() {
 	
 	return catTempSorted;
 }
+
+
 private List<Topic> getTopics() {
-	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	List<Tutorial> tutorials = tutService.findAllByStatus(true);
 	Set<Topic> topicTemp = new HashSet<Topic>();
 	for(Tutorial temp :tutorials) {
 		
@@ -408,8 +427,10 @@ private List<Topic> getTopics() {
 	Collections.sort(topicTempSorted);
 	return topicTempSorted;
 }
+
 private List<Language> getLanguages() {
-	List<Tutorial> tutorials = tutService.findAllBystatus(true);
+	List<Tutorial> tutorials = tutService.findAllByStatus(true);
+	
 	Set<Language> langTemp = new HashSet<Language>();
 	for(Tutorial temp :tutorials) {
 		Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
@@ -429,32 +450,53 @@ private List<Language> getLanguages() {
 	 * @return String object (Webpapge)
 	 */
 
+private void getModelData(Model model) {
+	List<Category> catTempSorted = catService.getCategoriesForCache();
+	List<Language> lanTempSorted = lanService.getLanguagesForCache();
+	List<Topic> topicTemp = topicService.getTopicsForcache(); 
+	
+	model.addAttribute("categories", catTempSorted);
+	model.addAttribute("languages", lanTempSorted);
+	model.addAttribute("topics", topicTemp);
+	model.addAttribute("languageCount",lanTempSorted.size());
+}
+	
+
 	@RequestMapping("/")
 	public String index(Model model) {
 
-		List<Event> events=eventservice.findAll();
-		List<Testimonial> testi=testService.findByApproved(true);
-		List<Consultant> consults= consultService.findByOnHome(true);
-		List<Category> categories= catService.findAll();
-		List<Language> languages = lanService.getAllLanguages();
-		List<Brouchure> brochures= broService.findAll();
-		List<Carousel> carousel= caroService.findAll();
-
-		Set<String> lanTemp = new HashSet<String>();
-
-		List<Category> category_objs = catService.findAllByOrder();
-		Collections.sort(category_objs);
-	
+		List<Event> events=eventservice.findAllEventForCache(); //findAllEvent(); 
+		List<Testimonial> testi= testService.findAllTestimonialByapprovedForCache();  //findAllTestimonialByapproved();
+		List<Consultant> consults=consultService.findAllConsultHomeTrueForCache(); //findAllConsultHomeTrue();	
+		List<Brouchure> brochures= broService.findAllBrouchuresForCache(); //findAllBrouchures(); 
+		List<Carousel> carousel= caroService.findCarouselForCache(); //findCarousel();	
+		//List<Category> category_objs = catService.findAllCategoryByOrderForCache(); // findAllCategoryByOrder();
 		List<Event> evnHome = new ArrayList<>();
 		List<Testimonial> testHome = new ArrayList<>();
 		List<Consultant> consulHome = new ArrayList<>();
 		List<Category> categoryHome = new ArrayList<>();
-		List<Brouchure> brochureHome = new ArrayList<>();
+		//List<Brouchure> brochureHome = new ArrayList<>();
+		List<Version> versionHome= new ArrayList<>();
 		List<Carousel> carouselHome = new ArrayList<>();
 		
-		List<Category> catTempSorted = getCategories();
-		List<Language> lanTempSorted = getLanguages();
-		List<Topic> topicTempSorted = getTopics();
+		List<Category> catTempSorted = catService.getCategoriesForCache(); // getCategories(); 
+		
+
+		
+		List<Version> allVersions=verService.findAll();
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brochures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		//model.addAttribute("brouchures", brochures);
+		//model.addAttribute("versions", versions);
+	
+		
+
+		getModelData(model);
 
 
 
@@ -490,7 +532,8 @@ private List<Language> getLanguages() {
 		upperlimit = 4 ;
 		//categoryHome=(categories.size()>upperlimit) ? categories.subList(0, upperlimit):categories;
 		categoryHome=(catTempSorted.size()>upperlimit) ? catTempSorted.subList(0, upperlimit):catTempSorted;
-		brochureHome=(brochures.size()>upperlimit) ? brochures.subList(0, upperlimit):brochures;
+		//brochureHome=(brochures.size()>upperlimit) ? brochures.subList(0, upperlimit):brochures;
+		versionHome=(versions.size()>upperlimit) ? versions.subList(0, upperlimit):versions;
 		carouselHome=(carousel.size()>upperlimit) ? carousel.subList(0, upperlimit):carousel;
 
 		if(!consulHome.isEmpty()) {
@@ -509,33 +552,23 @@ private List<Language> getLanguages() {
 			model.addAttribute("events", evnHome);
 		}
 
-		if(!brochureHome.isEmpty()) {
-			model.addAttribute("listofBrochures", brochureHome);
+		if(!versionHome.isEmpty()) {
+			model.addAttribute("listofVesrsions", versionHome);
 		}
 		
 		
-		List<Tutorial> tutorials=tutService.findAllBystatus(true);
-		List<Tutorial> finalTutorials=new ArrayList<>();
-		for(Tutorial temp :tutorials) {
-			
-			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
-			if(c.isStatus()) {
-				finalTutorials.add(temp);
-			}
-		}
+		List<Tutorial> finalTutorials = tutService.getFinalTutorialsForCache(); //getFinalTutorials();
 		
 
 
-		model.addAttribute("languageCount", getLanguages().size());
+		
+		
 		model.addAttribute("videoCount", finalTutorials.size());
 		model.addAttribute("consultantCount", consults.size());
 
 
 		
 		
-		model.addAttribute("categories", catTempSorted);
-		model.addAttribute("languages", lanTempSorted);
-		model.addAttribute("topics", topicTempSorted);
 
 		if(!carouselHome.isEmpty()) {
 			model.addAttribute("carousel", carouselHome.get(0));
@@ -545,6 +578,34 @@ private List<Language> getLanguages() {
 
 		return "index";
 	}
+	
+
+
+	/*
+	 * A controller to clear all caches
+	 * Author: Alok Kumar
+	 */
+	
+	@RequestMapping(value = "/clearAllCaches", method = RequestMethod.GET)
+	public String ClearAllCache(Principal principal,Model model ) {
+		
+		for(String name:cacheManager.getCacheNames()){
+			cacheManager.getCache(name).clear(); // clear cache by name
+			}
+		
+		User usr=new User();
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		model.addAttribute("success_msg",CommonData.All_Caches_Clear_MSG); 
+		return "ClearAllCaches";
+	}
+	
+
+
 
 	/**
 	 * Redirects to Tutorials Page
@@ -565,13 +626,7 @@ private List<Language> getLanguages() {
 			
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 
-		List<Category> catTempSorted = getCategories();
-		List<Language> lanTempSorted = getLanguages();
-		List<Topic> topicTemp = getTopics();
-		
-		model.addAttribute("categories", catTempSorted);
-		model.addAttribute("languages", lanTempSorted);
-		model.addAttribute("topics", topicTemp);
+		getModelData(model);
 		
 		model.addAttribute("category", cat);
 		model.addAttribute("language", lan);
@@ -654,15 +709,32 @@ private List<Language> getLanguages() {
 		}
 
 		for(Tutorial temp :tutToView) {
-			
 			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
 			if(c.isStatus()) {
 				tutToView1.add(temp);
 			}
-			System.out.println(temp.getTutorialId() +"***********");
 		}
 		
-		Collections.sort(tutToView1);  // sorting based on order value
+		if(localCat==null) {
+			Collections.sort(tutToView1, Tutorial.UserVisitComp);
+		}
+		else {
+			Collections.sort(tutToView1, Tutorial.SortByOrderValue);
+		}
+		
+		if(localCat==null) {
+			System.out.println("********Checking Sort by userVisit in Tutorial*********");
+			for(Tutorial tv: tutToView1) {
+				System.out.println(tv.getUserVisit() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+			}
+		}else {
+			System.out.println("********Checking Sort by orderValue in Tutorial*********");
+			for(Tutorial tv: tutToView1) {
+				System.out.println(tv.getConAssignedTutorial().getTopicCatId().getOrder() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+			}
+		}
+		
+		 // sorting based on order value
 		
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
@@ -682,18 +754,13 @@ private List<Language> getLanguages() {
 			@RequestParam(name = "query") String query,
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 		
-		List<Category> catTempSorted = getCategories();
-		List<Language> lanTempSorted = getLanguages();
-		List<Topic> topicTemp = getTopics();
-		
-		model.addAttribute("categories", catTempSorted);
-		model.addAttribute("languages", lanTempSorted);
-		model.addAttribute("topics", topicTemp);
+		getModelData(model);
 		
 
 		Page<Tutorial> tut = null;
 		List<Tutorial> tutToView = new ArrayList<Tutorial>();
 		List<Tutorial> tutToView1= new ArrayList<Tutorial>();
+		
 
 		User usr=new User();
 		if(principal!=null) {
@@ -708,6 +775,10 @@ private List<Language> getLanguages() {
 
 		if(query != null) {
 			tut = tutService.SearchOutlineByCombinationOfWords(query, pageable);
+			
+			if(tut.isEmpty()) {
+				return "redirect:/";
+			}
 			
 		}else {
 			tut = tutService.findAllPagination(pageable);
@@ -729,7 +800,13 @@ private List<Language> getLanguages() {
 			System.out.println(temp.getTutorialId() +"***********");
 		}
 		
-		Collections.sort(tutToView1);  
+		//Collections.sort(tutToView1); 
+		Collections.sort(tutToView1, Tutorial.UserVisitComp);
+		System.out.println("********Checking Sort by userVisit in Tutorial*********");
+		for(Tutorial tv: tutToView1) {
+			System.out.println(tv.getUserVisit() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		}
+		
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
 		model.addAttribute("totalPages",tut.getTotalPages());
@@ -739,156 +816,11 @@ private List<Language> getLanguages() {
 		//return "tutorialList";  
 		return "TutorialListforOutlineSearching";   // add view name (filename)
 	}
+
+
 	
 	
-	
-	
-	
-  
-	//This function is created to work and debugged for new algorithm
-	@RequestMapping(value = "/tutorialsSearch1", method = RequestMethod.GET)
-	public String viewCoursesAvailableBySearch1(HttpServletRequest req,
-			@RequestParam(name = "query") String query,
-			@RequestParam(name ="page",defaultValue = "0") int page,
-             Principal principal,Model model) {
-		
-		List<Category> catTempSorted = getCategories();
-		List<Language> lanTempSorted = getLanguages();
-		List<Topic> topicTemp = getTopics();
-		
-		model.addAttribute("categories", catTempSorted);
-		model.addAttribute("languages", lanTempSorted);
-		model.addAttribute("topics", topicTemp);
-		
 
-		Page<Tutorial> tut = null;
-		List<Tutorial> tutToView = new ArrayList<Tutorial>();
-
-		User usr=new User();
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-		
-       
-		Pageable pageable = PageRequest.of(page, 20);
-
-		if(query != null) {
-			
-			//tut=searchByWord.searchByWord2(query, pageable);
-			
-			//tut = tutService.SearchOutlineByQuerPagination(query, pageable);
-			
-		}else {
-			tut = tutService.findAllPagination(pageable);
-	
-		}
-
-		for(Tutorial temp :tut) {
-			if(temp.isStatus()) {
-				tutToView.add(temp);
-			}
-		}
-		
-		for(Tutorial temp :tutToView) {
-			System.out.println(temp.getTutorialId() +"***********");
-		}
-		
-		
-		
-		 //Pageable pageable = PageRequest.of(page, 20);
-
-		
-		 /* TutorialSpecificationsBuilder1 builder = new TutorialSpecificationsBuilder1();
-		  Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
-	        Matcher matcher = pattern.matcher(query + ",");
-	        while (matcher.find()) {
-	            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
-	        }
-	        
-	        Specification<Tutorial> spec=builder.build(); */
-		
-		/* TutorialSpecificationsBuilder1 builder = new TutorialSpecificationsBuilder1();
-	        String operationSetExper = Joiner.on("|")
-	            .join(SearchOperation1.SIMPLE_OPERATION_SET);
-	        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
-	        Matcher matcher = pattern.matcher(query + ",");
-	        while (matcher.find()) {
-	            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
-	        }
-	        */
-	        
-	        //Specification<Tutorial> spec=builder.build(); 
-	       // TutorialSpecification1 spec =  new TutorialSpecification1(new SpecSearchCriteria1("outline", SearchOperation1.getSimpleOperation('~'), query));
-	       // Specification<Tutorial> spec = resolveSpecification(query);
-	       
-	        //Page<Tutorial> tutorialPage = tutRepository.findAll(spec, pageable);;
-	       
-		/* List<String> queryList = new ArrayList<String>(Arrays.asList(query.split(" ")));
-		
-		 Page<Tutorial> tutorialPage=null;
-		
-		 Page<Tutorial> tutorialP1= tutRepository.findByOutlineContainingIgnoreCase(query, pageable);
-		 if(!tutorialP1.isEmpty()){
-			 tutorialPage=tutorialP1;
-		 }
-		 else {
-			 if(queryList == null || queryList.isEmpty())
-		            throw new RuntimeException("List of words cannot be empty.");
-		        Specification<Tutorial> spec= (root, query1, builder) -> queryList.stream()
-		                .map(String::toLowerCase)
-		                .map(word -> "%" + word + "%")
-		                .map(word -> builder.like(builder.lower(root.get("outline")), word))
-		                .reduce(builder::or)
-		                .get();
-		        
-		        tutorialPage= tutRepository.findAll(spec, pageable);
-		       // List<Tutorial> tutList=tutRepository.findAll(spec);
-		        //tutorialPage=new PageImpl<Tutorial>(tutList, pageable, tutList.size());
-		        
-		 }
-		 
-		 tutorialPage=searchByWord.SearchOutlineByWords(query, pageable);
-	    
-    
-        if(tutorialPage !=null) {
-        	tut=tutorialPage;
-        }else {
-			tut = tutService.findAllPagination(pageable);
-	
-		}
-
-		for(Tutorial temp :tut) {
-			if(temp.isStatus()) {
-				tutToView.add(temp);
-			}
-		}
-       
-       
-		
-		for(Tutorial temp :tutToView) {
-			System.out.println(temp.getTutorialId() +"***********");
-		}
-		*/
-		
-
-		
-		Collections.sort(tutToView);  // sorting based on order value
-		
-		model.addAttribute("tutorials", tutToView);
-		model.addAttribute("currentPage",page);
-		model.addAttribute("totalPages",tut.getTotalPages());
-		model.addAttribute("query", "");
-		//model.addAttribute("tutorialSearchDto1", tutorialSearchDto1);
-		
-		
-		
-
-		return "tutorialList";   // add view name (filename)
-	}
-	
 	
 
 	/**
@@ -966,11 +898,12 @@ private List<Language> getLanguages() {
 				Set<String> topicTemp = new HashSet<String>();
 				Set<String> lanTemp = new HashSet<String>();
 
-				List<Tutorial> tutorialse = tutService.findAllBystatus(true);
+				List<Tutorial> tutorialse = tutService.findAllByStatus(true);
 				for(Tutorial temp :tutorialse) {
-					catTemp.add(temp.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-					lanTemp.add(temp.getConAssignedTutorial().getLan().getLangName());
-					topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+					ContributorAssignedTutorial conAssignedTutorial = temp.getConAssignedTutorial();
+					catTemp.add(conAssignedTutorial.getTopicCatId().getCat().getCatName());
+					lanTemp.add(conAssignedTutorial.getLan().getLangName());
+					topicTemp.add(conAssignedTutorial.getTopicCatId().getTopic().getTopicName());
 				}
 				
 //				List<String> catTempSorted =new ArrayList<String>(catTemp);
@@ -979,12 +912,7 @@ private List<Language> getLanguages() {
 //				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
 //				Collections.sort(lanTempSorted);
 
-				List<Category> catTempSorted = getCategories();
-				List<Language> lanTempSorted = getLanguages();
-				List<Topic> topicTempSorted = getTopics();
-				model.addAttribute("categories", catTempSorted);
-				model.addAttribute("languages", lanTempSorted);
-				model.addAttribute("topics", topicTempSorted);
+				getModelData(model);
 //				model.addAttribute("topics", topicTemp);
 				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
 				model.addAttribute("sm_url", sm_url);
@@ -1051,6 +979,7 @@ private List<Language> getLanguages() {
 			
 		}
 		//map.put(100,"teststring");
+		
 
 		model.addAttribute("map", map);
 		return "Consultants";
@@ -1881,7 +1810,7 @@ private List<Language> getLanguages() {
 				return "addCarousel";
 			}
 
-		cara = caroService.findAll();
+	
 
 		model.addAttribute("carousels", cara);
 		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
@@ -1912,7 +1841,32 @@ private List<Language> getLanguages() {
 		List<Language> lans = lanService.getAllLanguages();
 		model.addAttribute("languages", lans);
 		List<Brouchure> brouchures = broService.findAll();
+		List<Version> allVersions= verService.findAll();
+		
+		
+		//List<Version> versions= new ArrayList<>();
+		//Set<Version> verList= new TreeSet<>();
+		//List<Version> list1= new ArrayList<>();
+		/*for(Brouchure bro: brouchures) {
+			 verList= bro.getVersions();
+			 list1=new ArrayList<>( verList);
+			Collections.sort(list1, Version.SortByBroVersionInDesc);
+			if(list1.size()>0)
+				versions.add(list1.get(0));
+			System.out.println(versions +"Alok Kumar");
+			
+		}
+	*/
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
 		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
+		
 		return "addBrochure";
 	}
 
@@ -1931,7 +1885,9 @@ private List<Language> getLanguages() {
 								  @RequestParam("brouchure") MultipartFile brochure,
 								  @RequestParam(value = "categoryName") int categoryId,
 								  @RequestParam(name = "inputTopicName") int topicId,
-								  @RequestParam(name = "languageyName") int languageId) {
+								  @RequestParam(name = "languageyName") int languageId,
+								  @RequestParam(value = "primaryVersion") int primaryVersion,
+								  @RequestParam(name = "title") String title) {
 
 		User usr=new User();
 
@@ -1941,22 +1897,33 @@ private List<Language> getLanguages() {
 		}
 
 		model.addAttribute("userInfo", usr);
-		List<Brouchure> brouchures = broService.findAll();
-		model.addAttribute("brouchures", brouchures);
 		List<Language> languages=lanService.getAllLanguages();
 		List<Category> categories=catService.findAll();
 		model.addAttribute("categories", categories);
 		model.addAttribute("languages", languages);
+		List<Brouchure> brouchures = broService.findAll();
+		List<Version> allVersions= verService.findAll();
+		List<Version> versions= new ArrayList<>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
 		
-		if(!ServiceUtility.checkFileExtensionImage(brochure)) {  // throw error
-			model.addAttribute("error_msg",CommonData.JPG_PNG_EXT);
+		
+		if(!ServiceUtility.checkFileExtensionImage(brochure) && !ServiceUtility.checkFileExtensiononeFilePDF(brochure)){  // throw error
+			model.addAttribute("error_msg","Only image and pdf files are supported");
 			return "addBrochure";
 		}
 		
 		Category cat=catService.findByid(categoryId);
+		
 		Topic topic=topicService.findById(topicId);
 		
-		if(cat == null) {  // throw error
+		/*if(cat == null) {  // throw error
 			model.addAttribute("error_msg","Please Try again");
 			return "addBrochure";
 		}
@@ -1965,15 +1932,40 @@ private List<Language> getLanguages() {
 			model.addAttribute("error_msg","Please Try again");
 			return "addBrochure";
 		}
+		*/
+		//int versionInt = Integer.parseInt(version);
+		String versionStr=Integer.toString(primaryVersion);
 		
-		TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
+		if(versionStr == null) {  // throw error
+		model.addAttribute("error_msg","Please Try again");
+		System.out.println("AlokSP Error1");
+		return "addBrochure";
+		}
+	
+		if(title == null) {  // throw error
+		model.addAttribute("error_msg","Please Try again");
+		return "addBrochure";
+		}
+	   
 		Language lan=lanService.getById(languageId);
-
+		
+		
 		int newBroId=broService.getNewId();
+		int newVerid= verService.getNewId();
 		Brouchure brochureTemp = new Brouchure();
 		brochureTemp.setId(newBroId);
 		brochureTemp.setLan(lan);
-		brochureTemp.setTopicCatId(topicCat);
+		brochureTemp.setTitle(title);
+		brochureTemp.setPrimaryVersion(primaryVersion);
+		
+		
+		if(cat !=null && topic !=null) 
+		
+		{
+			TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
+			brochureTemp.setTopicCatId(topicCat);
+		}
+		
 
 		try {
 			broService.save(brochureTemp);
@@ -1982,32 +1974,76 @@ private List<Language> getLanguages() {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+			System.out.println("AlokSP Error2");
 			return "addBrochure";
 		}
 
+
+		Version version= new Version();
+		
 		try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(brochure, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion);
+			String pathtoUploadPoster1=ServiceUtility.uploadFile(brochure, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId +"/" +primaryVersion);
+			int indexToStart1=pathtoUploadPoster1.indexOf("Media");
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+			String document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
 
-				brochureTemp.setPosterPath(document);
+			version.setVerId(newVerid);
+			version.setBrouchure(brochureTemp);
+			version.setBroVersion(primaryVersion);
+			version.setDateAdded(ServiceUtility.getCurrentTime());
+			version.setVersionPosterPath(document1);
+			verService.save(version);
+			
+			brouchures = broService.findAll();
+			allVersions= verService.findAll();
+			versions= new ArrayList<>();
+			for(Brouchure bro: brouchures) {
+				for(Version ver: allVersions) {
+					if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+						versions.add(ver);
+				}
+			}
+			model.addAttribute("brouchures", brouchures);
+			model.addAttribute("versions", versions);
+			//brochureTemp.getPosterPath().endsWith(".pdf");
 
-				broService.save(brochureTemp);
+			
 
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-			broService.delete(brochureTemp);
-			return "addBrochure";
-		}
-
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+		verService.delete(version);
+		System.out.println(" AlokSP  Error4");
 		brouchures = broService.findAll();
+		allVersions= verService.findAll();
+		versions= new ArrayList<>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
 		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
+		return "addBrochure";
+		
+	}
+		
+       
 		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
-
+		brouchures = broService.findAll();
+		allVersions= verService.findAll();
+		versions= new ArrayList<>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
 		return "addBrochure";
 
 
@@ -2032,19 +2068,43 @@ private List<Language> getLanguages() {
 
 			usr=userService.findByUsername(principal.getName());
 		}
+		List<TopicCategoryMapping> tcm=topicCatService.findAll();
+		
+		TopicCategoryMapping tcp=new TopicCategoryMapping();
+		
 
 		model.addAttribute("userInfo", usr);
 
 		List<Category> category = catService.findAll();
-		
 		Collections.sort(category);
+		
+		List<Category> getcats= getCategories();
+		
+		List<Category>newCategories1=new ArrayList<>();
+		List<Category>newCategories2=new ArrayList<>();
+		
+		for(Category cat1: category) {
+			for(Category cat2: getcats)
+				if(cat1==cat2)
+					continue;
+			
+			if(cat1.isStatus()) {
+				newCategories1.add(cat1);
+			}
+			else {
+				newCategories2.add(cat1);		
+		}
+			
+		}
+		newCategories1.addAll(newCategories2);
+		getcats.addAll(newCategories1);
 
-		model.addAttribute("categories", category);
+		model.addAttribute("categories",getcats);
 
 		List<Topic> topics = topicService.findAll();
 
 		model.addAttribute("topics", topics);
-
+		model.addAttribute("tcm", tcm);
 		return "addTopic";
 
 	}
@@ -2060,6 +2120,7 @@ private List<Language> getLanguages() {
 	 */
 	@RequestMapping(value = "/addTopic",method = RequestMethod.POST)
 	public String addTopicPost(Model model,Principal principal,
+							   @RequestParam(name = "topicId") int topicId,
 							   @RequestParam(name = "categoryName") int categoryId,
 							   @RequestParam(name = "topicName") String topicName,
 							   @RequestParam(name = "orderValue") int orderValue) {
@@ -2067,27 +2128,28 @@ private List<Language> getLanguages() {
 		User usr=new User();
 
 		if(principal!=null) {
-
 			usr=userService.findByUsername(principal.getName());
 		}
-
-		model.addAttribute("userInfo", usr);
-		List<Topic> topicsTemp = topicService.findAll();
-
-		model.addAttribute("topics", topicsTemp);
-
-		List<Category> category = catService.findAll();
-
-		model.addAttribute("categories", category);
 
 		Category cat =catService.findByid(categoryId);
 
 		if(cat == null) {
 			model.addAttribute("error_msg", "Category Doesn't Exist");
-			return "addTopic";
+			return addTopicGet(model,principal);
+		}
+		
+		Topic topicTemp;
+				
+		
+		
+		if(topicId==-1) {
+			topicTemp = topicService.findBytopicName(topicName);
+		}
+		else {
+			topicTemp = topicService.findById(topicId);
 		}
 
-		Topic topicTemp = topicService.findBytopicName(topicName);
+		
 
 		if(topicTemp!=null) {
 
@@ -2096,12 +2158,12 @@ private List<Language> getLanguages() {
 				TopicCategoryMapping localTopicMap=new TopicCategoryMapping(topicCatService.getNewId(), true, cat, topicTemp,orderValue);
 				topicCatService.save(localTopicMap);
 				model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
-				return "addTopic";
+				return addTopicGet(model,principal);
 
 			}else {
 
 				model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-				return "addTopic";
+				return addTopicGet(model,principal);
 			}
 		}
 
@@ -2124,26 +2186,28 @@ private List<Language> getLanguages() {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-			return "addTopic";
+			return addTopicGet(model,principal);
 		}
 		
-		topicsTemp = topicService.findAll();
-
-		model.addAttribute("topics", topicsTemp);
+		
 
 		model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
-		return "addTopic";
+		
+		
+		
+		return addTopicGet(model,principal);
 
 	}
 
 	/**
-	 * redirects to edit page of topic given id
+	 * redirects to 
+ page of topic given id
 	 * @param model Model object
 	 * @param principal principal object
 	 * @param id int value
 	 * @return String object (webpage)
 	 */
-	@RequestMapping(value = "/topic/edit/{topicName}", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/topic/edit/{topicName}", method = RequestMethod.GET)
 	public String editTopicGet(@PathVariable(name = "topicName") String topicTemp,Model model,Principal principal) {
 
 		User usr=new User();
@@ -2162,6 +2226,37 @@ private List<Language> getLanguages() {
 		}
 
 		model.addAttribute("topic",topic);
+
+		return "updateTopic";  // need to accomdate view part
+	}
+	*/
+	
+	@RequestMapping(value = "/topic/edit/{topicCatId}", method = RequestMethod.GET)
+	public String editTopicGet(@PathVariable(name = "topicCatId") int topicCatId, Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+		TopicCategoryMapping tcp= tcmRepository.findById(topicCatId).get();
+		
+		Topic topic=tcp.getTopic();
+		
+		
+		if(topic == null) {
+			return "redirect:/addTopic";
+		}
+
+		model.addAttribute("topic",topic);
+		model.addAttribute("topicCatMap",tcp);
+		
+		
+		
 
 		return "updateTopic";  // need to accomdate view part
 	}
@@ -2188,43 +2283,72 @@ private List<Language> getLanguages() {
 		String topicname=req.getParameter("topicName");
 		String topicIdInString = req.getParameter("TopicId");
 		int topicId = Integer.parseInt(topicIdInString);
-
+		
+		String orderVal=req.getParameter("orderValue");
+		int orderValue = Integer.parseInt(orderVal);
+		String topicCatIdInString = req.getParameter("TopicCatId");
+		int topicCatId = Integer.parseInt(topicCatIdInString);
+		
+		TopicCategoryMapping tcp= tcmRepository.findById(topicCatId).get();
 		Topic topic = topicService.findById(topicId);
 
-		if(topic == null) {
+		if(topic == null || tcp == null) {
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("topic",topic);
 			return "updateTopic";  //  accomodate view part
 		}
 
-		if(topicname==null) {
+		if(topicname==null ) {
 
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("topic",topic);
 			return "updateTopic";  //  accomodate view part
 		}
-
-		if(topicService.findBytopicName(topicname)!=null) {
-
+		
+		
+		  if(topicService.findBytopicName(topicname)!=null &&  topicService.findBytopicName(topicname)!= topic) {
+			model.addAttribute("topicCatMap",tcp);
 			model.addAttribute("error_msg", CommonData.RECORD_EXISTS);
 			model.addAttribute("topic",topic);
 			return "updateTopic";   //  accomodate view part
 		}
+		 
+		
+		
+		
 
 		topic.setTopicName(topicname);
+		tcp.setOrder(orderValue);
 
 		try {
 			topicService.save(topic);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			model.addAttribute("topic",topic);
-			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-			return "updateTopic";  //  accomodate view part
+			//e.printStackTrace();
+			
+			//model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			
+			
+		}
+		try {
+			
+			topicCatService.save(tcp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			
+			//model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+			
+			
 		}
 
 		topic = topicService.findById(topicId);
+		tcp= tcmRepository.findById(topicCatId).get();
 		model.addAttribute("topic",topic);
+		model.addAttribute("topicCatMap",tcp);
 
 		model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
 
@@ -2941,6 +3065,13 @@ private List<Language> getLanguages() {
 
 		List<Event> eventsTemp = eventservice.findAll();
 		model.addAttribute("events", eventsTemp);
+		
+		List<State> states = stateService.findAll();
+		model.addAttribute("states", states);
+		List<Category> categories = catService.findAll();
+		model.addAttribute("categories", categories);
+		List<Language> lans = lanService.getAllLanguages();
+		model.addAttribute("lans", lans);
 
 		String eventName = req.getParameter("eventname");
 		String desc = req.getParameter("description");
@@ -3697,16 +3828,32 @@ private List<Language> getLanguages() {
 		model.addAttribute("languages", languages);
 	
 		Language langByBrouchure= brouchure.getLan();
-		TopicCategoryMapping tcm=brouchure.getTopicCatId();
+	/* 
+	    TopicCategoryMapping tcm=brouchure.getTopicCatId();
 		Category catBrouchure=tcm.getCat();
 		Topic topicBrouchure=tcm.getTopic();
 		model.addAttribute("catBrouchure", catBrouchure);
 		model.addAttribute("topicBrouchure", topicBrouchure);
-		model.addAttribute("langByBrouchure",langByBrouchure);
-
 		
-		model.addAttribute("brouchures", brouchure);
-
+	*/	
+	
+		Set<Version> verSet= brouchure.getVersions();
+		
+		Version version= new Version();
+		
+			for(Version ver: verSet) {
+				if(brouchure.getId()==ver.getBrouchure().getId() && brouchure.getPrimaryVersion()==ver.getBroVersion())
+					version=ver;
+				break;	
+			}
+		
+		List<Version> listofVersions= new ArrayList<>(verSet);
+		model.addAttribute("listofVersions", listofVersions);
+		model.addAttribute("version", version);
+		model.addAttribute("brouchure", brouchure);
+		model.addAttribute("langByBrouchure",langByBrouchure);
+		
+		
 		return "updateBrochure";
 	}
 
@@ -3729,8 +3876,13 @@ private List<Language> getLanguages() {
 		model.addAttribute("userInfo", usr);
 		
 		
-
+		String title= req.getParameter("title");
 		String brochureId=req.getParameter("brochureId");
+		
+		String overwrite=req.getParameter("overwrite");
+		int overwriteValue=0;
+		if(overwrite!=null)
+			overwriteValue = Integer.parseInt(overwrite);
 		/*
 		String cat = req.getParameter("categoryName");
 		String topic = req.getParameter("inputTopic");
@@ -3739,24 +3891,45 @@ private List<Language> getLanguages() {
 		
 
 		Brouchure brouchure= broService.findById(Integer.parseInt(brochureId));
-
-		model.addAttribute("brouchures", brouchure);
+		Version version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+		
+		
+		
+		model.addAttribute("version", version);
+		
+		model.addAttribute("brouchure", brouchure);
 		
 		
 		
 
 
 		if(brouchure==null) {
-			model.addAttribute("error_msg","Event doesn't exist");
+			model.addAttribute("error_msg","Brouchure doesn't exist");
 			return "updateBrochure";
 		}
+		
+		Set<Version> verSet= brouchure.getVersions();
+		List<Version> listofVersions= new ArrayList<>(verSet);
+		model.addAttribute("listofVersions", listofVersions);
+		
+		if(title.isEmpty()){
+			model.addAttribute("error_msg","Title doesn't exist with empty");
+			return "updateBrochure";
+		}
+		
+		
+		int newVerId= verService.getNewId();
+		int versionValue=brouchure.getPrimaryVersion();
+		int newVersionValue=versionValue+1;
+		
+		
 
 		try {
 			
 
 			if(!files.isEmpty()) {
-				if(!ServiceUtility.checkFileExtensionImage(files)) { // throw error on extension
-					model.addAttribute("error_msg",CommonData.JPG_PNG_EXT);
+				if(ServiceUtility.checkFileExtensionVideo(files)) { // throw error on extension
+					model.addAttribute("error_msg", "Only image and pdf files are supported");
 					return "updateBrochure";
 			}
 			}
@@ -3786,29 +3959,78 @@ private List<Language> getLanguages() {
 			
 			
 			
+			
 
 			if(!files.isEmpty()) {
-				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brouchure.getId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+				
+				if(overwriteValue !=0) {
+					String pathtoUploadPoster1=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure + brochureId+ "/" + versionValue);
+					int indexToStart1=pathtoUploadPoster1.indexOf("Media");
+					String document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+					version.setVersionPosterPath(document1);
+					verService.save(version);
+					brouchure.setTitle(title);
+					broService.save(brouchure);
+					
+					
+				}
+					
+					else {
+						
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
+						String pathtoUploadPoster2=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
+						int indexToStart2=pathtoUploadPoster2.indexOf("Media");
+						String document2=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
+						
+						brouchure.setTitle(title);
+						brouchure.setPrimaryVersion(version.getBroVersion()+1);
+						broService.save(brouchure);
+						
+						Version newVer= new Version();
+						newVer.setVerId(newVerId);
+						newVer.setBrouchure(brouchure);
+						newVer.setDateAdded(ServiceUtility.getCurrentTime());
+						newVer.setBroVersion(version.getBroVersion()+1);
+						newVer.setVersionPosterPath(document2);
+						verService.save(newVer);
+						
+						brouchure= broService.findById(Integer.parseInt(brochureId));
+						verSet= brouchure.getVersions();
+						listofVersions= new ArrayList<>(verSet);
+						model.addAttribute("listofVersions", listofVersions);
+					}
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+			} 
+			
 
-				brouchure.setPosterPath(document);
-
-			}
-
-			broService.save(brouchure);
-
-		}catch (Exception e) {
+			} catch (Exception e) {
 			// TODO: handle exception
 			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-			model.addAttribute("brouchures", brouchure);
+			System.out.println("Check path error");
+			
+			
+			version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+			model.addAttribute("version", version);
+			model.addAttribute("brouchure", brouchure);
+			verSet= brouchure.getVersions();
+			listofVersions= new ArrayList<>(verSet);
+			model.addAttribute("listofVersions", listofVersions);
 			return "updateBrochure";        // need to add some error message
 		}
+		
+		
 
 
 		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
-		model.addAttribute("brouchures", brouchure);
+		version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+		model.addAttribute("version", version);
+		model.addAttribute("brouchure", brouchure);
+		brouchure= broService.findById(Integer.parseInt(brochureId));
+		verSet= brouchure.getVersions();
+		listofVersions= new ArrayList<>(verSet);
+		model.addAttribute("listofVersions", listofVersions);
+		for(Version ver: listofVersions)
+		System.out.println(ver);
 
 		return "updateBrochure";
 	}
@@ -5928,12 +6150,15 @@ private List<Language> getLanguages() {
 
 		List<Tutorial> tutorials =  tutService.findAllByContributorAssignedTutorialList(conTutorials);
 		for(Tutorial temp:tutorials) {
-
+			
+			
+			
+			
 			if(temp.getOutlineStatus() >= CommonData.WAITING_PUBLISH_STATUS && temp.getScriptStatus() >= CommonData.WAITING_PUBLISH_STATUS &&
 					temp.getSlideStatus() >= CommonData.WAITING_PUBLISH_STATUS && temp.getKeywordStatus() >= CommonData.WAITING_PUBLISH_STATUS &&
 					temp.getVideoStatus() >= CommonData.WAITING_PUBLISH_STATUS &&
 					temp.getPreRequisticStatus() >= CommonData.WAITING_PUBLISH_STATUS) {
-
+				
 				published.add(temp);
 			}
 
@@ -5945,6 +6170,7 @@ private List<Language> getLanguages() {
 
 
 	}
+	//getStreamCoder()
 
 	/**
 	 * publish the tutorial under quality role
@@ -7009,6 +7235,8 @@ private List<Language> getLanguages() {
 	 * @param model Model object
 	 * @return String object(webpage)
 	 */
+	
+	
 	@GetMapping("/brochure")
 	public String brochure(Principal principal,Model model){
 
@@ -7036,8 +7264,16 @@ private List<Language> getLanguages() {
 		*/
 		
 		List<Brouchure> brouchures= broService.findAll();
-		
+		List<Version> allVersions=verService.findAll();
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
 		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
 
 		return "brochures";  // view name
 	}
@@ -7351,7 +7587,7 @@ private List<Language> getLanguages() {
 			lanMap.put(l.getLanId(), l.getLangName());
 		}
 		
-		List<Tutorial> tutorilaListForCount=tutService.findAllBystatus(true);
+		List<Tutorial> tutorilaListForCount=tutService.findAllByStatus(true);
 		List<Tutorial> finaltutoriallistforcount=new ArrayList<>();
 		for(Tutorial temp :tutorilaListForCount) {
 			
@@ -7419,7 +7655,7 @@ private List<Language> getLanguages() {
 			model.addAttribute("cat_value", 0);
 			model.addAttribute("lan_value", language.getLanId());
 		}else {
-			tutorials = tutService.findAllBystatus(true);
+			tutorials = tutService.findAllByStatus(true);
 			for(Tutorial temp :tutorials) {
 				
 				  Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();

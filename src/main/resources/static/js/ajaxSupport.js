@@ -221,6 +221,9 @@ $(document).ready(function() {
 			});
 			
 			
+		
+			
+			
 			$('.enableTest').click(function() {
 				
 				var test_id=$(this).attr('value');
@@ -1761,9 +1764,12 @@ $(document).ready(function() {
 			   $( "#catreset" ).click(function() {
 			
 				var catgoryid = 0;
+				
+				$("#categoryname").val("0");
 				var topicid = $("#inputTopicName").val();
 				var languageid=$("#inputLanguage").val();
-				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				//loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
 				return false;
 				
 			});
@@ -1854,9 +1860,11 @@ $(document).ready(function() {
 			$( "#topicreset" ).click(function() {
 			
 				var topicid = 0;
+				$("#inputTopicName").val("0");
 				var languageid = $("#inputLanguage").val();
 				var catgoryid=$("#categoryname").val();
-				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				//loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
 				return false;
 				
 			});
@@ -1926,9 +1934,12 @@ $(document).ready(function() {
 			 $( "#langreset" ).click(function() {
 			
 				var languageid = 0;
+				$("#inputLanguage").val("0");
 				var topicid = $("#inputTopicName").val();
 				var catgoryid=$("#categoryname").val();
-				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				//loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				
 				return false;
 				
 			});
@@ -1942,6 +1953,10 @@ $(document).ready(function() {
 			$("#reset2").click(function(){
  			 $(":reset").css("background-color", "red");
 			});
+			
+			
+			
+
 
 		/*	$('#inputTopicName').change(function() {
 				var topic = $(this).val();
@@ -2324,6 +2339,140 @@ $(document).ready(function() {
 
 					});
 	/***************************************End ************************************************/
+	
+	
+	/* a funtion to load topic by Category 
+	*Author: Alok Kumar
+	*/
+	
+	/*$( "#categoryId" ).change(function() {
+				var catgoryid = $(this).val();
+				
+				$.ajax({
+					type : "GET",
+					url : projectPath+"loadTopicByCategoryInAddTopic",
+					data : {
+						"id" : catgoryid
+					},
+					contentType : "application/json",
+					success : function(topicName) {
+						var result = topicName;
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Topic</option>';
+						$.each(result , function( key, value ) {
+			  	  			        html += `<option value="${key}"> ${value} </option>`;
+			  	  			     })
+						$("#topicId").prop('disabled',false);
+						$('#topicId').html(html);
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+			});
+	*/
+	
+	
+	/* A java Script funtion to load topics by Category in Add Topic page 
+	*Author: Alok Kumar
+	*/
+	
+	$('#categoryId1').on('change',function() {
+						var catId = $(this).find("option:selected").val();
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryInAddTopic",
+							data : {
+								"id" : catId
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			       // $('#topicId1').text(key, value);
+			  	  			       //html += '<div>'+  key + "  " + value  +'</div>';
+			  	  			       html += '<tr>' + '<td>' + key + '</td>' + '<td>' + value + '</td>' +  '</tr>';
+			  	  			 		})
+			  	  			 
+								$("#topicTable1").prop('disabled', false);
+								//$('#topicId1').html(html);  topicTable
+								$('#topicTable1').html(html);
+
+							},
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+							}
+						});
+
+					});
+					
+					
+	
+	
+	/* A java Script funtion to load primary version b y checked or unchecked checkbox 
+	*Author: Alok Kumar
+	*/
+		$('#overwrite').change(function() {
+				
+						//var flag=$("#overwrite").prop("checked", true);
+						var flag;
+						if($("#overwrite").is(':checked')){
+							flag=1;
+						}
+						else{
+							flag=0;
+						}
+						var broId = $('#overwrite').val();
+						
+						$.ajax({
+
+							type : "GET",
+							url : projectPath+"primaryVersionWithoutOverwrite",
+							data : {
+								"id" : broId,
+								"checkedValue": flag
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+									  	  			     
+			  	  			       html += '<h6>' + 'Primary Version: ' + result +  '</h6>' ;
+			  	  			 		
+			  	  			 	
+			  	  			 	$('#pVersionbeforeJS').hide();
+								$("#pVersion").prop('disabled', false);
+								$('#pVersion').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "	+ JSON.stringify(err));
+							}
+
+						});
+
+					});
+	
+			
+					
+					
+					
+		 $('#topicId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewTopic');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+					
 
 			/* load Topic by catgory contributor */
 

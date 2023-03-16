@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.health.model.Brouchure;
@@ -55,9 +56,11 @@ public class BrouchureServiceImpl implements BrouchureService{
 	 * @see com.health.service.BrouchureService#findAll()
 	 */
 	@Override
+	//@Cacheable(cacheNames ="brouchures" )
 	public List<Brouchure> findAll() {
 		// TODO Auto-generated method stub
-		return (List<Brouchure>) repo.findAll();
+		//return (List<Brouchure>) repo.findAll();
+		return repo.findAll();
 	}
 
 	/**
@@ -107,7 +110,13 @@ public class BrouchureServiceImpl implements BrouchureService{
 
 		return brochures;
 	}
-
-
+	
+	@Override
+	@Cacheable(cacheNames ="brouchures" )
+	public List<Brouchure> findAllBrouchuresForCache(){
+		System.out.println("BrouchureCheck");
+		return repo.findAllByshowOnHomepage(true);
+		
+	}
 
 }

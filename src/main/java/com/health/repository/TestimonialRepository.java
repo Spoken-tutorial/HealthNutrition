@@ -2,12 +2,12 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.health.domain.security.Role;
-import com.health.domain.security.UserRole;
 import com.health.model.Testimonial;
 
 /**
@@ -25,11 +25,23 @@ public interface TestimonialRepository extends CrudRepository<Testimonial, Integ
 	@Query("select max(testimonialId) from Testimonial")
 	int getNewId();
 	
+	
+	@CacheEvict(cacheNames = "testimonials", allEntries=true)
+	void deleteById(int id);
+	
+	@CacheEvict(cacheNames = "testimonials", allEntries=true)
+	<S extends Testimonial> S save(S entity);
+
+	
 	/**
 	 * Find list of all Testimonial object given approve value
 	 * @param value boolean value
 	 * @return list of Testimonial object
 	 */
+	//@Cacheable(cacheNames ="testimonials", key="#value")
 	List<Testimonial> findByapproved(boolean value);
+	
+	//@Cacheable(cacheNames ="testimonials")
+	List<Testimonial> findAll();
 
 }

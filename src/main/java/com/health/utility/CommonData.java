@@ -59,6 +59,8 @@ public class CommonData {
 	public static String EVENT_CHECK_EMAIL = "Please check email id";
 
 	public static String RECORD_UPDATE_SUCCESS_MSG = "Record updated successfully!";
+	
+	public static String All_Caches_Clear_MSG = "All caches have been cleared successfully!";
 
 	public static String RECORD_EXISTS = "Record Already Exists!";
 
@@ -141,6 +143,8 @@ public class CommonData {
 	public static String uploadPostQuestion = "Media/Content/PostQuestion/";
 	
 	public static String uploadBrouchure = "Media/Content/Brouchure/";
+	
+	public static String uploadVersion = "Media/Content/Version/";
 	
 	public static String uploadCarousel = "Media/Content/Carousel/";
 

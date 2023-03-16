@@ -110,8 +110,16 @@ public interface TutorialService {
 	 * @param status boolean value
 	 * @return list of Tutorial object
 	 */
-	List<Tutorial> findAllBystatus(boolean status);
+	
+	List<Tutorial> findAllByStatus(boolean status);
+	//List<Tutorial> findAllByStatusTrue();
+	
 	
 	List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con);
+	
+	List<Tutorial> getFinalTutorialsForCache(); 
+
+
+	
 
 }

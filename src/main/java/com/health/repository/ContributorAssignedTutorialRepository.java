@@ -2,17 +2,17 @@ package com.health.repository;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.health.domain.security.UserRole;
-import com.health.model.Category;
+
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Language;
-import com.health.model.Topic;
+
 import com.health.model.TopicCategoryMapping;
-import com.health.model.User;
+
 
 /**
  * This Interface Extend CrudRepository to handle all database operation related to ContributorAssignedTutorial object
@@ -35,6 +35,12 @@ public interface ContributorAssignedTutorialRepository extends CrudRepository<Co
 	 * @return list of ContributorAssignedTutorial object
 	 */
 	List<ContributorAssignedTutorial> findAllBytopicCatId(TopicCategoryMapping topCat);
+	
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	void deleteById(int id);
+	
+	@CacheEvict(value = { "categories", "topics", "tutorials", "languages" }, allEntries = true)
+	<S extends ContributorAssignedTutorial> S save(S entity);
 	
 	/**
 	 * Find list of ContributorAssignedTutorial object given Language object
@@ -60,4 +66,3 @@ public interface ContributorAssignedTutorialRepository extends CrudRepository<Co
 	@Query("from ContributorAssignedTutorial where topicCatId IN (:TopicCat)")
 	List<ContributorAssignedTutorial> findByTopicCat(@Param("TopicCat")List<TopicCategoryMapping> topCat);
 }
-

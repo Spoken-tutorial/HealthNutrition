@@ -58,7 +58,7 @@ font-weight:bold!important;
 							method="post" enctype="multipart/form-data">
 
 							<div class="form-group">
-								<label for="categoryId">Select Category</label> <select id="categoryId"
+								<label for="categoryId1"><b>Select Category</b></label> <select id="categoryId1"
 									class="form-control" name="categoryName" required="required">
 
 									<option value='0'>Select Category</option>
@@ -69,25 +69,58 @@ font-weight:bold!important;
 								</select>
 
 							</div>
-
+							
 							<div class="form-group">
+								<label for="topicId"><b>Select Topic</b></label> <select id="topicId"
+									class="form-control" name="topicId" required="required">
 
-								<label for="topicId">Topic</label> <input type="text"
+									<option value='0'>Select Topic</option>
+									<option value='-1'>Enter New Topic</option>
+										<option th:each="topic: ${topics}" th:value="${topic.getTopicId()}" th:text="${topic.getTopicName()}">
+												</option>
+								
+								</select>
+
+							</div>
+							
+							
+
+							<div class="form-group" id="enterNewTopic">
+
+								<label for="topicId"><b>Topic</b></label> <input type="text"
 									class="form-control" id="topicId" name="topicName"
-									required="required" placeholder="Enter topic name" />
+									 placeholder="Enter topic name" />
 
 							</div>
 							
 							<div class="form-group">
 
-								<label for="topicId">Order</label> <input type="number"
+								<label for="topicId"><b>Order</b></label> <input type="number"
 									class="form-control" id="orderValue" name="orderValue"
 									required="required" placeholder="Enter Order Value" />
 
 							</div>
+						
 
 							<button type="submit" value="showAlert" class="btn a-btn">Submit</button>
-						</form>				
+						</form>	
+						<br>
+						<h5>Topics in the selected category</h5>
+						
+						<div id="topicId1">
+						<table class="table table-striped" id="topicTable" >
+						<thead>
+						<tr>
+						<th> Topic Name</th>
+						<th> Order value</th>
+						</tr>
+						</thead>
+						<tbody  id="topicTable1">
+						
+						</tbody>
+						</table>
+						</div>
+									
 						</div>
 						</div>
 					</div>
@@ -98,6 +131,7 @@ font-weight:bold!important;
   <table class="table table-striped" id="myTable">
   <thead>
     <tr>
+      <th scope="col">Category Status</th>
       <th scope="col">Category</th>
       <th scope="col">Topic Name</th>
       <th scope="col">Order</th>
@@ -106,12 +140,14 @@ font-weight:bold!important;
     </tr>
   </thead>
   <tbody>
-      <div th:each="topic : ${topics}">
-      <tr th:each="topicTemp : ${topic.getTopicCategoryMap()}">
+      <div >
+      <tr th:each="topicTemp : ${tcm}">
+      <td scope="row"><span th:text = "${topicTemp.getCat().isStatus()}"></span></td>
       <td scope="row"><span th:text = "${topicTemp.getCat().getCatName()}"></span></td>
 	  <td><span th:text = "${topicTemp.getTopic().getTopicName()}"></span></td>
       <td><span th:text = "${topicTemp.getOrder()}"></span></td>
-      <td><a th:href="@{${'/topic/edit/' + topicTemp.getTopic().getTopicName()}}">Edit</a></td>
+      <!-- <td><a th:href="@{${'/topic/edit/' + topicTemp.getTopic().getTopicName()}}">Edit</a></td>  -->
+      <td><a th:href="@{${'/topic/edit/' + topicTemp.getTopicCategoryId()}}">Edit</a></td>
       </tr>
     </div>
    
@@ -131,8 +167,11 @@ font-weight:bold!important;
 	
 <div th:replace="common/trail :: body-bottom-scripts"></div>		
 <script type="text/javascript">
+var projectPath='[(@{/})]';
 $(document).ready( function () {
     $('#myTable').DataTable();
+    $('#enterNewTopic').hide();
+    
 } );
 </script>
 

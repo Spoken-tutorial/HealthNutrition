@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Tutorial;
 import com.health.repository.TutorialRepository;
@@ -34,6 +36,25 @@ public class TutorialServiceImpl implements TutorialService {
 	public List<Tutorial> findAll() {
 		// TODO Auto-generated method stub
 		return (List<Tutorial>) tutorialRepo.findAll();
+	}
+	
+	@Override
+	@Cacheable(cacheNames ="tutorials" )
+	public List<Tutorial> getFinalTutorialsForCache() {
+		System.out.println("Tutorial_check");
+		
+		List<Tutorial> tutorials=tutorialRepo.findAllByStatus(true);
+		List<Tutorial> finalTutorials=new ArrayList<>();
+		for(Tutorial temp :tutorials) {
+			
+			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+			if(c.isStatus()) {
+				
+				finalTutorials.add(temp);
+			}
+		}
+		System.out.println("Tutorial_check_end");
+		return finalTutorials;
 	}
 
 	/**
@@ -119,14 +140,24 @@ public class TutorialServiceImpl implements TutorialService {
 	}
 
 	/**
-	 * @see com.health.service.TutorialService#findAllBystatus(boolean)
+	 * @see com.health.service.TutorialService#findAllByStatus(boolean)
 	 */
 	@Override
-	public List<Tutorial> findAllBystatus(boolean status) {
+	public List<Tutorial> findAllByStatus(boolean status) {
 		// TODO Auto-generated method stub
-		return tutorialRepo.findAllBystatus(status);
+		return tutorialRepo.findAllByStatus(status);
 	}
 
+	
+	/*
+	@Override
+	public List<Tutorial> findAllByStatusTrue() {
+		// TODO Auto-generated method stub
+		return tutorialRepo.findAllByStatusTrue();
+	}
+
+	*/
+	
 	/**
 	 * @see com.health.service.TutorialService#findAllPagination(Pageable)
 	 */

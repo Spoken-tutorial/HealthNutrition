@@ -56,6 +56,8 @@ public interface BrouchureService {
 	 * @return list of brochure object
 	 */
 	List<Brouchure> findByCategory(Category cat);
+	
+	List<Brouchure> findAllBrouchuresForCache();
 
 
 

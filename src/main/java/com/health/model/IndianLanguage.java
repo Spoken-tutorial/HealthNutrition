@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +16,7 @@ import javax.persistence.OneToMany;
  * @version 1.0
  */
 @Entity
-public class IndianLanguage {
+public class IndianLanguage implements  Serializable {
 
 	/**
 	 * unique id of object

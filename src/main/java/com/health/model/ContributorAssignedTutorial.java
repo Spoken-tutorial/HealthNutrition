@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +22,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="contributor_Role")
-public class ContributorAssignedTutorial {
+public class ContributorAssignedTutorial implements  Serializable {
 	
 	/**
 	 * unique id of object
@@ -33,27 +34,27 @@ public class ContributorAssignedTutorial {
 	/**
 	 * topicCategory Object
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="topicCat_ID")
 	private TopicCategoryMapping topicCatId;
 	 
 	/**
 	 * language object
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="language_id")
 	private Language lan;
 	
 	/**
 	 * tutorial associated with it
 	 */
-	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
 	private Set<Tutorial> tutorials=new HashSet<Tutorial>();
 	
 	/**
 	 * user to which tutorial is assigned
 	 */
-	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
 	private Set<ContributorAssignedMultiUserTutorial> multiUserAssigned=new HashSet<ContributorAssignedMultiUserTutorial>();
 
 	public int getId() {

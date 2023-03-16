@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -17,7 +18,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="feedbackForm")
-public class FeedbackForm {
+public class FeedbackForm  implements  Serializable{
 
 	/**
 	 * unique id of object

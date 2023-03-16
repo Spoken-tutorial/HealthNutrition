@@ -8,6 +8,10 @@ import org.springframework.data.repository.CrudRepository;
 import com.health.model.Brouchure;
 import com.health.model.TopicCategoryMapping;
 
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 /**
  * This Interface Extend CrudRepository to handle all database operation related to Brochure object
  * @author om prakash soni
@@ -22,6 +26,9 @@ public interface BrouchureRepository extends CrudRepository<Brouchure, Integer> 
 	 */
 	@Query("select max(id) from Brouchure")
 	int getNewId();
+	
+	
+	Brouchure findByTitle(String title);
 
 	/**
 	 * Find all the brochure based on given showOnHomePage field 
@@ -29,6 +36,12 @@ public interface BrouchureRepository extends CrudRepository<Brouchure, Integer> 
 	 * @return List of brochure object
 	 */
 	List<Brouchure> findAllByshowOnHomepage(boolean value);
+	
+	@CacheEvict(cacheNames = "brouchures", allEntries=true)
+	void deleteById(int id);
+	
+	@CacheEvict(cacheNames = "brouchures", allEntries=true)
+	<S extends Brouchure> S save(S entity);
 
 	/**
 	 * Find all the brochure based on given TopicCategory Object
@@ -37,4 +50,7 @@ public interface BrouchureRepository extends CrudRepository<Brouchure, Integer> 
 	 */
 	@Query("from Brouchure where topicCatId = ?1")
 	List<Brouchure> findByTopicCat(TopicCategoryMapping topicCat);
+	
+	//@Cacheable(cacheNames ="brouchures" )
+	List<Brouchure> findAll();
 }

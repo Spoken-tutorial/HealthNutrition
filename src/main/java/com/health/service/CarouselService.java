@@ -45,4 +45,6 @@ public interface CarouselService {
 	 * @param temp Carousel object
 	 */
 	void delete(Carousel temp);
+	
+	List<Carousel> findCarouselForCache();
 }

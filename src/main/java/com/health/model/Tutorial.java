@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +24,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "tutorial_resource")
-public class Tutorial implements Comparable<Tutorial>{
+public class Tutorial implements Comparable<Tutorial>, Serializable {
 
 	/**
 	 * unique id of object
@@ -56,7 +57,7 @@ public class Tutorial implements Comparable<Tutorial>{
 	/**
 	 * user object added script
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_script")
 	private User scriptUser;
 
@@ -78,7 +79,7 @@ public class Tutorial implements Comparable<Tutorial>{
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_slide")
 	private User slideUser;
 
@@ -100,7 +101,7 @@ public class Tutorial implements Comparable<Tutorial>{
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_keyword")
 	private User keywordUser;
 
@@ -122,14 +123,14 @@ public class Tutorial implements Comparable<Tutorial>{
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_outline")
 	private User outlineUser;
 
 	/**
 	 * tutorial object for pre-rrquisite
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "preRequistics")
 	private Tutorial preRequistic;
 
@@ -142,7 +143,7 @@ public class Tutorial implements Comparable<Tutorial>{
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_preRequistic")
 	private User preRequiticUser;
 	
@@ -157,7 +158,7 @@ public class Tutorial implements Comparable<Tutorial>{
 	/**
 	 * tutorial object when other language except English used
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "relatedVideo")
 	private Tutorial relatedVideo;
 
@@ -203,27 +204,27 @@ public class Tutorial implements Comparable<Tutorial>{
 	/**
 	 * user object who added slide
 	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="user_video")
 	private User videoUser;
 
 	/**
 	 * tutorial topic category information
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "conAssignedTutorial")
 	private ContributorAssignedTutorial conAssignedTutorial;
 
-	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL)
 	private Set<Comment> comments =new HashSet<Comment>();
 
-	@OneToMany(mappedBy = "preRequistic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "preRequistic", cascade = CascadeType.ALL)
 	private Set<Tutorial> preRequisticTutorial =new HashSet<Tutorial>();
 	
-	@OneToMany(mappedBy = "relatedVideo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "relatedVideo", cascade = CascadeType.ALL)
 	private Set<Tutorial> relatedTutorial =new HashSet<Tutorial>();
 
-	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL)
 	private Set<LogManegement> logs =new HashSet<LogManegement>();
 
 	public int getTutorialId() {
@@ -475,8 +476,35 @@ public class Tutorial implements Comparable<Tutorial>{
 	        		return t1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName().compareTo(
 	        				t2.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
 	        	}
+	        	
 	 
 	        	else if(t1.getUserVisit() < t2.getUserVisit()) {
+	        	  return 1;
+	          }
+	          else {
+	        	  return -1;
+	          }
+	            
+	        }
+	    };
+	    
+
+		/*
+		 * A function to Sort Tutorial BY OrderValue in Ascending order
+		 * Author: Alok Kumar
+		 */
+	    public static Comparator<Tutorial> SortByOrderValue = new Comparator<Tutorial>() {
+			  
+	        // Method
+	        public int compare(Tutorial t1,Tutorial t2) {
+	        	
+	        	if(t1.getConAssignedTutorial().getTopicCatId().getOrder() == t2.getConAssignedTutorial().getTopicCatId().getOrder()) {
+	        		return t1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName().compareTo(
+	        				t2.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+	        	}
+	        	
+	 
+	        	else if(t1.getConAssignedTutorial().getTopicCatId().getOrder() > t2.getConAssignedTutorial().getTopicCatId().getOrder()) {
 	        	  return 1;
 	          }
 	          else {

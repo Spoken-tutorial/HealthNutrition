@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -21,7 +22,7 @@ import javax.persistence.OneToMany;
  *
  */
 @Entity
-public class Event {
+public class Event implements  Serializable {
 
 	/**
 	 * unique id of object
@@ -100,28 +101,28 @@ public class Event {
 	/**
 	 * langauge in which event is occuring
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name="lan_id")
 	private Language lan;
 
 	/**
 	 * state of location
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name="state_id")
 	private State state;
 
 	/**
 	 * district of location
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name="district_id")
 	private District district;
 
 	/**
 	 * city of location
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name="city_id")
 	private City city;
 
@@ -131,17 +132,17 @@ public class Event {
 	@Column(name = "address" ,length = 10000)
 	private String address;
 
-	@OneToMany(mappedBy = "traineeInfos" , cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "traineeInfos" , cascade = CascadeType.ALL)
 	private Set<TrainingTopic> trainingTopicId = new HashSet<TrainingTopic>();
 
 	/**
 	 * user who added
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
 	private Set<TrainingInformation> trainings =new HashSet<TrainingInformation>();
 
 	public int getEventId() {

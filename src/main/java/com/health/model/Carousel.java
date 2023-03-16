@@ -1,5 +1,7 @@
 package com.health.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,7 +12,7 @@ import javax.persistence.Id;
  * @version 1.0
  */
 @Entity
-public class Carousel {
+public class Carousel implements  Serializable  {
 
 	/**
 	 * unique id to identify object

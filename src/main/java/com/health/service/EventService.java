@@ -52,6 +52,8 @@ public interface EventService {
 	 * @return List of event object
 	 */
 	List<Event> findByUser(User usr);
+	
+	 List<Event> findAllEventForCache();
 
 
 

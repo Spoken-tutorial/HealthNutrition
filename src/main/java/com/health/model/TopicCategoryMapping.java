@@ -1,6 +1,8 @@
 package com.health.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +25,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "topic_category")
-public class TopicCategoryMapping {
+public class TopicCategoryMapping implements  Serializable {
 
 	/**
 	 * unique id of object
@@ -42,32 +44,32 @@ public class TopicCategoryMapping {
 	 * order value
 	 */
 	@Column(name = "orderValue")
-	private int order = 0;
+	private int order= 0;
 	
 	/**
 	 * category 
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category cat;
 	
 	/**
 	 * topic
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "topic_id")
 	private Topic topic;
 	
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<Question> questions=new HashSet<Question>();
 	
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<ContributorAssignedTutorial> conAssignedTutorial=new HashSet<ContributorAssignedTutorial>();
 		
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch= FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<TrainingTopic> trainingTopic=new HashSet<TrainingTopic>();
 	
-	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL, fetch= FetchType.LAZY)
+	@OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
 	private Set<Brouchure> brochures=new HashSet<Brouchure>();
 	
 
@@ -102,6 +104,48 @@ public class TopicCategoryMapping {
 	public void setTopic(Topic topic) {
 		this.topic = topic;
 	}
+	
+	/*
+	 * Sort by OrderValue
+	 * Author: Alok Kumar
+	 */
+	 public static Comparator<TopicCategoryMapping> SortByOrderValue = new Comparator<TopicCategoryMapping>() {
+		  
+	        // Method
+	        public int compare(TopicCategoryMapping t1,TopicCategoryMapping t2) {
+	        	
+	        	if(t1.getOrder()==t2.getOrder()) {
+	        		return t1.getTopic().getTopicName().compareTo(
+	        				t2.getTopic().getTopicName());
+	        	}
+	 
+	        	else if(t1.getOrder() > t2.getOrder()) {
+	        	  return 1;
+	          }
+	          else {
+	        	  return -1;
+	          }
+	            
+	        }
+	    };
+	    
+	    
+	    /*
+		 * Sort by TopicName
+		 * Author: Alok Kumar
+		 */
+	    public static Comparator<TopicCategoryMapping> SortByTopicName = new Comparator<TopicCategoryMapping>() {
+			  
+	        // Method
+	        public int compare(TopicCategoryMapping t1,TopicCategoryMapping t2) {
+	        	
+	        	
+	        		return t1.getTopic().getTopicName().compareTo(
+	        				t2.getTopic().getTopicName());
+	        	
+	            
+	        }
+	    };
 
 	public TopicCategoryMapping() {
 		
@@ -151,6 +195,7 @@ public class TopicCategoryMapping {
 
 	public int getOrder() {
 		return order;
+		
 	}
 
 	public void setOrder(int order) {

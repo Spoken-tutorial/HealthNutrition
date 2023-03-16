@@ -47,6 +47,16 @@
 									class="form-control" id="topicId" name="topicName" th:value="${topic.getTopicName()}"
 									required="required" placeholder="Enter topic name" />
 							</div>
+							
+							
+							<input type="hidden"  name="TopicCatId"  th:value="${topicCatMap.getTopicCategoryId()}"/>
+							
+							<div class="form-group">
+
+								<label for="topicCatId">Order Value</label> <input type="text"
+									class="form-control" id="topicCatId" name="orderValue" th:value="${topicCatMap.getOrder()}"
+									required="required" placeholder="Enter Order Value" />
+							</div>
 
 							<button type="submit" value="showAlert" class="btn a-btn">Submit</button>
 						</form>	
