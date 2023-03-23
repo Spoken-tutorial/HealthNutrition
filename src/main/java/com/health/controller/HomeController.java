@@ -195,6 +195,9 @@ public class HomeController {
 
 	@Autowired
 	private UserRoleService usrRoleService;
+	
+	@Autowired
+	private UserRoleRepositary userRoleRepo;
 
 	@Autowired
 	private ContributorAssignedTutorialService conRepo;
@@ -5443,6 +5446,20 @@ private void getModelData(Model model) {
 		List<UserRole> domainReviewer = usrRoleService.findAllByRoleAndStatusAndRevoked(domain,false,false);
 		List<UserRole> externalUser= usrRoleService.findAllByRoleAndStatusAndRevoked(external,false,false);
 		
+		int countAdminreviewer= adminReviewer.size();
+		int countMasterTrainer= masterTrainer.size();
+		int countQualityReviewer= qualityReviewer.size();
+		int countContributorReviewer= contributorReviewer.size();
+		int countDomainReviwer= domainReviewer.size();
+		int countExternalUser= externalUser.size();
+		
+		model.addAttribute("countAdminreviewer", countAdminreviewer);
+		model.addAttribute("countMasterTrainer", countMasterTrainer);
+		model.addAttribute("countQualityReviewer", countQualityReviewer);
+		model.addAttribute("countContributorReviewer", countContributorReviewer);
+		model.addAttribute("countDomainReviwer", countDomainReviwer);
+		model.addAttribute("countExternalUser", countExternalUser);
+		
 
 		model.addAttribute("userInfoAdmin", adminReviewer);
 		model.addAttribute("userInfoQuality", qualityReviewer);
@@ -7604,9 +7621,39 @@ private void getModelData(Model model) {
 		model.addAttribute("userInfo", usr);
 	
 		List<User> allUser= userService.findAll();
-		
 		model.addAttribute("users", allUser);
-
+		model.addAttribute("usrRoleService", usrRoleService);
+		
+		Set<UserRole> ur;
+		for(User user: allUser) {
+			System.out.println("*******************************************");
+			System.out.println(user.getUsername() + " " + user.getFullName());
+			List<UserRole> ur1=  usrRoleService.findAllByUser(user);
+			//ur=user.getUserRoles();
+			for(UserRole temp: ur1) {
+				if(temp.getStatus()) {
+					String str1=new String();
+					String str2=new String();
+					if(temp.getCategory()==null ) {
+						str1="NA";
+					}else {
+						str1=temp.getCategory().getCatName();
+					}
+					if( temp.getLanguage()==null) {
+						str2="NA";
+					}else {
+						str2=temp.getLanguage().getLangName();
+					}
+					System.out.println(str1 + " " + str2+ " " + temp.getRole().getName());
+				}
+			}
+			
+		}
+		
+		
+		
+		
+		
 		return "showUsers";
 	}
 

@@ -130,9 +130,10 @@ font-weight:bold!important;
       <td><span th:text = "${question.getTopicCatId().getTopic().getTopicName()}"></span></td>
       <td><span th:text = "${question.getLan().getLangName()}"> </span>
 	  </td>
-      <td><a th:href="@{/files/}+@{${question.getQuestionPath()}}"
-			target="_blank" class="pdfclass"><img id="pdfsource"
-			th:src="${question.getQuestionPath()}" alt="Click here"></img></a></td>
+      <td><iframe style="width: 150px; height: 100px" th:if="${question.getQuestionPath().endsWith('.pdf')}" th:src="@{/files/}+@{${question.getQuestionPath()}}"></iframe>
+      		<br><a th:if="${question.getQuestionPath().endsWith('.pdf')}" th:href="@{/files/}+@{${question.getQuestionPath()}}"
+				target="_blank" class="pdfclass"><img id="pdfsource"
+				th:src="${question.getQuestionPath()}" alt="Download"></img></a>
 	  <td><a th:href="@{${'/question/edit/' + question.getTopicCatId().getCat().getCatName() + '/' + question.getTopicCatId().getTopic().getTopicName() + '/' + question.getLan().getLangName()}}">Edit</a></td>
     </tr>
    

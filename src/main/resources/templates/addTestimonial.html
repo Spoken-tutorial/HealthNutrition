@@ -174,9 +174,10 @@ font-weight:bold!important;
 										<td>
 											<div th:if="${testimonial.getConsentLetter() != null}"
 												style="width: 400px;">
-												<a th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
+													<iframe style="width: 150px; height: 100px" th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:src="@{/files/}+@{${testimonial.getConsentLetter()}}"></iframe>
+      												 <br><a th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
 													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${testimonial.getConsentLetter()}" alt="Click here"></img></a>
+													th:src="${testimonial.getConsentLetter()}" alt="Download"></img></a>
 											</div>
 										</td>
 										<td><a
@@ -229,9 +230,11 @@ font-weight:bold!important;
 										<td>
 											<div th:if="${testimonial.getConsentLetter() != null}"
 												style="width: 400px;">
-												<a th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
+													 <iframe style="width: 150px; height: 100px" th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:src="@{/files/}+@{${testimonial.getConsentLetter()}}"></iframe>
+      												 <br><a th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
 													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${testimonial.getConsentLetter()}" alt="Click here"></img></a>
+													th:src="${testimonial.getConsentLetter()}" alt="Download"></img></a>
+      										
 											</div>
 										</td>
 										<td><a

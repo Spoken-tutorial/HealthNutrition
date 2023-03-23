@@ -44,26 +44,26 @@ font-weight:bold!important;
 				<ul class="nav nav-tabs" id="myTab" role="tablist">
 					<li class="nav-item"><a class="nav-link active"
 						id="admin-rev-tab" data-toggle="tab" href="#Admin" role="tab"
-						aria-controls="home" aria-selected="true">Admin Reviewer</a></li>
+						aria-controls="home" aria-selected="true">Admin Reviewer &nbsp;<span th:text="${countAdminreviewer}"></span></a></li>
 					<li class="nav-item"><a class="nav-link" id="contri-tab"
 						data-toggle="tab" href="#Contributer" role="tab"
-						aria-controls="profile" aria-selected="false">Contributor</a></li>
+						aria-controls="profile" aria-selected="false">Contributor &nbsp;<span th:text="${countContributorReviewer}"></span></a></li>
 					<li class="nav-item"><a class="nav-link" id="Econtri-tab"
 						data-toggle="tab" href="#EContributer" role="tab"
-						aria-controls="profile" aria-selected="false">External Contributor</a></li>
+						aria-controls="profile" aria-selected="false">External Contributor &nbsp;<span th:text="${countExternalUser}"></span></a></li>
 					<li class="nav-item"><a class="nav-link" id="domain-tab"
 						data-toggle="tab" href="#domain" role="tab"
-						aria-controls="profile" aria-selected="false">Domain Reviewer</a></li>
+						aria-controls="profile" aria-selected="false">Domain Reviewer &nbsp;<span th:text="${countDomainReviwer}"></span></a></li>
 					
 					<li class="nav-item"><a class="nav-link" id="quality-tab"
 						data-toggle="tab" href="#Quality" role="tab"
-						aria-controls="contact" aria-selected="false">Quality Reviewer</a>
+						aria-controls="contact" aria-selected="false">Quality Reviewer &nbsp;<span th:text="${countQualityReviewer}"></span></a>
 					</li>
 					
 					<li class="nav-item"><a class="nav-link"
 						id="master-trainer-tab" data-toggle="tab" href="#MasterTrainer"
 						role="tab" aria-controls="contact" aria-selected="false">Master
-							Trainer</a></li>
+							Trainer &nbsp;<span th:text="${countMasterTrainer}"></span></a></li>
 				</ul>
 				<div class="tab-content" id="myTabContent">
 					<div class="tab-pane fade show active py-3" id="Admin"

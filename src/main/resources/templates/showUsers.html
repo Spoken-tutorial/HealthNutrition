@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
 <head th:replace="common/trail :: common-trail"></head>
@@ -31,15 +30,34 @@ font-weight:bold!important;
       <th scope="col">Username</th>
       <th scope="col">FullName</th>
       <th scope="col">Roles</th>
+      <th scope="col">Category</th>
+      <th scope="col">Language</th>
     </tr>
   </thead>
   <tbody>
     <tr th:each="user : ${users}">
       <td><span  th:text="${user.getUsername()}"> </span></td>
 	  <td><span  th:text="${user.getFullName()}"></span></td>
-	  <td><div  th:each=" userRoles : ${user.getUserRoles()}">
-	  			<div th:if = "${userRoles.getStatus()}" th:text="${userRoles.getRole().getName()}">
+	  <td><div th:each=" userRoles : ${user.getUserRoles()}">
+	  			<span style="width:100px" th:if = "${userRoles.getStatus()}" th:text="${userRoles.getRole().getName()}">
+	  			</span>
 	  			</div>
+	  </td>
+	  <td>
+	    <div th:each="userRoles : ${user.getUserRoles()}">
+	  			<span   th:if = "${userRoles.getStatus()}">
+	  			  <span style="width:300px" th:if="${userRoles.getCategory()==null}"> NA</span>
+	  			  <span  style="width:300px" th:unless="${userRoles.getCategory()==null}" th:text="${userRoles.getCategory().getCatName()}"></span>
+	  			</span>
+	    </div>	
+	  </td>
+	  
+	  	<td><div th:each="userRoles : ${user.getUserRoles()}">	
+	  	
+	  			<span  th:if = "${userRoles.getStatus()}">
+	  			  <span style="width:100px"  th:if="${userRoles.getLanguage()==null}"> NA</span>
+	  			  <span  style="width:100px" th:unless="${userRoles.getLanguage()==null}" th:text="${userRoles.getLanguage().getLangName()}"></span>
+	  			</span>
 	  	  </div>
 	  </td>
 	 
@@ -73,4 +91,3 @@ $(document).ready( function () {
 	</script>
 </body>
 </html>
-
