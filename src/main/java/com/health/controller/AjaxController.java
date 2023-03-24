@@ -933,9 +933,18 @@ public class AjaxController{
 		topic_list = conService.findAllByTopicCat(localtopic);
 		
 		//To find Languages
-		for(ContributorAssignedTutorial c : topic_list) {
-			if(!tutService.findAllByContributorAssignedTutorial1(c).isEmpty()) {
-				languages.put( c.getLan().getLangName(),c.getLan().getLanId());
+		for (ContributorAssignedTutorial c : topic_list) {
+			Language lan = c.getLan();
+			String langName = lan.getLangName();
+			if (!languages.containsKey(langName)) {
+				List<Tutorial> tutlist=tutService.findAllByContributorAssignedTutorial1(c);
+				for (Tutorial t1: tutlist) {
+					Category cat3 = t1.getConAssignedTutorial().getTopicCatId().getCat();
+					if (cat3.isStatus()) {
+						languages.put(langName, lan.getLanId());
+						break;
+					}
+				}
 			}
 		}
 		
@@ -959,29 +968,16 @@ public class AjaxController{
 		ArrayList<Map<String,Integer>> arlist=new ArrayList<>();
 		Map<String,Integer> cats=new TreeMap<>();
 		Map<String,Integer> topics=new LinkedHashMap<>();
-		//HashMap<String,Integer> topics=new LinkedHashMap<>();
 		
 		Category cat = catId != 0 ? catService.findByid(catId) : null;
 		Topic topic= topicId != 0 ? topicService.findById(topicId) : null;
 		Language language=languageId!=0? langService.getById(languageId):null;
 		
-		List<TopicCategoryMapping> local = cat!=null ? topicCatService.findAllByCategory(cat) : topicCatService.findAll();
+		// To find category
 		
+		List<TopicCategoryMapping> local = topic != null ? topicCatService.findAllByTopic(topic) : topicCatService.findAll();
 		
-		
-		if(topic!=null) {
-			local.clear();
-			local=topicCatService.findAllByTopic(topic);
-		}
-		
-		List<ContributorAssignedTutorial> lang_list = language!=null ? conService.findAllByTopicCatAndLanViewPart(local, language) : conService.findAllByTopicCat(local);
-		
-		//To find category
-		
-		if(topic!=null) {
-			local.clear();
-			local=topicCatService.findAllByTopic(topic);
-		}
+		List<ContributorAssignedTutorial> lang_list = language != null ? conService.findAllByTopicCatAndLanViewPart(local, language) : conService.findAllByTopicCat(local);
 		
 		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(lang_list);
 				
@@ -994,44 +990,31 @@ public class AjaxController{
 		}
 		
 		arlist.add(cats);
-				
-				
-				
+			
 		//To find Topics
-		List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list);
+
+		List<TopicCategoryMapping> local2 = cat != null ? topicCatService.findAllByCategory(cat) : topicCatService.findAll();
 		
+		List<ContributorAssignedTutorial> lang_list2 = language != null ? conService.findAllByTopicCatAndLanViewPart(local2, language) : conService.findAllByTopicCat(local2);
+		
+		List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list2);
+						
 		System.out.println("****Load By Langauge****");			
 		
-		/*for(Tutorial t: tutorials2) {
-			//Topic topic2 = t.getConAssignedTutorial().getTopicCatId().getTopic();
-			TopicCategoryMapping tcp=t.getConAssignedTutorial().getTopicCatId();
-			Topic topic2= tcp.getTopic();
-			
-			if(topic2.isStatus()) {
-				topics.put( topic2.getTopicName(),topic2.getTopicId());
-				//topics.put( topic2.getTopicName(),tcp.getOrder());
-				System.out.println(topic2.getTopicName()+" " + topic2.getTopicId() );
-			}
-			
-			}
-		
-		*/
 		 List<TopicCategoryMapping> tcmList = new ArrayList<>();
-			for(Tutorial t: tutorials2) {
-				Category c = t.getConAssignedTutorial().getTopicCatId().getCat();
-				TopicCategoryMapping tcp=t.getConAssignedTutorial().getTopicCatId();
-				if(c.isStatus()) {
-					
-					if(tcp.getTopic().isStatus()) {
-						tcmList.add(tcp);
-					}
-				}
-				
-				}
+		 for (Tutorial t: tutorials2) {
+			 Category c = t.getConAssignedTutorial().getTopicCatId().getCat();
+			 TopicCategoryMapping tcp = t.getConAssignedTutorial().getTopicCatId();
+			 if (c.isStatus()) {	
+				 if (tcp.getTopic().isStatus()) {
+					 tcmList.add(tcp);
+				 }
+			 }
+		 }
 		
-		if(cat==null ) {
+		if (cat == null) {
 			Collections.sort(tcmList, TopicCategoryMapping.SortByTopicName);
-		}else {
+		} else {
 			Collections.sort(tcmList, TopicCategoryMapping.SortByOrderValue);
 		}
 		
@@ -1042,13 +1025,8 @@ public class AjaxController{
 			topics.put( topic2.getTopicName(),topic2.getTopicId());
 		}
 		
-			//topics=HashMapSorting.sortHashMapByValue(topics);
-		
-		
-			arlist.add(topics);
+		arlist.add(topics);
 				
-				
-	
 		return arlist;
 
 	}

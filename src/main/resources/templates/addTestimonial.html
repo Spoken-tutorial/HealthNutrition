@@ -130,7 +130,7 @@ font-weight:bold!important;
 								</tr>
 							</thead>
 							<tbody>
-								<div sec:authorize="hasAnyAuthority('SUPER_USER')">
+								<div >
 									<tr th:each="testimonial : ${testimonials}" style="">
 
 										<td th:text="${testimonial.getTestimonialId()}"></td>
@@ -149,7 +149,7 @@ font-weight:bold!important;
 										</td>
 										
 
-										<div sec:authorize="hasAnyAuthority('SUPER_USER')">
+										<div>
 											<td>
 
 												<div th:if="${testimonial.isApproved()}">
