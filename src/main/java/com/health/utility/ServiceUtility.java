@@ -228,8 +228,9 @@ public class ServiceUtility {
 	 * @return
 	 */
 	public static boolean checkVideoSizeTestimonial(MultipartFile temp) {
-		
+		System.out.println("Video Size" +temp.getSize());
 		if(temp.getSize() > CommonData.videoSizeTest) {
+			
 			return false;
 		}
 		return true;

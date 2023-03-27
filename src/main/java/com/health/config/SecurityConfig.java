@@ -123,9 +123,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/approveRole/**",
 			"/assignTutorialToContributor/**",
 			"/assignContributor/edit/**",
-			"/enableDisableBrouchure/**",
-			"/enableDisableConsultant/**",
-			"/enableDisableTestimonial/**",
 			"/enableRoleById/**",
 			"/deleteMasterRole/**",
 			"/viewTrainee/**",
@@ -156,6 +153,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/updateTraining/**",
 			"/trainee/edit/**",
 			"/updateTrainee/**",
+			
 
 
 	};
@@ -259,7 +257,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers(ADMIN_URL).hasAnyAuthority("ADMIN_REVIEWER")
 			.antMatchers(DOMAIN_URL).hasAnyAuthority("DOMAIN_REVIEWER")
 			.antMatchers(QUALITY_URL).hasAnyAuthority("QUALITY_REVIEWER")
-			.antMatchers("/addEvent/**","/addTestimonial/**","/event/edit/**","/updateEvent/**","/testimonial/edit/**","/updateTestimonial/**","/viewTrainee/**","/downloadQuestion/**").hasAnyAuthority("SUPER_USER","MASTER_TRAINER")
+			.antMatchers("/viewTrainee/**","/downloadQuestion/**").hasAnyAuthority("SUPER_USER","MASTER_TRAINER")
 			.antMatchers("/addBrochure/**",
 					"/addCarousel/**",
 					"/addConsultant/**",
@@ -268,7 +266,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					"/brochure/edit/**",
 					"/carousel/edit/**",
 					"/event/edit/**",
-					"/testimonial/edit/**").hasAnyAuthority("SUPER_USER","CONTRIBUTOR")
+					"/testimonial/edit/**",
+					"/enableDisableBrouchure/**",
+					"/enableDisableConsultant/**",
+					"/enableDisableTestimonial/**").hasAnyAuthority("SUPER_USER","CONTRIBUTOR")
 			.antMatchers(PUBLIC_MATCHERS).
 				permitAll().anyRequest().authenticated().
 				and()

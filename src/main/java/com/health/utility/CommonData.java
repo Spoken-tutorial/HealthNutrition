@@ -205,9 +205,9 @@ public class CommonData {
 	
 	public static final long videoSize=400*1024*1024;
 	
-	public static final long videoSizeTest=20*1024*1024;
+	public static final long videoSizeTest=30*1024*1024;
 	
-	public static final long fileSize=20*1024*1024;
+	public static final long fileSize=10*1024*1024;
 	
 	public static final long categoryFileSizeImageFileSize = 10*1024*1024;
 	

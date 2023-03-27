@@ -122,16 +122,14 @@ border-right: 2px solid #014F7A;
 					                <td ><span th:text="${ver.getDateAdded()}"></span> </td>
 					               <td>  <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
       								 <br><a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
-													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${ver.getVersionPosterPath()}" alt="Download"></img></a>
+													target="_blank" class="pdfclass">Download</a>
      							 <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank" class="pdfclass">
       								<img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
 									style="width: 150px; height: 100px" /></a>
 					                </td>
 					                 <td th:text="${ver.getBrouchure().getTitle()}"></td>
 					                <td > 
-					                 <span th:if="${ver.getBrouchure().getTopicCatId()== null}">NA</span>
-					                <span th:unless="${ver.getBrouchure().getTopicCatId()==null}"> <span th:text = "${ver.getBrouchure().getTopicCatId().getTopic().getTopicName()}"></span></span></td>
+					                  <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getCat().getCatName() : 'NA'}"></span></td>
 					                <td th:text="${ver.getBrouchure().getLan().getLangName()}"></td>
 					            </tr>
 					            

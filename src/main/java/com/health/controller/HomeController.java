@@ -3042,7 +3042,8 @@ private void getModelData(Model model) {
 			usr=userService.findByUsername(principal.getName());
 		}
 		model.addAttribute("userInfo", usr);
-		List<Event> events = eventservice.findByUser(usr);
+		//List<Event> events = eventservice.findByUser(usr);
+		List<Event> events = eventservice.findAll();
 		model.addAttribute("events", events);
 		List<State> states = stateService.findAll();
 		model.addAttribute("states", states);
@@ -3685,10 +3686,11 @@ private void getModelData(Model model) {
 			return "redirect:/addEvent";
 		}
 
-		if(event.getUser().getId() != usr.getId()) {
+		/*if(event.getUser().getId() != usr.getId()) {
 
 			return "redirect:/addEvent";
-		}
+		}*/
+		
 		model.addAttribute("events", event);
 
 		return "updateEvent";
@@ -4520,11 +4522,13 @@ private void getModelData(Model model) {
 			return "redirect:/addTestimonial";
 		}
 
-		if(test.getUser().getId() != usr.getId()) {
+		/*
+		 * if(test.getUser().getId() != usr.getId()) {
 
 			return "redirect:/addTestimonial";
 		}
-
+		*/
+		
 		model.addAttribute("testimonials", test);
 
 		return "updateTestimonial";

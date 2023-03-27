@@ -156,12 +156,11 @@ font-weight:bold!important;
        
       </td>
       <td >
-       <span th:if="${ver.getBrouchure().getTopicCatId()== null}">NA</span>
-       <span th:unless="${ver.getBrouchure().getTopicCatId()== null}"> <span th:text = "${ver.getBrouchure().getTopicCatId().getCat().getCatName()}"></span> </span>
+       <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getCat().getCatName() : 'NA'}"></span>
       </td>
       <td>
-      <span th:if="${ver.getBrouchure().getTopicCatId()== null}">NA</span>
-       <span th:unless="${ver.getBrouchure().getTopicCatId()== null}"> <span th:text = "${ver.getBrouchure().getTopicCatId().getTopic().getTopicName()}"></span></span>
+       <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getTopic().getTopicName() : 'NA'}"></span>
+       
      </td>
       <td><span th:text = "${ver.getBrouchure().getLan().getLangName()}"> </span>
 	  </td>
@@ -170,8 +169,7 @@ font-weight:bold!important;
       <td>
        <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
        <br><a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
-													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${ver.getVersionPosterPath()}" alt="Download"></img></a>
+													target="_blank" class="pdfclass">Download</a>
       <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
 													target="_blank" class="pdfclass">
       <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"

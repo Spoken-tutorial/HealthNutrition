@@ -415,8 +415,7 @@ the globe.
    	 
    	  <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
        <a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
-													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${ver.getVersionPosterPath()}" alt="View"></img></a>
+													target="_blank" class="pdfclass">View</a>
       <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
 													target="_blank" class="pdfclass">
       <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
