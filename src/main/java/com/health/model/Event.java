@@ -3,6 +3,7 @@ package com.health.model;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -305,7 +306,14 @@ public class Event implements  Serializable {
 		this.trainingTopicId = trainingTopicId;
 	}
 
-
+	 public static Comparator<Event> SortByEventAddedTimeInDesc = new Comparator<Event>() {
+		  
+	        // Method
+	        public int compare(Event e1, Event e2) {
+	        	return e2.getDateAdded().compareTo(e1.getDateAdded());
+	            
+	        }
+	    };
 
 
 

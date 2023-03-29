@@ -99,9 +99,9 @@ font-weight:bold!important;
 										</div>
 										
 										<div class="form-group">
-											<label for="testimonialConsent" style="padding-top: 8px">Upload Consent document * <span class="text-muted"> (Only PDF format)</span></label> <input type="file" class="form-control-file"
+											<label for="testimonialConsent" style="padding-top: 8px">Upload Consent document  <span class="text-muted"> (Only PDF format)</span></label> <input type="file" class="form-control-file"
 												id="testimonialConsent" name="consent"
-												placeholder="uploadFile" required/>
+												placeholder="uploadFile" />
 										</div>
 										<button type="submit" value="showAlert" onclick="showAlert();"
 											class="btn a-btn">Submit</button>
@@ -146,6 +146,7 @@ font-weight:bold!important;
 													Your browser does not support HTML video.
 												</video>
 											</div>
+											<div th:unless="${testimonial.getFilePath() != 'null'}"> NA </div>
 										</td>
 										
 
@@ -179,6 +180,7 @@ font-weight:bold!important;
 													target="_blank" class="pdfclass"><img id="pdfsource"
 													th:src="${testimonial.getConsentLetter()}" alt="Download"></img></a>
 											</div>
+											<div th:unless="${testimonial.getConsentLetter() != null}">NA</div>
 										</td>
 										<td><a
 											th:href="@{${'/testimonial/edit/' + testimonial.getTestimonialId()}}">Edit</a></td>
@@ -236,6 +238,7 @@ font-weight:bold!important;
 													th:src="${testimonial.getConsentLetter()}" alt="Download"></img></a>
       										
 											</div>
+											<div th:unless="${testimonial.getConsentLetter() != null}">NA</div>
 										</td>
 										<td><a
 											th:href="@{${'/testimonial/edit/' + testimonial.getTestimonialId()}}">Edit</a></td>

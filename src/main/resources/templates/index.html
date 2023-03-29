@@ -335,8 +335,8 @@ the globe.
     		<p class="content mb-1 ml-0" th:text="${event.getDescription()}">Event Desc</p>
     		<div><i class="fas fa-map-marker-alt"></i> <span th:text="${event.getLocation()}"></span></div>
     		<hr/>
-    		<p class="mb-1 ml-0">Contact Details : </p>
-    		<div class="row">
+    		<p th:if="${event.getContactNumber()!=0}" class="mb-1 ml-0">Contact Details : </p>
+    		<div th:if="${event.getContactNumber()!=0}" class="row">
     		<div class="col-md-4"><p class="ml-0"><i class="fas fa-user"></i> <span th:text="${event.getContactPerson()}"></span></p></div>
     		<div class="col-6 col-md-4"><p class="ml-0"><i class="fas fa-phone-square-alt"></i> <span th:text="${event.getContactNumber()}"></span></p></div>
     		<div class="col-6 col-md-4"><p class="ml-0"><i class="fas fa-envelope"></i> <span th:text="${event.getEmail()}"></span></p></div>
@@ -379,11 +379,11 @@ the globe.
     <h1 class="text-center spk-title">Testimonials</h1>
     <div class="container-lg">
     	<div class="row">
-    <div class="col-md-4 " th:each="testimonial : ${listofTestimonial}" th:if="${testimonial.getFilePath()!= 'null'}">
+    <div class="col-md-4 " th:each="testimonial : ${listofTestimonial}" >
     <div class="card is-shady pt-3" style="width: 100%;" >
             <div class="card-image text-center">
             <div style="width:100%;">
-            <video  controls="controls" style="width:80%;" >
+            <video th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:80%;" >
   <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
  Your browser does not support HTML video.
 </video>
@@ -443,7 +443,7 @@ the globe.
 		      </div>
 		      <div class="modal-body">
 		      <div class="card-image text-center">
-				          <video  controls="controls" style="width:100%;">
+				          <video th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:100%;">
 				  <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
 				 Your browser does not support HTML video.
 				</video> </div>

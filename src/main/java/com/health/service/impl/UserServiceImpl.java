@@ -11,6 +11,7 @@ import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -156,6 +157,7 @@ public class UserServiceImpl implements UserService{
 	 * @see com.health.service.UserService#addUserToEvent(User, Set)
 	 */
 	@Override
+	@CacheEvict(cacheNames = "events", allEntries=true)
 	public User addUserToEvent(User usr, Set<Event> events) {
 		// TODO Auto-generated method stub
 		usr.getEvents().addAll(events);

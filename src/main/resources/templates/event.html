@@ -43,17 +43,18 @@
 		
 	</div>
 	<div>
-		<h1 class="text-center" th:text="${event.getEventName()}" style="font-size: 1.5rem;text-decoration: underline;"></h1>
+		<h1 class="text-center" th:text="${event.getEventName()}" style="font-size: 1.5rem;text-decoration: underline;"></h1><br>
 		<div class="row">
 			<div class="col-md-8 offset-md-2 text-center">
-			<img th:src="@{/files/}+@{${event.getPosterPath()}}" style="max-height:400px;">
+			
+			<img th:if="${event.getPosterPath()!=null}" th:src="@{${'/files/' + event.getPosterPath()}}" style="max-height:400px;">
 			</div>
 			<div class="col-md-8 offset-md-2 " style="border-bottom: 1px solid rgba(0,0,0,0.2);">
 			<div class="row my-2">
 			<div class="col-md-3 text-center"><i class="fas fa-calendar-alt mr-2 e-icon"></i><span th:text="${event.getStartDate()}"></span></div>
-			<div class="col-md-3 text-center"><i class="fas fa-user mr-2 e-icon"></i><span th:text="${event.getContactPerson()}"></span></div>
-			<div class="col-md-3 text-center"><i class="fas fa-phone-alt mr-2 e-icon"></i><span th:text="${event.getContactNumber()}"></span></div>
-			<div class="col-md-3 text-center"><i class="fas fa-envelope mr-2 e-icon"></i><span th:text="${event.getEmail()}"></span></div>
+			<div th:if="${event.getContactPerson()!=null}" class="col-md-3 text-center"><i  class="fas fa-user mr-2 e-icon"></i><span th:text="${event.getContactPerson()}"></span></div>
+			<div th:if="${event.getContactNumber()!=0}" class="col-md-3 text-center"><i class="fas fa-phone-alt mr-2 e-icon"></i><span th:text="${event.getContactNumber()}"></span></div>
+			<div th:if="${event.getEmail()!=null}" class="col-md-3 text-center"><i class="fas fa-envelope mr-2 e-icon"></i><span th:text="${event.getEmail()}"></span></div>
 		</div>
 </div>
 

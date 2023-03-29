@@ -553,6 +553,7 @@ private void getModelData(Model model) {
 		}
 
 		if(!evnHome.isEmpty()) {
+			Collections.sort(evnHome, Event.SortByEventAddedTimeInDesc);
 			model.addAttribute("events", evnHome);
 		}
 		
@@ -3137,38 +3138,50 @@ private void getModelData(Model model) {
 		try {
 			startDate=ServiceUtility.convertStringToDate(startDateTemp);
 			endDate=ServiceUtility.convertStringToDate(endDateTemp);
-
-			if(!ServiceUtility.checkFileExtensionImage(files)) {
-				model.addAttribute("error_msg", CommonData.JPG_PNG_EXT);
-				return "addEvent";
+			if(!files.isEmpty()) {
+				if(!ServiceUtility.checkFileExtensionImage(files)) {
+					model.addAttribute("error_msg", CommonData.JPG_PNG_EXT);
+					return "addEvent";
+				}
 			}
+			
 
 			if(endDate.before(startDate)) {      // throws error if end date is previous to start date
 				model.addAttribute("error_msg",CommonData.EVENT_CHECK_DATE);
 				return "addEvent";
 			}
-
-			if(!ServiceUtility.checkEmailValidity(email)) { // throw error on wrong email
-				model.addAttribute("error_msg",CommonData.EVENT_CHECK_EMAIL);
-				return "addEvent";
+			if(!email.isEmpty()) {
+				if(!ServiceUtility.checkEmailValidity(email)) { // throw error on wrong email
+					model.addAttribute("error_msg",CommonData.EVENT_CHECK_EMAIL);
+					return "addEvent";
+				}
 			}
-
-			if(contactNumber.length() != 10) {        // throw error on wrong phone number
-				model.addAttribute("error_msg",CommonData.EVENT_CHECK_CONTACT);
-				return "addEvent";
+			
+			if(!contactNumber.isEmpty()) {
+				if(contactNumber.length() != 10) {        // throw error on wrong phone number
+					model.addAttribute("error_msg",CommonData.EVENT_CHECK_CONTACT);
+					return "addEvent";
+				}
 			}
-
-			long contact=Long.parseLong(contactNumber);
+			
+			long contact=0;
+			if(!contactNumber.isEmpty()) {
+				contact=Long.parseLong(contactNumber);
+			}
+			
 
 			newEventid=eventservice.getNewEventId();
 			Event event=new Event();
 
 			
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-				event.setPosterPath(document);
+				if(!files.isEmpty()) {
+					String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
+					int indexToStart=pathtoUploadPoster.indexOf("Media");
+					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					event.setPosterPath(document);
+				}
+				
 			
 			
 			event.setEventId(newEventid);
@@ -3298,10 +3311,13 @@ private void getModelData(Model model) {
 		model.addAttribute("testimonials", testimonials);
 		model.addAttribute("trainings", trainings);
 		
-		if(!ServiceUtility.checkFileExtensionImage(consent) && !ServiceUtility.checkFileExtensiononeFilePDF(consent)) {
-			model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
-			return "addTestimonial";
+		if(!consent.isEmpty()) {
+			if(!ServiceUtility.checkFileExtensionImage(consent) && !ServiceUtility.checkFileExtensiononeFilePDF(consent)) {
+				model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
+				return "addTestimonial";
+			}
 		}
+		
 
 		if(!file.isEmpty()) {
 		if(!ServiceUtility.checkFileExtensionVideo(file)) { // throw error on extension
@@ -3387,12 +3403,15 @@ private void getModelData(Model model) {
 
 				temp.setFilePath(document);
 				
-				pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+newTestiId);
-				indexToStart=pathtoUploadPoster.indexOf("Media");
+				if(!consent.isEmpty()) {
+					pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+newTestiId);
+					indexToStart=pathtoUploadPoster.indexOf("Media");
 
-				document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					
+					temp.setConsentLetter(document);
+				}
 				
-				temp.setConsentLetter(document);
 
 				testService.save(temp);
 
@@ -3428,12 +3447,15 @@ private void getModelData(Model model) {
 			
 			try {
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-				String pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+				if(!consent.isEmpty()) {
+					String pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
+					int indexToStart=pathtoUploadPoster.indexOf("Media");
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					
+					test.setConsentLetter(document);
+				}
 				
-				test.setConsentLetter(document);
 
 				testService.save(test);
 
@@ -3747,18 +3769,23 @@ private void getModelData(Model model) {
 				model.addAttribute("error_msg","End date must be after Start date");
 				return "updateEvent";
 			}
+			/*if(!contactNumber.isEmpty()) {
+				if(contactNumber.length() != 10) {        // throw error on wrong phone number
 
-			if(contactNumber.length() != 10) {        // throw error on wrong phone number
+					model.addAttribute("error_msg","Contact number must be 10 digit");
+					return "updateEvent";
+				}
+			}
+			*/
+			if(!email.isEmpty()) {
+				if(!ServiceUtility.checkEmailValidity(email)) {    // throw error on wrong email
 
-				model.addAttribute("error_msg","Contact number must be 10 digit");
-				return "updateEvent";
+					model.addAttribute("error_msg",CommonData.NOT_VALID_EMAIL_ERROR);
+					return "updateEvent";
+				}
 			}
 
-			if(!ServiceUtility.checkEmailValidity(email)) {    // throw error on wrong email
-
-				model.addAttribute("error_msg",CommonData.NOT_VALID_EMAIL_ERROR);
-				return "updateEvent";
-			}
+			
 
 			if(!files.isEmpty()) {
 				if(!ServiceUtility.checkFileExtensionImage(files)) { // throw error on extension
@@ -3766,9 +3793,11 @@ private void getModelData(Model model) {
 					return "updateEvent";
 			}
 			}
-
-
-			long contact=Long.parseLong(contactNumber);
+			long contact=0;
+			if(!contactNumber.isEmpty()) {
+				contact=Long.parseLong(contactNumber);
+			}
+			
 
 			event.setContactPerson(contactPerson);
 			event.setEmail(email);

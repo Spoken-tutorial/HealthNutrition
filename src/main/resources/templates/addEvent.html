@@ -201,10 +201,10 @@ font-weight:bold!important;
 														</div>
 													</div>
 													<div class="form-group">
-												<label for="Image" style="padding-top: 8px">Poster of the Event *</label> <input type="file" style="padding-right: 50px"
+												<label for="Image" style="padding-top: 8px">Poster of the Event </label> <input type="file" style="padding-right: 50px"
 													class="form-control-file " id="Image"
 													name="Image" placeholder="uploadFile"
-													accept=".jpg, .jpeg ,.png" onchange="validate_file_size(this,500000)" required="required"/>
+													accept=".jpg, .jpeg ,.png" onchange="validate_file_size(this,500000)" />
 													<small>Max file size : 500 kB <br>Suggested Dimension : 600 x 400</small>
 
 											</div>
@@ -212,26 +212,26 @@ font-weight:bold!important;
 											<div class="row">
 											<div class="col-12">
 											<div class="form-group">
-												<label for="contactperson">Contact Person Name *</label> <input
+												<label for="contactperson">Contact Person Name </label> <input
 													type="text" class="form-control" id="contactperson"
-													name="contactperson" required="required" />
+													name="contactperson" />
 											</div>
 											</div>
 											</div>
 											<div class="row">
 											<div class="col-md-5">
 											<div class="form-group">
-												<label for="contactnumber">Phone Number *</label> <input
+												<label for="contactnumber">Phone Number </label> <input
 													type="number" class="form-control" id="conatctNumber"
-													name="contactnumber" required="required" />
+													name="contactnumber" />
 											</div>
 											</div>
 											<div class="col-md-7">
 											<div class="form-group">
 
-												<label for="email">Email Id *</label> <input type="email"
+												<label for="email">Email Id </label> <input type="email"
 													class="form-control" id="email" name="email"
-													required="required" />
+													 />
 											</div>
 											</div>
 											</div>
@@ -275,12 +275,13 @@ font-weight:bold!important;
       <td th:text = "${event.getDescription()}"></td>
       <td th:text = "${event.getLocation()}"></td>
       <td th:text = "${event.getContactPerson()}"></td>
-      <td th:text = "${event.getContactNumber()}"></td>
+      <td ><span th:if = "${event.getContactNumber()!=0}" th:text = "${event.getContactNumber()}"></span></td>
       <td th:text = "${event.getEmail()}"></td>
       <td th:text = "${event.getStartDate()}"></td>
       <td th:text = "${event.getEndDate()}"></td>
-      <td><img id="imagesource" th:src="@{/files/}+@{${event.getPosterPath()}}"
+      <td><img th:if="${event.getPosterPath()!=null}" id="imagesource" th:src="@{${'/files/' + event.getPosterPath()}}"
 			style="width: 150px; height: 100px" />
+			<span th:unless="${event.getPosterPath()!=null}"> NA</span>
 	  </td>
 	  <td><a th:href="@{${'/event/edit/' + event.getEventId()}}">Edit</a></td>
 	  <!-- </div> -->
