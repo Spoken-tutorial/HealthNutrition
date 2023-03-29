@@ -3643,6 +3643,7 @@ function readImageUrl(input) {
 	}
 function validate_file_size(elem,s){
 	var fileSize = elem.files[0].size;
+	console.log("size=", fileSize)
 	if(fileSize > s){
 		alert("Please check file size");
 		elem.value="";

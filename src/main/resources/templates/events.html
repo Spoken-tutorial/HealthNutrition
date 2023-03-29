@@ -58,9 +58,9 @@ border-right: 2px solid #014F7A;
 					                <td th:text="${event.getDescription()}"></td>
 					                <td th:text="${event.getLocation()}"></td>
 					                <td >
-					                <p th:text="${event.getContactPerson()}"> </p>
-					                <p th:text="${event.getContactNumber()}"> </p>
-					                <p th:text="${event.getEmail()}"> </p>
+					                <p th:if="${event.getContactPerson()!=null}" th:text="${event.getContactPerson()}"> </p>
+					                <p th:if="${event.getContactNumber()!=0}" th:text="${event.getContactNumber()}"> </p>
+					                <p th:if="${event.getEmail()!=null}" th:text="${event.getEmail()}"> </p>
 					                </td>
 					                <td th:text="${event.getStartDate()}"></td>
 					                <td th:text="${event.getEndDate()}"></td>

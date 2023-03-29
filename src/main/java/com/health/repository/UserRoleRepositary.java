@@ -33,6 +33,7 @@ public interface UserRoleRepositary extends  CrudRepository<UserRole, Long>{
 	 * @param usr user object
 	 * @return List of UserRole object
 	 */
+	@Query("from UserRole where user=?1 order by role, cat, lan ")
 	List<UserRole> findAllByuser(User usr);
 	
 	/**

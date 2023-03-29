@@ -195,6 +195,9 @@ public class HomeController {
 
 	@Autowired
 	private UserRoleService usrRoleService;
+	
+	@Autowired
+	private UserRoleRepositary userRoleRepo;
 
 	@Autowired
 	private ContributorAssignedTutorialService conRepo;
@@ -491,6 +494,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		//model.addAttribute("brouchures", brochures);
 		//model.addAttribute("versions", versions);
 	
@@ -549,10 +553,14 @@ private void getModelData(Model model) {
 		}
 
 		if(!evnHome.isEmpty()) {
+			Collections.sort(evnHome, Event.SortByEventAddedTimeInDesc);
 			model.addAttribute("events", evnHome);
 		}
+		
+		
 
 		if(!versionHome.isEmpty()) {
+			Collections.sort(versionHome, Version.SortByBroVersionTime);
 			model.addAttribute("listofVesrsions", versionHome);
 		}
 		
@@ -1864,6 +1872,10 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
+		for(Version ver: versions) {
+			System.out.println(ver.getDateAdded());
+		}
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		
@@ -1910,6 +1922,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		
@@ -2004,6 +2017,7 @@ private void getModelData(Model model) {
 						versions.add(ver);
 				}
 			}
+			Collections.sort(versions, Version.SortByBroVersionTime);
 			model.addAttribute("brouchures", brouchures);
 			model.addAttribute("versions", versions);
 			//brochureTemp.getPosterPath().endsWith(".pdf");
@@ -2025,6 +2039,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		return "addBrochure";
@@ -2042,6 +2057,7 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		return "addBrochure";
@@ -3027,7 +3043,8 @@ private void getModelData(Model model) {
 			usr=userService.findByUsername(principal.getName());
 		}
 		model.addAttribute("userInfo", usr);
-		List<Event> events = eventservice.findByUser(usr);
+		//List<Event> events = eventservice.findByUser(usr);
+		List<Event> events = eventservice.findAll();
 		model.addAttribute("events", events);
 		List<State> states = stateService.findAll();
 		model.addAttribute("states", states);
@@ -3121,38 +3138,50 @@ private void getModelData(Model model) {
 		try {
 			startDate=ServiceUtility.convertStringToDate(startDateTemp);
 			endDate=ServiceUtility.convertStringToDate(endDateTemp);
-
-			if(!ServiceUtility.checkFileExtensionImage(files)) {
-				model.addAttribute("error_msg", CommonData.JPG_PNG_EXT);
-				return "addEvent";
+			if(!files.isEmpty()) {
+				if(!ServiceUtility.checkFileExtensionImage(files)) {
+					model.addAttribute("error_msg", CommonData.JPG_PNG_EXT);
+					return "addEvent";
+				}
 			}
+			
 
 			if(endDate.before(startDate)) {      // throws error if end date is previous to start date
 				model.addAttribute("error_msg",CommonData.EVENT_CHECK_DATE);
 				return "addEvent";
 			}
-
-			if(!ServiceUtility.checkEmailValidity(email)) { // throw error on wrong email
-				model.addAttribute("error_msg",CommonData.EVENT_CHECK_EMAIL);
-				return "addEvent";
+			if(!email.isEmpty()) {
+				if(!ServiceUtility.checkEmailValidity(email)) { // throw error on wrong email
+					model.addAttribute("error_msg",CommonData.EVENT_CHECK_EMAIL);
+					return "addEvent";
+				}
 			}
-
-			if(contactNumber.length() != 10) {        // throw error on wrong phone number
-				model.addAttribute("error_msg",CommonData.EVENT_CHECK_CONTACT);
-				return "addEvent";
+			
+			if(!contactNumber.isEmpty()) {
+				if(contactNumber.length() != 10) {        // throw error on wrong phone number
+					model.addAttribute("error_msg",CommonData.EVENT_CHECK_CONTACT);
+					return "addEvent";
+				}
 			}
-
-			long contact=Long.parseLong(contactNumber);
+			
+			long contact=0;
+			if(!contactNumber.isEmpty()) {
+				contact=Long.parseLong(contactNumber);
+			}
+			
 
 			newEventid=eventservice.getNewEventId();
 			Event event=new Event();
 
 			
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-				event.setPosterPath(document);
+				if(!files.isEmpty()) {
+					String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
+					int indexToStart=pathtoUploadPoster.indexOf("Media");
+					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					event.setPosterPath(document);
+				}
+				
 			
 			
 			event.setEventId(newEventid);
@@ -3282,10 +3311,13 @@ private void getModelData(Model model) {
 		model.addAttribute("testimonials", testimonials);
 		model.addAttribute("trainings", trainings);
 		
-		if(!ServiceUtility.checkFileExtensionImage(consent) && !ServiceUtility.checkFileExtensiononeFilePDF(consent)) {
-			model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
-			return "addTestimonial";
+		if(!consent.isEmpty()) {
+			if(!ServiceUtility.checkFileExtensionImage(consent) && !ServiceUtility.checkFileExtensiononeFilePDF(consent)) {
+				model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
+				return "addTestimonial";
+			}
 		}
+		
 
 		if(!file.isEmpty()) {
 		if(!ServiceUtility.checkFileExtensionVideo(file)) { // throw error on extension
@@ -3371,12 +3403,15 @@ private void getModelData(Model model) {
 
 				temp.setFilePath(document);
 				
-				pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+newTestiId);
-				indexToStart=pathtoUploadPoster.indexOf("Media");
+				if(!consent.isEmpty()) {
+					pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+newTestiId);
+					indexToStart=pathtoUploadPoster.indexOf("Media");
 
-				document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					
+					temp.setConsentLetter(document);
+				}
 				
-				temp.setConsentLetter(document);
 
 				testService.save(temp);
 
@@ -3412,12 +3447,15 @@ private void getModelData(Model model) {
 			
 			try {
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-				String pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+				if(!consent.isEmpty()) {
+					String pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
+					int indexToStart=pathtoUploadPoster.indexOf("Media");
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					
+					test.setConsentLetter(document);
+				}
 				
-				test.setConsentLetter(document);
 
 				testService.save(test);
 
@@ -3670,10 +3708,11 @@ private void getModelData(Model model) {
 			return "redirect:/addEvent";
 		}
 
-		if(event.getUser().getId() != usr.getId()) {
+		/*if(event.getUser().getId() != usr.getId()) {
 
 			return "redirect:/addEvent";
-		}
+		}*/
+		
 		model.addAttribute("events", event);
 
 		return "updateEvent";
@@ -3730,18 +3769,23 @@ private void getModelData(Model model) {
 				model.addAttribute("error_msg","End date must be after Start date");
 				return "updateEvent";
 			}
+			/*if(!contactNumber.isEmpty()) {
+				if(contactNumber.length() != 10) {        // throw error on wrong phone number
 
-			if(contactNumber.length() != 10) {        // throw error on wrong phone number
+					model.addAttribute("error_msg","Contact number must be 10 digit");
+					return "updateEvent";
+				}
+			}
+			*/
+			if(!email.isEmpty()) {
+				if(!ServiceUtility.checkEmailValidity(email)) {    // throw error on wrong email
 
-				model.addAttribute("error_msg","Contact number must be 10 digit");
-				return "updateEvent";
+					model.addAttribute("error_msg",CommonData.NOT_VALID_EMAIL_ERROR);
+					return "updateEvent";
+				}
 			}
 
-			if(!ServiceUtility.checkEmailValidity(email)) {    // throw error on wrong email
-
-				model.addAttribute("error_msg",CommonData.NOT_VALID_EMAIL_ERROR);
-				return "updateEvent";
-			}
+			
 
 			if(!files.isEmpty()) {
 				if(!ServiceUtility.checkFileExtensionImage(files)) { // throw error on extension
@@ -3749,9 +3793,11 @@ private void getModelData(Model model) {
 					return "updateEvent";
 			}
 			}
-
-
-			long contact=Long.parseLong(contactNumber);
+			long contact=0;
+			if(!contactNumber.isEmpty()) {
+				contact=Long.parseLong(contactNumber);
+			}
+			
 
 			event.setContactPerson(contactPerson);
 			event.setEmail(email);
@@ -3848,7 +3894,18 @@ private void getModelData(Model model) {
 			}
 		
 		List<Version> listofVersions= new ArrayList<>(verSet);
-		model.addAttribute("listofVersions", listofVersions);
+		
+		Collections.sort(listofVersions, Version.SortByBroVersionTime);
+		
+		List<Version> newlistofVesrion= new ArrayList<>();
+		int temp=0;
+		for(Version ver: listofVersions) {
+			newlistofVesrion.add(ver);
+			temp++;
+			if(temp==3)
+				break;
+		}
+		model.addAttribute("listofVersions", newlistofVesrion);
 		model.addAttribute("version", version);
 		model.addAttribute("brouchure", brouchure);
 		model.addAttribute("langByBrouchure",langByBrouchure);
@@ -3910,7 +3967,17 @@ private void getModelData(Model model) {
 		
 		Set<Version> verSet= brouchure.getVersions();
 		List<Version> listofVersions= new ArrayList<>(verSet);
-		model.addAttribute("listofVersions", listofVersions);
+		Collections.sort(listofVersions, Version.SortByBroVersionTime);
+		List<Version> newlistofVesrion= new ArrayList<>();
+		int temp=0;
+		for(Version ver: listofVersions) {
+			newlistofVesrion.add(ver);
+			temp++;
+			if(temp==3)
+				break;
+		}
+		
+		model.addAttribute("listofVersions", newlistofVesrion);
 		
 		if(title.isEmpty()){
 			model.addAttribute("error_msg","Title doesn't exist with empty");
@@ -4012,9 +4079,19 @@ private void getModelData(Model model) {
 			version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
 			model.addAttribute("version", version);
 			model.addAttribute("brouchure", brouchure);
+		
 			verSet= brouchure.getVersions();
 			listofVersions= new ArrayList<>(verSet);
-			model.addAttribute("listofVersions", listofVersions);
+			Collections.sort(listofVersions, Version.SortByBroVersionTime);
+			newlistofVesrion= new ArrayList<>();
+			temp=0;
+			for(Version ver: listofVersions) {
+				newlistofVesrion.add(ver);
+				temp++;
+				if(temp==3)
+					break;
+			}
+			model.addAttribute("listofVersions", newlistofVesrion);
 			return "updateBrochure";        // need to add some error message
 		}
 		
@@ -4028,7 +4105,17 @@ private void getModelData(Model model) {
 		brouchure= broService.findById(Integer.parseInt(brochureId));
 		verSet= brouchure.getVersions();
 		listofVersions= new ArrayList<>(verSet);
-		model.addAttribute("listofVersions", listofVersions);
+		listofVersions= new ArrayList<>(verSet);
+		Collections.sort(listofVersions, Version.SortByBroVersionTime);
+		newlistofVesrion= new ArrayList<>();
+		temp=0;
+		for(Version ver: listofVersions) {
+			newlistofVesrion.add(ver);
+			temp++;
+			if(temp==3)
+				break;
+		}
+		model.addAttribute("listofVersions", newlistofVesrion);
 		for(Version ver: listofVersions)
 		System.out.println(ver);
 
@@ -4464,11 +4551,13 @@ private void getModelData(Model model) {
 			return "redirect:/addTestimonial";
 		}
 
-		if(test.getUser().getId() != usr.getId()) {
+		/*
+		 * if(test.getUser().getId() != usr.getId()) {
 
 			return "redirect:/addTestimonial";
 		}
-
+		*/
+		
 		model.addAttribute("testimonials", test);
 
 		return "updateTestimonial";
@@ -5389,6 +5478,20 @@ private void getModelData(Model model) {
 		List<UserRole> contributorReviewer = usrRoleService.findAllByRoleAndStatusAndRevoked(contributor,false,false);
 		List<UserRole> domainReviewer = usrRoleService.findAllByRoleAndStatusAndRevoked(domain,false,false);
 		List<UserRole> externalUser= usrRoleService.findAllByRoleAndStatusAndRevoked(external,false,false);
+		
+		int countAdminreviewer= adminReviewer.size();
+		int countMasterTrainer= masterTrainer.size();
+		int countQualityReviewer= qualityReviewer.size();
+		int countContributorReviewer= contributorReviewer.size();
+		int countDomainReviwer= domainReviewer.size();
+		int countExternalUser= externalUser.size();
+		
+		model.addAttribute("countAdminreviewer", countAdminreviewer);
+		model.addAttribute("countMasterTrainer", countMasterTrainer);
+		model.addAttribute("countQualityReviewer", countQualityReviewer);
+		model.addAttribute("countContributorReviewer", countContributorReviewer);
+		model.addAttribute("countDomainReviwer", countDomainReviwer);
+		model.addAttribute("countExternalUser", countExternalUser);
 		
 
 		model.addAttribute("userInfoAdmin", adminReviewer);
@@ -7272,6 +7375,9 @@ private void getModelData(Model model) {
 					versions.add(ver);
 			}
 		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
+		for(Version ver: versions)
+			System.out.println(ver.getDateAdded() + " " + ver.getBrouchure().getTitle());
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 
@@ -7548,9 +7654,39 @@ private void getModelData(Model model) {
 		model.addAttribute("userInfo", usr);
 	
 		List<User> allUser= userService.findAll();
-		
 		model.addAttribute("users", allUser);
-
+		model.addAttribute("usrRoleService", usrRoleService);
+		
+		Set<UserRole> ur;
+		for(User user: allUser) {
+			System.out.println("*******************************************");
+			System.out.println(user.getUsername() + " " + user.getFullName());
+			List<UserRole> ur1=  usrRoleService.findAllByUser(user);
+			//ur=user.getUserRoles();
+			for(UserRole temp: ur1) {
+				if(temp.getStatus()) {
+					String str1=new String();
+					String str2=new String();
+					if(temp.getCategory()==null ) {
+						str1="NA";
+					}else {
+						str1=temp.getCategory().getCatName();
+					}
+					if( temp.getLanguage()==null) {
+						str2="NA";
+					}else {
+						str2=temp.getLanguage().getLangName();
+					}
+					System.out.println(str1 + " " + str2+ " " + temp.getRole().getName());
+				}
+			}
+			
+		}
+		
+		
+		
+		
+		
 		return "showUsers";
 	}
 

@@ -2,6 +2,7 @@ package com.health.domain.security;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Comparator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 
 import com.health.model.Category;
 import com.health.model.Language;
+import com.health.model.Tutorial;
 import com.health.model.User;
 
 /**
@@ -183,6 +185,32 @@ public class UserRole implements Comparable <UserRole>, Serializable
 	public void setRejected(boolean rejected) {
 		this.rejected = rejected;
 	}
+	
+	 public static Comparator<UserRole> RoleNameComp = new Comparator<UserRole>() {
+
+	        public int compare(UserRole ur1, UserRole ur2) {
+	        	
+	        	
+	        	if(   ur1.getCategory()!=null && ur2.getCategory()!=null && ur1.getLanguage()!=null && ur2.getLanguage()!=null &&
+	        			ur1.getRole().getName()==ur2.getRole().getName() &&  ur1.getCategory().getCatName()==ur2.getCategory().getCatName()) {
+	        		
+	        		return ur1.getLanguage().getLangName().compareTo(ur2.getLanguage().getLangName());
+	        		
+	        	}
+	        	
+	        	else if( ur1.getCategory()!=null && ur2.getCategory()!=null && ur1.getRole().getName()==ur2.getRole().getName()){
+	        		
+	        		return ur1.getCategory().getCatName().compareTo(ur2.getCategory().getCatName());
+	        	}
+	        	
+	        	else {
+	        		
+	        		return ur1.getRole().getName().compareTo(ur2.getRole().getName());	
+	        	}
+	        		
+	            
+	        }
+	    };
 
 	@Override
 	public int compareTo(UserRole o) {

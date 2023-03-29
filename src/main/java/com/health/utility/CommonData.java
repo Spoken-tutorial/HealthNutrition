@@ -205,11 +205,11 @@ public class CommonData {
 	
 	public static final long videoSize=400*1024*1024;
 	
-	public static final long videoSizeTest=20*1024*1024;
+	public static final long videoSizeTest=30*1024*1024;
 	
-	public static final long fileSize=20*1024*1024;
+	public static final long fileSize=10*1024*1024;
 	
-	public static final long categoryFileSizeImageFileSize = 1*1024*1024;
+	public static final long categoryFileSizeImageFileSize = 10*1024*1024;
 	
 //public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
 	public static String SCRIPT_MANAGER_BASE= "https://scriptmanager.spoken-tutorial.org/";

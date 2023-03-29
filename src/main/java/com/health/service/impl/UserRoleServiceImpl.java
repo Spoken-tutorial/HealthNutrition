@@ -1,6 +1,8 @@
 package com.health.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +45,9 @@ public class UserRoleServiceImpl implements UserRoleService{
 	@Override
 	public List<UserRole> findAllByUser(User usr) {
 		// TODO Auto-generated method stub
-		return usrRoleRepo.findAllByuser(usr);
+		List<UserRole> list1 = usrRoleRepo.findAllByuser(usr);
+		Collections.sort(list1, UserRole.RoleNameComp);
+		return list1;
 	}
 
 	/**
