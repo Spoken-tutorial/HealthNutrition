@@ -935,8 +935,10 @@ public class AjaxController{
 		//To find Languages
 		for (ContributorAssignedTutorial c : topic_list) {
 			Language lan = c.getLan();
-			String langName = lan.getLangName();
-			if (!languages.containsKey(langName)) {
+			String langName="";
+			if(lan!=null)
+			langName = lan.getLangName();
+			if (!languages.containsKey(langName) && langName!="") {
 				List<Tutorial> tutlist=tutService.findAllByContributorAssignedTutorial1(c);
 				for (Tutorial t1: tutlist) {
 					Category cat3 = t1.getConAssignedTutorial().getTopicCatId().getCat();
