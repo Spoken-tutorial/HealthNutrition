@@ -1819,7 +1819,7 @@ private void getModelData(Model model) {
 			}
 
 	
-
+		cara = caroService.findAll();
 		model.addAttribute("carousels", cara);
 		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
 
