@@ -290,6 +290,7 @@ public class AjaxController{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println(document);
 		return document;
 	}
 	
@@ -320,15 +321,18 @@ public class AjaxController{
 
 		try {
 			String  document = getDocument(tut,videoFile,"Video");
+			
 			if(document!="") {
 				tut.setVideo(document);
 				tut.setVideoStatus(CommonData.ADMIN_STATUS);
 				tut.setVideoUser(usr);
 				tutService.save(tut);
+				
 				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus(),tut.getTutorialId(),usr);
 				logService.save(log);
 			}
 		}catch (Exception e) {
+			System.out.println("Error in get addVideo");
 			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus(),tut.getTutorialId(),usr);
 		}
 		

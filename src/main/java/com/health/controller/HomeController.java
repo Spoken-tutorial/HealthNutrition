@@ -3120,10 +3120,7 @@ private void getModelData(Model model) {
 			return "addEvent";
 		}
 		
-		if(cityService.findById(Integer.parseInt(cityName))==null){
-			model.addAttribute("error_msg", "Please Select City");
-			return "addEvent";
-		}
+		
 		
 		if(lanService.getByLanName(language)==null){
 			model.addAttribute("error_msg", "Please Select language");
@@ -3198,7 +3195,10 @@ private void getModelData(Model model) {
 			event.setAddress(addressInformationName);
 			event.setState(stateService.findById(Integer.parseInt(stateName)));
 			event.setDistrict(districtService.findById(Integer.parseInt(districtName)));
-			event.setCity(cityService.findById(Integer.parseInt(cityName)));
+			if(cityService.findById(Integer.parseInt(cityName))!=null) {
+				event.setCity(cityService.findById(Integer.parseInt(cityName)));
+			}
+			
 			event.setPincode(Integer.parseInt(pinCode));
 			event.setLan(lanService.getByLanName(language));
 			Set<TrainingTopic> trainingTopicTemp = new HashSet<>();
@@ -3590,7 +3590,7 @@ private void getModelData(Model model) {
 
 		if(!file.isEmpty()) {
 			try {
-
+					ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryCategory+cat.getCategoryId());
 					String pathtoUploadPoster=ServiceUtility.uploadFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryCategory+cat.getCategoryId());
 
 					int indexToStart=pathtoUploadPoster.indexOf("Media");

@@ -203,7 +203,7 @@ public class CommonData {
 	
 	public static String ADMIN_REVIEWER_REQ= "Admin Reviewer role request submitted";
 	
-	public static final long videoSize=400*1024*1024;
+	public static final long videoSize=50*1024*1024;
 	
 	public static final long videoSizeTest=30*1024*1024;
 	
