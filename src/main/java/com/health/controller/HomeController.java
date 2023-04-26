@@ -1895,6 +1895,7 @@ private void getModelData(Model model) {
 	@RequestMapping(value = "/addBrochure",method = RequestMethod.POST)
 	public String addBrochurePost(Model model,Principal principal,
 								  @RequestParam("brouchure") MultipartFile brochure,
+								  @RequestParam("brouchurePrint") MultipartFile brochurePrint,
 								  @RequestParam(value = "categoryName") int categoryId,
 								  @RequestParam(name = "inputTopicName") int topicId,
 								  @RequestParam(name = "languageyName") int languageId,
@@ -1931,6 +1932,14 @@ private void getModelData(Model model) {
 			model.addAttribute("error_msg","Only image and pdf files are supported");
 			return "addBrochure";
 		}
+		
+		if(!brochurePrint.isEmpty()) {
+			if(!ServiceUtility.checkFileExtensionImage(brochurePrint) && !ServiceUtility.checkFileExtensiononeFilePDF(brochurePrint)){  // throw error
+				model.addAttribute("error_msg","Only image and pdf files are supported");
+				return "addBrochure";
+			}
+		}
+		
 		
 		Category cat=catService.findByid(categoryId);
 		
@@ -1998,14 +2007,24 @@ private void getModelData(Model model) {
 			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion);
 			String pathtoUploadPoster1=ServiceUtility.uploadFile(brochure, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId +"/" +primaryVersion);
 			int indexToStart1=pathtoUploadPoster1.indexOf("Media");
-
 			String document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+			
+			if(!brochurePrint.isEmpty()) {
+			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion+ "/" + "printdoc");
+			String pathtoUploadPoster2=ServiceUtility.uploadFile(brochurePrint, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion+ "/" + "printdoc");
+			int indexToStart2=pathtoUploadPoster2.indexOf("Media");
+			String printDocument=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
+			if(!printDocument.isEmpty()) {
+				version.setVersionPrintPosterPath(printDocument);
+			}
+			}
 
 			version.setVerId(newVerid);
 			version.setBrouchure(brochureTemp);
 			version.setBroVersion(primaryVersion);
 			version.setDateAdded(ServiceUtility.getCurrentTime());
 			version.setVersionPosterPath(document1);
+			
 			verService.save(version);
 			
 			brouchures = broService.findAll();
@@ -3921,7 +3940,7 @@ private void getModelData(Model model) {
 	 */
 	@RequestMapping(value = "/updateBrochure", method = RequestMethod.POST)
 	public String updatBrochureGet(HttpServletRequest req,Model model,Principal principal,
-			@RequestParam("Image") MultipartFile files) {
+			@RequestParam("Image") MultipartFile files, @RequestParam("ImagePrint") MultipartFile filesPrint) {
 
 		User usr=new User();
 
@@ -4000,6 +4019,13 @@ private void getModelData(Model model) {
 					return "updateBrochure";
 			}
 			}
+			
+			if(!filesPrint.isEmpty()) {
+				if(ServiceUtility.checkFileExtensionVideo(filesPrint)) { // throw error on extension
+					model.addAttribute("error_msg", "Only image and pdf files are supported");
+					return "updateBrochure";
+			}
+			}
 
 			
 			//Category cat1=catService.findByid(Integer.parseInt(cat));
@@ -4028,13 +4054,26 @@ private void getModelData(Model model) {
 			
 			
 
-			if(!files.isEmpty()) {
+			
 				
 				if(overwriteValue !=0) {
+					
+					if(!files.isEmpty()) {
 					String pathtoUploadPoster1=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure + brochureId+ "/" + versionValue);
 					int indexToStart1=pathtoUploadPoster1.indexOf("Media");
 					String document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
 					version.setVersionPosterPath(document1);
+					}
+					
+					if(!filesPrint.isEmpty()) {
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +versionValue+ "/" + "printdoc");
+						String pathtoUploadPoster2=ServiceUtility.uploadFile(filesPrint, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +versionValue+ "/" + "printdoc");
+						int indexToStart2=pathtoUploadPoster2.indexOf("Media");
+						String printDocument=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
+						version.setVersionPrintPosterPath(printDocument);
+						
+					}
+					
 					verService.save(version);
 					brouchure.setTitle(title);
 					broService.save(brouchure);
@@ -4044,10 +4083,19 @@ private void getModelData(Model model) {
 					
 					else {
 						
+						if(!files.isEmpty() && !filesPrint.isEmpty()) {
 						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
-						String pathtoUploadPoster2=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
-						int indexToStart2=pathtoUploadPoster2.indexOf("Media");
-						String document2=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
+						String pathtoUploadPoster3=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
+						int indexToStart3=pathtoUploadPoster3.indexOf("Media");
+						String document2=pathtoUploadPoster3.substring(indexToStart3, pathtoUploadPoster3.length());
+						
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +newVersionValue+ "/" + "printdoc");
+						String pathtoUploadPoster4=ServiceUtility.uploadFile(filesPrint, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +newVersionValue+ "/" + "printdoc");
+						int indexToStart4=pathtoUploadPoster4.indexOf("Media");
+						String printDocument2=pathtoUploadPoster4.substring(indexToStart4, pathtoUploadPoster4.length());
+
+						
+						
 						
 						brouchure.setTitle(title);
 						brouchure.setPrimaryVersion(version.getBroVersion()+1);
@@ -4059,15 +4107,19 @@ private void getModelData(Model model) {
 						newVer.setDateAdded(ServiceUtility.getCurrentTime());
 						newVer.setBroVersion(version.getBroVersion()+1);
 						newVer.setVersionPosterPath(document2);
+						if(!printDocument2.isEmpty()) {
+							newVer.setVersionPrintPosterPath(printDocument2);
+						}
 						verService.save(newVer);
 						
 						brouchure= broService.findById(Integer.parseInt(brochureId));
 						verSet= brouchure.getVersions();
 						listofVersions= new ArrayList<>(verSet);
 						model.addAttribute("listofVersions", listofVersions);
+						}
 					}
 
-			} 
+			
 			
 
 			} catch (Exception e) {
@@ -4096,7 +4148,12 @@ private void getModelData(Model model) {
 		}
 		
 		
-
+		if(overwriteValue ==0) {
+			if(files.isEmpty() || filesPrint.isEmpty()) {
+				model.addAttribute("error_msg", "Both brouchure web and print file are required for new version");
+				return "updateBrochure";
+			}
+		}
 
 		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
 		version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());

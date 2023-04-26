@@ -110,10 +110,18 @@ font-weight:bold!important;
 
 									<div class="form-group">
 
-										<label for="brouchure">Brochure *</label><small> (.jpg or .png or.pdf Format Only)</small> <input type="file"
+										<label for="brouchure">Brochure for web  *</label><small> (.jpg or .png or.pdf Format Only)</small> <input type="file"
 											class="form-control" id="brouchure" name="brouchure"
 											accept=" .jpeg,.jpg,.png, .pdf" required="required" onchange="validate_file_size(this,1024000)"/>
 										<small>Max file size : 1 MB</small>
+									</div>
+									
+									<div class="form-group">
+
+										<label for="brouchurePrint">Brochure for print </label><small> (.jpg or .png or.pdf Format Only)</small> <input type="file"
+											class="form-control" id="brouchurePrint" name="brouchurePrint"
+											accept=" .jpeg,.jpg,.png, .pdf"  onchange="validate_file_size(this,512000000)"/>
+										<small>Max file size : 500 MB</small>
 									</div>
 
 
@@ -168,12 +176,13 @@ font-weight:bold!important;
 	  </td>
       <td>
        <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
-       <br><a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
-													target="_blank" class="pdfclass">Download</a>
-      <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
-													target="_blank" class="pdfclass">
       <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
-			style="width: 150px; height: 100px" /></a>
+			style="width: 150px; height: 100px" />
+			<br>
+			<a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
+			<a th:if="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
+													download >Download</a>
+			<a th:unless="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
 	  </td>
 	  <td>
 	  		
