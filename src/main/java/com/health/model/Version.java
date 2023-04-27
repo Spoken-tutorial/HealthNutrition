@@ -21,6 +21,9 @@ public class Version {
 	@Column(name = "Image_path", nullable = false)
 	private String versionPosterPath;
 	
+	@Column(name = "Print_Image_path", nullable = false)
+	private String versionPrintPosterPath;
+	
 	@ManyToOne
 	@JoinColumn(name = "bro_id")
 	private Brouchure brouchure;
@@ -45,6 +48,17 @@ public class Version {
 		this.broVersion = broVersion;
 	}
 
+	 public Version(int verId, Timestamp dateAdded, String versionPosterPath, String versionPrintPosterPath,
+				Brouchure brouchure, int broVersion) {
+			super();
+			this.verId = verId;
+			this.dateAdded = dateAdded;
+			this.versionPosterPath = versionPosterPath;
+			this.versionPrintPosterPath = versionPrintPosterPath;
+			this.brouchure = brouchure;
+			this.broVersion = broVersion;
+		}
+	 
 	public int getBroVersion() {
 		return broVersion;
 	}
@@ -65,9 +79,25 @@ public class Version {
 		this.versionPosterPath = versionPosterPath;
 		this.brouchure = brouchure;
 	}
+	
+	
 
 	
-	 public static Comparator<Version> SortByBroVersionInDesc = new Comparator<Version>() {
+	 public Version(int verId, Timestamp dateAdded, String versionPosterPath, String versionPrintPosterPath,
+			Brouchure brouchure) {
+		super();
+		this.verId = verId;
+		this.dateAdded = dateAdded;
+		this.versionPosterPath = versionPosterPath;
+		this.versionPrintPosterPath = versionPrintPosterPath;
+		this.brouchure = brouchure;
+		
+	}
+
+
+
+
+	public static Comparator<Version> SortByBroVersionInDesc = new Comparator<Version>() {
 		  
 	        // Method
 	        public int compare(Version v1, Version v2) {
@@ -118,6 +148,14 @@ public class Version {
 
 	public String getVersionPosterPath() {
 		return versionPosterPath;
+	}
+
+	public String getVersionPrintPosterPath() {
+		return versionPrintPosterPath;
+	}
+
+	public void setVersionPrintPosterPath(String versionPrintPosterPath) {
+		this.versionPrintPosterPath = versionPrintPosterPath;
 	}
 
 	public void setVersionPosterPath(String versionPosterPath) {

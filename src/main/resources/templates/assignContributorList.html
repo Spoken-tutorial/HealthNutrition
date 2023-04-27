@@ -122,7 +122,7 @@ font-weight:bold!important;
     <tr th:each="user : ${userByContributorsAssigned}">
       <td><span  th:text="${user.getTopicCatId().getCat().getCatName()}"> </span></td>
 	  <td><span  th:text="${user.getTopicCatId().getTopic().getTopicName()}"></span></td>
-	  <td><span  th:text="${user.getLan().getLangName()}"></span></td>
+	  <td><span th:if="${user.getLan()!=null}" th:text="${user.getLan().getLangName()}"></span></td>
 	  <td><div th:each="usr :${user.getMultiUserAssigned()}" th:text = "${usr.getUser().getFullName()}"></div></td>
     </tr>
   

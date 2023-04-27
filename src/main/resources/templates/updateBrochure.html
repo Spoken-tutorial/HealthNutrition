@@ -95,10 +95,18 @@
 											
 									
 											<div class="form-group">
-												<label for="Image" style="padding-top: 8px">Brouchure File* </label> <input type="file" style="padding-right: 50px"
+												<label for="Image" style="padding-top: 8px">Brouchure Web File </label> <input type="file" style="padding-right: 50px"
 													class="form-control-file " id="Image"
-													name="Image" placeholder="uploadFile" required="required"
-													accept=".jpg, .jpeg ,.png, .pdf"/>
+													name="Image" placeholder="uploadFile" 
+													accept=".jpg, .jpeg ,.png, .pdf" onchange="validate_file_size(this,1024000)" />
+
+											</div>
+											
+											<div class="form-group">
+												<label for="ImagePrint" style="padding-top: 8px">Brouchure Print File </label> <input type="file" style="padding-right: 50px"
+													class="form-control-file " id="ImagePrint"
+													name="ImagePrint" placeholder="uploadFile" 
+													accept=".jpg, .jpeg ,.png, .pdf" onchange="validate_file_size(this,512000000)" />
 
 											</div>
 											
@@ -144,13 +152,14 @@
       </td>
      
       <td>
-       <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
-      								 <br><a th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"
-													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${ver.getVersionPosterPath()}" alt="Download"></img></a>
-     							 <a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank" class="pdfclass">
-      								<img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
-									style="width: 150px; height: 100px" /></a>
+        <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
+      <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
+			style="width: 150px; height: 100px" />
+			<br>
+			<a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
+			<a th:if="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
+													download >Download</a>
+			<a th:unless="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
 	  </td>
 	 
 	   <td><span th:text="${ver.getBroVersion()}"></span></td>

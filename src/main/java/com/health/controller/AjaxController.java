@@ -290,6 +290,7 @@ public class AjaxController{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println(document);
 		return document;
 	}
 	
@@ -320,15 +321,18 @@ public class AjaxController{
 
 		try {
 			String  document = getDocument(tut,videoFile,"Video");
+			
 			if(document!="") {
 				tut.setVideo(document);
 				tut.setVideoStatus(CommonData.ADMIN_STATUS);
 				tut.setVideoUser(usr);
 				tutService.save(tut);
+				
 				temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getVideoStatus(),tut.getTutorialId(),usr);
 				logService.save(log);
 			}
 		}catch (Exception e) {
+			System.out.println("Error in get addVideo");
 			temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus(),tut.getTutorialId(),usr);
 		}
 		
@@ -935,8 +939,10 @@ public class AjaxController{
 		//To find Languages
 		for (ContributorAssignedTutorial c : topic_list) {
 			Language lan = c.getLan();
-			String langName = lan.getLangName();
-			if (!languages.containsKey(langName)) {
+			String langName="";
+			if(lan!=null)
+			langName = lan.getLangName();
+			if (!languages.containsKey(langName) && langName!="") {
 				List<Tutorial> tutlist=tutService.findAllByContributorAssignedTutorial1(c);
 				for (Tutorial t1: tutlist) {
 					Category cat3 = t1.getConAssignedTutorial().getTopicCatId().getCat();

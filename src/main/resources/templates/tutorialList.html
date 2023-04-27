@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
-<html>
-<head>
-<head th:replace="common/trail :: common-trail"></head>
+<head th:replace="common/trail :: common-trail">
+</head>
 <body>
+ <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
   <section th:replace="index.html :: header-bar"></section>
   <nav class="navbar navbar-expand-lg navbar-light bg-light ">
   <a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
@@ -34,13 +34,15 @@
 </div>
 <main id="tutorial_list">
 	<div th:each="tutorial : ${tutorials}" class="row t-wrapper mt-3">
-		<div class="col-sm-4">
-			<video id='storedVideoId' 
-				controls="controls" style="width:100%!important;">
+		<div class="col-md-6" >
+		<div style="width: 100%; margin: auto;">
+			<video th:id="${'storedVideoId' + tutorial.getTutorialId()}" 
+				  controls style="width:100%!important;" class="vid1">
 				<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4"></source>
 			</video>
+			</div>
 		</div>
-		<div class="col-sm-8">
+		<div class="col-md-6">
 		<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" style="color: black;text-decoration: none;">
 			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
 			<h6 style="color: #014F7A;font-size: 1rem;">
@@ -71,6 +73,17 @@
 
 		
 <div th:replace="common/trail :: body-bottom-scripts"></div>
+<style>
+  :root {
+  --plyr-color-main: #ff9033;
+   
+}
+  .plyr__controls__item plyr__volume{
+    margin-bottom: 25px;
+    padding-bottom:25px;
+  }
+</style>
+
 
 <script>
 		var projectPath='[(@{/})]';
@@ -201,7 +214,33 @@ var isPlaying = [];
 		} */
 		
 		
+		 var controls =
+			 [
+			     'play-large', // The large play button in the center
+			    // 'restart', // Restart playback
+			    // 'rewind', // Rewind by the seek time (default 10 seconds)
+			     'play', // Play/pause playback
+			    
+			     'progress', // The progress bar and scrubber for playback and buffering
+			     'current-time', // The current time of playback
+			    
+			     'mute', // Toggle mute
+			    'volume', // Volume control
+			    
+			     //'settings', // Settings menu
+			    // 'pip', // Picture-in-picture (currently Safari only)
+			     'airplay', // Airplay (currently Safari only)
+			     'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+			     'fullscreen' // Toggle fullscreen
+			 ];
+
+		for(var i=0; i<videos.length; i++){
 		
+			const player = new Plyr(videos[i],{controls});	
+			
+			
+			   
+		}
 </script>
 </body>
 </html>
