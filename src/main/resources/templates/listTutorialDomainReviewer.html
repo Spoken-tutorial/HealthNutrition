@@ -72,7 +72,7 @@ a{
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getKeywordStatus()})"></td>
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getVideoStatus()})"></td>
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getPreRequisticStatus()})"></td>
-													<td><a th:href="@{${'/domainreview/review/'+ componenettutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName() + '/' + componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName() +'/'+ componenettutorial.getConAssignedTutorial().getLan().getLangName()}}"><b>Review</b></a></td>
+													<td><a th:href="@{${'/domainreview/review/'+ componenettutorial.getTutorialId()}}"><b>Review</b></a></td>
 												</tr>
 											</tbody>
 										</table>

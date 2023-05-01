@@ -873,7 +873,7 @@ public class AjaxController{
 		
 		//To find Languages
 		for(ContributorAssignedTutorial c : cat_list) {
-			if(!tutService.findAllByContributorAssignedTutorial1(c).isEmpty()) {
+			if(!tutService.findAllByContributorAssignedTutorialEnabled(c).isEmpty()) {
 				languages.put( c.getLan().getLangName(),c.getLan().getLanId());
 			}
 		}
@@ -943,7 +943,7 @@ public class AjaxController{
 			if(lan!=null)
 			langName = lan.getLangName();
 			if (!languages.containsKey(langName) && langName!="") {
-				List<Tutorial> tutlist=tutService.findAllByContributorAssignedTutorial1(c);
+				List<Tutorial> tutlist=tutService.findAllByContributorAssignedTutorialEnabled(c);
 				for (Tutorial t1: tutlist) {
 					Category cat3 = t1.getConAssignedTutorial().getTopicCatId().getCat();
 					if (cat3.isStatus()) {

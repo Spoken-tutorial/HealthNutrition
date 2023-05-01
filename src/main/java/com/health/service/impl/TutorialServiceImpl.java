@@ -83,7 +83,7 @@ public class TutorialServiceImpl implements TutorialService {
 	
 	//New Function By Alok
 	@Override
-	public List<Tutorial> findAllByContributorAssignedTutorial1(ContributorAssignedTutorial con) {
+	public List<Tutorial> findAllByContributorAssignedTutorialEnabled(ContributorAssignedTutorial con) {
 		// TODO Auto-generated method stub
 		return tutorialRepo.findAllByconAssignedTutorialByStatusTrue(con);
 	}

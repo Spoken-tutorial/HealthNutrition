@@ -855,16 +855,18 @@ private void getModelData(Model model) {
 		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
 		
 		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
+			System.out.println("Problem1");
 			return "redirect:/";
 		}
 		
 		
 		
 		
-			 Tutorial tutorial = tutService.findAllByContributorAssignedTutorial(conTut).get(0);
+			 Tutorial tutorial = tutService.findAllByContributorAssignedTutorialEnabled(conTut).get(0);
 			 List<Tutorial> relatedTutorial = new ArrayList<>();
 			 
 			 if(tutorial == null || tutorial.isStatus() == false) {
+				 System.out.println("Problem2");
 				 return "redirect:/";
 			 }
 			 
@@ -3929,6 +3931,22 @@ private void getModelData(Model model) {
 		model.addAttribute("brouchure", brouchure);
 		model.addAttribute("langByBrouchure",langByBrouchure);
 		
+		List<Brouchure> brouchures = broService.findAll();
+		List<Version> allVersions= verService.findAll();
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
+		for(Version ver: versions) {
+			System.out.println(ver.getDateAdded());
+		}
+		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
+		
 		
 		return "updateBrochure";
 	}
@@ -4083,19 +4101,11 @@ private void getModelData(Model model) {
 					
 					else {
 						
-						if(!files.isEmpty() && !filesPrint.isEmpty()) {
+						if(!files.isEmpty()) {
 						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
 						String pathtoUploadPoster3=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/"+ newVersionValue);
 						int indexToStart3=pathtoUploadPoster3.indexOf("Media");
 						String document2=pathtoUploadPoster3.substring(indexToStart3, pathtoUploadPoster3.length());
-						
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +newVersionValue+ "/" + "printdoc");
-						String pathtoUploadPoster4=ServiceUtility.uploadFile(filesPrint, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +newVersionValue+ "/" + "printdoc");
-						int indexToStart4=pathtoUploadPoster4.indexOf("Media");
-						String printDocument2=pathtoUploadPoster4.substring(indexToStart4, pathtoUploadPoster4.length());
-
-						
-						
 						
 						brouchure.setTitle(title);
 						brouchure.setPrimaryVersion(version.getBroVersion()+1);
@@ -4107,9 +4117,16 @@ private void getModelData(Model model) {
 						newVer.setDateAdded(ServiceUtility.getCurrentTime());
 						newVer.setBroVersion(version.getBroVersion()+1);
 						newVer.setVersionPosterPath(document2);
-						if(!printDocument2.isEmpty()) {
-							newVer.setVersionPrintPosterPath(printDocument2);
+						
+						if(!filesPrint.isEmpty()) {
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +newVersionValue+ "/" + "printdoc");
+						String pathtoUploadPoster4=ServiceUtility.uploadFile(filesPrint, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" +newVersionValue+ "/" + "printdoc");
+						int indexToStart4=pathtoUploadPoster4.indexOf("Media");
+						String printDocument2=pathtoUploadPoster4.substring(indexToStart4, pathtoUploadPoster4.length());
+						newVer.setVersionPrintPosterPath(printDocument2);
 						}
+						
+						
 						verService.save(newVer);
 						
 						brouchure= broService.findById(Integer.parseInt(brochureId));
@@ -4149,19 +4166,18 @@ private void getModelData(Model model) {
 		
 		
 		if(overwriteValue ==0) {
-			if(files.isEmpty() || filesPrint.isEmpty()) {
-				model.addAttribute("error_msg", "Both brouchure web and print file are required for new version");
+			if(files.isEmpty()) {
+				model.addAttribute("error_msg", "brouchure web file is required for new version");
 				return "updateBrochure";
 			}
 		}
 
 		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
+		brouchure= broService.findById(Integer.parseInt(brochureId));
 		version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
 		model.addAttribute("version", version);
 		model.addAttribute("brouchure", brouchure);
-		brouchure= broService.findById(Integer.parseInt(brochureId));
 		verSet= brouchure.getVersions();
-		listofVersions= new ArrayList<>(verSet);
 		listofVersions= new ArrayList<>(verSet);
 		Collections.sort(listofVersions, Version.SortByBroVersionTime);
 		newlistofVesrion= new ArrayList<>();
@@ -4172,9 +4188,25 @@ private void getModelData(Model model) {
 			if(temp==3)
 				break;
 		}
+		
 		model.addAttribute("listofVersions", newlistofVesrion);
 		for(Version ver: listofVersions)
 		System.out.println(ver);
+		List<Brouchure> brouchures = broService.findAll();
+		List<Version> allVersions= verService.findAll();
+		List<Version> versions= new ArrayList<Version>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
+		for(Version ver: versions) {
+			System.out.println(ver.getDateAdded());
+		}
+		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
 
 		return "updateBrochure";
 	}
@@ -6072,11 +6104,16 @@ private void getModelData(Model model) {
 
 		List<Tutorial> tutorials =  tutService.findAllByContributorAssignedTutorialList(conTutorials);
 		for(Tutorial temp:tutorials) {
-			if(temp.getVideoStatus() == CommonData.ADMIN_STATUS) {
+			int videoStatus = temp.getVideoStatus();
+			if(videoStatus == CommonData.ADMIN_STATUS) {
 				toReview.add(temp);
-			}else if(temp.getVideoStatus() > CommonData.ADMIN_STATUS) {
+				System.out.println(temp);
+			}else if(videoStatus > CommonData.ADMIN_STATUS) {
 				reviewed.add(temp);
 			}
+			
+			if(temp.getTutorialId()==654)
+				System.out.println("VideoStatus: " + videoStatus);
 		}
 
 		model.addAttribute("tutorialToReview", toReview);
@@ -6091,40 +6128,46 @@ private void getModelData(Model model) {
 	 * @param principal Principal object
 	 * @return String object (webpage)
 	 */
-	@RequestMapping(value = "adminreview/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
-	public String listAdminReviewTutorialGet(@PathVariable(name = "catName") String cat,
-			@PathVariable (name = "topicName") String topic,
-			@PathVariable (name = "language") String lan,Model model,Principal principal) {
+	@RequestMapping(value = "adminreview/review/{tutorialId}", method = RequestMethod.GET)
+	public String listAdminReviewTutorialGet(@PathVariable int  tutorialId, Model model,Principal principal) {
 		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
-		Category catName = catService.findBycategoryname(cat);
-		Topic topicName = topicService.findBytopicName(topic);
-		Language lanName = lanService.getByLanName(lan);
+		
+		Tutorial tutorial1=tutService.getById(tutorialId);
+		if(tutorial1 == null) {
+			System.out.println(" problem 2");	
+			return "redirect:/listTutorialForAdminReview";
+		}
+		
+		Category catName = tutorial1.getConAssignedTutorial().getTopicCatId().getCat();
+		Topic topicName = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
+		Language lanName = tutorial1.getConAssignedTutorial().getLan();
 		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
 		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
 		
 		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
-			return "redirect:/listTutorialForAdminReview";
+			System.out.println(" problem 1");			return "redirect:/listTutorialForAdminReview";
 		}
 		List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTut);
-		Tutorial tutorial=tutService.findAllByContributorAssignedTutorial(conTut).get(0);
-		if(tutorial == null) {
-			return "redirect:/listTutorialForAdminReview";
-		}
-
-		if(tutorial.getVideoStatus() != CommonData.ADMIN_STATUS) {
-			return "redirect:/listTutorialForAdminReview";
-		}
-
-		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
-		model.addAttribute("tutorial", tutorial);
+		System.out.println(tutorials);
 		
-		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, tutorial);
+	
+
+		if(tutorial1.getVideoStatus() != CommonData.ADMIN_STATUS) {
+			
+			return "redirect:/listTutorialForAdminReview";
+		}
+
+		model.addAttribute("category", tutorial1.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
+		model.addAttribute("topic", tutorial1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		model.addAttribute("language", tutorial1.getConAssignedTutorial().getLan().getLangName());
+		model.addAttribute("tutorial", tutorial1);
+		
+		List<Comment> comVideo = comService.getCommentBasedOnTutorialType(CommonData.VIDEO, tutorial1);
 		model.addAttribute("comVideo", comVideo);
 		setVideoInfo(model, tutorials);
+		
 		
 		return "addContentAdminReview";
 
@@ -6173,9 +6216,16 @@ private void getModelData(Model model) {
 
 				published.add(temp);
 			}else {
+				if(temp.getOutlineStatus() == CommonData.DOMAIN_STATUS || temp.getScriptStatus() == CommonData.DOMAIN_STATUS ||
+						temp.getSlideStatus() == CommonData.DOMAIN_STATUS || temp.getKeywordStatus() == CommonData.DOMAIN_STATUS ||
+						temp.getVideoStatus() == CommonData.DOMAIN_STATUS ||
+						temp.getPreRequisticStatus() == CommonData.DOMAIN_STATUS) {
+
+				
 				toReview.add(temp);
 			}
 
+		}
 		}
 
 		model.addAttribute("tutorialToReview", toReview);
@@ -6190,40 +6240,40 @@ private void getModelData(Model model) {
 	 * @param principal Principal object
 	 * @return String object (webpage)
 	 */
-	@RequestMapping(value = "domainreview/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
-	public String listDomainReviewTutorialGet(@PathVariable(name = "catName") String cat,
-			@PathVariable (name = "topicName") String topicName,
-			@PathVariable (name = "language") String lan,Model model,Principal principal) {
+	@RequestMapping(value = "domainreview/review/{tutorialId}", method = RequestMethod.GET)
+	public String listDomainReviewTutorialGet(@PathVariable int tutorialId, Model model,Principal principal) {
 		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
-		Category category = catService.findBycategoryname(cat);
-		Topic topic = topicService.findBytopicName(topicName);
-		Language language = lanService.getByLanName(lan);
+		Tutorial tutorial1= tutService.getById(tutorialId);
+
+		if(tutorial1 == null) {
+			return "redirect:/listTutorialForDomainReview";
+		}
+		
+		Category category = tutorial1.getConAssignedTutorial().getTopicCatId().getCat();
+		Topic topic =  tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
+		Language language = tutorial1.getConAssignedTutorial().getLan();
 		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
 		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
 		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTut);
-		Tutorial tutorial = tutorials.get(0);
 		
-		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
+		model.addAttribute("category", tutorial1.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
+		model.addAttribute("topic", tutorial1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		model.addAttribute("language", tutorial1.getConAssignedTutorial().getLan().getLangName());
 		
 		if(category == null || topic == null || language == null || topicCatMap == null || conTut == null) {
 			return "redirect:/listTutorialForDomainReview";
 		}
 		
 		
-		if(tutorials.get(0) == null) {
-			return "redirect:/listTutorialForDomainReview";
-		}
 
 		setCompComment(model, tutorials, comService);
 		setCompStatus(model, tutorials);
 		setVideoInfo(model, tutorials);
-		model.addAttribute("tutorial", tutorial);
+		model.addAttribute("tutorial", tutorial1);
 		setEngLangStatus(model, language);
-		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, language, category);
+		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
 		
 		return "addContentDomainReview";
@@ -6270,8 +6320,18 @@ private void getModelData(Model model) {
 					temp.getPreRequisticStatus() == CommonData.PUBLISH_STATUS) {
 
 				published.add(temp);
-			}else {
-				toReview.add(temp);
+			}
+			
+			else {
+				if(temp.getOutlineStatus() > CommonData.DOMAIN_STATUS || temp.getScriptStatus() > CommonData.DOMAIN_STATUS ||
+						temp.getSlideStatus() > CommonData.DOMAIN_STATUS || temp.getKeywordStatus() > CommonData.DOMAIN_STATUS ||
+						temp.getVideoStatus() > CommonData.DOMAIN_STATUS  ||
+						temp.getPreRequisticStatus() > CommonData.DOMAIN_STATUS) {
+					
+					toReview.add(temp);
+				}
+				
+				
 			}
 
 		}
@@ -6498,21 +6558,21 @@ private void getModelData(Model model) {
 	 * @param principal Principal object
 	 * @return String object(webpage)
 	 */
-	@RequestMapping(value = "qualityreview/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
-	public String listQualityReviewTutorialGet(@PathVariable(name = "catName") String cat,
-			@PathVariable (name = "topicName") String topicName,
-			@PathVariable (name = "language") String lan,Model model,Principal principal) {
+	@RequestMapping(value = "qualityreview/review/{tutorialId}", method = RequestMethod.GET)
+	public String listQualityReviewTutorialGet(@PathVariable int tutorialId, Model model, Principal principal) {
 		
 		User usr = getUser(principal, userService);
 		model.addAttribute("userInfo", usr);
 		
-		Category category = catService.findBycategoryname(cat);
-		Topic topic = topicService.findBytopicName(topicName);
-		Language language = lanService.getByLanName(lan);
+		Tutorial tutorial1= tutService.getById(tutorialId);
+		
+		Category category = tutorial1.getConAssignedTutorial().getTopicCatId().getCat();
+		Topic topic = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
+		Language language = tutorial1.getConAssignedTutorial().getLan();
 		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
 		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
 		
-		if(category == null || topicName == null || language == null || topicCatMap == null || conTut == null) {
+		if(category == null || topic == null || language == null || topicCatMap == null || conTut == null) {
 			return "redirect:/listTutorialForQualityReview";
 		}
 		
@@ -6521,17 +6581,17 @@ private void getModelData(Model model) {
 			return "redirect:/listTutorialForQualityReview";
 		}
 
-		Tutorial tutorial =tutService.findAllByContributorAssignedTutorial(conTut).get(0);
-		model.addAttribute("category", tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-		model.addAttribute("topic", tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-		model.addAttribute("language", tutorial.getConAssignedTutorial().getLan().getLangName());
 		
-		model.addAttribute("tutorial", tutorial);
+		model.addAttribute("category", tutorial1.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
+		model.addAttribute("topic", tutorial1.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+		model.addAttribute("language", tutorial1.getConAssignedTutorial().getLan().getLangName());
+		
+		model.addAttribute("tutorial", tutorial1);
 		setCompComment(model, tutorials, comService);
 		setCompStatus(model, tutorials);
 		setVideoInfo(model, tutorials);
 		setEngLangStatus(model, language);
-		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, language, category);
+		String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic, language, category);
 		model.addAttribute("sm_url", sm_url);
 		
 		return "addContentQualityReview";

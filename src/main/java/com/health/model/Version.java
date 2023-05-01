@@ -18,10 +18,10 @@ public class Version {
 	@Column(name = "date_added", nullable = false)
 	private Timestamp dateAdded;
 	
-	@Column(name = "Image_path", nullable = false)
+	@Column(name = "Image_path")
 	private String versionPosterPath;
 	
-	@Column(name = "Print_Image_path", nullable = false)
+	@Column(name = "Print_Image_path")
 	private String versionPrintPosterPath;
 	
 	@ManyToOne

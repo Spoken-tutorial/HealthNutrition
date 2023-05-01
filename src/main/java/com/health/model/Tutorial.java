@@ -524,6 +524,11 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	public void setUserVisit(int userVisit) {
 		UserVisit = userVisit;
 	}
+
+	@Override
+	public String toString() {
+		return "Tutorial [tutorialId=" + tutorialId + ", videoStatus=" + videoStatus + "]";
+	}
 	
 	
 
