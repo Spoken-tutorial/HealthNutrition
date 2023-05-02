@@ -2840,17 +2840,7 @@ private void getModelData(Model model) {
 
 		if(!ServiceUtility.checkEmailValidity(email)) {  // throw email wromng error
 
-			model.addAttribute("msg", CommonData.NOT_VALID_EMAIL_ERROR);
-			return "addConsultant";
-		}
-
-		if (userService.findByUsername(email) != null) {
-			model.addAttribute("emailExists", true);
-			return "addConsultant";
-		}
-
-		if (userService.findByEmail(email) != null) {
-			model.addAttribute("emailExists", true);
+			model.addAttribute("error_msg", CommonData.NOT_VALID_EMAIL_ERROR);
 			return "addConsultant";
 		}
 
@@ -2859,55 +2849,85 @@ private void getModelData(Model model) {
 		
 		if(cats == null){  // throw email wromng error
 
-			model.addAttribute("msg", "Please Try Again");
+			model.addAttribute("error_msg", "Cat is null, Please Try Again");
 			return "addConsultant";
 		}
 		
 		if(lan == null) {  // throw email wromng error
 
-			model.addAttribute("msg", "Please Try Again");
+			model.addAttribute("error_msg", " Language is null, Please Try Again");
 			return "addConsultant";
 		}
-		if(!ServiceUtility.checkFileExtensionImage(photo) ) {
-			model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
-			return "addConsultant";
+		
+		if(!photo.isEmpty()) {
+			if(!ServiceUtility.checkFileExtensionImage(photo) ) {
+				model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
+				return "addConsultant";
+			}
+			
 		}
 		
 
 		Role role = roleService.findByname(CommonData.domainReviewerRole);
-
+		
+		boolean flagforExistingUser=false;
 		User userTemp = new User();
-		userTemp.setId(userService.getNewId());
-		userTemp.setFirstName(name);
-		userTemp.setLastName(lastname);
-		userTemp.setEmail(email);
-		userTemp.setUsername(email);
-		userTemp.setDateAdded(ServiceUtility.getCurrentTime());
-		userTemp.setPassword(SecurityUtility.passwordEncoder().encode(CommonData.COMMON_PASSWORD));
-		userTemp.setEmailVerificationCode("");
+		
+		
+		if(userService.findByUsername(email) == null || userService.findByEmail(email)==null) {
+			userTemp.setId(userService.getNewId());
+			userTemp.setFirstName(name);
+			userTemp.setLastName(lastname);
+			userTemp.setEmail(email);
+			userTemp.setUsername(email);
+			userTemp.setDateAdded(ServiceUtility.getCurrentTime());
+			userTemp.setPassword(SecurityUtility.passwordEncoder().encode(CommonData.COMMON_PASSWORD));
+			userTemp.setEmailVerificationCode("");
 
-		userService.save(userTemp);
-
-
+		}
+		
+		else {
+				userTemp=userService.findByEmail(email) ;
+				
+				if(consultService.findByUser(userTemp)!=null) {
+					model.addAttribute("error_msg", " Email is already assigned to consultant");
+					return "addConsultant";
+				}
+				
+				else {
+					
+					flagforExistingUser=true;
+				}
+				
+			
+		}
+		
+		
 		int newConsultid=consultService.getNewConsultantId();
 		Consultant local=new Consultant();
 		local.setConsultantId(newConsultid);
 		local.setDescription(desc);
-		
 		local.setDateAdded(ServiceUtility.getCurrentTime());
-		local.setUser(userTemp);
-		String pathtoUploadPhoto;
 		try {
-			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+newConsultid);
-			pathtoUploadPhoto = ServiceUtility.uploadFile(photo, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+newConsultid);
-			int indexToStart=pathtoUploadPhoto.indexOf("Media");
-			String cons_photo=pathtoUploadPhoto.substring(indexToStart, pathtoUploadPhoto.length());
-			local.getUser().setProfilePic(cons_photo);
-//			local.setDisplay_picture(cons_photo);
+			if(!photo.isEmpty()) {
+				String photoFolder = env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+newConsultid;
+				ServiceUtility.createFolder(photoFolder);
+				String pathtoUploadPhoto = ServiceUtility.uploadFile(photo, photoFolder);
+				int indexToStart=pathtoUploadPhoto.indexOf("Media");
+				String cons_photo=pathtoUploadPhoto.substring(indexToStart, pathtoUploadPhoto.length());
+				userTemp.setProfilePic(cons_photo);
+			}
+			
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			
 		}
+		
+		
+		userService.save(userTemp);
+		
+		local.setUser(userTemp);
 		
 		Set<Consultant> consults=new HashSet<Consultant>();
 		consults.add(local);
@@ -2927,22 +2947,31 @@ private void getModelData(Model model) {
 
 			usrRoleService.save(usrRole);
 			
-			SimpleMailMessage msg = mailConstructor.domainRoleMailSend(userTemp);
-			
-			mailSender.send(msg);
-
-
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			model.addAttribute("msg",CommonData.RECORD_ERROR);
+			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+			System.out.println("Problem 1");
 			return "addConsultant";    // throw a error
 		}
+		
+		if(flagforExistingUser==true) {
+			SimpleMailMessage msg1 = mailConstructor.domainRoleMailSendforExistingUser(userTemp);
+			mailSender.send(msg1);
+		}
+		else {
+			SimpleMailMessage msg2 = mailConstructor.domainRoleMailSend(userTemp);
+			mailSender.send(msg2);
+		}
+		
+		
+		
 
 		consultants = consultService.findAll();
 		model.addAttribute("consultants", consultants);
-		model.addAttribute("msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
+		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
+		System.out.println("Problem 2");
 		return "addConsultant";
 
 	}

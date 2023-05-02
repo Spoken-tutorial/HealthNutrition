@@ -66,6 +66,16 @@ public class MailConstructor {
 		return email;
 	}
 	
+	public SimpleMailMessage domainRoleMailSendforExistingUser(User usr) {
+		String message="Hello, You have been added to consultant\n";
+		SimpleMailMessage email=new SimpleMailMessage();
+		email.setSubject("Approval of Consultant to  Health Website");
+		email.setText(message);
+		email.setTo(usr.getEmail());
+	
+		return email;
+	}
+	
 	/**
 	 * 
 	 * This method to send email to user when role is being accepted from super admin

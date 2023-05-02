@@ -21,10 +21,20 @@ font-weight:bold!important;
 				<div th:replace="common/sidebar :: contributor_sidebar"></div>
 			</div>
 			<div class="col-md-9 col-lg-10 p-md-5">
-				<div class="alert alert-success" role="alert" th:if="${msg}">
-					<div id="#test" class="">
-						<div>
-							<span th:text="${msg}"></span>
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
 						</div>
 					</div>
 				</div>
