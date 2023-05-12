@@ -2414,7 +2414,7 @@ $(document).ready(function() {
 					
 	
 	
-	/* A java Script funtion to load primary version b y checked or unchecked checkbox 
+	/* A java Script funtion to load primary version by checked or unchecked checkbox 
 	*Author: Alok Kumar
 	*/
 		$('#overwrite').change(function() {
@@ -2460,7 +2460,9 @@ $(document).ready(function() {
 					});
 	
 			
-					
+		
+		
+			
 					
 					
 		 $('#topicId').on('change', function() {
@@ -2472,6 +2474,21 @@ $(document).ready(function() {
           divToHide.hide();
         }
       });
+      
+       $('languageNameId1').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#showOneMoreRow1');
+        if (selectedValue !='0') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+      
+      
+      
+       
+      
 					
 
 			/* load Topic by catgory contributor */

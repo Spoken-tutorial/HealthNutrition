@@ -1,13 +1,21 @@
 package com.health.model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OrderBy;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Version {
@@ -31,8 +39,93 @@ public class Version {
 	@Column(name="Brouchure_Version")
 	int broVersion;
 	
+	@OneToMany(mappedBy = "version", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OrderBy("date_added")
+	private Set<FilesofBrouchure> filesofBrouchure=new HashSet<FilesofBrouchure>();
+	
 	
 
+	public Set<FilesofBrouchure> getFilesofBrouchure() {
+		return filesofBrouchure;
+	}
+
+	public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
+		this.filesofBrouchure = filesofBrouchure;
+	}
+
+	public String findAlllangNames() {
+		if (filesofBrouchure.size() == 0)
+			return "";
+		StringBuilder names = new StringBuilder();
+		for (FilesofBrouchure files: filesofBrouchure) {
+			names.append(", ").append(files.getLan().getLangName());
+		}
+		return names.substring(2);
+	}
+	
+	
+	
+	
+	public String findWebFileofEnglish() {
+		if (filesofBrouchure.size() == 0)
+			return "";
+		String webFile="";
+		for (FilesofBrouchure file: filesofBrouchure) {
+			if(file.getLan().getLanId()==22) {
+				webFile=file.getWebPath();
+				break;
+				
+			}
+		}
+		
+		if(webFile==null) {
+			return "";
+		}
+		return webFile;
+	}
+	
+	
+	
+	public String findPrintFileofEnglish() {
+		if (filesofBrouchure.size() == 0)
+			return "";
+		String printFile="";
+		for (FilesofBrouchure file: filesofBrouchure) {
+			if(file.getLan().getLanId()==22) {
+				printFile=file.getPrintPath();
+				break;
+				
+			}
+		}
+		
+		if(printFile==null) {
+			return "";
+		}
+		return printFile;
+	}
+	
+	
+	
+	public String GetWebFileofFirstLan() {
+		if (filesofBrouchure.size() == 0)
+			return "";
+		FilesofBrouchure first = filesofBrouchure.iterator().next();
+		String webPath = first.getWebPath();
+		if(webPath==null)
+			return "";
+		return webPath;
+	}
+	
+	public String  GetPrintFileofFirstLan() {
+		if (filesofBrouchure.size() == 0)
+			return "";
+		FilesofBrouchure first = filesofBrouchure.iterator().next();
+		String printPath = first.getPrintPath();
+		if(printPath==null)
+			return "";
+		return printPath;
+	}
+	
 	@Override
 	public String toString() {
 		return "Version [verId=" + verId + ", dateAdded=" + dateAdded + ", versionPosterPath=" + versionPosterPath

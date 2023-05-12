@@ -296,9 +296,9 @@
 									<form th:action="@{/addOutline}" method="post" class="w-100">
 										<div class="form-group">
 											<label for="message-text" class="col-form-label"><span>Add
-													outline : </span><span class="text-muted">(Characters limit : 1500)</span></label>
+													outline : </span><span class="text-muted">(Characters limit : 2500)</span></label>
 											<textarea class="form-control editor" name="editor"
-												id="editor" rows="10" maxlength="1500">
+												id="editor" rows="15" maxlength="2500">
 										        		  
 																	<span th:if="${tutorial}"
 													th:text="${tutorial.getOutline()}"></span>

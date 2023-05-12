@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import com.health.model.FilesofBrouchure;
+import com.health.model.Version;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -70,6 +72,7 @@ import com.health.service.ContributorAssignedTutorialService;
 import com.health.service.DistrictService;
 import com.health.service.EventService;
 import com.health.service.FeedbackService;
+import com.health.service.FilesofBrouchureService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
 import com.health.service.RoleService;
@@ -83,6 +86,7 @@ import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.service.VersionService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -101,7 +105,13 @@ public class AjaxController{
 
 	@Autowired
 	private CategoryService catService;
-
+	
+	@Autowired
+	private VersionService verService;
+	
+	@Autowired 
+	private FilesofBrouchureService filesofBroService;
+	
 	@Autowired
 	private TopicService topicService;
 
@@ -772,6 +782,33 @@ public class AjaxController{
 
 	}
 	
+	@RequestMapping("/loadWebAndPrintFile")
+	public @ResponseBody List<String> loadWebAndPrintFile(@RequestParam(value = "lanId") int lanId, @RequestParam(value = "verId") int verId ) {
+
+		List<String> fileList = new ArrayList<>();
+		Language lan= langService.getById(lanId);
+		Version ver= verService.findById(verId);
+		
+		try {
+			FilesofBrouchure filesBro= filesofBroService.findByLanguageandVersion(lan, ver);
+			
+			
+			String webFile= filesBro.getWebPath();
+			String printFile= filesBro.getPrintPath();
+			if(webFile!="") {
+				fileList.add(webFile);
+			}
+			if(printFile !="") {
+				fileList.add(printFile);
+			}
+			
+		} catch(Exception e) {
+			
+		}
+		
+		return fileList;
+
+	}
 	
 	
 	
@@ -1378,9 +1415,8 @@ public class AjaxController{
 											Principal principal) {
 		
 		System.out.println("id "+tutorialId+" data "+ outlineData + " catname " + catName + " topicid " + topicId + " lanId " + lang +" Principal "+ principal);
-		//System.out.println(tutService.getById(tutorialId)+ "alok sp");
 		HashMap<String, String> temp = new HashMap<>();
-		//alok
+		
 		Category cat=catService.findBycategoryname(catName);
 		int catId=cat.getCategoryId();
 		Topic topic=topicService.findById(topicId);
@@ -1390,11 +1426,10 @@ public class AjaxController{
 		List<Tutorial> tut= tutService.findAllByContributorAssignedTutorial(cnn);
 		Tutorial tut1= tut.get(0);
 		int tutId1=tut1.getTutorialId();
-		System.out.println(tutService.getById(tutId1)+ "aloksp1");
 		
 		User usr=getUser(principal);
 		Tutorial local = null;
-		System.out.println(tutService.getById(tutId1)+ "alok sp");
+		
 		if(tutId1!=0) {
 			Tutorial tut2=tutService.getById(tutId1);
 			temp = addOutlineComp(tut2,outlineData,usr);

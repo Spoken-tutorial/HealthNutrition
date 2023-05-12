@@ -71,6 +71,17 @@ public class Language implements Comparable<Language>, Serializable{
 
 	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Brouchure> brouchure=new HashSet<Brouchure>();
+	
+	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<FilesofBrouchure>filesofBrouchure=new HashSet<FilesofBrouchure>();
+
+	public Set<FilesofBrouchure> getFilesofBrouchure() {
+		return filesofBrouchure;
+	}
+
+	public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
+		this.filesofBrouchure = filesofBrouchure;
+	}
 
 	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Event> events=new HashSet<Event>();
@@ -146,6 +157,11 @@ public class Language implements Comparable<Language>, Serializable{
 
 	public void setTrainingInfos(Set<TrainingInformation> trainingInfos) {
 		this.trainingInfos = trainingInfos;
+	}
+
+	@Override
+	public String toString() {
+		return "Language [lanId=" + lanId + ", langName=" + langName +  "]";
 	}
 
 	@Override

@@ -108,7 +108,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * outline
 	 */
-	@Column(name = "outline",length = 3000)
+	@Column(name = "outline",length = 3500)
 	private String outline;
 
 	/**

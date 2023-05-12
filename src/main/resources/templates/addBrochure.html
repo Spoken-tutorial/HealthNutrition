@@ -82,15 +82,6 @@ font-weight:bold!important;
 									</div>
 									
 									<div class="form-group">
-										<label for="languageNameId">Select Language *</label> <select
-											id="languageNameId" class="form-control" name="languageyName"
-											required="required">
-												<option th:each="lan: ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option>
-										
-										</select>
-									</div>
-
-									<div class="form-group">
 
 										<label for="title">Title *</label> <input type="text"
 											class="form-control" id="title" name="title"
@@ -105,28 +96,35 @@ font-weight:bold!important;
 											 th:value=1 readonly required="required"/>
 										
 									</div>
+					
+								<div th:each="lanouter,iter: ${languages}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									<div class="form-group" style="float:left; width:20%; ">
+               	                 		<label th:for="${'languageNameId' + iter.index}">Select Language </label>
+										<select th:id="${'languageNameId' + iter.index}" class="form-control" name="languageName">
+	  										<option value="0">Select ...</option>
+	  										<option th:each="lan : ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option>
+										</select>
+  									</div>
+
+<div class="form-group" style="float:left;  width:35%; margin-left:15px; margin-right:15px;">
+	<label th:for="${'brouchure' + iter.index}">Brochure for web*  </label>
+	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,102400000)"/>
+	<small> (.jpg or .png or .pdf Format Only)</small> 
+	<small>Max file size : 100 MB</small>
+</div>
+
+<div class="form-group" style="float:left;  width:35%;">
+	<label th:for="${'brouchurePrint' + iter.index}">Brochure for print </label>
+	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,358400000)"/>
+	<small> (.jpg or .png or .pdf Format Only)</small>
+	<small>Max file size : 350 MB</small>
+</div>
+								</div>
 									
 									
-
-									<div class="form-group">
-
-										<label for="brouchure">Brochure for web  *</label><small> (.jpg or .png or.pdf Format Only)</small> <input type="file"
-											class="form-control" id="brouchure" name="brouchure"
-											accept=" .jpeg,.jpg,.png, .pdf" required="required" onchange="validate_file_size(this,1024000)"/>
-										<small>Max file size : 1 MB</small>
-									</div>
 									
-									<div class="form-group">
-
-										<label for="brouchurePrint">Brochure for print </label><small> (.jpg or .png or.pdf Format Only)</small> <input type="file"
-											class="form-control" id="brouchurePrint" name="brouchurePrint"
-											accept=" .jpeg,.jpg,.png, .pdf"  onchange="validate_file_size(this,512000000)"/>
-										<small>Max file size : 500 MB</small>
-									</div>
-
-
-
-
+							
+									<br>
 									&nbsp;&nbsp;&nbsp;
 									<button type="submit" class="btn  btn-success">Submit</button>
 								</form>
@@ -138,12 +136,9 @@ font-weight:bold!important;
 				</div>
   </div>
   <div class="tab-pane fade py-3" id="view" role="tabpanel" aria-labelledby="profile-tab">
+  	<div id="Success" style="display: none; color: green; font-size: 16px; text-align: center">Changes Updated Successfully</div>
+	<div id="Failure" style="display: none; color: green; font-size: 16px; text-align: center">Please Try Again</div>
   <table class="table table-striped" id="myTable"  data-order='[[ 0, "desc" ]]'>
-  	<div id="Success"
-										style="display: none; color: green; font-size: 16px; text-align: center">Changes Updated Successfully</div>
-								<div id="Failure"
-										style="display: none; color: green; font-size: 16px; text-align: center">Please Try Again</div>    
-                            	 </div>
   <thead>
     <tr>
     <th scope="col">Date Added</th>
@@ -157,7 +152,7 @@ font-weight:bold!important;
     </tr>
   </thead>
   <tbody>
-     <tr th:each="ver : ${versions}">
+     <tr th:each="ver : ${versions}"  >
      
      <td scope="row">
        <span th:text="${ver.getDateAdded()}"></span>
@@ -170,19 +165,18 @@ font-weight:bold!important;
        <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getTopic().getTopicName() : 'NA'}"></span>
        
      </td>
-      <td><span th:text = "${ver.getBrouchure().getLan().getLangName()}"> </span>
+      <td><span  th:text="${ver.findAlllangNames()}"> </span>
 	  </td>
 	   <td><span th:text = "${ver.getBrouchure().getTitle()}"> </span>
 	  </td>
       <td>
-       <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
-      <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
+       <iframe style="width: 150px; height: 100px" th:if="${ver.GetWebFileofFirstLan().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.GetWebFileofFirstLan()}}"></iframe>
+      <img th:unless="${ver.GetWebFileofFirstLan().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.GetWebFileofFirstLan()}}"
 			style="width: 150px; height: 100px" />
 			<br>
-			<a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-			<a th:if="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
-													download >Download</a>
-			<a th:unless="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
+			<a th:href="@{/files/}+@{${ver.GetWebFileofFirstLan()}}" target="_blank"> View</a> &nbsp;&nbsp;
+			<a th:if="${ver.GetPrintFileofFirstLan()!=null and ver.GetPrintFileofFirstLan()!=''}" th:href="@{/files/}+@{${ver.GetPrintFileofFirstLan()}}" download >Download</a>
+			<a th:unless="${ver.GetPrintFileofFirstLan()!=null and ver.GetPrintFileofFirstLan()!=''}" th:href="@{/files/}+@{${ver.GetPrintFileofFirstLan()}}" download >Download</a>
 	  </td>
 	  <td>
 	  		
@@ -212,14 +206,55 @@ font-weight:bold!important;
 		</div>
 
 	</div>
+	
+	
 <div th:replace="common/trail :: body-bottom-scripts"></div>
 <script>
 var projectPath='[(@{/})]';
 $(document).ready( function () {
+	
     $('#myTable').DataTable();
-    
+	$('#showOneMoreRow1').hide();   
     
 } );
+
+var divid = 0;
+
+function addListener(divid) {
+	var languageSelect = document.getElementById("languageNameId" + (divid - 1));
+	if (languageSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	languageSelect.addEventListener("change", function() {
+	  var selectedLanguage = languageSelect.value;
+	  if (selectedLanguage !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+function setRequired(divid) {
+	var languageName = document.getElementById("languageNameId" + divid).value;
+	var brochure = document.getElementById("brochure" + divid);
+	brochure.required = (value != "");
+	return false;
+}
+
+addRow(divid);
+
 </script>
 </body>
 

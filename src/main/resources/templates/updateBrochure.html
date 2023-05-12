@@ -35,7 +35,7 @@
 						role="tabpanel" aria-labelledby="home-tab">
 						<div class="card">
 							<div class="card-header">
-								<h4>Update Brouchure</h4>
+								<h4>Update Brochure</h4>
 							</div>
 							<div class="card-body">
 								<div class="row">
@@ -90,31 +90,59 @@
 										<label for="title">Title *</label> <input type="text"
 											class="form-control" id="title" name="title"
 											 required="required" th:value="${brouchure.getTitle()}"/>
+		
+											</div>
+											
+										<div class="form-group"  id="lanForWebFile">
+										<label for="title"><h6>Web files available for the languages: </h6></label>
+										<span id="webLan" th:each="filesofBro: ${filesOfBroList}"> 
+										<b><span class="webLanClass"  th:if="${filesofBro.getWebPath() != ''}" th:text="${filesofBro.getLan().getLangName()}"></span></b>
+										</span>
+		
+										</div>
 										
-											</div>
+										<div class="form-group" id="lanForPrintFile" >
+										<label for="title"><h6>Print files available for the languages: </h6></label>
+										<span th:each="filesofBro: ${filesOfBroList}"> 
+										<b><span class="webPrintClass" th:if="${filesofBro.getPrintPath() != ''}" th:text="${filesofBro.getLan().getLangName()}" ></span></b>
+										</span>
+		
+										</div>
 											
-									
-											<div class="form-group">
-												<label for="Image" style="padding-top: 8px">Brouchure Web File </label> <input type="file" style="padding-right: 50px"
-													class="form-control-file " id="Image"
-													name="Image" placeholder="uploadFile" 
-													accept=".jpg, .jpeg ,.png, .pdf" onchange="validate_file_size(this,1024000)" />
+											
 
-											</div>
+
+
+										
+<div th:each="lanouter,iter: ${languages}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+<div class="form-group" style="float:left; width:20%; ">
+<label th:for="${'languageNameId' + iter.index}">Select Language </label>
+<select th:id="${'languageNameId' + iter.index}" class="form-control" name="languageName" >
+<option value="0">Select ...</option>
+<option th:each="lan : ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option></select>
+ </div>
+
+<div class="form-group" style="float:left;  width:35%; margin-left:15px; margin-right:15px;">
+	<label th:for="${'brouchure' + iter.index}">Brochure for web  </label>
+	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,102400000)"/>
+	<small> (.jpg or .png or .pdf only)</small> 
+	<small>Max file size : 100 MB</small>
+</div>
+
+<div class="form-group" style="float:left;  width:35%; margin-right:30px;">
+	<label th:for="${'brouchurePrint' + iter.index}">Brochure for print </label>
+	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,358400000)"/>
+	<small> (.jpg or .png or .pdf only)</small>
+	<small>Max file size : 350 MB</small>
+</div>
+</div>
+<br>
 											
 											<div class="form-group">
-												<label for="ImagePrint" style="padding-top: 8px">Brouchure Print File </label> <input type="file" style="padding-right: 50px"
-													class="form-control-file " id="ImagePrint"
-													name="ImagePrint" placeholder="uploadFile" 
-													accept=".jpg, .jpeg ,.png, .pdf" onchange="validate_file_size(this,512000000)" />
-
-											</div>
-											
-											<div class="form-group">
 
 											
-											<input type="checkbox" id="overwrite" name="overwrite" 
-											  th:value="${brouchure.getId()}"  checked/>Do you want to replace ?
+											<label><input type="checkbox" id="overwrite" name="overwrite" 
+											  th:value="${brouchure.getId()}"  checked/> Do you want to replace?</label>
 										
 											</div>
 											
@@ -157,9 +185,9 @@
 			style="width: 150px; height: 100px" />
 			<br>
 			<a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-			<a th:if="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
+			<a th:if="${ver.getVersionPrintPosterPath()!=null and ver.getVersionPrintPosterPath()!=''}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
 													download >Download</a>
-			<a th:unless="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
+			<a th:unless="${ver.getVersionPrintPosterPath()!=null and ver.getVersionPrintPosterPath()!=''}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
 	  </td>
 	 
 	   <td><span th:text="${ver.getBroVersion()}"></span></td>
@@ -186,10 +214,63 @@
 <script>
 var projectPath='[(@{/})]';
 $(document).ready( function () {
+	
     $('#myTable').DataTable();
-    
+	$('#showOneMoreRow1').hide();   
     
 } );
+
+var divid = 0;
+
+function addListener(divid) {
+	var languageSelect = document.getElementById("languageNameId" + (divid - 1));
+	if (languageSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	languageSelect.addEventListener("change", function() {
+	  var selectedLanguage = languageSelect.value;
+	  if (selectedLanguage !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+console.log("none");
+
+addRow(divid);
+
+
+
+var checkbox = document.getElementById('overwrite');
+var divWeb = document.getElementById('lanForWebFile');
+var divPrint = document.getElementById('lanForPrintFile');
+var webClassElements = document.getElementsByClassName('webLanClass');
+var printClassElements = document.getElementsByClassName('printLanClass');
+var webClassArray = Array.from(webClassElements);
+var printClassArray = Array.from(printClassElements);
+
+
+checkbox.addEventListener('change', function () {
+ 
+  var displayStyle = this.checked ? 'block' : 'none';
+ 
+  divWeb.style.display = displayStyle;
+  divPrint.style.display = displayStyle;
+  
+});
 
 </script>
 </body>

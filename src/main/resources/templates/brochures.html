@@ -106,6 +106,15 @@ border-right: 2px solid #014F7A;
  <h1 class="text-center" style="color: #014F7A;font-size:1.5rem;">Brochures</h1>
  <div class="row">
  <div class="col">
+ 
+ 
+ <div class="form-group" style="float:left; width:20%; ">
+               	     <label>Select Language </label>
+										<select id="languageforBro">
+	  										<option value="">Select ...</option>
+	  										<option th:each="lan : ${languages}" th:text="${lan.getLangName()}"></option>
+										</select>
+  </div>
  <table id="events_table" class="table table-striped" data-order='[[ 0, "desc" ]]'>
 					         <thead>
 					            <tr>
@@ -117,22 +126,25 @@ border-right: 2px solid #014F7A;
 					            </tr>
 					            </thead>
 					            <tbody>
-					            	<tr th:each="ver : ${versions}" style="">
+					            	<tr th:each="filesBro : ${filesList}"   style="">
+					            	
 					                <!-- <td class="td-name" th:text="${category.getPosterPath()}"> -->
-					                <td ><span th:text="${ver.getDateAdded()}"></span> </td>
-					               <td>   <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
-      									<img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
+					                <td ><span th:text="${filesBro.getDateAdded()}"></span>
+					               
+					                 </td>
+					               <td> <iframe style="width: 150px; height: 100px" th:if="${filesBro.getWebPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${filesBro.getWebPath()}}"></iframe>
+      									<img th:unless="${filesBro.getWebPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${filesBro.getWebPath()}}"
 											style="width: 150px; height: 100px" />
 										<br>
-										<a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-										<a th:if="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
+										<a th:href="@{/files/}+@{${filesBro.getWebPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
+										<a th:if="${filesBro.getPrintPath()!=null and filesBro.getPrintPath()!=''}" th:href="@{/files/}+@{${filesBro.getPrintPath()}}"
 													download >Download</a>
-										<a th:unless="${ver.getVersionPrintPosterPath()!=null}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
+										<a th:unless="${filesBro.getPrintPath()!=null and filesBro.getPrintPath()!='' }" th:href="@{/files/}+@{${filesBro.getWebPath()}}" download >Download</a>
 					                </td>
-					                 <td th:text="${ver.getBrouchure().getTitle()}"></td>
+					                 <td th:text="${filesBro.getVersion().getBrouchure().getTitle()}"></td>
 					                <td > 
-					                  <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getCat().getCatName() : 'NA'}"></span></td>
-					                <td th:text="${ver.getBrouchure().getLan().getLangName()}"></td>
+					                  <span th:text="${filesBro.getVersion().getBrouchure().getTopicCatId() != null ?filesBro.getVersion().getBrouchure().getTopicCatId().getCat().getCatName() : 'NA'}"></span></td>
+					                <td th:text="${filesBro.getLan().getLangName()}"></td>
 					            </tr>
 					            
 					            </tbody>
@@ -157,7 +169,14 @@ border-right: 2px solid #014F7A;
 		src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
-	    $('#events_table').DataTable();
+		
+	  var table=  $('#events_table').DataTable(
+			  
+	  );
+	  $('#languageforBro').on('change', function(){
+	       table.search(this.value).draw();   
+	    });
+	    
 	} );
 	</script>
 	
