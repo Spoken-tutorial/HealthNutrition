@@ -7,29 +7,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.health.model.Brouchure;
+import com.health.model.Brochure;
 import com.health.model.Category;
 import com.health.model.TopicCategoryMapping;
-import com.health.repository.BrouchureRepository;
+import com.health.repository.BrochureRepository;
 import com.health.repository.TopicCategoryMappingRepository;
-import com.health.service.BrouchureService;
+import com.health.service.BrochureService;
 
 /**
- * Default implementation of the {@link com.health.service.BrouchureService} interface.  
+ * Default implementation of the {@link com.health.service.BrochureService} interface.  
  * @author om prakash soni
  * @version 1.0
  */
 @Service
-public class BrouchureServiceImpl implements BrouchureService{
+public class BrochureServiceImpl implements BrochureService{
 
 	@Autowired
-	private BrouchureRepository repo;
+	private BrochureRepository repo;
 
 	@Autowired
 	private TopicCategoryMappingRepository topicCatRepo;
 
 	/**
-	 * @see com.health.service.BrouchureService#getNewId()
+	 * @see com.health.service.BrochureService#getNewId()
 	 */
 	@Override
 	public int getNewId() {
@@ -44,48 +44,46 @@ public class BrouchureServiceImpl implements BrouchureService{
 	}
 
 	/**
-	 * @see com.health.service.BrouchureService#save(Brouchure)
+	 * @see com.health.service.BrochureService#save(Brochure)
 	 */
 	@Override
-	public void save(Brouchure temp) {
+	public void save(Brochure temp) {
 		// TODO Auto-generated method stub
 		repo.save(temp);
 	}
 
 	/**
-	 * @see com.health.service.BrouchureService#findAll()
+	 * @see com.health.service.BrochureService#findAll()
 	 */
 	@Override
-	//@Cacheable(cacheNames ="brouchures" )
-	public List<Brouchure> findAll() {
-		// TODO Auto-generated method stub
-		//return (List<Brouchure>) repo.findAll();
+	//@Cacheable(cacheNames ="brochures" )
+	public List<Brochure> findAll() {
 		return repo.findAll();
 	}
 
 	/**
-	 * @see com.health.service.BrouchureService#delete(Brouchure)
+	 * @see com.health.service.BrochureService#delete(Brochure)
 	 */
 	@Override
-	public void delete(Brouchure temp) {
+	public void delete(Brochure temp) {
 		// TODO Auto-generated method stub
 		repo.delete(temp);
 	}
 
 	/**
-	 * @see com.health.service.BrouchureService#findByOnHome(boolean)
+	 * @see com.health.service.BrochureService#findByOnHome(boolean)
 	 */
 	@Override
-	public List<Brouchure> findByOnHome(boolean value) {
+	public List<Brochure> findByOnHome(boolean value) {
 		// TODO Auto-generated method stub
 		return repo.findAllByshowOnHomepage(value);
 	}
 
 	/**
-	 * @see com.health.service.BrouchureService#findById(int)
+	 * @see com.health.service.BrochureService#findById(int)
 	 */
 	@Override
-	public Brouchure findById(int id) {
+	public Brochure findById(int id) {
 		// TODO Auto-generated method stub
 		try {
 			return repo.findById(id).get();
@@ -97,13 +95,13 @@ public class BrouchureServiceImpl implements BrouchureService{
 	}
 
 	/**
-	 * @see com.health.service.impl.BrouchureServiceImpl#findByCategory(Category)
+	 * @see com.health.service.impl.BrochureServiceImpl#findByCategory(Category)
 	 */
 	@Override
-	public List<Brouchure> findByCategory(Category cat) {
+	public List<Brochure> findByCategory(Category cat) {
 		// TODO Auto-generated method stub
 		List<TopicCategoryMapping> topicCat = topicCatRepo.findAllBycat(cat);
-		List<Brouchure> brochures = new ArrayList<Brouchure>();
+		List<Brochure> brochures = new ArrayList<Brochure>();
 		for (TopicCategoryMapping t:topicCat) {
 			brochures.addAll(repo.findByTopicCat(t));
 		}
@@ -112,9 +110,9 @@ public class BrouchureServiceImpl implements BrouchureService{
 	}
 	
 	@Override
-	@Cacheable(cacheNames ="brouchures" )
-	public List<Brouchure> findAllBrouchuresForCache(){
-		System.out.println("BrouchureCheck");
+	@Cacheable(cacheNames ="brochures" )
+	public List<Brochure> findAllBrochuresForCache(){
+		System.out.println("BrochureCheck");
 		return repo.findAllByshowOnHomepage(true);
 		
 	}

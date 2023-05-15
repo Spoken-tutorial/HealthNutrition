@@ -34,30 +34,30 @@ public class Version {
 	
 	@ManyToOne
 	@JoinColumn(name = "bro_id")
-	private Brouchure brouchure;
+	private Brochure brochure;
 	
-	@Column(name="Brouchure_Version")
+	@Column(name="Brochure_Version")
 	int broVersion;
 	
 	@OneToMany(mappedBy = "version", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@OrderBy("date_added")
-	private Set<FilesofBrouchure> filesofBrouchure=new HashSet<FilesofBrouchure>();
+	private Set<FilesofBrochure> filesofBrochure=new HashSet<FilesofBrochure>();
 	
 	
 
-	public Set<FilesofBrouchure> getFilesofBrouchure() {
-		return filesofBrouchure;
+	public Set<FilesofBrochure> getFilesofBrochure() {
+		return filesofBrochure;
 	}
 
-	public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
-		this.filesofBrouchure = filesofBrouchure;
+	public void setFilesofBrochure(Set<FilesofBrochure> filesofBrochure) {
+		this.filesofBrochure = filesofBrochure;
 	}
 
 	public String findAlllangNames() {
-		if (filesofBrouchure.size() == 0)
+		if (filesofBrochure.size() == 0)
 			return "";
 		StringBuilder names = new StringBuilder();
-		for (FilesofBrouchure files: filesofBrouchure) {
+		for (FilesofBrochure files: filesofBrochure) {
 			names.append(", ").append(files.getLan().getLangName());
 		}
 		return names.substring(2);
@@ -67,10 +67,10 @@ public class Version {
 	
 	
 	public String findWebFileofEnglish() {
-		if (filesofBrouchure.size() == 0)
+		if (filesofBrochure.size() == 0)
 			return "";
 		String webFile="";
-		for (FilesofBrouchure file: filesofBrouchure) {
+		for (FilesofBrochure file: filesofBrochure) {
 			if(file.getLan().getLanId()==22) {
 				webFile=file.getWebPath();
 				break;
@@ -87,10 +87,10 @@ public class Version {
 	
 	
 	public String findPrintFileofEnglish() {
-		if (filesofBrouchure.size() == 0)
+		if (filesofBrochure.size() == 0)
 			return "";
 		String printFile="";
-		for (FilesofBrouchure file: filesofBrouchure) {
+		for (FilesofBrochure file: filesofBrochure) {
 			if(file.getLan().getLanId()==22) {
 				printFile=file.getPrintPath();
 				break;
@@ -107,9 +107,9 @@ public class Version {
 	
 	
 	public String GetWebFileofFirstLan() {
-		if (filesofBrouchure.size() == 0)
+		if (filesofBrochure.size() == 0)
 			return "";
-		FilesofBrouchure first = filesofBrouchure.iterator().next();
+		FilesofBrochure first = filesofBrochure.iterator().next();
 		String webPath = first.getWebPath();
 		if(webPath==null)
 			return "";
@@ -117,9 +117,9 @@ public class Version {
 	}
 	
 	public String  GetPrintFileofFirstLan() {
-		if (filesofBrouchure.size() == 0)
+		if (filesofBrochure.size() == 0)
 			return "";
-		FilesofBrouchure first = filesofBrouchure.iterator().next();
+		FilesofBrochure first = filesofBrochure.iterator().next();
 		String printPath = first.getPrintPath();
 		if(printPath==null)
 			return "";
@@ -132,23 +132,23 @@ public class Version {
 				+ ", broVersion=" + broVersion + "]";
 	}
 
-	public Version(int verId, Timestamp dateAdded, String versionPosterPath, Brouchure brouchure, int broVersion) {
+	public Version(int verId, Timestamp dateAdded, String versionPosterPath, Brochure brochure, int broVersion) {
 		super();
 		this.verId = verId;
 		this.dateAdded = dateAdded;
 		this.versionPosterPath = versionPosterPath;
-		this.brouchure = brouchure;
+		this.brochure = brochure;
 		this.broVersion = broVersion;
 	}
 
 	 public Version(int verId, Timestamp dateAdded, String versionPosterPath, String versionPrintPosterPath,
-				Brouchure brouchure, int broVersion) {
+				Brochure brochure, int broVersion) {
 			super();
 			this.verId = verId;
 			this.dateAdded = dateAdded;
 			this.versionPosterPath = versionPosterPath;
 			this.versionPrintPosterPath = versionPrintPosterPath;
-			this.brouchure = brouchure;
+			this.brochure = brochure;
 			this.broVersion = broVersion;
 		}
 	 
@@ -165,25 +165,25 @@ public class Version {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Version(int verId, Timestamp dateAdded, String versionPosterPath, Brouchure brouchure) {
+	public Version(int verId, Timestamp dateAdded, String versionPosterPath, Brochure brochure) {
 		super();
 		this.verId = verId;
 		this.dateAdded = dateAdded;
 		this.versionPosterPath = versionPosterPath;
-		this.brouchure = brouchure;
+		this.brochure = brochure;
 	}
 	
 	
 
 	
 	 public Version(int verId, Timestamp dateAdded, String versionPosterPath, String versionPrintPosterPath,
-			Brouchure brouchure) {
+			Brochure brochure) {
 		super();
 		this.verId = verId;
 		this.dateAdded = dateAdded;
 		this.versionPosterPath = versionPosterPath;
 		this.versionPrintPosterPath = versionPrintPosterPath;
-		this.brouchure = brouchure;
+		this.brochure = brochure;
 		
 	}
 
@@ -215,12 +215,12 @@ public class Version {
 	    };
 	    
 	
-	public Brouchure getBrouchure() {
-		return brouchure;
+	public Brochure getBrochure() {
+		return brochure;
 	}
 
-	public void setBrouchure(Brouchure brouchure) {
-		this.brouchure = brouchure;
+	public void setBrochure(Brochure brochure) {
+		this.brochure = brochure;
 	}
 
 	public int getVerId() {

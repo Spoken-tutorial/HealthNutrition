@@ -2,7 +2,7 @@ package com.health.service;
 
 import java.util.List;
 
-import com.health.model.Brouchure;
+import com.health.model.Brochure;
 import com.health.model.Version;
 
 public interface VersionService {
@@ -19,9 +19,9 @@ public interface VersionService {
 	
 	Version findById(int id);
 
-	Version findByBrouchureAndPrimaryVersion(Brouchure brochure, int primaryVersion);
+	Version findByBrochureAndPrimaryVersion(Brochure brochure, int primaryVersion);
 	
-	List<Version> findByCategory(Brouchure bro);
+	List<Version> findByCategory(Brochure bro);
 	
 	
 

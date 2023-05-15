@@ -148,7 +148,7 @@ $(document).ready(function() {
 			
 /******************* Changes made by om prakash *************************************/
 			
-		$('.enableBrouchure').click(function() {
+		$('.enableBrochure').click(function() {
 				
 				var test_id=$(this).attr('value');
 				
@@ -158,7 +158,7 @@ $(document).ready(function() {
 			
 				$.ajax({
 					type : "GET",
-					url : projectPath+"enableDisableBrouchure",
+					url : projectPath+"enableDisableBrochure",
 					data : {
 						"id" : test_id
 					},
@@ -184,7 +184,7 @@ $(document).ready(function() {
 			});
 			
 			
-			$('.disableBrouchure').click(function() {
+			$('.disableBrochure').click(function() {
 				
 				var test_id=$(this).attr('value');
 				
@@ -193,7 +193,7 @@ $(document).ready(function() {
 			
 				$.ajax({
 					type : "GET",
-					url : projectPath+"enableDisableBrouchure",
+					url : projectPath+"enableDisableBrochure",
 					data : {
 						"id" : test_id
 					},

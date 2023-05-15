@@ -141,9 +141,9 @@ border-right: 2px solid #014F7A;
 													download >Download</a>
 										<a th:unless="${filesBro.getPrintPath()!=null and filesBro.getPrintPath()!='' }" th:href="@{/files/}+@{${filesBro.getWebPath()}}" download >Download</a>
 					                </td>
-					                 <td th:text="${filesBro.getVersion().getBrouchure().getTitle()}"></td>
+					                 <td th:text="${filesBro.getVersion().getBrochure().getTitle()}"></td>
 					                <td > 
-					                  <span th:text="${filesBro.getVersion().getBrouchure().getTopicCatId() != null ?filesBro.getVersion().getBrouchure().getTopicCatId().getCat().getCatName() : 'NA'}"></span></td>
+					                  <span th:text="${filesBro.getVersion().getBrochure().getTopicCatId() != null ?filesBro.getVersion().getBrochure().getTopicCatId().getCat().getCatName() : 'NA'}"></span></td>
 					                <td th:text="${filesBro.getLan().getLangName()}"></td>
 					            </tr>
 					            

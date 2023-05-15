@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.health.model.Brouchure;
+import com.health.model.Brochure;
 import com.health.model.Version;
 import com.health.repository.VersionRepository;
 import com.health.service.VersionService;
@@ -60,9 +60,9 @@ public class VersionServiceImpl implements VersionService{
 		
 	}
 	@Override
-	public Version findByBrouchureAndPrimaryVersion(Brouchure brochure, int primaryVersion) {
+	public Version findByBrochureAndPrimaryVersion(Brochure brochure, int primaryVersion) {
 		try {
-			return verRepository.findByBrouchureAndBroVersion(brochure, primaryVersion);
+			return verRepository.findByBrochureAndBroVersion(brochure, primaryVersion);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,9 +72,9 @@ public class VersionServiceImpl implements VersionService{
 	}
 
 	@Override
-	public List<Version> findByCategory(Brouchure bro){
+	public List<Version> findByCategory(Brochure bro){
 		
-		return verRepository.findByBrouchure(bro);
+		return verRepository.findByBrochure(bro);
 		
 	}
 

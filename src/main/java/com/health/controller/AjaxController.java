@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import com.health.model.FilesofBrouchure;
+import com.health.model.FilesofBrochure;
 import com.health.model.Version;
 
 import javax.mail.MessagingException;
@@ -41,7 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.health.config.SecurityConfig;
 import com.health.domain.security.Role;
 import com.health.domain.security.UserRole;
-import com.health.model.Brouchure;
+import com.health.model.Brochure;
 import com.health.model.Category;
 import com.health.model.City;
 import com.health.model.Comment;
@@ -62,7 +62,7 @@ import com.health.model.TrainingInformation;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
-import com.health.service.BrouchureService;
+import com.health.service.BrochureService;
 import com.health.service.CategoryService;
 import com.health.service.CityService;
 import com.health.service.CommentService;
@@ -72,7 +72,7 @@ import com.health.service.ContributorAssignedTutorialService;
 import com.health.service.DistrictService;
 import com.health.service.EventService;
 import com.health.service.FeedbackService;
-import com.health.service.FilesofBrouchureService;
+import com.health.service.FilesofBrochureService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
 import com.health.service.RoleService;
@@ -110,7 +110,7 @@ public class AjaxController{
 	private VersionService verService;
 	
 	@Autowired 
-	private FilesofBrouchureService filesofBroService;
+	private FilesofBrochureService filesofBroService;
 	
 	@Autowired
 	private TopicService topicService;
@@ -179,7 +179,7 @@ public class AjaxController{
 	private TestimonialService testService;
 
 	@Autowired
-	private BrouchureService broService;
+	private BrochureService broService;
 
 	@Autowired
 	private LanguageService langService;
@@ -462,9 +462,9 @@ public class AjaxController{
 	 * @param id int value
 	 * @return Boolean value
 	 */
-	@GetMapping("/enableDisableBrouchure")
-	public @ResponseBody boolean enableDisableBrouchure(int id){
-		Brouchure bro = broService.findById(id);
+	@GetMapping("/enableDisableBrochure")
+	public @ResponseBody boolean enableDisableBrochure(int id){
+		Brochure bro = broService.findById(id);
 
 		try {
 			if(bro.isShowOnHomepage()) {
@@ -495,7 +495,7 @@ public class AjaxController{
 	@GetMapping("/primaryVersionWithoutOverwrite")
 	public @ResponseBody int getPrimaryVersionwithoutOverwrite(int id, int checkedValue){
 			
-			Brouchure bro = broService.findById(id);
+			Brochure bro = broService.findById(id);
 			if(checkedValue==1)
 			return bro.getPrimaryVersion();
 			else
@@ -790,7 +790,7 @@ public class AjaxController{
 		Version ver= verService.findById(verId);
 		
 		try {
-			FilesofBrouchure filesBro= filesofBroService.findByLanguageandVersion(lan, ver);
+			FilesofBrochure filesBro= filesofBroService.findByLanguageandVersion(lan, ver);
 			
 			
 			String webFile= filesBro.getWebPath();
