@@ -42,7 +42,7 @@ font-weight:bold!important;
     <a class="nav-link active" id="home-tab" data-toggle="tab" href="#add" role="tab" aria-controls="home" aria-selected="true">Add</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#view" role="tab" aria-controls="profile" aria-selected="false">View</a>
+    <a th:if="${viewSection !=false}" class="nav-link" id="profile-tab" data-toggle="tab" href="#view" role="tab" aria-controls="profile" aria-selected="false">View</a>
   </li>
 
   
@@ -176,7 +176,7 @@ font-weight:bold!important;
 			<br>
 			<a th:href="@{/files/}+@{${ver.GetWebFileofFirstLan()}}" target="_blank"> View</a> &nbsp;&nbsp;
 			<a th:if="${ver.GetPrintFileofFirstLan()!=null and ver.GetPrintFileofFirstLan()!=''}" th:href="@{/files/}+@{${ver.GetPrintFileofFirstLan()}}" download >Download</a>
-			<a th:unless="${ver.GetPrintFileofFirstLan()!=null and ver.GetPrintFileofFirstLan()!=''}" th:href="@{/files/}+@{${ver.GetPrintFileofFirstLan()}}" download >Download</a>
+			<a th:unless="${ver.GetPrintFileofFirstLan()!=null and ver.GetPrintFileofFirstLan()!=''}" th:href="@{/files/}+@{${ver.GetWebFileofFirstLan()}}" download >Download</a>
 	  </td>
 	  <td>
 	  		

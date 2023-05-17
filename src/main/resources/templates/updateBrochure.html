@@ -164,33 +164,40 @@
 										</form>
 <br>
 <br>
+<div class="form-group" style="float:left; width:20%; ">
+               	     <label>Select Language </label>
+										<select id="languageforBro">
+	  										<option value="">Select ...</option>
+	  										<option th:each="lan : ${languages}" th:text="${lan.getLangName()}"></option>
+										</select>
+  </div>
 <table class="table table-striped" id="myTable" data-order='[[ 0, "desc" ]]'>								
 <thead>
     <tr>
       <th scope="col">Date Added</th>
       <th scope="col">Files</th>
+      <th scope="col">Language</th>
       <th scope="col">Brouchure_Version</th>
       
     </tr>
   </thead>
   <tbody>
-     <tr th:each="ver : ${listofVersions}">
+     <tr th:each="file1 : ${newfilesList}">
       <td scope="row">
-       <span th:text="${ver.getDateAdded()}"></span>
+       <span th:text="${file1.getDateAdded()}"></span>
       </td>
      
-      <td>
-        <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
-      <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
-			style="width: 150px; height: 100px" />
-			<br>
-			<a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-			<a th:if="${ver.getVersionPrintPosterPath()!=null and ver.getVersionPrintPosterPath()!=''}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
+      <td> <iframe style="width: 150px; height: 100px" th:if="${file1.getWebPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${file1.getWebPath()}}"></iframe>
+      									<img th:unless="${file1.getWebPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${file1.getWebPath()}}"
+											style="width: 150px; height: 100px" />
+										<br>
+										<a th:href="@{/files/}+@{${file1.getWebPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
+										<a th:if="${file1.getPrintPath()!=null and file1.getPrintPath()!=''}" th:href="@{/files/}+@{${file1.getPrintPath()}}"
 													download >Download</a>
-			<a th:unless="${ver.getVersionPrintPosterPath()!=null and ver.getVersionPrintPosterPath()!=''}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
-	  </td>
-	 
-	   <td><span th:text="${ver.getBroVersion()}"></span></td>
+										<a th:unless="${file1.getPrintPath()!=null and file1.getPrintPath()!='' }" th:href="@{/files/}+@{${file1.getWebPath()}}" download >Download</a>
+					                </td>
+	 	<td> <span th:text="${file1.getLan().getLangName()}"> </span></td>
+	   <td><span th:text="${file1.getVersion().getBroVersion()}"></span></td>
     </tr>
    
   </tbody>
@@ -215,7 +222,11 @@
 var projectPath='[(@{/})]';
 $(document).ready( function () {
 	
-    $('#myTable').DataTable();
+   var table= $('#myTable').DataTable();
+    $('#languageforBro').on('change', function(){
+	       table.search(this.value).draw();   
+	    });
+	    
 	$('#showOneMoreRow1').hide();   
     
 } );

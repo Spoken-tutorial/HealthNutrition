@@ -932,7 +932,8 @@ private void getModelData(Model model) {
 
 				getModelData(model);
 //				model.addAttribute("topics", topicTemp);
-				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
+				//String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
+				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName())+"/1";
 				model.addAttribute("sm_url", sm_url);
 			return "tutorial";
 	}
@@ -1917,6 +1918,9 @@ private void getModelData(Model model) {
 		model.addAttribute("userInfo", usr);
 		System.out.println(languageIds);
 		
+		boolean viewSection= false;
+		model.addAttribute("viewSection", viewSection);
+		
 		List<Language> languages=lanService.getAllLanguages();
 		List<Category> categories=catService.findAll();
 		model.addAttribute("categories", categories);
@@ -2018,6 +2022,8 @@ private void getModelData(Model model) {
 			int newbroFileId= filesofbrouchureService.getNewId();
 			
 			for(int i=0; i<languageIds.size(); i++) {
+				document1="";
+				printDocument="";
 				
 				if(languageIds.get(i)==0){
 					break;
@@ -2085,6 +2091,9 @@ private void getModelData(Model model) {
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
+		viewSection= false;
+		model.addAttribute("viewSection", viewSection);
+		
 		model.addAttribute("error_msg",CommonData.RECORD_ERROR);
 		verService.delete(version);
 		System.out.println(" AlokSP  Error4");
@@ -2106,8 +2115,14 @@ private void getModelData(Model model) {
 	}
 		
 		if(filesError==true) {
+			viewSection= false;
+			model.addAttribute("viewSection", viewSection);
+			
 			model.addAttribute("error_msg", "Web Files should not be null for selected language");
 		} else {
+			viewSection= false;
+			model.addAttribute("viewSection", viewSection);
+			
 			model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
 		}
 		return addBrochureGet(model, principal);
@@ -3963,6 +3978,19 @@ private void getModelData(Model model) {
 			}
 				
 		}
+		
+		List<FilesofBrouchure> newfilesList= new ArrayList<>();
+		for(Version ver1: newlistofVersion) {
+			for(Language lan: languages) {
+				FilesofBrouchure filesBro= filesofbrouchureService.findByLanguageandVersion(lan, ver1);
+				if(filesBro!=null) {
+					newfilesList.add(filesBro);
+				}
+			}
+		}
+		
+		model.addAttribute("newfilesList", newfilesList);
+		
 		System.out.println(version);
 		List<FilesofBrouchure> filesOfBroList = filesofbrouchureService.findByVersion(version);
 		System.out.println(filesOfBroList);
@@ -4055,6 +4083,18 @@ private void getModelData(Model model) {
 				break;
 		}
 		
+		List<FilesofBrouchure> newfilesList= new ArrayList<>();
+		for(Version ver1: newlistofVesrion) {
+			for(Language lan: languages) {
+				FilesofBrouchure filesBro= filesofbrouchureService.findByLanguageandVersion(lan, ver1);
+				if(filesBro!=null) {
+					newfilesList.add(filesBro);
+				}
+			}
+		}
+		
+		model.addAttribute("newfilesList", newfilesList);
+		
 		model.addAttribute("listofVersions", newlistofVesrion);
 		
 		if(title.isEmpty()){
@@ -4067,6 +4107,7 @@ private void getModelData(Model model) {
 		int versionValue=brouchure.getPrimaryVersion();
 		int newVersionValue=versionValue+1;
 		boolean filesError=false;
+		boolean webfileErrorforOverride= false;
 		
 		
 
@@ -4101,6 +4142,8 @@ private void getModelData(Model model) {
 					List<FilesofBrouchure> filesBroList= new ArrayList<>();
 					
 					for(int i=0; i<languageIds.size(); i++) {
+						document1="";
+						printDocument="";
 						
 						if(languageIds.get(i)==0){
 							break;
@@ -4154,13 +4197,22 @@ private void getModelData(Model model) {
 					}
 					
 					else {
-						filesBroList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, language));
-						newbroFileId = newbroFileId + 1;
+						
+						if(!brochures.get(i).isEmpty()) {
+							filesBroList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, language));
+							newbroFileId = newbroFileId + 1;
+							
+						}
+						else {
+							 webfileErrorforOverride=true;
+						}
+						
 					}
 					
 					
 					
-				}
+				} 
+					if(webfileErrorforOverride==false) {
 					version.setVersionPosterPath(document1);
 					version.setVersionPrintPosterPath(printDocument);
 					verService.save(version);
@@ -4168,6 +4220,8 @@ private void getModelData(Model model) {
 					broService.save(brouchure);
 					
 					filesofbrouchureService.saveAll(filesBroList);
+				}
+					
 					
 					
 					
@@ -4182,6 +4236,8 @@ private void getModelData(Model model) {
 						Version newVer= new Version();
 						
 						for(int i=0; i<languageIds.size(); i++) {
+							document2="";
+							printDocument2="";
 							
 							if(languageIds.get(i)==0){
 								break;
@@ -4272,10 +4328,28 @@ private void getModelData(Model model) {
 				if(temp==3)
 					break;
 			}
+			
+			newfilesList= new ArrayList<>();
+			for(Version ver1: newlistofVesrion) {
+				for(Language lan: languages) {
+					FilesofBrouchure filesBro= filesofbrouchureService.findByLanguageandVersion(lan, ver1);
+					if(filesBro!=null) {
+						newfilesList.add(filesBro);
+					}
+				}
+			}
+			
+			model.addAttribute("newfilesList", newfilesList);
+			
 			model.addAttribute("listofVersions", newlistofVesrion);
 			return "updateBrochure";        // need to add some error message
 		}
 		
+		if(webfileErrorforOverride==true) {
+			model.addAttribute("error_msg", "brouchure web file is required for new Language");
+			return "updateBrochure"; 	
+			
+		}
 		
 		if(filesError==true) {
 			model.addAttribute("error_msg", "brouchure web file is required for new version");
@@ -4303,6 +4377,17 @@ private void getModelData(Model model) {
 			if(temp==3)
 				break;
 		}
+		newfilesList= new ArrayList<>();
+		for(Version ver1: newlistofVesrion) {
+			for(Language lan: languages) {
+				FilesofBrouchure filesBro= filesofbrouchureService.findByLanguageandVersion(lan, ver1);
+				if(filesBro!=null) {
+					newfilesList.add(filesBro);
+				}
+			}
+		}
+		
+		model.addAttribute("newfilesList", newfilesList);
 		
 		model.addAttribute("listofVersions", newlistofVesrion);
 		for(Version ver: listofVersions)
