@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import javax.persistence.*;
 
 @Entity
-public class FilesofBrochure {
+public class FilesofBrouchure {
 	
 	@Id
 	int broFileId;
@@ -27,12 +27,12 @@ public class FilesofBrochure {
 	private Language lan;
 
 	
-	public FilesofBrochure() {
+	public FilesofBrouchure() {
 	super();
 	
 }
 	
-	public FilesofBrochure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version,
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version,
 			Language lan) {
 		super();
 		this.broFileId = broFileId;
@@ -43,7 +43,7 @@ public class FilesofBrochure {
 		this.lan = lan;
 	}
 	 
-	public FilesofBrochure(int broFileId, Timestamp dateAdded, String webPath, String printPath) {
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
@@ -52,7 +52,7 @@ public class FilesofBrochure {
 		
 	}
 	 
-	public FilesofBrochure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Language lan) {
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Language lan) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
@@ -61,7 +61,7 @@ public class FilesofBrochure {
 		this.lan = lan;
 	} 
 	
-	public FilesofBrochure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version) {
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
@@ -121,7 +121,7 @@ public class FilesofBrochure {
 
 	@Override
 	public String toString() {
-		return "FilesofBrochure [broFileId=" + broFileId + ", version=" + version + ", lan=" + lan + "]";
+		return "FilesofBrouchure [broFileId=" + broFileId + ", version=" + version + ", lan=" + lan + "]";
 	}
 	
 	

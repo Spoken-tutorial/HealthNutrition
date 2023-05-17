@@ -70,17 +70,17 @@ public class Language implements Comparable<Language>, Serializable{
 	private Set<TrainingInformation> trainingInfos=new HashSet<TrainingInformation>();
 
 	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Brochure> brochure=new HashSet<Brochure>();
+	private Set<Brouchure> brouchure=new HashSet<Brouchure>();
 	
 	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<FilesofBrochure>filesofBrochure=new HashSet<FilesofBrochure>();
+	private Set<FilesofBrouchure>filesofBrouchure=new HashSet<FilesofBrouchure>();
 
-	public Set<FilesofBrochure> getFilesofBrochure() {
-		return filesofBrochure;
+	public Set<FilesofBrouchure> getFilesofBrouchure() {
+		return filesofBrouchure;
 	}
 
-	public void setFilesofBrochure(Set<FilesofBrochure> filesofBrochure) {
-		this.filesofBrochure = filesofBrochure;
+	public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
+		this.filesofBrouchure = filesofBrouchure;
 	}
 
 	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

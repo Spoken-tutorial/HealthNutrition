@@ -73,7 +73,7 @@
 <!--        <persistence strategy="LOCALRESTARTABLE" />-->
     </cache>
     
-    <cache name="brochures"
+    <cache name="brouchures"
            maxEntriesLocalHeap="5"
            maxEntriesLocalDisk="10"
            eternal="false"

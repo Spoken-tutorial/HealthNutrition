@@ -267,7 +267,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					"/carousel/edit/**",
 					"/event/edit/**",
 					"/testimonial/edit/**",
-					"/enableDisableBrochure/**",
+					"/enableDisableBrouchure/**",
 					"/enableDisableConsultant/**",
 					"/enableDisableTestimonial/**").hasAnyAuthority("SUPER_USER","CONTRIBUTOR")
 			.antMatchers(PUBLIC_MATCHERS).

@@ -43,7 +43,7 @@
 										<form class="form-horizontal" th:action="@{/updateBrochure}"
 											method="post" enctype="multipart/form-data">
 											
-											<input type="hidden"  name="brochureId"  th:value="${brochure.getId()}"/>
+											<input type="hidden"  name="brochureId"  th:value="${brouchure.getId()}"/>
 											
 											
 							<!--  
@@ -89,7 +89,7 @@
 
 										<label for="title">Title *</label> <input type="text"
 											class="form-control" id="title" name="title"
-											 required="required" th:value="${brochure.getTitle()}"/>
+											 required="required" th:value="${brouchure.getTitle()}"/>
 		
 											</div>
 											
@@ -123,15 +123,15 @@
  </div>
 
 <div class="form-group" style="float:left;  width:35%; margin-left:15px; margin-right:15px;">
-	<label th:for="${'brochure' + iter.index}">Brochure for web  </label>
-	<input type="file" class="form-control" th:id="${'brochure' + iter.index}" name="brochure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,102400000)"/>
+	<label th:for="${'brouchure' + iter.index}">Brochure for web  </label>
+	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,102400000)"/>
 	<small> (.jpg or .png or .pdf only)</small> 
 	<small>Max file size : 100 MB</small>
 </div>
 
 <div class="form-group" style="float:left;  width:35%; margin-right:30px;">
-	<label th:for="${'brochurePrint' + iter.index}">Brochure for print </label>
-	<input type="file" class="form-control" th:id="${'brochurePrint' + iter.index}" name="brochurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,358400000)"/>
+	<label th:for="${'brouchurePrint' + iter.index}">Brochure for print </label>
+	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,358400000)"/>
 	<small> (.jpg or .png or .pdf only)</small>
 	<small>Max file size : 350 MB</small>
 </div>
@@ -142,20 +142,20 @@
 
 											
 											<label><input type="checkbox" id="overwrite" name="overwrite" 
-											  th:value="${brochure.getId()}"  checked/> Do you want to replace?</label>
+											  th:value="${brouchure.getId()}"  checked/> Do you want to replace?</label>
 										
 											</div>
 											
 											<div id="pVersion"></div>
 											
-											<h6 id="pVersionbeforeJS">Primary Version: <span th:text="${brochure.getPrimaryVersion()}"></span></h6>
+											<h6 id="pVersionbeforeJS">Primary Version: <span th:text="${brouchure.getPrimaryVersion()}"></span></h6>
 											
 											
 											<!-- <div class="form-group">
 
 										<label for="primaryVersion">Primary Version </label> <input type="number"
 											class="form-control" id="primaryVersion" name="primaryVersion"
-											 th:value="${brochure.getPrimaryVersion()}" readonly />
+											 th:value="${brouchure.getPrimaryVersion()}" readonly />
 										
 									</div> -->
 											
@@ -164,41 +164,33 @@
 										</form>
 <br>
 <br>
-
-<div class="form-group" style="float:left; width:20%; ">
-               	     <label>Select Language </label>
-										<select id="languageforBro">
-	  										<option value="">Select ...</option>
-	  										<option th:each="lan : ${languages}" th:text="${lan.getLangName()}"></option>
-										</select>
-  </div>
 <table class="table table-striped" id="myTable" data-order='[[ 0, "desc" ]]'>								
 <thead>
     <tr>
       <th scope="col">Date Added</th>
       <th scope="col">Files</th>
-      <th scope="col">Language</th>
-      <th scope="col">Brochure_Version</th>
+      <th scope="col">Brouchure_Version</th>
       
     </tr>
   </thead>
   <tbody>
-     <tr th:each="file1 : ${newFileList}">
+     <tr th:each="ver : ${listofVersions}">
       <td scope="row">
-       <span th:text="${file1.getDateAdded()}"></span>
+       <span th:text="${ver.getDateAdded()}"></span>
       </td>
      
-     <td> <iframe style="width: 150px; height: 100px" th:if="${file1.getWebPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${file1.getWebPath()}}"></iframe>
-      	<img th:unless="${file1.getWebPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${file1.getWebPath()}}"
-		style="width: 150px; height: 100px" />
-		<br>
-		<a th:href="@{/files/}+@{${file1.getWebPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-		<a th:if="${file1.getPrintPath()!=null and file1.getPrintPath()!=''}" th:href="@{/files/}+@{${file1.getPrintPath()}}"
+      <td>
+        <iframe style="width: 150px; height: 100px" th:if="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"></iframe>
+      <img th:unless="${ver.getVersionPosterPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}"
+			style="width: 150px; height: 100px" />
+			<br>
+			<a th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
+			<a th:if="${ver.getVersionPrintPosterPath()!=null and ver.getVersionPrintPosterPath()!=''}" th:href="@{/files/}+@{${ver.getVersionPrintPosterPath()}}"
 													download >Download</a>
-		<a th:unless="${file1.getPrintPath()!=null and file1.getPrintPath()!='' }" th:href="@{/files/}+@{${file1.getWebPath()}}" download >Download</a>
-		</td>
-	 	<td th:text="${file1.getLan().getLangName()}"></td>
-	   <td><span th:text="${file1.getVersion().getBroVersion()}"></span></td>
+			<a th:unless="${ver.getVersionPrintPosterPath()!=null and ver.getVersionPrintPosterPath()!=''}" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}" download >Download</a>
+	  </td>
+	 
+	   <td><span th:text="${ver.getBroVersion()}"></span></td>
     </tr>
    
   </tbody>
@@ -223,12 +215,7 @@
 var projectPath='[(@{/})]';
 $(document).ready( function () {
 	
-   var table = $('#myTable').DataTable();
-   
-    $('#languageforBro').on('change', function(){
-	       table.search(this.value).draw();   
-	    });
-	    
+    $('#myTable').DataTable();
 	$('#showOneMoreRow1').hide();   
     
 } );

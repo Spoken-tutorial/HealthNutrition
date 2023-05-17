@@ -19,7 +19,7 @@ import java.util.HashSet;
  *
  */
 @Entity
-public class Brochure implements  Serializable {
+public class Brouchure implements  Serializable {
 
 	/**
 	 * unique brochure id 
@@ -63,7 +63,7 @@ public class Brochure implements  Serializable {
 
 
 
-	@OneToMany(mappedBy = "brochure", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "brouchure", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Version> versions=new HashSet<Version>();
 	
 

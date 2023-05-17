@@ -420,9 +420,9 @@ the globe.
 													target="_blank" class="pdfclass">
       <img th:unless="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.findWebFileofEnglish()}}"
 			style="width: 150px; height: 100px" /></a>
-   		<p class="mb-1"   th:text="${ver.getBrochure().getTitle()}" style="color: #1C7871;border-bottom: 1px solid #015686!important;"></p>
-   		<p class="mb-1"  th:if="${ver.getBrochure().getTopicCatId()!= null}" th:text="${ver.getBrochure().getTopicCatId().getCat().getCatName()}" style="color: #1C7871;border-bottom: 1px solid #015686!important;"></p>
-   		<p class="mb-1" th:if="${ver.getBrochure().getTopicCatId()!= null}" th:text="${ver.getBrochure().getTopicCatId().getTopic().getTopicName()}" style="color: #015686;"></p>
+   		<p class="mb-1"   th:text="${ver.getBrouchure().getTitle()}" style="color: #1C7871;border-bottom: 1px solid #015686!important;"></p>
+   		<p class="mb-1"  th:if="${ver.getBrouchure().getTopicCatId()!= null}" th:text="${ver.getBrouchure().getTopicCatId().getCat().getCatName()}" style="color: #1C7871;border-bottom: 1px solid #015686!important;"></p>
+   		<p class="mb-1" th:if="${ver.getBrouchure().getTopicCatId()!= null}" th:text="${ver.getBrouchure().getTopicCatId().getTopic().getTopicName()}" style="color: #015686;"></p>
    		<p class="mb-1" th:text="${ver.findAlllangNames()}" style="color: rgba(0,0,0,0.6);"></p>
    	</div>
     </div>

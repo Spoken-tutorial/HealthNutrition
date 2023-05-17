@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.TreeSet;
-import com.health.service.FilesofBrochureService;
+import com.health.service.FilesofBrouchureService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,12 +60,12 @@ import com.google.common.collect.Lists;
 import com.health.config.Auth;
 import com.health.domain.security.Role;
 import com.health.domain.security.UserRole;
-import com.health.model.Brochure;
+import com.health.model.Brouchure;
 import com.health.model.Carousel;
 import com.health.model.Category;
 import com.health.model.Comment;
 import com.health.model.Consultant;
-import com.health.model.FilesofBrochure;
+import com.health.model.FilesofBrouchure;
 import com.health.model.ContributorAssignedMultiUserTutorial;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Event;
@@ -87,10 +87,10 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
-import com.health.repository.BrochureRepository;
+import com.health.repository.BrouchureRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.TutorialRepository;
-import com.health.service.BrochureService;
+import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
 import com.health.service.CityService;
@@ -147,7 +147,7 @@ public class HomeController {
 	private VersionRepository verRepository;
 	
 	@Autowired
-	private BrochureRepository broRepository;
+	private BrouchureRepository broRepository;
 	
 	@Autowired
 	private TopicCategoryMappingRepository tcmRepository;
@@ -193,7 +193,7 @@ public class HomeController {
 	private TestimonialService testService;
 	
 	@Autowired
-	private FilesofBrochureService filesofbrochureService;
+	private FilesofBrouchureService filesofbrouchureService;
 
 	@Autowired
 	private ConsultantService consultService;
@@ -244,7 +244,7 @@ public class HomeController {
 	private PostQuestionaireService postQuestionService;
 
 	@Autowired
-	private BrochureService broService;
+	private BrouchureService broService;
 
 	@Autowired
 	private IndianLanguageService iLanService;
@@ -479,14 +479,14 @@ private void getModelData(Model model) {
 		List<Event> events=eventservice.findAllEventForCache(); //findAllEvent(); 
 		List<Testimonial> testi= testService.findAllTestimonialByapprovedForCache();  //findAllTestimonialByapproved();
 		List<Consultant> consults=consultService.findAllConsultHomeTrueForCache(); //findAllConsultHomeTrue();	
-		List<Brochure> brochures= broService.findAllBrochuresForCache(); //findAllBrochures(); 
+		List<Brouchure> brochures= broService.findAllBrouchuresForCache(); //findAllBrouchures(); 
 		List<Carousel> carousel= caroService.findCarouselForCache(); //findCarousel();	
 		//List<Category> category_objs = catService.findAllCategoryByOrderForCache(); // findAllCategoryByOrder();
 		List<Event> evnHome = new ArrayList<>();
 		List<Testimonial> testHome = new ArrayList<>();
 		List<Consultant> consulHome = new ArrayList<>();
 		List<Category> categoryHome = new ArrayList<>();
-		//List<Brochure> brochureHome = new ArrayList<>();
+		//List<Brouchure> brochureHome = new ArrayList<>();
 		List<Version> versionHome= new ArrayList<>();
 		List<Carousel> carouselHome = new ArrayList<>();
 		
@@ -496,14 +496,14 @@ private void getModelData(Model model) {
 		
 		List<Version> allVersions=verService.findAll();
 		List<Version> versions= new ArrayList<Version>();
-		for(Brochure bro: brochures) {
+		for(Brouchure bro: brochures) {
 			for(Version ver: allVersions) {
-				if(bro.getId()==ver.getBrochure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
 					versions.add(ver);
 			}
 		}
 		Collections.sort(versions, Version.SortByBroVersionTime);
-		//model.addAttribute("brochures", brochures);
+		//model.addAttribute("brouchures", brochures);
 		//model.addAttribute("versions", versions);
 	
 		
@@ -932,8 +932,7 @@ private void getModelData(Model model) {
 
 				getModelData(model);
 //				model.addAttribute("topics", topicTemp);
-				//String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
-				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName())+"/1";
+				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
 				model.addAttribute("sm_url", sm_url);
 			return "tutorial";
 	}
@@ -1840,7 +1839,7 @@ private void getModelData(Model model) {
 	}
 	/************************************END**********************************************/
 
-	/******************************ADD BROCHURE ******************************************/
+	/******************************ADD BROUCHURE ******************************************/
 	
 	/**
 	 * redirect to add brochure page
@@ -1859,15 +1858,15 @@ private void getModelData(Model model) {
 		model.addAttribute("categories", category);
 		List<Language> lans = lanService.getAllLanguages();
 		model.addAttribute("languages", lans);
-		List<Brochure> brochures = broService.findAll();
+		List<Brouchure> brouchures = broService.findAll();
 		
 		
 		List<Version> versions= new ArrayList<Version>();
-		for(Brochure bro: brochures) {
-			Version ver = verService.findByBrochureAndPrimaryVersion(bro, bro.getPrimaryVersion());
+		for(Brouchure bro: brouchures) {
+			Version ver = verService.findByBrouchureAndPrimaryVersion(bro, bro.getPrimaryVersion());
 			versions.add(ver);
 			/*for(Version ver: allVersions) {
-				if(bro.getId()==ver.getBrochure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
 					versions.add(ver);
 			}*/
 		}
@@ -1879,9 +1878,9 @@ private void getModelData(Model model) {
 		
 		
 		
-		model.addAttribute("brochures", brochures);
+		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
-		model.addAttribute("filesofbrochureService",filesofbrochureService);
+		model.addAttribute("filesofbrouchureService",filesofbrouchureService);
 		
 		
 		return "addBrochure";
@@ -1899,8 +1898,8 @@ private void getModelData(Model model) {
 	 */
 	@RequestMapping(value = "/addBrochure",method = RequestMethod.POST)
 	public String addBrochurePost(Model model,Principal principal,
-								  @RequestParam("brochure") List<MultipartFile> brochures,
-								  @RequestParam("brochurePrint") List<MultipartFile> brochurePrints,
+								  @RequestParam("brouchure") List<MultipartFile> brochures,
+								  @RequestParam("brouchurePrint") List<MultipartFile> brochurePrints,
 								  @RequestParam(value = "categoryName") int categoryId,
 								  @RequestParam(name = "inputTopicName") int topicId,
 								  @RequestParam(name = "languageName") List<Integer> languageIds,
@@ -1914,8 +1913,7 @@ private void getModelData(Model model) {
 			usr=userService.findByUsername(principal.getName());
 		}
 
-		boolean viewCheck=false;
-		model.addAttribute("viewCheck", viewCheck);
+		
 		model.addAttribute("userInfo", usr);
 		System.out.println(languageIds);
 		
@@ -1923,17 +1921,17 @@ private void getModelData(Model model) {
 		List<Category> categories=catService.findAll();
 		model.addAttribute("categories", categories);
 		model.addAttribute("languages", languages);
-		List<Brochure> brochures1 = broService.findAll();
+		List<Brouchure> brouchures = broService.findAll();
 		
 		List<Version> versions= new ArrayList<>();
-		for(Brochure bro: brochures1) {
-			Version ver= verService.findByBrochureAndPrimaryVersion(bro, bro.getPrimaryVersion());
+		for(Brouchure bro: brouchures) {
+			Version ver= verService.findByBrouchureAndPrimaryVersion(bro, bro.getPrimaryVersion());
 			versions.add(ver);
 		}
 		Collections.sort(versions, Version.SortByBroVersionTime);
-		model.addAttribute("brochures", brochures1);
+		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
-		model.addAttribute("filesofbrochureService",filesofbrochureService);
+		model.addAttribute("filesofbrouchureService",filesofbrouchureService);
 		
 		for(MultipartFile uniquefile: brochures) {
 			if(!uniquefile.isEmpty()) {
@@ -1991,7 +1989,7 @@ private void getModelData(Model model) {
 		
 		int newBroId=broService.getNewId();
 		int newVerid= verService.getNewId();
-		Brochure brochureTemp = new Brochure();
+		Brouchure brochureTemp = new Brouchure();
 		brochureTemp.setId(newBroId);
 		brochureTemp.setLan(lan);
 		brochureTemp.setTitle(title);
@@ -2013,11 +2011,11 @@ private void getModelData(Model model) {
 		Version version= new Version();
 		
 		try {
-			List<FilesofBrochure> filesofbrochureList=new ArrayList<>();
+			List<FilesofBrouchure> filesofbrochureList=new ArrayList<>();
 			
 			String document1="";
 			String printDocument="";
-			int newbroFileId= filesofbrochureService.getNewId();
+			int newbroFileId= filesofbrouchureService.getNewId();
 			
 			for(int i=0; i<languageIds.size(); i++) {
 				
@@ -2028,18 +2026,19 @@ private void getModelData(Model model) {
 				{
 				
 				String langName=lanService.getById(languageIds.get(i)).getLangName();
+				FilesofBrouchure filesOfbrouchure= new FilesofBrouchure();
 			
 				if(!brochures.get(i).isEmpty()) {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+newBroId + "/" + primaryVersion + "/" + "web" + "/" + langName );
-				String pathtoUploadPoster1=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+newBroId +"/" + primaryVersion + "/" + "web" + "/" + langName );
+				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId + "/" + primaryVersion + "/" + "web" + "/" + langName );
+				String pathtoUploadPoster1=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId +"/" + primaryVersion + "/" + "web" + "/" + langName );
 				int indexToStart1=pathtoUploadPoster1.indexOf("Media");
 				 document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
 				}
 			
 			
 			if(!brochurePrints.get(i).isEmpty()) {
-			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+newBroId+"/" +primaryVersion+ "/" + "printdoc" + "/" + langName);
-			String pathtoUploadPoster2=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+newBroId+"/" +primaryVersion+ "/" + "printdoc" + "/" + langName);
+			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion+ "/" + "printdoc" + "/" + langName);
+			String pathtoUploadPoster2=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion+ "/" + "printdoc" + "/" + langName);
 			int indexToStart2=pathtoUploadPoster2.indexOf("Media");
 			printDocument=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
 			
@@ -2050,7 +2049,7 @@ private void getModelData(Model model) {
 			
 			
 			
-			filesofbrochureList.add(new FilesofBrochure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, lanService.getById(languageIds.get(i))));
+			filesofbrochureList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, lanService.getById(languageIds.get(i))));
 			newbroFileId +=1;
 			
 			
@@ -2076,30 +2075,40 @@ private void getModelData(Model model) {
 				version.setVerId(newVerid);
 				version.setVersionPosterPath(document1);
 				version.setVersionPrintPosterPath(printDocument);
-				version.setBrochure(brochureTemp);
+				version.setBrouchure(brochureTemp);
 				version.setBroVersion(primaryVersion);
 				version.setDateAdded(ServiceUtility.getCurrentTime());
 				verService.save(version);
 				
-				filesofbrochureService.saveAll(filesofbrochureList);
+				filesofbrouchureService.saveAll(filesofbrochureList);
 			}	
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 		model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-		model.addAttribute("viewCheck", viewCheck);
 		verService.delete(version);
 		System.out.println(" AlokSP  Error4");
+		/*brouchures = broService.findAll();
+		allVersions= verService.findAll();
+		versions= new ArrayList<>();
+		for(Brouchure bro: brouchures) {
+			for(Version ver: allVersions) {
+				if(bro.getId()==ver.getBrouchure().getId() && bro.getPrimaryVersion()==ver.getBroVersion())
+					versions.add(ver);
+			}
+		}
+		Collections.sort(versions, Version.SortByBroVersionTime);
+		model.addAttribute("brouchures", brouchures);
+		model.addAttribute("versions", versions);
+		*/
 		return  addBrochureGet(model, principal);
 		
 	}
 		
 		if(filesError==true) {
 			model.addAttribute("error_msg", "Web Files should not be null for selected language");
-			model.addAttribute("viewCheck", viewCheck);
 		} else {
 			model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
-			model.addAttribute("viewCheck", viewCheck);
 		}
 		return addBrochureGet(model, principal);
 	}
@@ -3906,7 +3915,7 @@ private void getModelData(Model model) {
 		model.addAttribute("userInfo", usr);
 
 		//Event event= eventservice.findById(id);
-		Brochure brochure=broService.findById(id);
+		Brouchure brochure=broService.findById(id);
 		
 		
 		if(brochure == null) {
@@ -3920,6 +3929,14 @@ private void getModelData(Model model) {
 		model.addAttribute("languages", languages);
 	
 		Language langByBrochure= brochure.getLan();
+	/* 
+	    TopicCategoryMapping tcm=brouchure.getTopicCatId();
+		Category catBrouchure=tcm.getCat();
+		Topic topicBrouchure=tcm.getTopic();
+		model.addAttribute("catBrouchure", catBrouchure);
+		model.addAttribute("topicBrouchure", topicBrouchure);
+		
+	*/	
 	
 		Set<Version> verSet= brochure.getVersions();
 		
@@ -3936,8 +3953,6 @@ private void getModelData(Model model) {
 		
 		Collections.sort(listofVersions, Version.SortByBroVersionTime);
 		
-		List<FilesofBrochure> filesOfBroList = filesofbrochureService.findByVersion(version);
-		
 		List<Version> newlistofVersion= new ArrayList<>();
 		int temp=0;
 		for(Version ver: listofVersions) {
@@ -3948,36 +3963,26 @@ private void getModelData(Model model) {
 			}
 				
 		}
-		
-		List<FilesofBrochure> newFileList= new ArrayList<>();
-		for(Version ver1: newlistofVersion) {
-			for(Language lan: languages) {
-				FilesofBrochure filesBro= filesofbrochureService.findByLanguageandVersion(lan, ver1);
-				if(filesBro!=null) {
-					newFileList.add(filesBro);
-				}
-			}
-		}
-		
-		System.out.println(newFileList + "Alok Kumar");
-		model.addAttribute("newFileList", newFileList);
+		System.out.println(version);
+		List<FilesofBrouchure> filesOfBroList = filesofbrouchureService.findByVersion(version);
+		System.out.println(filesOfBroList);
 		model.addAttribute("filesOfBroList", filesOfBroList);
 		model.addAttribute("listofVersions", newlistofVersion);
 		model.addAttribute("version", version);
-		model.addAttribute("brochure", brochure);
-		model.addAttribute("langByBrochure",langByBrochure);
+		model.addAttribute("brouchure", brochure);
+		model.addAttribute("langByBrouchure",langByBrochure);
 		
-		List<Brochure> brochures = broService.findAll();
+		List<Brouchure> brouchures = broService.findAll();
 		List<Version> versions= new ArrayList<Version>();
-		for(Brochure bro: brochures) {
-			Version ver= verService.findByBrochureAndPrimaryVersion(bro, bro.getPrimaryVersion());
+		for(Brouchure bro: brouchures) {
+			Version ver= verService.findByBrouchureAndPrimaryVersion(bro, bro.getPrimaryVersion());
 			versions.add(ver);
 		}
 		Collections.sort(versions, Version.SortByBroVersionTime);
 		for(Version ver: versions) {
 			System.out.println(ver.getDateAdded());
 		}
-		model.addAttribute("brochures", brochures);
+		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		
 		
@@ -3991,7 +3996,7 @@ private void getModelData(Model model) {
 	 */
 	@RequestMapping(value = "/updateBrochure", method = RequestMethod.POST)
 	public String updatBrochureGet(HttpServletRequest req,Model model,Principal principal, @RequestParam(name = "languageName") List<Integer> languageIds,
-			@RequestParam("brochure") List<MultipartFile> brochures, @RequestParam("brochurePrint") List<MultipartFile> brochurePrints) {
+			@RequestParam("brouchure") List<MultipartFile> brochures, @RequestParam("brouchurePrint") List<MultipartFile> brochurePrints) {
 
 		User usr=new User();
 
@@ -4019,26 +4024,26 @@ private void getModelData(Model model) {
 		List<Language> languages=lanService.getAllLanguages();
 		model.addAttribute("languages", languages);
 
-		Brochure brochure= broService.findById(Integer.parseInt(brochureId));
-		Version version=verRepository.findByBrochureAndBroVersion(brochure, brochure.getPrimaryVersion());
+		Brouchure brouchure= broService.findById(Integer.parseInt(brochureId));
+		Version version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
 		
 		
-		List<FilesofBrochure> filesOfBroList = filesofbrochureService.findByVersion(version);
+		List<FilesofBrouchure> filesOfBroList = filesofbrouchureService.findByVersion(version);
 		model.addAttribute("filesOfBroList", filesOfBroList);
 		model.addAttribute("version", version);
 		
-		model.addAttribute("brochure", brochure);
+		model.addAttribute("brouchure", brouchure);
 		
 		
 		
 
 
-		if(brochure==null) {
-			model.addAttribute("error_msg","Brochure doesn't exist");
+		if(brouchure==null) {
+			model.addAttribute("error_msg","Brouchure doesn't exist");
 			return "updateBrochure";
 		}
 		
-		Set<Version> verSet= brochure.getVersions();
+		Set<Version> verSet= brouchure.getVersions();
 		List<Version> listofVersions= new ArrayList<>(verSet);
 		Collections.sort(listofVersions, Version.SortByBroVersionTime);
 		List<Version> newlistofVesrion= new ArrayList<>();
@@ -4050,19 +4055,6 @@ private void getModelData(Model model) {
 				break;
 		}
 		
-		List<FilesofBrochure> newFileList= new ArrayList<>();
-		for(Version ver1: newlistofVesrion) {
-			for(Language lan: languages) {
-				FilesofBrochure filesBro= filesofbrochureService.findByLanguageandVersion(lan, ver1);
-				if(filesBro!=null) {
-					newFileList.add(filesBro);
-				}
-			}
-		}
-		
-		
-		model.addAttribute("newFileList", newFileList);
-		
 		model.addAttribute("listofVersions", newlistofVesrion);
 		
 		if(title.isEmpty()){
@@ -4072,9 +4064,8 @@ private void getModelData(Model model) {
 		
 		
 		int newVerId= verService.getNewId();
-		int versionValue=brochure.getPrimaryVersion();
+		int versionValue=brouchure.getPrimaryVersion();
 		int newVersionValue=versionValue+1;
-		boolean fileErrorforNewLang= false;
 		boolean filesError=false;
 		
 		
@@ -4106,8 +4097,8 @@ private void getModelData(Model model) {
 					 
 					String document1="";
 					String printDocument="";
-					int newbroFileId= filesofbrochureService.getNewId();
-					List<FilesofBrochure> filesBroList= new ArrayList<>();
+					int newbroFileId= filesofbrouchureService.getNewId();
+					List<FilesofBrouchure> filesBroList= new ArrayList<>();
 					
 					for(int i=0; i<languageIds.size(); i++) {
 						
@@ -4121,13 +4112,13 @@ private void getModelData(Model model) {
 						
 						System.out.println(langName + " " + language + " " + version);
 
-						FilesofBrochure fileBro = filesofbrochureService.findByLanguageandVersion(language, version);
+						FilesofBrouchure fileBro = filesofbrouchureService.findByLanguageandVersion(language, version);
 						
 					
 					
 					if(!brochures.get(i).isEmpty()) {
-					ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+ brochureId + "/" + versionValue + "/" + "web" + "/" + langName );
-					String pathtoUploadPoster1=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+ brochureId +"/" + versionValue + "/" + "web" + "/" + langName );
+					ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId + "/" + versionValue + "/" + "web" + "/" + langName );
+					String pathtoUploadPoster1=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" + versionValue + "/" + "web" + "/" + langName );
 					int indexToStart1=pathtoUploadPoster1.indexOf("Media");
 					document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
 					
@@ -4135,8 +4126,8 @@ private void getModelData(Model model) {
 					}
 					
 					if(!brochurePrints.get(i).isEmpty()) {
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+brochureId+"/" + versionValue + "/" + "printdoc" + "/" + langName);
-						String pathtoUploadPoster2=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+ brochureId +"/" +versionValue+ "/" + "printdoc" + "/" + langName);
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" + versionValue + "/" + "printdoc" + "/" + langName);
+						String pathtoUploadPoster2=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" +versionValue+ "/" + "printdoc" + "/" + langName);
 						int indexToStart2=pathtoUploadPoster2.indexOf("Media");
 						printDocument=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
 						
@@ -4156,37 +4147,27 @@ private void getModelData(Model model) {
 							fileBro.setPrintPath(printDocument);
 						}
 						
-						filesofbrochureService.save(fileBro);
+						filesofbrouchureService.save(fileBro);
 						//filesBroList.add(fileBro);
 						
 						
 					}
 					
-					else { 
-						if(!brochures.get(i).isEmpty()) {
-							filesBroList.add(new FilesofBrochure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, language));
-							newbroFileId = newbroFileId + 1;
-						}
-						else {
-							fileErrorforNewLang=true;
-						}
-						
+					else {
+						filesBroList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, language));
+						newbroFileId = newbroFileId + 1;
 					}
 					
 					
 					
 				}
+					version.setVersionPosterPath(document1);
+					version.setVersionPrintPosterPath(printDocument);
+					verService.save(version);
+					brouchure.setTitle(title);
+					broService.save(brouchure);
 					
-					if(fileErrorforNewLang==false) {
-						version.setVersionPosterPath(document1);
-						version.setVersionPrintPosterPath(printDocument);
-						verService.save(version);
-						brochure.setTitle(title);
-						broService.save(brochure);
-						
-						filesofbrochureService.saveAll(filesBroList);
-					}
-					
+					filesofbrouchureService.saveAll(filesBroList);
 					
 					
 					
@@ -4196,8 +4177,8 @@ private void getModelData(Model model) {
 						
 						String document2="";
 						String printDocument2="";
-						int newbroFileId= filesofbrochureService.getNewId();
-						List<FilesofBrochure> filesBroList1= new ArrayList<>();
+						int newbroFileId= filesofbrouchureService.getNewId();
+						List<FilesofBrouchure> filesBroList1= new ArrayList<>();
 						Version newVer= new Version();
 						
 						for(int i=0; i<languageIds.size(); i++) {
@@ -4212,21 +4193,21 @@ private void getModelData(Model model) {
 						
 						if(!brochures.get(i).isEmpty()) {
 						
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+ brochureId + "/" + newVersionValue + "/" + "web" + "/" + langName );
-						String pathtoUploadPoster3=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+ brochureId +"/" + newVersionValue + "/" + "web" + "/" + langName );
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId + "/" + newVersionValue + "/" + "web" + "/" + langName );
+						String pathtoUploadPoster3=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" + newVersionValue + "/" + "web" + "/" + langName );
 						int indexToStart3=pathtoUploadPoster3.indexOf("Media");
 						document2=pathtoUploadPoster3.substring(indexToStart3, pathtoUploadPoster3.length());
 						
 						
 						if(!brochurePrints.get(i).isEmpty()) {
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+brochureId+"/" + newVersionValue+ "/" + "printdoc" + "/" + langName);
-						String pathtoUploadPoster4=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrochure+ brochureId +"/" + newVersionValue + "/" + "printdoc" + "/" + langName);	
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" + newVersionValue+ "/" + "printdoc" + "/" + langName);
+						String pathtoUploadPoster4=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" + newVersionValue + "/" + "printdoc" + "/" + langName);	
 						int indexToStart4=pathtoUploadPoster4.indexOf("Media");
 						printDocument2=pathtoUploadPoster4.substring(indexToStart4, pathtoUploadPoster4.length());
 						
 						}
 						
-						filesBroList1.add(new FilesofBrochure(newbroFileId, ServiceUtility.getCurrentTime(), document2, printDocument2,  newVer, lanService.getById(languageIds.get(i))));
+						filesBroList1.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document2, printDocument2,  newVer, lanService.getById(languageIds.get(i))));
 						newbroFileId +=1;
 						
 						}
@@ -4239,23 +4220,23 @@ private void getModelData(Model model) {
 						
 						if(filesError==false) {
 							
-							brochure.setTitle(title);
-							brochure.setPrimaryVersion(version.getBroVersion()+1);
-							broService.save(brochure);
+							brouchure.setTitle(title);
+							brouchure.setPrimaryVersion(version.getBroVersion()+1);
+							broService.save(brouchure);
 							
 							
 							newVer.setVerId(newVerId);
-							newVer.setBrochure(brochure);
+							newVer.setBrouchure(brouchure);
 							newVer.setDateAdded(ServiceUtility.getCurrentTime());
 							newVer.setBroVersion(version.getBroVersion()+1);
 							newVer.setVersionPosterPath(document2);
 							newVer.setVersionPrintPosterPath(printDocument2);
 							verService.save(newVer);
 							
-							filesofbrochureService.saveAll(filesBroList1);
+							filesofbrouchureService.saveAll(filesBroList1);
 							
-							brochure= broService.findById(Integer.parseInt(brochureId));
-							verSet= brochure.getVersions();
+							brouchure= broService.findById(Integer.parseInt(brochureId));
+							verSet= brouchure.getVersions();
 							listofVersions= new ArrayList<>(verSet);
 							model.addAttribute("listofVersions", listofVersions);
 							
@@ -4274,13 +4255,13 @@ private void getModelData(Model model) {
 			System.out.println("Check path error");
 			
 			
-			version=verRepository.findByBrochureAndBroVersion(brochure, brochure.getPrimaryVersion());
-			filesOfBroList = filesofbrochureService.findByVersion(version);
+			version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+			filesOfBroList = filesofbrouchureService.findByVersion(version);
 			model.addAttribute("filesOfBroList", filesOfBroList);
 			model.addAttribute("version", version);
-			model.addAttribute("brochure", brochure);
+			model.addAttribute("brouchure", brouchure);
 		
-			verSet= brochure.getVersions();
+			verSet= brouchure.getVersions();
 			listofVersions= new ArrayList<>(verSet);
 			Collections.sort(listofVersions, Version.SortByBroVersionTime);
 			newlistofVesrion= new ArrayList<>();
@@ -4291,31 +4272,13 @@ private void getModelData(Model model) {
 				if(temp==3)
 					break;
 			}
-			
-			newFileList= new ArrayList<>();
-			for(Version ver1: newlistofVesrion) {
-				for(Language lan: languages) {
-					FilesofBrochure filesBro= filesofbrochureService.findByLanguageandVersion(lan, ver1);
-					if(filesBro!=null) {
-						newFileList.add(filesBro);
-					}
-				}
-			}
-			
-			
-			model.addAttribute("newFileList", newFileList);
 			model.addAttribute("listofVersions", newlistofVesrion);
 			return "updateBrochure";        // need to add some error message
 		}
 		
-		if(fileErrorforNewLang==true) {
-			model.addAttribute("error_msg", "brochure web file is required for new Language");
-			return "updateBrochure"; 	
-			
-		}
 		
 		if(filesError==true) {
-			model.addAttribute("error_msg", "brochure web file is required for new version");
+			model.addAttribute("error_msg", "brouchure web file is required for new version");
 			return "updateBrochure"; 	
 			
 		}
@@ -4323,13 +4286,13 @@ private void getModelData(Model model) {
 		
 
 		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
-		brochure= broService.findById(Integer.parseInt(brochureId));
-		version=verRepository.findByBrochureAndBroVersion(brochure, brochure.getPrimaryVersion());
-		filesOfBroList = filesofbrochureService.findByVersion(version);
+		brouchure= broService.findById(Integer.parseInt(brochureId));
+		version=verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
+		filesOfBroList = filesofbrouchureService.findByVersion(version);
 		model.addAttribute("filesOfBroList", filesOfBroList);
 		model.addAttribute("version", version);
-		model.addAttribute("brochure", brochure);
-		verSet= brochure.getVersions();
+		model.addAttribute("brouchure", brouchure);
+		verSet= brouchure.getVersions();
 		listofVersions= new ArrayList<>(verSet);
 		Collections.sort(listofVersions, Version.SortByBroVersionTime);
 		newlistofVesrion= new ArrayList<>();
@@ -4341,34 +4304,20 @@ private void getModelData(Model model) {
 				break;
 		}
 		
-		newFileList= new ArrayList<>();
-		for(Version ver1: newlistofVesrion) {
-			for(Language lan: languages) {
-				FilesofBrochure filesBro= filesofbrochureService.findByLanguageandVersion(lan, ver1);
-				if(filesBro!=null) {
-					newFileList.add(filesBro);
-				}
-			}
-		}
-		
-		
-		
-		model.addAttribute("newFileList", newFileList);
-		
 		model.addAttribute("listofVersions", newlistofVesrion);
 		for(Version ver: listofVersions)
 		System.out.println(ver);
-		List<Brochure> brochures1 = broService.findAll();
+		List<Brouchure> brouchures = broService.findAll();
 		List<Version> versions= new ArrayList<Version>();
-		for(Brochure bro: brochures1) {
-			Version ver= verService.findByBrochureAndPrimaryVersion(bro, bro.getPrimaryVersion());
+		for(Brouchure bro: brouchures) {
+			Version ver= verService.findByBrouchureAndPrimaryVersion(bro, bro.getPrimaryVersion());
 			versions.add(ver);
 		}
 		Collections.sort(versions, Version.SortByBroVersionTime);
 		for(Version ver: versions) {
 			System.out.println(ver.getDateAdded());
 		}
-		model.addAttribute("brochures", brochures1);
+		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 
 		return "updateBrochure";
@@ -7646,21 +7595,21 @@ private void getModelData(Model model) {
 		
 		*/
 		
-		List<Brochure> brochures= broService.findAll();
+		List<Brouchure> brouchures= broService.findAll();
 		List<Language> languages= lanService.getAllLanguages();
 		List<Version> allVersions=verService.findAll();
 		List<Version> versions= new ArrayList<Version>();
-		for(Brochure bro: brochures) {
-				Version ver = verService.findByBrochureAndPrimaryVersion(bro, bro.getPrimaryVersion());
+		for(Brouchure bro: brouchures) {
+				Version ver = verService.findByBrouchureAndPrimaryVersion(bro, bro.getPrimaryVersion());
 				versions.add(ver);
 					
 		}
 		Collections.sort(versions, Version.SortByBroVersionTime);
 		
-		List<FilesofBrochure> filesList= new ArrayList<>();
+		List<FilesofBrouchure> filesList= new ArrayList<>();
 		for(Version ver1: versions) {
 			for(Language lan: languages) {
-				FilesofBrochure filesBro= filesofbrochureService.findByLanguageandVersion(lan, ver1);
+				FilesofBrouchure filesBro= filesofbrouchureService.findByLanguageandVersion(lan, ver1);
 				if(filesBro!=null) {
 					filesList.add(filesBro);
 				}
@@ -7668,7 +7617,7 @@ private void getModelData(Model model) {
 		}
 		
 		model.addAttribute("filesList", filesList);
-		model.addAttribute("brochures", brochures);
+		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		model.addAttribute("languages", languages);
 
