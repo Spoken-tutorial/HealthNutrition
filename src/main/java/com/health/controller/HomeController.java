@@ -1988,6 +1988,7 @@ private void getModelData(Model model) {
 		
 		
 	   boolean filesError=false;
+	   boolean duplicatLanguage=false;
 	   Language lan=lanService.getById(languageIds.get(0));
 		
 		
@@ -2020,7 +2021,7 @@ private void getModelData(Model model) {
 			String document1="";
 			String printDocument="";
 			int newbroFileId= filesofbrouchureService.getNewId();
-			
+			List<String>addedLanguages= new ArrayList<>();
 			for(int i=0; i<languageIds.size(); i++) {
 				document1="";
 				printDocument="";
@@ -2033,6 +2034,7 @@ private void getModelData(Model model) {
 				
 				String langName=lanService.getById(languageIds.get(i)).getLangName();
 				FilesofBrouchure filesOfbrouchure= new FilesofBrouchure();
+				
 			
 				if(!brochures.get(i).isEmpty()) {
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId + "/" + primaryVersion + "/" + "web" + "/" + langName );
@@ -2053,7 +2055,14 @@ private void getModelData(Model model) {
 			
 			
 			
+			for(String testLan: addedLanguages){
+				if(testLan==langName) {
+					duplicatLanguage=true;
+				}
+				
+			}
 			
+			addedLanguages.add(langName);
 			
 			filesofbrochureList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, lanService.getById(languageIds.get(i))));
 			newbroFileId +=1;
@@ -2065,7 +2074,7 @@ private void getModelData(Model model) {
 				}
 			}
 
-			if(filesError==false) {
+			if(filesError==false && duplicatLanguage==false) {
 				
 				try {
 					broService.save(brochureTemp);
@@ -2114,11 +2123,15 @@ private void getModelData(Model model) {
 		
 	}
 		
-		if(filesError==true) {
+		if(filesError==true || duplicatLanguage==true) {
 			viewSection= false;
 			model.addAttribute("viewSection", viewSection);
+			if(filesError==true) {
+				model.addAttribute("error_msg", "Web Files should not be null for selected language");
+			}else {
+				model.addAttribute("error_msg", "Duplicate Languages are not allowed");
+			}
 			
-			model.addAttribute("error_msg", "Web Files should not be null for selected language");
 		} else {
 			viewSection= false;
 			model.addAttribute("viewSection", viewSection);
@@ -4107,6 +4120,8 @@ private void getModelData(Model model) {
 		int versionValue=brouchure.getPrimaryVersion();
 		int newVersionValue=versionValue+1;
 		boolean filesError=false;
+		boolean duplicatLanguage =false;
+		boolean duplicatelangforOverride= false;
 		boolean webfileErrorforOverride= false;
 		
 		
@@ -4140,7 +4155,7 @@ private void getModelData(Model model) {
 					String printDocument="";
 					int newbroFileId= filesofbrouchureService.getNewId();
 					List<FilesofBrouchure> filesBroList= new ArrayList<>();
-					
+					List<String> addedlanguagesforOverride= new ArrayList<>();
 					for(int i=0; i<languageIds.size(); i++) {
 						document1="";
 						printDocument="";
@@ -4177,6 +4192,13 @@ private void getModelData(Model model) {
 						
 					}
 					
+					for(String testlan: addedlanguagesforOverride) {
+						if(testlan==langName) {
+							duplicatelangforOverride=true;
+						}
+					}
+					addedlanguagesforOverride.add(langName);
+					
 					if(fileBro !=null) {
 						fileBro.setLan(language);
 						System.out.println(fileBro.getLan().getLangName() + "Alok Kumar Check BrochureFile");
@@ -4212,7 +4234,7 @@ private void getModelData(Model model) {
 					
 					
 				} 
-					if(webfileErrorforOverride==false) {
+					if(webfileErrorforOverride==false && duplicatelangforOverride==false) {
 					version.setVersionPosterPath(document1);
 					version.setVersionPrintPosterPath(printDocument);
 					verService.save(version);
@@ -4234,7 +4256,7 @@ private void getModelData(Model model) {
 						int newbroFileId= filesofbrouchureService.getNewId();
 						List<FilesofBrouchure> filesBroList1= new ArrayList<>();
 						Version newVer= new Version();
-						
+						List<String> addedLanguages= new ArrayList<>();
 						for(int i=0; i<languageIds.size(); i++) {
 							document2="";
 							printDocument2="";
@@ -4262,6 +4284,13 @@ private void getModelData(Model model) {
 						printDocument2=pathtoUploadPoster4.substring(indexToStart4, pathtoUploadPoster4.length());
 						
 						}
+						 
+						for(String testlan: addedLanguages) {
+							if(testlan==langName) {
+								duplicatLanguage=true;
+							}
+						}
+						addedLanguages.add(langName);
 						
 						filesBroList1.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document2, printDocument2,  newVer, lanService.getById(languageIds.get(i))));
 						newbroFileId +=1;
@@ -4274,7 +4303,9 @@ private void getModelData(Model model) {
 						
 						}
 						
-						if(filesError==false) {
+						if(filesError==false && duplicatLanguage == false) {
+							
+							System.out.println("Alok Kumar test");
 							
 							brouchure.setTitle(title);
 							brouchure.setPrimaryVersion(version.getBroVersion()+1);
@@ -4350,6 +4381,19 @@ private void getModelData(Model model) {
 			return "updateBrochure"; 	
 			
 		}
+		
+		if(duplicatLanguage==true) {
+			model.addAttribute("error_msg", "Duplicate Languages are not allowed");
+			return "updateBrochure"; 	
+			
+		}
+		
+		if(duplicatelangforOverride==true) {
+			model.addAttribute("error_msg", "Duplicate Languages are not allowed");
+			return "updateBrochure"; 	
+			
+		}
+		
 		
 		if(filesError==true) {
 			model.addAttribute("error_msg", "brouchure web file is required for new version");

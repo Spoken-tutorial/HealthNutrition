@@ -108,16 +108,16 @@ font-weight:bold!important;
 
 <div class="form-group" style="float:left;  width:35%; margin-left:15px; margin-right:15px;">
 	<label th:for="${'brouchure' + iter.index}">Brochure for web*  </label>
-	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,102400000)"/>
+	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,524288000)"/>
 	<small> (.jpg or .png or .pdf Format Only)</small> 
-	<small>Max file size : 100 MB</small>
+	<small>Max file size : 500 MB</small>
 </div>
 
 <div class="form-group" style="float:left;  width:35%;">
 	<label th:for="${'brouchurePrint' + iter.index}">Brochure for print </label>
-	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,358400000)"/>
+	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,524288000)"/>
 	<small> (.jpg or .png or .pdf Format Only)</small>
-	<small>Max file size : 350 MB</small>
+	<small>Max file size : 500 MB</small>
 </div>
 								</div>
 									
