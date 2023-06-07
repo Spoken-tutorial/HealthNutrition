@@ -18,6 +18,9 @@ public class FilesofBrouchure {
 	@Column(name = "Print_path")
 	private String printPath;
 	
+	@Column(name = "thumbnail_path")
+	private String thumbnailPath;
+	
 	@ManyToOne
 	@JoinColumn(name = "ver_id")
 	private Version version;
@@ -69,6 +72,15 @@ public class FilesofBrouchure {
 		this.printPath = printPath;
 		this.version = version;
 		
+	}
+	
+
+	public String getThumbnailPath() {
+		return thumbnailPath;
+	}
+
+	public void setThumbnailPath(String thumbnailPath) {
+		this.thumbnailPath = thumbnailPath;
 	}
 
 	public int getBroFileId() {

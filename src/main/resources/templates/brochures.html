@@ -132,9 +132,9 @@ border-right: 2px solid #014F7A;
 					                <td ><span th:text="${filesBro.getDateAdded()}"></span>
 					               
 					                 </td>
-					               <td> <iframe style="width: 150px; height: 100px" th:if="${filesBro.getWebPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${filesBro.getWebPath()}}"></iframe>
+					               <td> <img style=" height: 100px" th:if="${filesBro.getWebPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${filesBro.getThumbnailPath()}}"></img>
       									<img th:unless="${filesBro.getWebPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${filesBro.getWebPath()}}"
-											style="width: 150px; height: 100px" />
+											style=" height: 100px" />
 										<br>
 										<a th:href="@{/files/}+@{${filesBro.getWebPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
 										<a th:if="${filesBro.getPrintPath()!=null and filesBro.getPrintPath()!=''}" th:href="@{/files/}+@{${filesBro.getPrintPath()}}"

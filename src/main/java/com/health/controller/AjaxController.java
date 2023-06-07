@@ -2336,25 +2336,27 @@ public class AjaxController{
 			Tutorial tut=tutService.getById(tutorialId);
 			
 			try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript");
-					String pathtoUploadPoster=ServiceUtility.uploadFile(File, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
+				String path = env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript";
+				ServiceUtility.createFolder(path);
+				String pathtoUploadPoster=ServiceUtility.uploadFile(File, path);
+				System.out.println("File uploaded");
+				int indexToStart=pathtoUploadPoster.indexOf("Media");
 
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
-					tut.setTimeScript(document);
-					tutService.save(tut);
+				tut.setTimeScript(document);
+				tutService.save(tut);
+				System.out.println("Database updated");
 
-					return CommonData.Script_SAVE_SUCCESS_MSG;
+				return CommonData.Script_SAVE_SUCCESS_MSG;
 
 			}catch (Exception e) {
-				// TODO: handle exception
-
-				// throw error
+				System.out.println("Time Script Upload Error " + tut);
+				e.printStackTrace();
 			}
 
 		}
-		return CommonData.Script_SAVE_SUCCESS_MSG;
+		return CommonData.SCRIPT_UPLOAD_ERROR;
 
 	}
 	

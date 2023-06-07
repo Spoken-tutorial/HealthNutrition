@@ -124,16 +124,16 @@
 
 <div class="form-group" style="float:left;  width:35%; margin-left:15px; margin-right:15px;">
 	<label th:for="${'brouchure' + iter.index}">Brochure for web  </label>
-	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,524288000)"/>
+	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,734003200)"/>
 	<small> (.jpg or .png or .pdf only)</small> 
-	<small>Max file size : 500 MB</small>
+	<small>Max file size : 700 MB</small>
 </div>
 
 <div class="form-group" style="float:left;  width:35%; margin-right:30px;">
 	<label th:for="${'brouchurePrint' + iter.index}">Brochure for print </label>
-	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,524288000)"/>
+	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,734003200)"/>
 	<small> (.jpg or .png or .pdf only)</small>
-	<small>Max file size : 500 MB</small>
+	<small>Max file size : 700 MB</small>
 </div>
 </div>
 <br>
@@ -187,7 +187,7 @@
        <span th:text="${file1.getDateAdded()}"></span>
       </td>
      
-      <td> <iframe style="width: 150px; height: 100px" th:if="${file1.getWebPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${file1.getWebPath()}}"></iframe>
+      <td> <img style="width: 150px; height: 100px" th:if="${file1.getWebPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${file1.getThumbnailPath()}}"></img>
       									<img th:unless="${file1.getWebPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${file1.getWebPath()}}"
 											style="width: 150px; height: 100px" />
 										<br>

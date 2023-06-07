@@ -85,6 +85,25 @@ public class Version {
 	}
 	
 	
+	public String findWebThumbnailofEnglish() {
+		if (filesofBrouchure.size() == 0)
+			return "";
+		String webFile="";
+		for (FilesofBrouchure file: filesofBrouchure) {
+			if(file.getLan().getLanId()==22) {
+				webFile=file.getThumbnailPath();
+				break;
+				
+			}
+		}
+		
+		if(webFile==null) {
+			return "";
+		}
+		return webFile;
+	}
+	
+	
 	
 	public String findPrintFileofEnglish() {
 		if (filesofBrouchure.size() == 0)
@@ -116,6 +135,16 @@ public class Version {
 		return webPath;
 	}
 	
+	public String GetWebThumbnailofFirstLan() {
+		if (filesofBrouchure.size() == 0)
+			return "";
+		FilesofBrouchure first = filesofBrouchure.iterator().next();
+		String webPath = first.getThumbnailPath();
+		if(webPath==null)
+			return "";
+		return webPath;
+	}
+	
 	public String  GetPrintFileofFirstLan() {
 		if (filesofBrouchure.size() == 0)
 			return "";
@@ -125,6 +154,8 @@ public class Version {
 			return "";
 		return printPath;
 	}
+	
+	
 	
 	@Override
 	public String toString() {

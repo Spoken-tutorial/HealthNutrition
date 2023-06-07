@@ -210,6 +210,8 @@ public class CommonData {
 	public static final long fileSize=10*1024*1024;
 	
 	public static final long categoryFileSizeImageFileSize = 10*1024*1024;
+
+	public static final String SCRIPT_UPLOAD_ERROR = "Script Not Uploaded";
 	
 //public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
 	public static String SCRIPT_MANAGER_BASE= "https://scriptmanager.spoken-tutorial.org/";

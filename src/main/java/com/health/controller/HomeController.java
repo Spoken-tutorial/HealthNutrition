@@ -24,6 +24,19 @@ import com.health.service.FilesofBrouchureService;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -1877,7 +1890,11 @@ private void getModelData(Model model) {
 		}
 		
 		
+		List<FilesofBrouchure> filesofbrochures= filesofbrouchureService.findAll();
 		
+		for(FilesofBrouchure temp : filesofbrochures) {
+			makeThumbnail(temp);
+		}
 		
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
@@ -4212,6 +4229,7 @@ private void getModelData(Model model) {
 							fileBro.setPrintPath(printDocument);
 						}
 						
+						fileBro.setThumbnailPath(null);
 						filesofbrouchureService.save(fileBro);
 						//filesBroList.add(fileBro);
 						
@@ -4554,6 +4572,8 @@ private void getModelData(Model model) {
 				carousel.setPosterPath(document);
 
 			}
+			
+			
 
 			caroService.save(carousel);
 
@@ -4563,6 +4583,8 @@ private void getModelData(Model model) {
 			model.addAttribute("carousels", carousel);
 			return "updateEvent";        // need to add some error message
 		}
+		
+		
 
 
 		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
@@ -7698,6 +7720,34 @@ private void getModelData(Model model) {
 	 */
 	
 	
+
+	/* to generate img from 1st page of pdf */
+	
+    private static final String IMAGE_FORMAT = "png";
+
+    public String generateImageFromPdfAndSave(String pdfFilePath, String outputFolderPath) throws IOException {
+    	System.out.println(pdfFilePath + " " + outputFolderPath);
+        String pathName = env.getProperty("spring.applicationexternalPath.name");
+		try (PDDocument document = PDDocument.load(new File(pathName + pdfFilePath))) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            BufferedImage image = pdfRenderer.renderImageWithDPI(0, 15); // Render the first page with 300 DPI
+
+            // Save the image to the output folder
+            String fileName = outputFolderPath + "/" + "thumbnail.png";
+            File outputFile = new File(pathName, fileName);
+            ImageIO.write(image, "png", outputFile);
+
+            // Convert the byte array to a Base64-encoded string
+           // String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            return fileName;
+        }
+    }
+    
+    
+	
+	
+	
 	@GetMapping("/brochure")
 	public String brochure(Principal principal,Model model){
 
@@ -7724,7 +7774,7 @@ private void getModelData(Model model) {
 		
 		*/
 		
-		List<Brouchure> brouchures= broService.findAll();
+		List<Brouchure> brouchures= broService.findAllBrouchuresForCache();
 		List<Language> languages= lanService.getAllLanguages();
 		List<Version> allVersions=verService.findAll();
 		List<Version> versions= new ArrayList<Version>();
@@ -7745,12 +7795,48 @@ private void getModelData(Model model) {
 			}
 		}
 		
+		
+		for(FilesofBrouchure temp: filesList) {
+			
+			 makeThumbnail(temp);
+			
+		}
+		
+		
 		model.addAttribute("filesList", filesList);
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
 		model.addAttribute("languages", languages);
 
 		return "brochures";  // view name
+	}
+
+
+	private void makeThumbnail(FilesofBrouchure temp) {
+		try {
+			 
+			 boolean checkPdf=temp.getWebPath().toLowerCase().endsWith(".pdf");
+			 
+			 if(checkPdf==true && temp.getThumbnailPath()==null) {
+				 int brochureId=temp.getVersion().getBrouchure().getId();
+				 int versionValue= temp.getVersion().getBroVersion();
+				 String langName= temp.getLan().getLangName();
+				 String pdfpath=temp.getWebPath();
+				 	
+				
+				 String str=CommonData.uploadBrouchure+ brochureId + "/" + versionValue + "/" + "web" + "/" + langName ;
+				 ServiceUtility.createFolder(str);
+				 String document1= generateImageFromPdfAndSave(pdfpath, str);
+				 temp.setThumbnailPath(document1);
+				 filesofbrouchureService.save(temp);
+					
+			 }
+			 
+			 
+	  } catch (IOException e) {
+			 
+		    e.printStackTrace();
+	  }
 	}
 
 

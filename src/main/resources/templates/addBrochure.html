@@ -108,16 +108,16 @@ font-weight:bold!important;
 
 <div class="form-group" style="float:left;  width:35%; margin-left:15px; margin-right:15px;">
 	<label th:for="${'brouchure' + iter.index}">Brochure for web*  </label>
-	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,524288000)"/>
+	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,734003200)"/>
 	<small> (.jpg or .png or .pdf Format Only)</small> 
-	<small>Max file size : 500 MB</small>
+	<small>Max file size : 700 MB</small>
 </div>
 
 <div class="form-group" style="float:left;  width:35%;">
 	<label th:for="${'brouchurePrint' + iter.index}">Brochure for print </label>
-	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,524288000)"/>
+	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,734003200)"/>
 	<small> (.jpg or .png or .pdf Format Only)</small>
-	<small>Max file size : 500 MB</small>
+	<small>Max file size : 700 MB</small>
 </div>
 								</div>
 									
@@ -170,9 +170,9 @@ font-weight:bold!important;
 	   <td><span th:text = "${ver.getBrouchure().getTitle()}"> </span>
 	  </td>
       <td>
-       <iframe style="width: 150px; height: 100px" th:if="${ver.GetWebFileofFirstLan().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.GetWebFileofFirstLan()}}"></iframe>
+       <img style=" height: 100px" th:if="${ver.GetWebFileofFirstLan().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.GetWebThumbnailofFirstLan()}}"></img>
       <img th:unless="${ver.GetWebFileofFirstLan().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.GetWebFileofFirstLan()}}"
-			style="width: 150px; height: 100px" />
+			style="height: 100px" />
 			<br>
 			<a th:href="@{/files/}+@{${ver.GetWebFileofFirstLan()}}" target="_blank"> View</a> &nbsp;&nbsp;
 			<a th:if="${ver.GetPrintFileofFirstLan()!=null and ver.GetPrintFileofFirstLan()!=''}" th:href="@{/files/}+@{${ver.GetPrintFileofFirstLan()}}" download >Download</a>
