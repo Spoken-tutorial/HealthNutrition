@@ -90,6 +90,20 @@ public class Brouchure implements  Serializable {
 	@ManyToOne
 	@JoinColumn(name = "topicCat_id")
 	private TopicCategoryMapping topicCatId;
+	
+	@ManyToOne
+	@JoinColumn(name = "cat_id")
+	private Category catId;
+	
+	
+
+	public Category getCatId() {
+		return catId;
+	}
+
+	public void setCatId(Category catId) {
+		this.catId = catId;
+	}
 
 	public int getId() {
 		return id;

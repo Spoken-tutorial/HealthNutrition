@@ -141,6 +141,8 @@ import com.health.utility.ServiceUtility;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.pattern.FileOfCallerConverter;
 
@@ -152,6 +154,8 @@ import ch.qos.logback.classic.pattern.FileOfCallerConverter;
  */
 @Controller
 public class HomeController {
+	
+	private static Logger logger= LoggerFactory.getLogger(HomeController.class);
 	
 	@Autowired
 	private TutorialRepository tutRepository;
@@ -2016,6 +2020,10 @@ private void getModelData(Model model) {
 		brochureTemp.setLan(lan);
 		brochureTemp.setTitle(title);
 		brochureTemp.setPrimaryVersion(primaryVersion);
+		
+		if(cat!=null) {
+			brochureTemp.setCatId(cat);
+		}
 		
 		
 		if(cat !=null && topic !=null) 
@@ -7726,12 +7734,22 @@ private void getModelData(Model model) {
     private static final String IMAGE_FORMAT = "png";
 
     public String generateImageFromPdfAndSave(String pdfFilePath, String outputFolderPath) throws IOException {
-    	System.out.println(pdfFilePath + " " + outputFolderPath);
+    	logger.info(pdfFilePath + " " + outputFolderPath);
         String pathName = env.getProperty("spring.applicationexternalPath.name");
 		try (PDDocument document = PDDocument.load(new File(pathName + pdfFilePath))) {
             PDFRenderer pdfRenderer = new PDFRenderer(document);
             BufferedImage image = pdfRenderer.renderImageWithDPI(0, 15); // Render the first page with 300 DPI
-
+            
+            logger.info("Image Width and Height:{} {}", image.getWidth(), image.getHeight());
+            
+            if(image.getHeight()>200) {
+            	int newDPI = (int) Math.ceil(15.0 * 200 / image.getHeight());
+            	if (newDPI > 2 && newDPI < 15) {
+            		image = pdfRenderer.renderImageWithDPI(0, newDPI);
+            		logger.info("After setting dpi {}, Width and Height of Image: {} {}", newDPI, image.getWidth(), image.getHeight());
+            	}
+            }
+            
             // Save the image to the output folder
             String fileName = outputFolderPath + "/" + "thumbnail.png";
             File outputFile = new File(pathName, fileName);

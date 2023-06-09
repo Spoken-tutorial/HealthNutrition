@@ -159,7 +159,7 @@ font-weight:bold!important;
        
       </td>
       <td >
-       <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getCat().getCatName() : 'NA'}"></span>
+       <span th:text="${ver.getBrouchure().getCatId() != null ? ver.getBrouchure().getCatId().getCatName() : 'NA'}"></span>
       </td>
       <td>
        <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getTopic().getTopicName() : 'NA'}"></span>

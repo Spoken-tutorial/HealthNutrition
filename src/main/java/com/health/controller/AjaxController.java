@@ -1,15 +1,11 @@
 package com.health.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,19 +13,16 @@ import java.util.TreeMap;
 import com.health.model.FilesofBrouchure;
 import com.health.model.Version;
 
-import javax.mail.MessagingException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.cache.annotation.Cacheable;
 
-import org.apache.logging.log4j.util.PropertySource.Comparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.data.repository.query.Param;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -91,8 +84,8 @@ import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
-
-import javassist.bytecode.Descriptor.Iterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This Controller Class takes website AJAX request and process it accordingly
@@ -102,6 +95,9 @@ import javassist.bytecode.Descriptor.Iterator;
  */
 @Controller
 public class AjaxController{
+
+	 private static Logger logger = LoggerFactory.getLogger(AjaxController.class);
+
 
 	@Autowired
 	private CategoryService catService;
@@ -2331,7 +2327,7 @@ public class AjaxController{
 
 			usr=usrservice.findByUsername(principal.getName());
 		}
-
+		logger.info("Time Script: tut id {}", tutorialId);
 		if(tutorialId != 0) {
 			Tutorial tut=tutService.getById(tutorialId);
 			
@@ -2339,20 +2335,21 @@ public class AjaxController{
 				String path = env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript";
 				ServiceUtility.createFolder(path);
 				String pathtoUploadPoster=ServiceUtility.uploadFile(File, path);
-				System.out.println("File uploaded");
+				logger.info("Time Script: File uploaded");
 				int indexToStart=pathtoUploadPoster.indexOf("Media");
 
 				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
 				tut.setTimeScript(document);
 				tutService.save(tut);
-				System.out.println("Database updated");
+			
+		        logger.info("Time Script: Info Database updated");
+			
 
 				return CommonData.Script_SAVE_SUCCESS_MSG;
 
 			}catch (Exception e) {
-				System.out.println("Time Script Upload Error " + tut);
-				e.printStackTrace();
+		        logger.error("Time Script: Upload Error {}", tut, e);				
 			}
 
 		}
