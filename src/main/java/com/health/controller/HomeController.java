@@ -144,8 +144,6 @@ import com.xuggle.xuggler.IStreamCoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.pattern.FileOfCallerConverter;
-
 /**
  * This Controller Class takes website request and process it accordingly
  * @author om prakash soni
@@ -155,27 +153,17 @@ import ch.qos.logback.classic.pattern.FileOfCallerConverter;
 @Controller
 public class HomeController {
 	
-	private static Logger logger= LoggerFactory.getLogger(HomeController.class);
-	
-	@Autowired
-	private TutorialRepository tutRepository;
+	private static final Logger logger= LoggerFactory.getLogger(HomeController.class);
 	
 	@Autowired
 	private VersionRepository verRepository;
 	
 	@Autowired
-	private BrouchureRepository broRepository;
-	
-	@Autowired
 	private TopicCategoryMappingRepository tcmRepository;
-	
 
 	@Autowired
 	private VersionService verService;
 	
-	@Autowired
-	private ContributorAssignedTutorialService conService;
-
 	@Autowired
 	private JavaMailSender mailSender;
 
