@@ -10,15 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import com.health.model.FilesofBrouchure;
-import com.health.model.Version;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import org.springframework.cache.annotation.Cacheable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -44,8 +43,11 @@ import com.health.model.ContributorAssignedTutorial;
 import com.health.model.District;
 import com.health.model.Event;
 import com.health.model.FeedbackForm;
+import com.health.model.FilesofBrouchure;
 import com.health.model.Language;
 import com.health.model.LogManegement;
+import com.health.model.PathofPromoVideo;
+import com.health.model.PromoVideo;
 import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
@@ -55,6 +57,7 @@ import com.health.model.TrainingInformation;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
+import com.health.model.Version;
 import com.health.service.BrouchureService;
 import com.health.service.CategoryService;
 import com.health.service.CityService;
@@ -68,6 +71,8 @@ import com.health.service.FeedbackService;
 import com.health.service.FilesofBrouchureService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
+import com.health.service.PathofPromoVideoService;
+import com.health.service.PromoVideoService;
 import com.health.service.RoleService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
@@ -84,8 +89,6 @@ import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This Controller Class takes website AJAX request and process it accordingly
@@ -101,6 +104,13 @@ public class AjaxController{
 
 	@Autowired
 	private CategoryService catService;
+	
+	@Autowired
+	private PromoVideoService promoVideoService;
+	
+	@Autowired
+	private PathofPromoVideoService pathofPromoVideoService
+	;
 	
 	@Autowired
 	private VersionService verService;
@@ -482,6 +492,34 @@ public class AjaxController{
 	}
 	
 	
+	
+	
+	@GetMapping("/enableDisablePromoVideo")
+	public @ResponseBody boolean enableDisablePromoVideo(int id){
+		PromoVideo pro = promoVideoService.findById(id);
+
+		try {
+			if(pro.isShowOnHomepage()) {
+				pro.setShowOnHomepage(false);
+				promoVideoService.save(pro);
+				return true;
+
+			}else {
+				pro.setShowOnHomepage(true);
+				promoVideoService.save(pro);
+				return true;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	
+	
+	
 	/*
 	 * A function to get primary version by checked and unchecked checkbox
 	 * Author: Alok Kumar
@@ -777,6 +815,31 @@ public class AjaxController{
 		return topicName;
 
 	}
+	
+	
+	
+	
+	@RequestMapping("/loadPromoVideoByLanguage")
+	public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId, @RequestParam(value = "promoId") int promoId ) {
+			
+		try {
+				Language lan= langService.getById(lanId);
+				PromoVideo promo= promoVideoService.findById(promoId);
+				PathofPromoVideo pathofPromoVideo = pathofPromoVideoService.findByLanguageandPromoVideo(lan, promo);
+				return pathofPromoVideo.getVideoPath();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+				return "";
+			}
+		
+		
+
+	}
+	
+	
+	
+	
 	
 	@RequestMapping("/loadWebAndPrintFile")
 	public @ResponseBody List<String> loadWebAndPrintFile(@RequestParam(value = "lanId") int lanId, @RequestParam(value = "verId") int verId ) {

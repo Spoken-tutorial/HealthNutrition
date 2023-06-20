@@ -1,13 +1,13 @@
 
 <configuration>
 
-    <property name="HOME_LOG" value="logs/app.log"/>
+    <property name="HOME_LOG" value="${catalina.base:-.}/logs/app.log"/>
 
     <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${HOME_LOG}</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${catalina.base:-.}/logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
             <totalSizeCap>20GB</totalSizeCap>
             <!-- 60 days to keep -->
@@ -19,7 +19,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.health" level="debug" additivity="true">
+    <logger name="com.health" level="debug" additivity="false">
         <appender-ref ref="FILE-ROLLING"/>
     </logger>
     

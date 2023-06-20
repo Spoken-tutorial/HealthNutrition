@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail">
+</head>
+<style>
+.nav-promoVideo{
+border-right: 5px solid orange;
+font-size:0.9rem;
+}
+.nav-promoVideo a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#add" role="tab" aria-controls="home" aria-selected="true">Add</a>
+  </li>
+  <li class="nav-item">
+    <a th:if="${viewSection !=false}" class="nav-link" id="profile-tab" data-toggle="tab" href="#view" role="tab" aria-controls="profile" aria-selected="false">View</a>
+  </li>
+
+  
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active py-3" id="add" role="tabpanel" aria-labelledby="home-tab">
+  				<div class="card">
+					<div class="card-header">
+						<h4>Add Promo Video</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-6">
+								<form th:action="@{/addPromoVideo}"
+									method="post" enctype="multipart/form-data">
+									
+									<div class="form-group">
+
+										<label for="title">Title *</label> <input type="text"
+											class="form-control" id="title" name="title"
+											 required="required"/>
+										
+									</div>
+									
+									
+								<div th:each="lanouter,iter: ${languages}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									<div class="form-group" style="float:left; width:40%; ">
+               	                 		<label th:for="${'languageNameId' + iter.index}">Select Language </label>
+										<select th:id="${'languageNameId' + iter.index}" class="form-control" name="languageName">
+	  										<option value="0">Select ...</option>
+	  										<option th:each="lan : ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option>
+										</select>
+  									</div>
+
+<div class="form-group" style="float:left;  width:40%; margin-left:15px; margin-right:40px;">
+	<label th:for="${'promoVideo' + iter.index}">PromoVideo*  </label>
+	<input type="file" class="form-control" th:id="${'promoVideo' + iter.index}" name="promoVideo"  accept=".mp4"/>
+	<small> (Only mp4 format of max filesize 1GB)</small> 
+	
+</div>
+
+</div>
+									
+									<br>
+									&nbsp;&nbsp;&nbsp;
+									<button type="submit" class="btn  btn-success">Submit</button>
+								</form>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+  </div>
+  <div class="tab-pane fade py-3" id="view" role="tabpanel" aria-labelledby="profile-tab">
+  <div class="card">
+					<div class="card-header">
+						<h4>Promo Video</h4>
+					</div>
+					<br><br>
+  	<div id="Success" style="display: none; color: green; font-size: 16px; text-align: center">Changes Updated Successfully</div>
+	<div id="Failure" style="display: none; color: green; font-size: 16px; text-align: center">Please Try Again</div>
+  <table class="table table-striped" id="myTable"  data-order='[[ 0, "desc" ]]'>
+  <thead>
+    <tr>
+    <th scope="col">Date Added</th>
+     <th scope="col">Title</th>
+     <th scope="col">Language</th>
+     <th scope="col">PromoVideo</th>
+     <th scope="col">Enable / Disable</th>
+       <th scope="col">Action</th>
+     
+    </tr>
+  </thead>
+  <tbody>
+     <tr th:each="pro : ${promoVideos}"  >
+     
+     <td scope="row"> <span th:text="${pro.getDateAdded()}"> </span> </td>
+     <td><span th:text = "${pro.getTitle()}"> </span></td>
+     <td> <span  th:text="${pro.findAlllangNames()}"> </span> </td>
+	   
+      <td>
+     <div th:if="${pro.GetVideoFileofFirstLan() != 'null'}" style="width:300px;">
+												<video controls="controls" style="width: 100%;">
+													<source th:src="@{/files/}+@{${pro.GetVideoFileofFirstLan()}}"
+														type="video/mp4" /> 	Your browser does not support HTML video. </video>
+											</div>
+	  </td>
+	  
+	  <td>
+	  		
+	   			<div th:if="${pro.isShowOnHomepage()}">
+	   				<a class="disablePromoVideo" th:value="${pro.getPromoId()}" title="Click to Disable Brochure"><i class="fas fa-times-circle" th:id="${pro.getPromoId()}" style="color:red"></i></a>
+	   			</div>
+	   			<div th:unless="${pro.isShowOnHomepage()}">
+	   				<a class="enablePromoVideo" th:value="${pro.getPromoId()}" title="Click to Enable Brochure"><i class="fas fa-check-circle" th:id="${pro.getPromoId()}" style="color:green"></i> </a>
+	   			</div>
+	   		
+	  
+	  </td>
+	   <td><a th:href="@{${'/promoVideo/edit/' + pro.getPromoId()}}">Edit</a></td>
+    </tr>
+   
+  </tbody>
+</table>
+  </div>
+  
+
+  
+</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+	
+	
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+<script>
+var projectPath='[(@{/})]';
+$(document).ready( function () {
+	
+    $('#myTable').DataTable();
+	$('#showOneMoreRow1').hide();   
+    
+} );
+
+var divid = 0;
+
+function addListener(divid) {
+	var languageSelect = document.getElementById("languageNameId" + (divid - 1));
+	if (languageSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	languageSelect.addEventListener("change", function() {
+	  var selectedLanguage = languageSelect.value;
+	  if (selectedLanguage !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+function setRequired(divid) {
+	var languageName = document.getElementById("languageNameId" + divid).value;
+	var promoVideo = document.getElementById("promoVideo" + divid);
+	promoVideo.required = (value != "");
+	return false;
+}
+
+addRow(divid);
+
+</script>
+</body>
+
+</html>

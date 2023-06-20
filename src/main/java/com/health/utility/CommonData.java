@@ -144,6 +144,8 @@ public class CommonData {
 	
 	public static String uploadBrouchure = "Media/Content/Brouchure/";
 	
+	public static String uploadPromoVideo = "Media/Content/PromoVideo/";
+	
 	public static String uploadVersion = "Media/Content/Version/";
 	
 	public static String uploadCarousel = "Media/Content/Carousel/";
@@ -206,6 +208,8 @@ public class CommonData {
 	public static final long videoSize=50*1024*1024;
 	
 	public static final long videoSizeTest=30*1024*1024;
+	
+	public static final long videoSizePromoVideo=1000*1024*1024;
 	
 	public static final long fileSize=10*1024*1024;
 	

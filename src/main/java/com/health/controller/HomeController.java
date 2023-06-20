@@ -87,7 +87,9 @@ import com.health.model.IndianLanguage;
 import com.health.model.Language;
 import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
+import com.health.model.PathofPromoVideo;
 import com.health.model.PostQuestionaire;
+import com.health.model.PromoVideo;
 import com.health.model.Question;
 import com.health.model.State;
 import com.health.model.Testimonial;
@@ -118,7 +120,9 @@ import com.health.service.IndianLanguageService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
+import com.health.service.PathofPromoVideoService;
 import com.health.service.PostQuestionaireService;
+import com.health.service.PromoVideoService;
 import com.health.service.QuestionService;
 import com.health.service.RoleService;
 import com.health.service.StateService;
@@ -250,6 +254,12 @@ public class HomeController {
 
 	@Autowired
 	private BrouchureService broService;
+	
+	@Autowired
+	private PromoVideoService promoVideoService;
+	
+	@Autowired
+	private PathofPromoVideoService pathofPromoVideoService;
 
 	@Autowired
 	private IndianLanguageService iLanService;
@@ -487,6 +497,8 @@ private void getModelData(Model model) {
 		List<Brouchure> brochures= broService.findAllBrouchuresForCache(); //findAllBrouchures(); 
 		List<Carousel> carousel= caroService.findCarouselForCache(); //findCarousel();	
 		//List<Category> category_objs = catService.findAllCategoryByOrderForCache(); // findAllCategoryByOrder();
+		List<PromoVideo> promoVideos= promoVideoService.findAllByShowOnHomePage();
+		
 		List<Event> evnHome = new ArrayList<>();
 		List<Testimonial> testHome = new ArrayList<>();
 		List<Consultant> consulHome = new ArrayList<>();
@@ -494,6 +506,7 @@ private void getModelData(Model model) {
 		//List<Brouchure> brochureHome = new ArrayList<>();
 		List<Version> versionHome= new ArrayList<>();
 		List<Carousel> carouselHome = new ArrayList<>();
+		List<PromoVideo> promoVideoHome= new ArrayList<>();
 		
 		List<Category> catTempSorted = catService.getCategoriesForCache(); // getCategories(); 
 		
@@ -552,6 +565,7 @@ private void getModelData(Model model) {
 		//brochureHome=(brochures.size()>upperlimit) ? brochures.subList(0, upperlimit):brochures;
 		versionHome=(versions.size()>upperlimit) ? versions.subList(0, upperlimit):versions;
 		carouselHome=(carousel.size()>upperlimit) ? carousel.subList(0, upperlimit):carousel;
+		promoVideoHome=(promoVideos.size()>1) ? promoVideos.subList(0, 1):promoVideos;
 
 		if(!consulHome.isEmpty()) {
 			model.addAttribute("listOfConsultant", consulHome);
@@ -570,6 +584,12 @@ private void getModelData(Model model) {
 			model.addAttribute("events", evnHome);
 		}
 		
+		if(!promoVideoHome.isEmpty()) {
+			model.addAttribute("listofPromoVideos", promoVideoHome);
+			model.addAttribute("PromoVideoLanguages", promoVideoHome.get(0).findAlllanguages());
+			model.addAttribute("PromoVideos", promoVideoHome.get(0).getVideoFiles());
+			System.out.println("PromoVideo Test" + promoVideoHome);
+		}
 		
 
 		if(!versionHome.isEmpty()) {
@@ -596,6 +616,8 @@ private void getModelData(Model model) {
 			model.addAttribute("carouselList", carouselHome.subList(1, carouselHome.size()));
 			//model.addAttribute("carouselList", carouselHome.size());
 		}
+		
+		
 
 		return "index";
 	}
@@ -1844,6 +1866,205 @@ private void getModelData(Model model) {
 
 	}
 	/************************************END**********************************************/
+	
+	
+	
+	/**************************************ADD PROMOVIDEO*********************************/
+	
+	@RequestMapping(value = "/addPromoVideo",method = RequestMethod.GET)
+	public String addPromoVideoGet(Model model,Principal principal) {
+		User usr=new User();
+		if(principal!=null) {
+			usr=userService.findByUsername(principal.getName());
+		}
+		model.addAttribute("userInfo", usr);
+		
+		List<Language> lans = lanService.getAllLanguages();
+		model.addAttribute("languages", lans);
+		
+		List<PromoVideo> promovideos = promoVideoService.findAll();
+		List<PathofPromoVideo> pathofPromoVideos= pathofPromoVideoService.findAll();
+		model.addAttribute("promoVideos", promovideos);
+		model.addAttribute("pathofPromoVideos",pathofPromoVideos);
+		
+		
+		return "addPromoVideo";
+	}
+	
+	
+	
+	
+	@RequestMapping(value = "/addPromoVideo",method = RequestMethod.POST)
+	public String addPromoVideoPost(Model model,Principal principal,
+								  @RequestParam("promoVideo") List<MultipartFile> promoVideos,
+								  @RequestParam(name = "languageName") List<Integer> languageIds,
+								  @RequestParam(name = "title") String title) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		
+		model.addAttribute("userInfo", usr);
+		System.out.println(languageIds);
+		
+		boolean viewSection= false;
+		model.addAttribute("viewSection", viewSection);
+		
+		List<Language> languages=lanService.getAllLanguages();
+		model.addAttribute("languages", languages);
+		List<PromoVideo> promoVideosList = promoVideoService.findAll();
+		List<PathofPromoVideo> pathofPromoVideos=pathofPromoVideoService.findAll();
+		
+		model.addAttribute("promoVideos", promoVideosList);
+		model.addAttribute("pathofPromoVideos",pathofPromoVideos);
+		
+		for(MultipartFile uniquefile: promoVideos) {
+			if(!uniquefile.isEmpty()) {
+				
+				if(!ServiceUtility.checkFileExtensionVideo(uniquefile)) { // throw error on extension
+					model.addAttribute("error_msg",CommonData.VIDEO_FILE_EXTENSION_ERROR);
+					return addPromoVideoGet(model, principal);
+				}
+				
+				if(!ServiceUtility.checkVideoSizePromoVideo(uniquefile)) {
+					model.addAttribute("error_msg","File size must be less than 1 GB");
+					return addPromoVideoGet(model, principal);
+				}
+				
+				
+				
+			}
+			
+		}
+		
+
+	
+		if(title == null) {  // throw error
+		model.addAttribute("error_msg","Please Try again");
+		return  addPromoVideoGet(model, principal);
+		}
+		
+		
+	   boolean filesError=false;
+	   boolean duplicatLanguage=false;
+	   Language lan=lanService.getById(languageIds.get(0));
+		
+		
+		
+		int newPromoVideoId= promoVideoService.getNewId();
+		PromoVideo promoVideoTemp = new PromoVideo();
+		promoVideoTemp.setPromoId(newPromoVideoId);
+		promoVideoTemp.setTitle(title);
+		promoVideoTemp.setDateAdded(ServiceUtility.getCurrentTime());
+		
+		try {
+			List<PathofPromoVideo> pathofPromoVideoList=new ArrayList<>();
+			
+			String document1="";
+			
+			int newPathOfPromoId= pathofPromoVideoService.getNewId();
+			List<String>addedLanguages= new ArrayList<>();
+			for(int i=0; i<languageIds.size(); i++) {
+				document1="";
+				
+				if(languageIds.get(i)==0){
+					break;
+				}
+				if(!promoVideos.get(i).isEmpty()) 
+				{
+				
+				String langName=lanService.getById(languageIds.get(i)).getLangName();
+				PathofPromoVideo pathofPromoVideo= new PathofPromoVideo();
+				
+			
+				if(!promoVideos.get(i).isEmpty()) {
+				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadPromoVideo + newPromoVideoId  + "/" + langName );
+				String pathtoUploadPoster1=ServiceUtility.uploadVideoFile(promoVideos.get(i), env.getProperty("spring.applicationexternalPath.name")+ CommonData.uploadPromoVideo + newPromoVideoId  + "/" + langName );
+				int indexToStart1=pathtoUploadPoster1.indexOf("Media");
+				 document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+				}
+			
+			
+			
+			for(String testLan: addedLanguages){
+				if(testLan==langName) {
+					duplicatLanguage=true;
+				}
+				
+			}
+			
+			addedLanguages.add(langName);
+			
+			pathofPromoVideoList.add(new PathofPromoVideo(newPathOfPromoId, ServiceUtility.getCurrentTime(), document1, promoVideoTemp, lanService.getById(languageIds.get(i))));
+			newPathOfPromoId +=1;
+			
+			
+			}
+				else {
+					filesError=true;
+				}
+			}
+
+			if(filesError==false && duplicatLanguage==false) {
+				
+				try {
+					promoVideoService.save(promoVideoTemp);
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+					System.out.println("AlokSP Error2");
+					return  addPromoVideoGet(model, principal);
+				}
+				
+				
+				
+				pathofPromoVideoService.saveAll(pathofPromoVideoList);
+			}	
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		viewSection= false;
+		model.addAttribute("viewSection", viewSection);
+		
+		model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+		
+		return  addPromoVideoGet(model, principal);
+		
+	}
+		
+		if(filesError==true || duplicatLanguage==true) {
+			
+			viewSection= false;
+			
+			model.addAttribute("viewSection", viewSection);
+			
+			if(filesError==true) {
+				model.addAttribute("error_msg", "Video Files should not be null for selected language");
+			}else {
+				model.addAttribute("error_msg", "Duplicate Languages are not allowed");
+			}
+			
+		} else {
+			viewSection= false;
+			model.addAttribute("viewSection", viewSection);
+			
+			model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+		}
+		return addPromoVideoGet(model, principal);
+	}
+
+	
+	
+	/***************************************END********************************************/
+	
+	
+	
 
 	/******************************ADD BROUCHURE ******************************************/
 	
@@ -3932,6 +4153,234 @@ private void getModelData(Model model) {
 
 
 	/************************************END**********************************************/
+	
+	
+	
+	
+	/************************************Edit Section of PromoVideo **********************/
+	
+	@RequestMapping(value = "/promoVideo/edit/{id}", method = RequestMethod.GET)
+	public String promoVideoGet(@PathVariable int id,Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		//Event event= eventservice.findById(id);
+		PromoVideo promoVideo=promoVideoService.findById(id);
+		
+		
+		if(promoVideo == null) {
+
+			return "redirect:/addPromoVideo";
+		}
+		
+		List<Language> languages=lanService.getAllLanguages();
+		model.addAttribute("languages", languages);
+	
+		List<PathofPromoVideo> pathofPromoVideoList= pathofPromoVideoService.findByPromoVideo(promoVideo);
+		
+		model.addAttribute("pathofPromoVideoList", pathofPromoVideoList);
+		model.addAttribute("promoVideo", promoVideo);
+		
+		List<PromoVideo> promoVideos = promoVideoService.findAll();
+		
+		model.addAttribute("promoVideos",promoVideos);
+		
+		return "updatePromoVideo";
+	}
+
+	
+	
+	
+	@RequestMapping(value = "/updatePromoVideo", method = RequestMethod.POST)
+	public String updatePromoVideoGet(HttpServletRequest req,Model model,Principal principal, @RequestParam(name = "languageName") List<Integer> languageIds,
+			 @RequestParam("promoVideo") List<MultipartFile> promoVideoFiles) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+		
+		
+		String title= req.getParameter("title");
+		String promoVideoId=req.getParameter("promoVideoId");
+		int promoVideoIdInt= Integer.parseInt(promoVideoId);
+		
+		
+		
+		List<Language> languages=lanService.getAllLanguages();
+		model.addAttribute("languages", languages);
+
+		PromoVideo promoVideo= promoVideoService.findById(Integer.parseInt(promoVideoId));
+		
+		if(promoVideo==null) {
+			model.addAttribute("error_msg","Brouchure doesn't exist");
+			return "updatePromoVideo";
+		}
+		
+		
+		List<PathofPromoVideo> pathofPromoVideoList = pathofPromoVideoService.findByPromoVideo(promoVideo);
+		model.addAttribute("pathofPromoVideoList", pathofPromoVideoList);
+		model.addAttribute("promoVideo", promoVideo);
+		
+		
+		if(title.isEmpty()){
+			model.addAttribute("error_msg","Title doesn't exist with empty");
+			return "updatePromoVideo";
+		}
+		
+		
+		boolean fileError=false;
+		boolean duplicatLanguage =false;
+		
+
+		try {
+			
+			for(MultipartFile uniquefile: promoVideoFiles) {
+				if(!uniquefile.isEmpty()) {
+					
+					if(!ServiceUtility.checkFileExtensionVideo(uniquefile)) { // throw error on extension
+						model.addAttribute("error_msg",CommonData.VIDEO_FILE_EXTENSION_ERROR);
+						return  "updatePromoVideo";
+					}
+					
+					if(!ServiceUtility.checkVideoSizePromoVideo(uniquefile)) {
+						model.addAttribute("error_msg","File size must be less than 1 GB");
+						return "updatePromoVideo";
+					}
+					
+					
+					
+				}
+				
+			}
+			
+					 
+					String document1="";
+					int newpathofPromoVideoId= pathofPromoVideoService.getNewId();
+					List<PathofPromoVideo> pathofPromoVideoList1= new ArrayList<>();
+					List<String> addedlanguages= new ArrayList<>();
+					for(int i=0; i<languageIds.size(); i++) {
+						document1="";
+						
+						if(languageIds.get(i)==0){
+							break;
+						}
+						
+						
+						Language language = lanService.getById(languageIds.get(i));
+						String langName=language.getLangName();	
+						
+						PathofPromoVideo pathofPromoVideo1 = pathofPromoVideoService.findByLanguageandPromoVideo(language, promoVideo);
+						
+					
+					
+					if(!promoVideoFiles.get(i).isEmpty()) {
+						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadPromoVideo + promoVideoIdInt  + "/" + langName );
+						String pathtoUploadPoster1=ServiceUtility.uploadVideoFile(promoVideoFiles.get(i), env.getProperty("spring.applicationexternalPath.name")+ CommonData.uploadPromoVideo + promoVideoIdInt + "/" + langName );
+						int indexToStart1=pathtoUploadPoster1.indexOf("Media");
+						document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+					
+					
+					}
+					
+					
+					for(String testlan: addedlanguages) {
+						if(testlan==langName) {
+							duplicatLanguage=true;
+						}
+					}
+					addedlanguages.add(langName);
+					
+					if(pathofPromoVideo1 !=null) {
+						pathofPromoVideo1.setLan(language);
+						
+						if(!promoVideoFiles.get(i).isEmpty()) {
+							pathofPromoVideo1.setVideoPath(document1);
+						}
+						
+						pathofPromoVideoService.save(pathofPromoVideo1);
+						
+						
+					}
+					
+					else {
+						
+						if(!promoVideoFiles.get(i).isEmpty()) {
+							pathofPromoVideoList1.add(new PathofPromoVideo(newpathofPromoVideoId, ServiceUtility.getCurrentTime(), document1,  promoVideo, language));
+							newpathofPromoVideoId = newpathofPromoVideoId + 1;
+							
+						}
+						else {
+							 fileError=true;
+						}
+						
+					}
+					
+					
+					
+				} 
+					if(fileError==false && duplicatLanguage==false) {
+					
+					promoVideo.setTitle(title);
+					promoVideoService.save(promoVideo);
+					
+					pathofPromoVideoService.saveAll(pathofPromoVideoList1);
+				}
+					
+			
+
+			} 
+			
+		   catch (Exception e) {
+			// TODO: handle exception
+			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+			
+			pathofPromoVideoList = pathofPromoVideoService.findByPromoVideo(promoVideo);
+			model.addAttribute("pathofPromoVideoList", pathofPromoVideoList);
+			model.addAttribute("promoVideo", promoVideo);
+			
+			return "updatePromoVideo";        // need to add some error message
+		}
+		
+		if(fileError==true) {
+			model.addAttribute("error_msg", "PromoVideo  file is required for new Language");
+			return "updatePromoVideo"; 	
+			
+		}
+		
+		
+		if(duplicatLanguage==true) {
+			model.addAttribute("error_msg", "Duplicate Languages are not allowed");
+			return "updatePromoVideo"; 	
+			
+		}
+		
+		
+
+		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
+		pathofPromoVideoList = pathofPromoVideoService.findByPromoVideo(promoVideo);
+		model.addAttribute("pathofPromoVideoList", pathofPromoVideoList);
+		model.addAttribute("promoVideo", promoVideo);
+		
+		return "updatePromoVideo";
+	}
+
+	
+
+	
+	
+	/*************************************END**********************************************/
 	
 	
 	

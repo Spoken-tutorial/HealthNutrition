@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="../css/hello-parallax.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
     <link rel="stylesheet" th:href="@{/css/main-style.css}" />
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
     <link rel="stylesheet" th:href="@{/VenoBox/venobox/venobox.css}" />
     <style>
     .c-header{
@@ -46,9 +47,19 @@
     #stats a{
     	color:black!important;
     }
+    
+      :root {
+  --plyr-color-main: #ff9033;
+  --plyr-video-control-color: #ffffff;
+}
+.plyr__control[data-plyr="download"] svg {
+  fill:#ffffff; /* change to your desired color */
+}
+    
     </style>
   </head>
   <body>
+   <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
   <div id="back-to-top">
   <a href="#top-fixed-banner"><i class="fas fa-chevron-circle-up"></i></a>
   </div>
@@ -89,6 +100,7 @@
     <a class="dropdown-item" th:href="@{/#about}">About</a>
     <a class="dropdown-item" th:href="@{/#consultants}">Consultants</a>
     <a class="dropdown-item" th:href="@{/#events}">Events</a>
+    <a class="dropdown-item" th:href="@{/#promoVideo}">Promo Videos</a>
     <a class="dropdown-item" th:href="@{/#testimonial}">Testimonials</a>
   </div>
 </div>
@@ -375,6 +387,55 @@ the globe.
 			</div>
 		</div>	
   
+  
+  <section id=promoVideo  th:if="${not #lists.isEmpty(listofPromoVideos)}">
+    <h1 class="text-center spk-title">Promo Videos</h1>
+    <div class="container-lg">
+    	<div class="row">
+    <div class="col-md-12 " th:each="pro : ${listofPromoVideos}" >
+    <input type="hidden" id="promoVideoId" name="promoVideoId"  th:value="${pro.getPromoId()}"/>
+    <div class="card is-shady pt-3" style="width: 100%;" >
+            <div class="card-image text-center" style="margin-left:15px; margin-right:15px;">
+            <div  id="promoVideoSourceOuter" style="width:100%;">
+            <video class="vid1" th:if="${pro.GetVideoFileofFirstLan()!= 'null'}" controls="controls" style="width:100%;" >
+			  <source th:src="@{/files/}+@{${pro.GetVideoFileofFirstLan()}}" type="video/mp4" />
+ 				Your browser does not support HTML video.
+			</video>
+            </div>
+           </div>
+            <div class="card-content  " >
+              <div class="content">
+              <div style="float:left; margin-left:15px; margin-right:40px;">
+                <h4 th:text="${pro.getTitle()}"> </h4>
+                <span th:text="${pro.findAlllangNames()}"></span>
+              </div>
+              <script th:inline="javascript">
+              var promoVideos = /*[[${PromoVideos}]]*/ null;
+      
+              </script>
+                          
+                
+                  <div class="form-group" style="float:left; margin-left:15px; margin-right:40px;">
+								<label for="languageId1"><h4>Select Language</h4></label> <select id="languageId1"
+									class="form-control" name="languageName" required="required">
+
+										<option th:each="lan: ${PromoVideoLanguages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}">
+												</option>
+								
+								</select>
+
+							</div>
+                
+              </div>
+            </div>
+          </div>
+    </div>
+    </div>
+    <br>
+    </div>
+    </section>
+  
+  
   <section id=testimonial  th:if="${not #lists.isEmpty(listofTestimonial)}">
     <h1 class="text-center spk-title">Testimonials</h1>
     <div class="container-lg">
@@ -383,7 +444,7 @@ the globe.
     <div class="card is-shady pt-3" style="width: 100%;" >
             <div class="card-image text-center">
             <div style="width:100%;">
-            <video th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:80%;" >
+            <video  th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:80%;" >
   <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
  Your browser does not support HTML video.
 </video>
@@ -431,7 +492,8 @@ the globe.
     <div class=" text-center"><a th:href="@{/brochure}" target="_blank" class="button catBtn mb-5 ">View all Brochures</a></div>
     </div>
     </section>
-    <section> 
+    
+      <section> 
     	<div th:each="testimonial : ${listofTestimonial}" class="modal fade" th:attrappend="id=${'_'+testimonial.getTestimonialId()}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		  <div class="modal-dialog">
 		    <div class="modal-content">
@@ -606,6 +668,29 @@ $(document).ready(function(){
 	<script th:inline="javascript">
     	
 		var projectPath='[(@{/})]';
+		
+		
+		 var controls =
+[
+'play-large', // The large play button in the center
+// 'restart', // Restart playback
+// 'rewind', // Rewind by the seek time (default 10 seconds)
+'play', // Play/pause playback
+//'fast-forward', // Fast forward by the seek time (default 10 seconds)
+'progress', // The progress bar and scrubber for playback and buffering
+'current-time', // The current time of playback
+//'duration', // The full duration of the media
+'mute', // Toggle mute
+'volume', // Volume control
+'captions', // Toggle captions
+'settings', // Settings menu
+'pip', // Picture-in-picture (currently Safari only)
+'airplay', // Airplay (currently Safari only)
+'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+'fullscreen' // Toggle fullscreen
+];
+
+const player = new Plyr('.vid1',{controls});
 		
 	</script>
     
