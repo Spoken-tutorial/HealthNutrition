@@ -989,8 +989,10 @@ private void getModelData(Model model) {
 	 */
 	@RequestMapping(value = "/showEvent",method = RequestMethod.GET)
 	public String showEventGet(Model model) {
-
+	
 		List<Event> events=eventservice.findAll();
+		
+		
 		model.addAttribute("Events", events);
 		return "events";
 	}
@@ -1013,20 +1015,23 @@ private void getModelData(Model model) {
 		Set<Category> categorys = user.getCategories();
 		for(Consultant c:consults) {
 			String s="";
-			
-			Set<UserRole> userRoles = c.getUser().getUserRoles();
-			for(UserRole ur:userRoles) {
-				if(ur.getRole().getName().equals(CommonData.domainReviewerRole)) {
-					s= s+ ur.getCategory().getCatName()+" , ";
+			if(c.isOnHome()) {
+				Set<UserRole> userRoles = c.getUser().getUserRoles();
+				for(UserRole ur:userRoles) {
+					if(ur.getRole().getName().equals(CommonData.domainReviewerRole)) {
+						s= s+ ur.getCategory().getCatName()+" , ";
+						
+					}
 					
 				}
+				if(s.length()==0) {
+					continue;
+				}
 				
-			}
-			if(s.length()==0) {
-				continue;
+				map.put(c.getConsultantId(),s.substring(0, s.length()-2));
 			}
 			
-			map.put(c.getConsultantId(),s.substring(0, s.length()-2));
+			
 			
 			
 		}
@@ -5300,7 +5305,14 @@ private void getModelData(Model model) {
 	 */
 	@RequestMapping(value = "/testimonialList", method = RequestMethod.GET)
 	public String viewtestimonialListGet(Model model,Principal principal) {
-		List<Testimonial> test=testService.findAll();
+		List<Testimonial> test= new ArrayList<>();
+		List<Testimonial> test1=testService.findAll();
+		for(Testimonial temp : test1) {
+			if(temp.isApproved()) {
+				test.add(temp);
+			}
+		}
+		
 		model.addAttribute("testimonials", test);
 
 		return "testimonialList";

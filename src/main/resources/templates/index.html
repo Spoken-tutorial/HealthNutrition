@@ -442,9 +442,9 @@ the globe.
     	<div class="row">
     <div class="col-md-4 " th:each="testimonial : ${listofTestimonial}" >
     <div class="card is-shady pt-3" style="width: 100%;" >
-            <div class="card-image text-center">
+            <div class="card-image text-center" style="margin-left:10px; margin-right:10px;">
             <div style="width:100%;">
-            <video  th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:80%;" >
+            <video class="vid1" th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:100%;" >
   <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
  Your browser does not support HTML video.
 </video>
@@ -505,7 +505,7 @@ the globe.
 		      </div>
 		      <div class="modal-body">
 		      <div class="card-image text-center">
-				          <video th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:100%;">
+				          <video class="vid1" th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:100%;">
 				  <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
 				 Your browser does not support HTML video.
 				</video> </div>
@@ -669,6 +669,68 @@ $(document).ready(function(){
     	
 		var projectPath='[(@{/})]';
 		
+	
+		 
+		var isPlaying = [];
+				
+				var videos = document.querySelectorAll('video');
+				for(var i=0; i<videos.length; i++){
+				  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+				}
+				
+				
+
+				function pauseAll(elem){
+					var videos2 = document.querySelectorAll('video');
+					for(var i=0; i<videos2.length; i++){
+				                if(videos2[i] == elem) continue;
+				                if(videos2[i].played.length > 0 && !videos2[i].paused){
+				                  videos2[i].pause();
+				                }
+				        }
+				  }
+				
+				
+				
+				
+				   // Functions to play the video with/without sound
+					function playMutedVideoMouseOver(event) {
+						var video = event.target;
+					 	var flag=0;
+					 	for (var j = 0; j < videos.length; j++){
+							 if(!videos[j].paused && !videos[j].muted)
+					 			flag=flag+1;
+						 }
+					 	if(flag==0){
+					 	video.play();
+					 	video.muted = true;
+						}
+					 
+					}
+				   
+
+					function playUnmutedVideoOnClick(event) {
+					 var video = event.target;
+					 video.muted = false;
+					 video.play();
+					}
+					
+					function pauseWithMutedVideoMouseOut(event) {
+						 var video = event.target;
+							if(video.muted){
+								video.pause();
+								//video.muted=!video.muted;
+							}
+						 
+						}
+						
+					
+				
+					 
+					
+					
+		
+		
 		
 		 var controls =
 [
@@ -690,7 +752,17 @@ $(document).ready(function(){
 'fullscreen' // Toggle fullscreen
 ];
 
-const player = new Plyr('.vid1',{controls});
+//const player = new Plyr('.vid1',{controls});
+
+//var videos = document.querySelectorAll('video');
+
+for(var i=0; i<videos.length; i++){
+	
+	const player = new Plyr(videos[i],{controls});	
+	
+	
+	   
+}
 		
 	</script>
     

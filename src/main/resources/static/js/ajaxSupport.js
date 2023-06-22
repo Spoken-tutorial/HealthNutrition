@@ -1449,33 +1449,15 @@ $("#languageId1").change(function() {
 
 						var lanId = $(this).find(":selected").val();
 						var video = promoVideos[lanId];
-						var outerhtml = '<video class="vid1" controls="controls" style="width:100%;" >';
+						var outerhtml = '<video id="newvid1" class="vid1" controls="controls" style="width:100%;" >';
 						outerhtml += '<source src="/files/' + video + '" type="video/mp4" />';
 						outerhtml += 'Your browser does not support HTML video.'
 						outerhtml += '</video>';
+						outerhtml += '<script>';
+						outerhtml += 'new Plyr("#newvid1", {controls});';
+						outerhtml += 'document.getElementById("newvid1").addEventListener("play", function(){pauseAll(this)}, true);';
+						outerhtml += '</script>';
 						$('#promoVideoSourceOuter').html(outerhtml);
-						
-						 var controls =
-							[
-								'play-large', // The large play button in the center
-								 // 'restart', // Restart playback
-								 // 'rewind', // Rewind by the seek time (default 10 seconds)
-								'play', // Play/pause playback
-								 //'fast-forward', // Fast forward by the seek time (default 10 seconds)
-								'progress', // The progress bar and scrubber for playback and buffering
-								'current-time', // The current time of playback
-								//'duration', // The full duration of the media
-								'mute', // Toggle mute
-								'volume', // Volume control
-								'captions', // Toggle captions
-								'settings', // Settings menu
-								'pip', // Picture-in-picture (currently Safari only)
-								'airplay', // Airplay (currently Safari only)
-								'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
-								'fullscreen' // Toggle fullscreen
-							];
-
-							const player = new Plyr('.vid1',{controls});
 					});
 
 

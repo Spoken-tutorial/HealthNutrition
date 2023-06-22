@@ -13,10 +13,12 @@
 <link rel="stylesheet"
 	href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
 <link rel="stylesheet" th:href="@{/css/main.css}" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
 </head>
 
 
 <body>
+<script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
 <header class="pt-3 mb-5" id="top-fixed-banner">
 	<section th:replace="index.html :: header-bar"></section>
   <nav th:replace="index.html :: navbar"></nav>
@@ -53,8 +55,8 @@
 
 				<td th:text="${testimonial.getDescription()}"></td>
 					<td>
-						<div th:if="${testimonial.getFilePath() != 'null'}">
-						<video width="320" height="240" controls>
+						<div th:if="${testimonial.getFilePath() != 'null'}" style="width:320px; height:240px;">
+						<video   controls>
 							<source th:src="@{/files/}+@{${testimonial.getFilePath()}}"
 								type="video/mp4">
 	
@@ -77,6 +79,17 @@
 		</div>
 
 	</div>
+	<style>
+  :root {
+  --plyr-color-main: #ff9033;
+   
+}
+  .plyr__controls__item plyr__volume{
+    margin-bottom: 25px;
+    padding-bottom:25px;
+  }
+</style>
+	
 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
 		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
 		crossorigin="anonymous"></script>
@@ -94,6 +107,102 @@
 	$(document).ready(function() {
 	    $('#testimonial_table').DataTable();
 	} );
+	
+	
+	var isPlaying = [];
+	
+	var videos = document.querySelectorAll('video');
+	for(var i=0; i<videos.length; i++){
+		
+	  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+	    //videos[i].addEventListener('mouseover', playMutedVideoMouseOver);
+	    //videos[i].addEventListener('click', playUnmutedVideoOnClick);
+	   // videos[i].addEventListener('mouseout', pauseWithMutedVideoMouseOut);
+	   
+		}
+	
+	
+
+	function pauseAll(elem){
+	        
+		for(var i=0; i<videos.length; i++){
+	                if(videos[i] == elem) continue;
+	                if(videos[i].played.length > 0 && !videos[i].paused){
+	                  videos[i].pause();
+	                }
+	        }
+	  }
+	
+	
+	
+	
+	   // Functions to play the video with/without sound
+		function playMutedVideoMouseOver(event) {
+			var video = event.target;
+		 	var flag=0;
+		 	for (var j = 0; j < videos.length; j++){
+				 if(!videos[j].paused && !videos[j].muted)
+		 			flag=flag+1;
+			 }
+		 	if(flag==0){
+		 	video.play();
+		 	video.muted = true;
+			}
+		 
+		}
+	   
+
+		function playUnmutedVideoOnClick(event) {
+		 var video = event.target;
+		 video.muted = false;
+		 video.play();
+		}
+		
+		function pauseWithMutedVideoMouseOut(event) {
+			 var video = event.target;
+				if(video.muted){
+					video.pause();
+					//video.muted=!video.muted;
+				}
+			 
+			}
+			
+		
+	
+		 
+		
+		
+
+
+
+	
+	 var controls =
+		 [
+		     'play-large', // The large play button in the center
+		    // 'restart', // Restart playback
+		    // 'rewind', // Rewind by the seek time (default 10 seconds)
+		     'play', // Play/pause playback
+		    
+		     'progress', // The progress bar and scrubber for playback and buffering
+		     'current-time', // The current time of playback
+		    
+		     'mute', // Toggle mute
+		    'volume', // Volume control
+		    
+		     //'settings', // Settings menu
+		    // 'pip', // Picture-in-picture (currently Safari only)
+		     'airplay', // Airplay (currently Safari only)
+		     'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+		     'fullscreen' // Toggle fullscreen
+		 ];
+	//var videos = document.querySelectorAll('video');
+	for(var i=0; i<videos.length; i++){
+	
+		const player = new Plyr(videos[i],{controls});	
+		
+		
+		   
+	}
 	</script>
 </body>
 
