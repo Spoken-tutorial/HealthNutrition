@@ -71,5 +71,7 @@ public interface TopicCategoryMappingService {
 	TopicCategoryMapping findByCategoryAndOrder(Category cat, int order);
 	
 	TopicCategoryMapping findByCategoryAndStatus(Category cat, Boolean status);
+
+	List<TopicCategoryMapping> findAllByTopicwithCategoryTrue(Topic topic);
 }
 

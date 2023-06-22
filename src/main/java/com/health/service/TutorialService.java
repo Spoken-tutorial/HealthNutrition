@@ -117,7 +117,10 @@ public interface TutorialService {
 	
 	List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con);
 	
-	List<Tutorial> getFinalTutorialsForCache(); 
+	List<Tutorial> getFinalTutorialsForCache();
+
+
+	Page<Tutorial> findAllPaginationWithEnabledCategoryandTrueTutorial(Pageable page); 
 
 
 	

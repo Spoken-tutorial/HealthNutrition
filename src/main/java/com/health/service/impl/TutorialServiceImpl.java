@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -165,6 +166,25 @@ public class TutorialServiceImpl implements TutorialService {
 	public Page<Tutorial> findAllPagination(Pageable page) {
 		// TODO Auto-generated method stub
 		return tutorialRepo.findAll(page);
+	}
+	
+	@Override
+	public Page<Tutorial> findAllPaginationWithEnabledCategoryandTrueTutorial(Pageable page) {
+		
+		List<Tutorial> tutorials= new ArrayList<>();
+		
+		List<Tutorial> tutList= tutorialRepo.findAll();
+		for(Tutorial temp : tutList) {
+			if(temp.getConAssignedTutorial().getTopicCatId().getCat().isStatus() && temp.isStatus()) {
+				tutorials.add(temp);
+			}
+		}
+		
+		final int start = (int)page.getOffset();
+		final int end = Math.min((start + page.getPageSize()), tutorials.size());
+		Page<Tutorial> pageOfTutorials = new PageImpl<>(tutorials.subList(start, end), page, tutorials.size());
+		
+		return pageOfTutorials;
 	}
 
 	/**

@@ -709,7 +709,7 @@ private void getModelData(Model model) {
 		}else if (localCat != null) {
 			localTopicCatList = topicCatService.findAllByCategory(localCat);
 		}else if (localTopic != null) {
-			localTopicCatList = topicCatService.findAllByTopic(localTopic);
+			localTopicCatList = topicCatService.findAllByTopicwithCategoryTrue(localTopic);
 		}
 
 		if(localTopicCat != null) {
@@ -722,17 +722,17 @@ private void getModelData(Model model) {
 		}else if(localTopicCatList != null) {
 
 			if(localLan != null) {
-				conAssigTutorialList = conRepo.findAllByTopicCatAndLanViewPart(localTopicCatList, localLan);
+				conAssigTutorialList = conRepo.findAllByTopicCatAndLanViewPartwithCategoryTrue(localTopicCatList, localLan);
 			}else {
 				conAssigTutorialList = conRepo.findAllByTopicCat(localTopicCatList);
 			}
 		}else {
 			if(localLan != null) {
-				conAssigTutorialList = conRepo.findAllByLan(localLan);
+				conAssigTutorialList = conRepo.findAllByLanWithcategoryTrue(localLan);
 			}
 		}
 
-		Pageable pageable = PageRequest.of(page, 20);
+		Pageable pageable = PageRequest.of(page, 10);
 
 		if(conAssigTutorial != null) {
 			tut = tutService.findAllByconAssignedTutorialPagination(conAssigTutorial,pageable);
@@ -741,7 +741,7 @@ private void getModelData(Model model) {
 			tut =tutService.findAllByconAssignedTutorialListPagination(conAssigTutorialList, pageable);
 			
 		}else {
-			tut = tutService.findAllPagination(pageable);
+			tut = tutService.findAllPaginationWithEnabledCategoryandTrueTutorial(pageable);
 	
 		}
 
@@ -779,9 +779,15 @@ private void getModelData(Model model) {
 		
 		 // sorting based on order value
 		
+		int totalPages = tut.getTotalPages();
+		int firstPage = page + 1 > 2 ? page + 1 - 2 : 1;
+		int lastPage= page + 1 < totalPages - 5 ? page + 1 + 5 : totalPages;
+
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
-		model.addAttribute("totalPages",tut.getTotalPages());
+		model.addAttribute("firstPage", firstPage);
+		model.addAttribute("lastPage", lastPage);
+		model.addAttribute("totalPages",totalPages);
 
 		return "tutorialList";   // add view name (filename)
 	}
@@ -1884,6 +1890,7 @@ private void getModelData(Model model) {
 		
 		List<PromoVideo> promovideos = promoVideoService.findAll();
 		List<PathofPromoVideo> pathofPromoVideos= pathofPromoVideoService.findAll();
+		logger.info("promovideos={} {}", promovideos, promovideos.isEmpty());
 		model.addAttribute("promoVideos", promovideos);
 		model.addAttribute("pathofPromoVideos",pathofPromoVideos);
 		
