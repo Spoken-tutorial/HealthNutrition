@@ -26,17 +26,4 @@ dist/
 nbdist/
 src/main/resources/static/s/Media/content/
 .nb-gradle/
-
-<<<<<<< Updated upstream
-src/main/resources/static/Media/content/MasterTrainer
-src/main/resources/static/Media/content/Consaltant
-src/main/resources/static/Media/content/Testimonial
-src/main/resources/static/Media/content/Creation
-=======
-### Temp ###
-src/main/resources/static/Media/*
-src/main/resources/application.properties
-src/main/resources/templates/roleAdminDetail1.html
-src/main/resources/templates/roleAdminDetail_WorkingCopyBeforeDelete.html
-src/main/resources/templates/addContent_modified.html
->>>>>>> Stashed changes
+logs/
