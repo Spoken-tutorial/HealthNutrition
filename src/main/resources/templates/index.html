@@ -443,7 +443,7 @@ the globe.
     <div class="col-md-4 " th:each="testimonial : ${listofTestimonial}" >
     <div class="card is-shady pt-3" style="width: 100%;" >
             <div class="card-image text-center" style="margin-left:10px; margin-right:10px;">
-            <div style="width:100%;">
+            <div style="width:100%; height: 220px;" >
             <video class="vid1" th:if="${testimonial.getFilePath()!= 'null'}" controls="controls" style="width:100%;" >
   <source th:src="@{/files/}+@{${testimonial.getFilePath()}}" type="video/mp4" />
  Your browser does not support HTML video.
@@ -456,7 +456,7 @@ the globe.
                 
                 <p th:text="${#strings.abbreviate(testimonial.getDescription(),150)}"></p>
                 <!-- <span class="button is-link modal-button" data-target="modal-testimonial" th:attrappend="data-target=${'_'+testimonial.getTestimonialId()}">Details</span> -->
-                <button type="button" class="btn testimonial-btn" data-toggle="modal" th:attrappend="data-target=${'#_'+testimonial.getTestimonialId()}">View</button>
+                <!--  >button type="button" class="btn testimonial-btn" data-toggle="modal" th:attrappend="data-target=${'#_'+testimonial.getTestimonialId()}">View</button -->
                 
               </div>
             </div>
