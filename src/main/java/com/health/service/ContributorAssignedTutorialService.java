@@ -84,4 +84,9 @@ public interface ContributorAssignedTutorialService {
 	 * @return ContributorAssignedTutorial object
 	 */
 	ContributorAssignedTutorial findById(int id);
+
+	List<ContributorAssignedTutorial> findAllByTopicCatAndLanViewPartwithCategoryTrue(List<TopicCategoryMapping> topCat,
+			Language lan);
+
+	List<ContributorAssignedTutorial> findAllByLanWithcategoryTrue(Language lan);
 }

@@ -84,32 +84,16 @@
             <version>1.0</version>
         </dependency>
         
-	
 	<dependency>
 		    <groupId>xuggle</groupId>
 		    <artifactId>xuggle-xuggler</artifactId>
 		    <version>5.4</version>
 		</dependency>
 		
-		
-		
-			<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		
 		 <dependency>
     	<groupId>org.thymeleaf.extras</groupId>
     	<artifactId>thymeleaf-extras-springsecurity5</artifactId>
-   		 
 		</dependency>
-		
-	
 
 	<dependency>
 	   <groupId>org.apache.commons</groupId>
@@ -119,6 +103,16 @@
 		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
 		  
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -139,14 +133,17 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-		
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-devtools</artifactId>
 		</dependency>
-		
-		
+	
+		<!-- These dependencies are used for caching-->
+	  	<dependency>
+      		<groupId>org.springframework.boot</groupId>
+      		<artifactId>spring-boot-starter-cache</artifactId>
+      	</dependency>
+      
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
@@ -158,9 +155,27 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+	 	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		
 		<dependency>
@@ -168,66 +183,45 @@
 			<artifactId>c3p0</artifactId>
 			<version>0.9.5.2</version>
 		</dependency>
-		
-		
-			  <dependency>
+				
+		<dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
             <version>2.2.4</version>
         </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+      	<dependency>
+	    	<groupId>org.apache.pdfbox</groupId>
+    		<artifactId>pdfbox</artifactId>
+    		<version>2.0.27</version>
 		</dependency>
-	<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-devtools</artifactId>
-	</dependency>
 	
-	 <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
+    	<dependency>
+    		<groupId>org.hibernate</groupId>
+    		<artifactId>hibernate-ehcache</artifactId>
 		</dependency>
-		
-		<!-- These dependencies are used for caching-->
-	  <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-cache</artifactId>
-      </dependency>
-      
-      <!--   
-       <dependency>
-      <groupId>net.sf.ehcache</groupId>
-     <artifactId>ehcache</artifactId> 
-      </dependency>
-      
-      -->
-     
-    <dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-ehcache</artifactId>
-	</dependency>
-      
-      
-   
 
-      <dependency>
-      <groupId>javax.cache</groupId>
-      <artifactId>cache-api</artifactId>
-      </dependency>
+      	<dependency>
+      		<groupId>javax.cache</groupId>
+      		<artifactId>cache-api</artifactId>
+      	</dependency>
 		
 	</dependencies>
 
 	<build>
 	<finalName>HealthNutrition</finalName>
 		<plugins>
+			
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			
+			 <plugin>
+               <groupId>pl.project13.maven</groupId>
+			  <artifactId>git-commit-id-plugin</artifactId>
+			  <version>4.0.0</version>
+            </plugin> 
 		</plugins>
 	</build>
 

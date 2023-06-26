@@ -71,6 +71,48 @@ public class Language implements Comparable<Language>, Serializable{
 
 	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Brouchure> brouchure=new HashSet<Brouchure>();
+	
+	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<FilesofBrouchure>filesofBrouchure=new HashSet<FilesofBrouchure>();
+	
+	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<PathofPromoVideo>pathofPromoVideo=new HashSet<PathofPromoVideo>();
+	
+	
+	
+	
+
+	public Set<Brouchure> getBrouchure() {
+		return brouchure;
+	}
+
+	public void setBrouchure(Set<Brouchure> brouchure) {
+		this.brouchure = brouchure;
+	}
+
+	public Set<PathofPromoVideo> getPathofPromoVideo() {
+		return pathofPromoVideo;
+	}
+
+	public void setPathofPromoVideo(Set<PathofPromoVideo> pathofPromoVideo) {
+		this.pathofPromoVideo = pathofPromoVideo;
+	}
+
+	public Set<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(Set<Event> events) {
+		this.events = events;
+	}
+
+	public Set<FilesofBrouchure> getFilesofBrouchure() {
+		return filesofBrouchure;
+	}
+
+	public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
+		this.filesofBrouchure = filesofBrouchure;
+	}
 
 	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Event> events=new HashSet<Event>();
@@ -146,6 +188,11 @@ public class Language implements Comparable<Language>, Serializable{
 
 	public void setTrainingInfos(Set<TrainingInformation> trainingInfos) {
 		this.trainingInfos = trainingInfos;
+	}
+
+	@Override
+	public String toString() {
+		return "Language [lanId=" + lanId + ", langName=" + langName +  "]";
 	}
 
 	@Override

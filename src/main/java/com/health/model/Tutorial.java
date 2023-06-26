@@ -108,7 +108,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 	/**
 	 * outline
 	 */
-	@Column(name = "outline",length = 3000)
+	@Column(name = "outline",length = 3500)
 	private String outline;
 
 	/**
@@ -523,6 +523,11 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
 	public void setUserVisit(int userVisit) {
 		UserVisit = userVisit;
+	}
+
+	@Override
+	public String toString() {
+		return "Tutorial [tutorialId=" + tutorialId + ", videoStatus=" + videoStatus + "]";
 	}
 	
 	

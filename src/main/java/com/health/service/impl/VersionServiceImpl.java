@@ -3,7 +3,6 @@ package com.health.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.health.model.Brouchure;
@@ -58,6 +57,17 @@ public class VersionServiceImpl implements VersionService{
 			return null;
 		}
 		
+		
+	}
+	@Override
+	public Version findByBrouchureAndPrimaryVersion(Brouchure brochure, int primaryVersion) {
+		try {
+			return verRepository.findByBrouchureAndBroVersion(brochure, primaryVersion);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 		
 	}
 

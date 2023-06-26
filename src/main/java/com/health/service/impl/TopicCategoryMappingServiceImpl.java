@@ -95,6 +95,19 @@ public class TopicCategoryMappingServiceImpl implements TopicCategoryMappingServ
 		// TODO Auto-generated method stub
 		return topicCatRepo.findAllBytopic(topic);
 	}
+	
+	@Override
+	public List<TopicCategoryMapping> findAllByTopicwithCategoryTrue(Topic topic) {
+		// TODO Auto-generated method stub
+		List<TopicCategoryMapping> list1= new ArrayList<>();
+		List<TopicCategoryMapping> list2=topicCatRepo.findAllBytopic(topic);
+		for(TopicCategoryMapping temp : list2) {
+			if(temp.getCat().isStatus()) {
+				list1.add(temp);
+;			}
+		}
+		return list1;
+	}
 
 	/**
 	 * @see com.health.service.TopicCategoryMappingService#findByCategoryAndOrder(Category, int)

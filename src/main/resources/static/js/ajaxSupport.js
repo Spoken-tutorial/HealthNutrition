@@ -221,6 +221,83 @@ $(document).ready(function() {
 			});
 			
 			
+			
+			
+			
+	/********** Changes Done By Alok Kumar */
+	
+	$('.enablePromoVideo').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisablePromoVideo",
+					data : {
+						"id" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				$('#'+test_id).addClass('fas fa-times-circle');
+			   				$('#'+test_id).removeClass('fas fa-check-circle');
+			   				$('#'+test_id).css({"color": "red"});
+			   				$('#Success').css({"display": "block"});
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+			
+			$('.disablePromoVideo').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisablePromoVideo",
+					data : {
+						"id" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				
+			   				$('#'+test_id).addClass('fas fa-check-circle');
+			   				$('#'+test_id).removeClass('fas fa-times-circle');
+			   				$('#'+test_id).css({"color": "green"});
+			   				$('#Success').css({"display": "block"});
+			   				
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
 		
 			
 			
@@ -1364,6 +1441,30 @@ $(document).ready(function() {
 			 * Here is code for access topic according to category
 			 * master trainer
 			 */
+			
+			
+			
+/**************************************Promo Video by Selectd Language  ********************/
+$("#languageId1").change(function() {
+
+						var lanId = $(this).find(":selected").val();
+						var video = promoVideos[lanId];
+						var outerhtml = '<video id="newvid1" class="vid1" controls="controls" style="width:100%;" >';
+						outerhtml += '<source src="/files/' + video + '" type="video/mp4" />';
+						outerhtml += 'Your browser does not support HTML video.'
+						outerhtml += '</video>';
+						outerhtml += '<script>';
+						outerhtml += 'new Plyr("#newvid1", {controls});';
+						outerhtml += 'document.getElementById("newvid1").addEventListener("play", function(){pauseAll(this)}, true);';
+						outerhtml += '</script>';
+						$('#promoVideoSourceOuter').html(outerhtml);
+					});
+
+
+/**********************************************************************************************/
+			
+			
+			
 /***************** changes made by om prakash *********************************************/
 			
 			$("#catMasterId").change(function() {
@@ -2414,7 +2515,7 @@ $(document).ready(function() {
 					
 	
 	
-	/* A java Script funtion to load primary version b y checked or unchecked checkbox 
+	/* A java Script funtion to load primary version by checked or unchecked checkbox 
 	*Author: Alok Kumar
 	*/
 		$('#overwrite').change(function() {
@@ -2460,7 +2561,9 @@ $(document).ready(function() {
 					});
 	
 			
-					
+		
+		
+			
 					
 					
 		 $('#topicId').on('change', function() {
@@ -2472,6 +2575,21 @@ $(document).ready(function() {
           divToHide.hide();
         }
       });
+      
+       $('languageNameId1').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#showOneMoreRow1');
+        if (selectedValue !='0') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+      
+      
+      
+       
+      
 					
 
 			/* load Topic by catgory contributor */
@@ -3093,6 +3211,10 @@ $(document).ready(function() {
 
 			
 /*********************************** end*******************************************************/
+
+
+
+
 
 						$('#viewScript').click(function() {
 						var categoryid = $("#categoryId").val();

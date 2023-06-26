@@ -1,0 +1,168 @@
+
+<!-- Author: Alok Kumar -->
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail"></head>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="edit"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Update PromoVideo</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form class="form-horizontal" th:action="@{/updatePromoVideo}"
+											method="post" enctype="multipart/form-data">
+											
+											<input type="hidden"  name="promoVideoId"  th:value="${promoVideo.getPromoId()}"/>
+											
+											
+  											
+											<div class="form-group">
+
+										<label for="title">Title *</label> <input type="text"
+											class="form-control" id="title" name="title"
+											 required="required" th:value="${promoVideo.getTitle()}"/>
+		
+											</div>
+											
+										<div class="form-group"  id="lanForWebFile">
+										<label for="title"><h6>Promo Videos available for the languages: </h6></label>
+										<span id="webLan" th:each="pro: ${pathofPromoVideoList}"> 
+										<b><span class="webLanClass"  th:if="${pro.getVideoPath() != ''}" th:text="${pro.getLan().getLangName()}"></span></b>
+										</span>
+		
+										</div>
+										
+										
+											
+											
+
+
+
+		
+								<div th:each="lanouter,iter: ${languages}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									<div class="form-group" style="float:left; width:40%; ">
+               	                 		<label th:for="${'languageNameId' + iter.index}">Select Language </label>
+										<select th:id="${'languageNameId' + iter.index}" class="form-control" name="languageName">
+	  										<option value="0">Select ...</option>
+	  										<option th:each="lan : ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option>
+										</select>
+  									</div>
+
+<div class="form-group" style="float:left;  width:40%; margin-left:15px; margin-right:40px;">
+	<label th:for="${'promoVideo' + iter.index}">PromoVideo*  </label>
+	<input type="file" class="form-control" th:id="${'promoVideo' + iter.index}" name="promoVideo"  accept=".mp4"/>
+	<small> (Only mp4 format of max filesize 1GB)</small> 
+	
+</div>
+
+</div>
+									
+									<br>
+									&nbsp;&nbsp;&nbsp;
+									<button type="submit" class="btn  btn-success">Submit</button>
+</form>
+<br>
+<br>
+
+
+									</div>
+
+								</div>
+								
+							</div>
+						</div>
+
+
+					</div>
+			
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+<script>
+var projectPath='[(@{/})]';
+$(document).ready( function () {
+	
+    $('#myTable').DataTable();
+	$('#showOneMoreRow1').hide();   
+    
+} );
+
+var divid = 0;
+
+function addListener(divid) {
+	var languageSelect = document.getElementById("languageNameId" + (divid - 1));
+	if (languageSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	languageSelect.addEventListener("change", function() {
+	  var selectedLanguage = languageSelect.value;
+	  if (selectedLanguage !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+function setRequired(divid) {
+	var languageName = document.getElementById("languageNameId" + divid).value;
+	var promoVideo = document.getElementById("promoVideo" + divid);
+	promoVideo.required = (value != "");
+	return false;
+}
+
+addRow(divid);
+
+
+</script>
+</body>
+</html>
+
+ 
+
+ 

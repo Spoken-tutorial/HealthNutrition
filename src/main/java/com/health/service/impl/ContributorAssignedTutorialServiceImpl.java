@@ -82,6 +82,24 @@ public class ContributorAssignedTutorialServiceImpl implements ContributorAssign
 		
 		return localData;
 	}
+	
+	@Override
+	public List<ContributorAssignedTutorial> findAllByTopicCatAndLanViewPartwithCategoryTrue(List<TopicCategoryMapping> topCat,Language lan) {
+		// TODO Auto-generated method stub
+		List<ContributorAssignedTutorial> localData=new ArrayList<ContributorAssignedTutorial>();
+		
+		for(TopicCategoryMapping temp:topCat) {
+			
+			if(temp.getCat().isStatus()) {
+				localData.add(conRepo.findByTopicCatLan(temp, lan));
+			}
+			
+			
+			
+		}
+		
+		return localData;
+	}
 
 	/**
 	 * @see com.health.service.ContributorAssignedTutorialService#findByTopicCatAndLanViewPart(TopicCategoryMapping, Language)
@@ -91,7 +109,8 @@ public class ContributorAssignedTutorialServiceImpl implements ContributorAssign
 		// TODO Auto-generated method stub
 		return conRepo.findByTopicCatLan(topCat, lan);
 	}
-
+	
+	
 	/**
 	 * @see com.health.service.ContributorAssignedTutorialService#findAllByTopicCat(List)
 	 */
@@ -108,6 +127,18 @@ public class ContributorAssignedTutorialServiceImpl implements ContributorAssign
 	public List<ContributorAssignedTutorial> findAllByLan(Language lan) {
 		// TODO Auto-generated method stub
 		return conRepo.findAllBylan(lan);
+	}
+	
+	@Override
+	public List<ContributorAssignedTutorial> findAllByLanWithcategoryTrue(Language lan) {
+		List<ContributorAssignedTutorial> list1= new ArrayList<>();
+		List<ContributorAssignedTutorial> list2= conRepo.findAllBylan(lan);
+		for(ContributorAssignedTutorial temp: list2) {
+			if(temp.getTopicCatId().getCat().isStatus()) {
+				list1.add(temp);
+			}
+		}
+		return list1;
 	}
 
 	/**

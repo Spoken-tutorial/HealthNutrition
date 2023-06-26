@@ -68,17 +68,10 @@ a{
 												<tr
 													th:each="componenettutorial,rowStat : ${tutorialToReview}">
 
-													<td th:text="${rowStat.count}"><i
-														class="fas fa-check-circle"></i></td>
-													<td
-														th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"><i
-														class="fas fa-check-circle"></i></td>
-													<td
-														th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"><i
-														class="fas fa-check-circle"></i></td>
-													<td
-														th:text="${componenettutorial.getConAssignedTutorial().getLan().getLangName()}"><i
-														class="fas fa-check-circle"></i></td>
+													<td th:text="${componenettutorial.getTutorialId()}"><i class="fas fa-check-circle"></i></td>
+													<td th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"><i class="fas fa-check-circle"></i></td>
+													<td th:text="${componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"><i class="fas fa-check-circle"></i></td>
+													<td th:text="${componenettutorial.getConAssignedTutorial().getLan().getLangName()}"><i class="fas fa-check-circle"></i></td>
 
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getOutlineStatus()})"></td>
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getScriptStatus()})"></td>
@@ -86,7 +79,7 @@ a{
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getKeywordStatus()})"></td>
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getVideoStatus()})"></td>
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getPreRequisticStatus()})"></td>
-													<td><a th:href="@{${'/adminreview/review/'+ componenettutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName() + '/' + componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName() +'/'+ componenettutorial.getConAssignedTutorial().getLan().getLangName()}}"><b>Review </b></a></td>
+													<td><a th:href="@{${'/adminreview/review/'+ componenettutorial.getTutorialId()}}"><b>Review </b></a></td>
 												</tr>
 											</tbody>
 										</table>
@@ -129,7 +122,7 @@ a{
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getVideoStatus()})"></td>
 													<td th:replace="common/commonElements :: show_status_icons(${componenettutorial.getPreRequisticStatus()})"></td>	
 													<td><a
-														th:href="@{${'/adminreview/review/'+ componenettutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName() + '/' + componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName() +'/'+ componenettutorial.getConAssignedTutorial().getLan().getLangName()}}"><b>Review
+														th:href="@{${'/adminreview/review/'+ componenettutorial.getTutorialId()}}"><b>Review
 														</b></a></td>
 
 

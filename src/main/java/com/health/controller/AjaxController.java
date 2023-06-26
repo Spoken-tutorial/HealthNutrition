@@ -1,33 +1,27 @@
 package com.health.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import org.springframework.cache.annotation.Cacheable;
 
-import org.apache.logging.log4j.util.PropertySource.Comparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
-import org.springframework.data.repository.query.Param;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,8 +43,11 @@ import com.health.model.ContributorAssignedTutorial;
 import com.health.model.District;
 import com.health.model.Event;
 import com.health.model.FeedbackForm;
+import com.health.model.FilesofBrouchure;
 import com.health.model.Language;
 import com.health.model.LogManegement;
+import com.health.model.PathofPromoVideo;
+import com.health.model.PromoVideo;
 import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
@@ -60,6 +57,7 @@ import com.health.model.TrainingInformation;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
+import com.health.model.Version;
 import com.health.service.BrouchureService;
 import com.health.service.CategoryService;
 import com.health.service.CityService;
@@ -70,8 +68,11 @@ import com.health.service.ContributorAssignedTutorialService;
 import com.health.service.DistrictService;
 import com.health.service.EventService;
 import com.health.service.FeedbackService;
+import com.health.service.FilesofBrouchureService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
+import com.health.service.PathofPromoVideoService;
+import com.health.service.PromoVideoService;
 import com.health.service.RoleService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
@@ -83,12 +84,11 @@ import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.service.VersionService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
-
-import javassist.bytecode.Descriptor.Iterator;
 
 /**
  * This Controller Class takes website AJAX request and process it accordingly
@@ -99,9 +99,25 @@ import javassist.bytecode.Descriptor.Iterator;
 @Controller
 public class AjaxController{
 
+	 private static Logger logger = LoggerFactory.getLogger(AjaxController.class);
+
+
 	@Autowired
 	private CategoryService catService;
-
+	
+	@Autowired
+	private PromoVideoService promoVideoService;
+	
+	@Autowired
+	private PathofPromoVideoService pathofPromoVideoService
+	;
+	
+	@Autowired
+	private VersionService verService;
+	
+	@Autowired 
+	private FilesofBrouchureService filesofBroService;
+	
 	@Autowired
 	private TopicService topicService;
 
@@ -476,6 +492,34 @@ public class AjaxController{
 	}
 	
 	
+	
+	
+	@GetMapping("/enableDisablePromoVideo")
+	public @ResponseBody boolean enableDisablePromoVideo(int id){
+		PromoVideo pro = promoVideoService.findById(id);
+
+		try {
+			if(pro.isShowOnHomepage()) {
+				pro.setShowOnHomepage(false);
+				promoVideoService.save(pro);
+				return true;
+
+			}else {
+				pro.setShowOnHomepage(true);
+				promoVideoService.save(pro);
+				return true;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	
+	
+	
 	/*
 	 * A function to get primary version by checked and unchecked checkbox
 	 * Author: Alok Kumar
@@ -775,6 +819,58 @@ public class AjaxController{
 	
 	
 	
+	@RequestMapping("/loadPromoVideoByLanguage")
+	public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId, @RequestParam(value = "promoId") int promoId ) {
+			
+		try {
+				Language lan= langService.getById(lanId);
+				PromoVideo promo= promoVideoService.findById(promoId);
+				PathofPromoVideo pathofPromoVideo = pathofPromoVideoService.findByLanguageandPromoVideo(lan, promo);
+				return pathofPromoVideo.getVideoPath();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+				return "";
+			}
+		
+		
+
+	}
+	
+	
+	
+	
+	
+	@RequestMapping("/loadWebAndPrintFile")
+	public @ResponseBody List<String> loadWebAndPrintFile(@RequestParam(value = "lanId") int lanId, @RequestParam(value = "verId") int verId ) {
+
+		List<String> fileList = new ArrayList<>();
+		Language lan= langService.getById(lanId);
+		Version ver= verService.findById(verId);
+		
+		try {
+			FilesofBrouchure filesBro= filesofBroService.findByLanguageandVersion(lan, ver);
+			
+			
+			String webFile= filesBro.getWebPath();
+			String printFile= filesBro.getPrintPath();
+			if(webFile!="") {
+				fileList.add(webFile);
+			}
+			if(printFile !="") {
+				fileList.add(printFile);
+			}
+			
+		} catch(Exception e) {
+			
+		}
+		
+		return fileList;
+
+	}
+	
+	
+	
 	
 	/* 
 	 * Function to load Topic and Language by category
@@ -873,7 +969,7 @@ public class AjaxController{
 		
 		//To find Languages
 		for(ContributorAssignedTutorial c : cat_list) {
-			if(!tutService.findAllByContributorAssignedTutorial1(c).isEmpty()) {
+			if(!tutService.findAllByContributorAssignedTutorialEnabled(c).isEmpty()) {
 				languages.put( c.getLan().getLangName(),c.getLan().getLanId());
 			}
 		}
@@ -943,7 +1039,7 @@ public class AjaxController{
 			if(lan!=null)
 			langName = lan.getLangName();
 			if (!languages.containsKey(langName) && langName!="") {
-				List<Tutorial> tutlist=tutService.findAllByContributorAssignedTutorial1(c);
+				List<Tutorial> tutlist=tutService.findAllByContributorAssignedTutorialEnabled(c);
 				for (Tutorial t1: tutlist) {
 					Category cat3 = t1.getConAssignedTutorial().getTopicCatId().getCat();
 					if (cat3.isStatus()) {
@@ -1378,9 +1474,8 @@ public class AjaxController{
 											Principal principal) {
 		
 		System.out.println("id "+tutorialId+" data "+ outlineData + " catname " + catName + " topicid " + topicId + " lanId " + lang +" Principal "+ principal);
-		//System.out.println(tutService.getById(tutorialId)+ "alok sp");
 		HashMap<String, String> temp = new HashMap<>();
-		//alok
+		
 		Category cat=catService.findBycategoryname(catName);
 		int catId=cat.getCategoryId();
 		Topic topic=topicService.findById(topicId);
@@ -1390,11 +1485,10 @@ public class AjaxController{
 		List<Tutorial> tut= tutService.findAllByContributorAssignedTutorial(cnn);
 		Tutorial tut1= tut.get(0);
 		int tutId1=tut1.getTutorialId();
-		System.out.println(tutService.getById(tutId1)+ "aloksp1");
 		
 		User usr=getUser(principal);
 		Tutorial local = null;
-		System.out.println(tutService.getById(tutId1)+ "alok sp");
+		
 		if(tutId1!=0) {
 			Tutorial tut2=tutService.getById(tutId1);
 			temp = addOutlineComp(tut2,outlineData,usr);
@@ -2296,30 +2390,33 @@ public class AjaxController{
 
 			usr=usrservice.findByUsername(principal.getName());
 		}
-
+		logger.info("Time Script: tut id {}", tutorialId);
 		if(tutorialId != 0) {
 			Tutorial tut=tutService.getById(tutorialId);
 			
 			try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript");
-					String pathtoUploadPoster=ServiceUtility.uploadFile(File, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript");
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
+				String path = env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript";
+				ServiceUtility.createFolder(path);
+				String pathtoUploadPoster=ServiceUtility.uploadFile(File, path);
+				logger.info("Time Script: File uploaded");
+				int indexToStart=pathtoUploadPoster.indexOf("Media");
 
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
-					tut.setTimeScript(document);
-					tutService.save(tut);
+				tut.setTimeScript(document);
+				tutService.save(tut);
+			
+		        logger.info("Time Script: Info Database updated");
+			
 
-					return CommonData.Script_SAVE_SUCCESS_MSG;
+				return CommonData.Script_SAVE_SUCCESS_MSG;
 
 			}catch (Exception e) {
-				// TODO: handle exception
-
-				// throw error
+		        logger.error("Time Script: Upload Error {}", tut, e);				
 			}
 
 		}
-		return CommonData.Script_SAVE_SUCCESS_MSG;
+		return CommonData.SCRIPT_UPLOAD_ERROR;
 
 	}
 	

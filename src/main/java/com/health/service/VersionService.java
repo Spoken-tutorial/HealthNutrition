@@ -19,6 +19,8 @@ public interface VersionService {
 	
 	Version findById(int id);
 
+	Version findByBrouchureAndPrimaryVersion(Brouchure brochure, int primaryVersion);
+	
 	List<Version> findByCategory(Brouchure bro);
 	
 	

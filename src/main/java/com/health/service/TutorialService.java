@@ -65,7 +65,7 @@ public interface TutorialService {
 	List<Tutorial> findAllByContributorAssignedTutorial(ContributorAssignedTutorial con);
 	
 	//New Function By Alok
-	List<Tutorial> findAllByContributorAssignedTutorial1(ContributorAssignedTutorial con);
+	List<Tutorial> findAllByContributorAssignedTutorialEnabled(ContributorAssignedTutorial con);
 
 	/**
 	 * List of Tutorial Object given list of ContributorAssignedTutorial object
@@ -117,7 +117,10 @@ public interface TutorialService {
 	
 	List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con);
 	
-	List<Tutorial> getFinalTutorialsForCache(); 
+	List<Tutorial> getFinalTutorialsForCache();
+
+
+	Page<Tutorial> findAllPaginationWithEnabledCategoryandTrueTutorial(Pageable page); 
 
 
 	

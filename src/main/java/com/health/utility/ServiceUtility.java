@@ -102,7 +102,7 @@ public class ServiceUtility {
 		return path;
 	}
 	
-
+	
 	
 	/**
 	 * to upload video file in system
@@ -235,6 +235,16 @@ public class ServiceUtility {
 		}
 		return true;
 	}
+	
+	public static boolean checkVideoSizePromoVideo(MultipartFile temp) {
+		System.out.println("Video Size" +temp.getSize());
+		if(temp.getSize() > CommonData.videoSizePromoVideo) {
+			
+			return false;
+		}
+		return true;
+	}
+	
 	
 	/**
 	 * to check whether size of file is within the limit

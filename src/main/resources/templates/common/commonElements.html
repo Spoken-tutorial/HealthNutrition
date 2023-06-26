@@ -17,39 +17,32 @@ function resetInput(id) {
 	}
 </script>
 <div class="row" style="width: 100%;">
-<div class="col-md-3 mb-3">
-            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
+<div class="col-md-3 mb-3 input-group">
+            <select class="custom-select d-block form-control" id="categoryname" name="categoryName">
               <option value="0">Select Category</option>
-              <option th:each="category : ${categories}" th:value="${category.getCategoryId()}"><span th:text="${category.getCatName()}" ></span></option>
+              <option th:each="category : ${categories}" th:value="${category.getCategoryId()}" th:text="${category.getCatName()}" ></option>
             </select>
-            
-            <div class="invalid-feedback">
-              Please select a valid foss.
-            </div>
-            <div style="margin-left:90%;"><button  id="catreset"  > <span style="font-size:12px;">&#10060;</span></button></div>
+            <span class="input-group-btn" style=" padding-top: 4px;"><button  id="catreset"  > <span style="font-size:8px;">&#10060;</span></button></span>
            
 </div>
 
 
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
+<div class="col-md-3 mb-3 input-group">
+<select class="custom-select d-block form-control" id="inputTopicName" name="topic">
               <option value="0">Select Topic</option>
-              <option th:each="topic : ${topics}" th:value="${topic.getTopicId()}"><span th:text="${topic.getTopicName()}">Title ...</span></option>
+              <option th:each="topic : ${topics}" th:value="${topic.getTopicId()}" span th:text="${topic.getTopicName()}"></option>
             </select>
-            <div style="margin-left:90%;" ><button  id="topicreset"  > <span style="font-size:12px;">&#10060;</span></button></div>
+            <div class="input-group-btn"  style=" padding-top: 4px;"><button  id="topicreset" > <span style="font-size:8px;">&#10060;</span></button></div>
 </div>
 
 
 
-<div class="col-md-3 mb-3">
-<select class="custom-select d-block w-100" id="inputLanguage" name="lan">
+<div class="col-md-3 mb-3 input-group">
+<select class="custom-select d-block form-control" id="inputLanguage" name="lan">
               <option value="0">Select Language</option>
-              <option th:each="language : ${languages}" th:value="${language.getLanId()}"><span th:text="${language.getLangName()}">Title ...</span></option> 
+              <option th:each="language : ${languages}" th:value="${language.getLanId()}" th:text="${language.getLangName()}"></option> 
             </select>
-            <div class="invalid-feedback">
-              Please provide a valid language.
-            </div>
-            <div style="margin-left:90%;"><button  id="langreset"  > <span style="font-size:12px;">&#10060;</span></button></div>
+            <div class="input-group-btn"  style=" padding-top: 4px;"><button  id="langreset" > <span style="font-size:8px;">&#10060;</span></button></div>
             
 </div>
 

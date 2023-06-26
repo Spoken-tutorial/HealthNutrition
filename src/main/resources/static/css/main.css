@@ -325,8 +325,8 @@ nav #dropdownMenuButton{
 
 /*-----------------------------------Testimonials---------------------------*/
 #testimonial video{
-	height: 220px;
-	width: auto;
+	
+	width: 100%;
 	max-width: 100%;
 }
 #testimonial .card{
