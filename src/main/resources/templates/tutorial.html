@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
 <html>
-<head th:replace="common/trail :: common-trail">  
+<head th:replace="common/trail :: common-trail (pageTitle='Tutorial - Health And Nutrition')"> 
+
+<title>tutorials - Health And Nutrition</title> 
 
 </head>
 <body>
@@ -29,10 +31,7 @@
 									Account</a>
 							</span>
 						</p>
-						<p class="d-inline-block">
-							<span class="top-banner"><a
-								sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a></span>
-						</p>
+						<p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p>
 					</div>
 				</div>
 			</div>

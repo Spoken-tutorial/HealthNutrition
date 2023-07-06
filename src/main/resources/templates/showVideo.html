@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
 
-<head th:replace="common/trail :: common-trail">
+<head th:replace="common/trail :: common-trail (pageTitle='Videos - Health And Nutrition')">
 
 
 		<meta charset="utf-8"/>
@@ -15,7 +15,7 @@
   <body>
   	<!-- 	<div th:replace="common/trail :: navbar1"/> -->
   		
-  		<div class="" style="padding-top: ">
+  		<div class="" style=" ">
 
     <div class="mdb-lightbox">
 	
@@ -186,11 +186,11 @@
 							
 							<a th:href="${tutorials.getTutorialid()}">
 							
-								<img style="borde"  width="200" height="100" th:src="@{/image/Classes-And-Objects-Small.png}"></img>
+								<img style=""  width="200" height="100" th:src="@{/image/Classes-And-Objects-Small.png}"></img>
 								
 							</a>
 					<br></br>&nbsp;
-							<h6 style="color: blue; padding-right: 25px" th:text="${tutorials.getTopic().getTopicname()}"></h6>
+							<h6 style="color:blue; padding-right: 25px;" th:text="${tutorials.getTopic().getTopicname()}"></h6>
 						
 							
 							</div>	

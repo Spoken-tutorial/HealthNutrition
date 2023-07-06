@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Spoken Tutorials</title>
+   <title>Health And Nutrition</title>
     <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
     
   <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css" />
@@ -73,11 +73,11 @@
 	</div>
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
 	<div><p class="d-inline-block"><span class="top-banner">
-		<a sec:authorize="isAnonymous()" th:href="@{/login}">Login | New
+		<a sec:authorize="isAnonymous()" th:href="@{/login}" target="_blank">Login | New
 		User</a> <a sec:authorize="isAuthenticated()"
 		th:href="@{/dashBoard}">My Account</a> 
 		</span></p>
-	    <p class="d-inline-block"><span class="top-banner"><a sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a></span></p></div>
+	  <p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p></div>
 	</div>
 	</div>
 	</div>
@@ -229,7 +229,7 @@ the globe.
 		</div> -->
 		</div>
 		<br>
-		<div class="w-100 text-center"><a th:href="@{/statistics}" target="_blank" class="button catBtn mb-5">View Statistics</a></div>
+		<div class="w-100 text-center"><a th:href="@{/statistics}" class="button catBtn mb-5">View Statistics</a></div>
 	</div>
   </section>
     
@@ -252,7 +252,7 @@ the globe.
 	    	</div>
    		 </div>
    		 <br>
-   		 <div class="w-100 text-center"><a th:href="@{/categories}" target="_blank" class="button catBtn mb-5">View all Categories</a></div> 
+   		 <div class="w-100 text-center"><a th:href="@{/categories}"  class="button catBtn mb-5">View all Categories</a></div> 
     </div>  
   </section>
   <!-- modal for displaying full category description -->
@@ -295,7 +295,7 @@ the globe.
     		</div>
     	</div>
     	<br>
-    	<div class="text-center"><a th:href="@{/showConsultant}" target="_blank" class="button is-link is-outlined is-fullwidth consBtn mb-5">View all consultants</a></div>
+    	<div class="text-center"><a th:href="@{/showConsultant}"  class="button is-link is-outlined is-fullwidth consBtn mb-5">View all consultants</a></div>
     </div>
     </section>
     
@@ -357,7 +357,7 @@ the globe.
     		</div>
     	</div>	
     	<br>
-    <div class=" text-center"><a th:href="@{/showEvent}" target="_blank" class="button catBtn mb-5 ">View all Events</a></div>
+    <div class=" text-center"><a th:href="@{/showEvent}"  class="button catBtn mb-5 ">View all Events</a></div>
     </div>
     
      
@@ -464,7 +464,7 @@ the globe.
     </div>
     </div>
     <br>
-    <div class=" text-center"><a th:href="@{/testimonialList}" target="_blank" class="button catBtn mb-5 ">View all Testimonials</a></div>
+    <div class=" text-center"><a th:href="@{/testimonialList}"  class="button catBtn mb-5 ">View all Testimonials</a></div>
     </div>
     </section>
     <section th:if="${not #lists.isEmpty(listofVesrsions)}">
@@ -489,7 +489,7 @@ the globe.
     </div>
     <br>
     <br>
-    <div class=" text-center"><a th:href="@{/brochure}" target="_blank" class="button catBtn mb-5 ">View all Brochures</a></div>
+    <div class=" text-center"><a th:href="@{/brochure}" class="button catBtn mb-5 ">View all Brochures</a></div>
     </div>
     </section>
     

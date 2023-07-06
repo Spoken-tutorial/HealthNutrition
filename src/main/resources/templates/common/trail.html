@@ -3,7 +3,10 @@
 <html xmlns:th="https://thymeleaf.org">
 
 
-<head th:fragment="common-trail">
+<head th:fragment="common-trail (pageTitle)">
+
+<title th:text="${pageTitle}">Template title</title>
+
 
 	<meta charset="utf-8"/> 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
