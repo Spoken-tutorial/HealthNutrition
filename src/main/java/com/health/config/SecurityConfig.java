@@ -282,7 +282,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		  http.
 		  formLogin().
-		  defaultSuccessUrl("/", true);
+		  defaultSuccessUrl("/dashBoard", true);
 
 
 		http
