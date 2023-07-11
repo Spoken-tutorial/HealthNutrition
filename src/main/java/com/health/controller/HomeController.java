@@ -91,6 +91,7 @@ import com.health.model.PathofPromoVideo;
 import com.health.model.PostQuestionaire;
 import com.health.model.PromoVideo;
 import com.health.model.Question;
+import com.health.model.ResearchPaper;
 import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
@@ -124,6 +125,7 @@ import com.health.service.PathofPromoVideoService;
 import com.health.service.PostQuestionaireService;
 import com.health.service.PromoVideoService;
 import com.health.service.QuestionService;
+import com.health.service.ResearchPaperService;
 import com.health.service.RoleService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
@@ -182,6 +184,10 @@ public class HomeController {
 
 	@Autowired
 	private CategoryService catService;
+	
+	@Autowired
+	private ResearchPaperService researchPaperService;
+
 
 	@Autowired
 	private RoleService roleService;
@@ -1878,7 +1884,105 @@ private void getModelData(Model model) {
 	}
 	/************************************END**********************************************/
 	
+	/*****************************ADD Research Paper *************************************/
 	
+	@RequestMapping(value = "/addResearchPaper",method = RequestMethod.GET)
+	public String addResearchPaperGet(Model model,Principal principal) {
+		User usr=new User();
+		if(principal!=null) {
+			usr=userService.findByUsername(principal.getName());
+		}
+		model.addAttribute("userInfo", usr);
+
+		List<ResearchPaper> researchPapers = researchPaperService.findAll();
+		for(ResearchPaper temp : researchPapers) {
+			makeThumbnailofResearchPaper(temp);
+		}
+
+		model.addAttribute("researchPapers", researchPapers);
+
+		return "addResearchPaper";
+	}
+	
+	
+	@RequestMapping(value = "/addResearchPaper",method = RequestMethod.POST)
+	public String addResearchPaperPost(Model model,Principal principal,
+								  @RequestParam("researchFile") MultipartFile researchFile,
+								  @RequestParam(value = "title") String title,
+								  @RequestParam(name = "researchPaperDesc") String researchPaperDesc
+								  ) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		List<ResearchPaper> researchPapers = researchPaperService.findAll();
+
+		model.addAttribute("researchPapers", researchPapers);
+
+		
+		if(title == null) {  // throw error
+			model.addAttribute("error_msg","Please Try Again");
+			return "addResearchPaper";
+		}
+		
+		if(researchPaperDesc == null) {  // throw error
+			model.addAttribute("error_msg","Please Try Again");
+			return "addResearchPaper";
+		}
+
+		if(!ServiceUtility.checkFileExtensiononeFilePDF(researchFile)) {  // throw error
+			model.addAttribute("error_msg", "Only PDf file is required");
+			return "addResearchPaper";
+		}
+		
+		
+
+		ResearchPaper researchPaperTemp = new ResearchPaper();
+		researchPaperTemp.setId(researchPaperService.getNewId());
+		researchPaperTemp.setDescription(researchPaperDesc);
+		researchPaperTemp.setTitle(title);
+		researchPaperTemp.setDateAdded(ServiceUtility.getCurrentTime());
+
+		try {
+
+			
+
+			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaperTemp.getId());
+			String pathtoUploadPoster=ServiceUtility.uploadFile(researchFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaperTemp.getId());
+			int indexToStart=pathtoUploadPoster.indexOf("Media");
+
+			String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+
+			researchPaperTemp.setResearchPaperPath(document);
+
+			researchPaperService.save(researchPaperTemp);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+				researchPaperService.delete(researchPaperTemp);
+				return "addResearchPaper";
+			}
+
+	
+		researchPapers = researchPaperService.findAll();
+		model.addAttribute("researchPapers", researchPapers);
+		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
+
+		return "addResearchPaper";
+
+
+	}
+
+	
+	/************************************************************************************/
 	
 	/**************************************ADD PROMOVIDEO*********************************/
 	
@@ -4934,7 +5038,122 @@ private void getModelData(Model model) {
 	/************************************END******************************************************************/
 	
 	
+	/******************************************Edit Section of Research Paper ********************************/
 	
+	@RequestMapping(value = "/researchPaper/edit/{id}", method = RequestMethod.GET)
+	public String editResearchPaerGet(@PathVariable int id,Model model,Principal principal) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		
+		ResearchPaper researchPaper=researchPaperService.findById(id);
+		
+		if(researchPaper == null) {
+
+			return "redirect:/addResearchPaper";
+		}
+
+		/*if(carousel.getUser().getId() != usr.getId()) {
+
+			return "redirect:/addResearchPaper";
+		}*/
+		model.addAttribute("researchPaper", researchPaper);
+
+		return "updateResearchPaper";
+	}
+	
+	
+	@RequestMapping(value = "/updateResearchPaper", method = RequestMethod.POST)
+	public String updateResearchPaperPost(HttpServletRequest req,Model model,Principal principal,
+			@RequestParam("researchFile") MultipartFile researchFile) {
+
+		User usr=new User();
+
+		if(principal!=null) {
+
+			usr=userService.findByUsername(principal.getName());
+		}
+
+		model.addAttribute("userInfo", usr);
+
+		String rseacrhPaperId=req.getParameter("researchPaperId");
+		String title = req.getParameter("title");
+		String desc = req.getParameter("description");
+		
+		
+
+		
+		ResearchPaper researchPaper=researchPaperService.findById(Integer.parseInt(rseacrhPaperId));
+		
+		if(researchPaper==null) {
+			model.addAttribute("error_msg","ResearchPaper doesn't exist");
+			return "updateResearchPaper";
+		}
+
+		
+		model.addAttribute("researchPaper", researchPaper);
+
+		
+		try {
+			
+
+			if(!researchFile.isEmpty()) {
+				if(!ServiceUtility.checkFileExtensiononeFilePDF(researchFile)) { // throw error on extension
+					model.addAttribute("error_msg", "Only pdf file is required");
+					return "updateResearchPaper";
+			}
+			}
+
+
+			
+
+			researchPaper.setTitle(title);
+			researchPaper.setDescription(desc);
+			
+			if(!researchFile.isEmpty()) {
+				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaper.getId());
+				String pathtoUploadPoster=ServiceUtility.uploadFile(researchFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaper.getId());
+				int indexToStart=pathtoUploadPoster.indexOf("Media");
+
+				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+
+				researchPaper.setResearchPaperPath(document);
+
+			}
+			
+			
+
+			researchPaperService.save(researchPaper);
+
+		}catch (Exception e) {
+			// TODO: handle exception
+			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+			model.addAttribute("researchPaper", researchPaper);
+			return "updateResearchPaper";        // need to add some error message
+		}
+		
+		
+
+
+		model.addAttribute("success_msg",CommonData.RECORD_UPDATE_SUCCESS_MSG);
+		model.addAttribute("researchPaper", researchPaper);
+
+		return "updateResearchPaper";
+	}
+	
+	
+	
+
+
+	
+	/***********************************************End********************************************************/
 	
 	/**************************************Edit section of Carousel ************************************************/
 	
@@ -4976,7 +5195,7 @@ private void getModelData(Model model) {
 	 */
 	
 	@RequestMapping(value = "/updateCarousel", method = RequestMethod.POST)
-	public String updateCaroUselGet(HttpServletRequest req,Model model,Principal principal,
+	public String updateCaroUselPost(HttpServletRequest req,Model model,Principal principal,
 			@RequestParam("Image") MultipartFile files) {
 
 		User usr=new User();
@@ -5010,7 +5229,7 @@ private void getModelData(Model model) {
 			if(!files.isEmpty()) {
 				if(!ServiceUtility.checkFileExtensionImage(files)) { // throw error on extension
 					model.addAttribute("error_msg",CommonData.JPG_PNG_EXT);
-					return "updateEvent";
+					return "updateCarousel";
 			}
 			}
 
@@ -5038,7 +5257,7 @@ private void getModelData(Model model) {
 			// TODO: handle exception
 			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
 			model.addAttribute("carousels", carousel);
-			return "updateEvent";        // need to add some error message
+			return "updateCarousel";        // need to add some error message
 		}
 		
 		
@@ -8303,6 +8522,34 @@ private void getModelData(Model model) {
 				 String document1= generateImageFromPdfAndSave(pdfpath, str);
 				 temp.setThumbnailPath(document1);
 				 filesofbrouchureService.save(temp);
+					
+			 }
+			 
+			 
+	  } catch (IOException e) {
+			 
+		    e.printStackTrace();
+	  }
+	}
+	
+	
+	
+	private void makeThumbnailofResearchPaper(ResearchPaper temp) {
+		try {
+			 
+			 boolean checkPdf=temp.getResearchPaperPath().toLowerCase().endsWith(".pdf");
+			 
+			 if(checkPdf==true && temp.getThumbnailPath()==null) {
+				 int researchPaperId=temp.getId();
+				 
+				 String pdfpath=temp.getResearchPaperPath();
+				 	
+				
+				 String str=CommonData.uploadResearchPaper+researchPaperId ;
+				 ServiceUtility.createFolder(str);
+				 String document1= generateImageFromPdfAndSave(pdfpath, str);
+				 temp.setThumbnailPath(document1);
+				 researchPaperService.save(temp);
 					
 			 }
 			 

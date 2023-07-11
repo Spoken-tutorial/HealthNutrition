@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Research Paper - Admin - Health And Nutrition')"></head>
+<style>
+.nav-carousel{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-reserachPaper a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">View</a></li>
+
+
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Research Paper</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form th:action="@{/addResearchPaper}" method="post"
+											enctype="multipart/form-data">
+											
+											
+											  <div class="form-group">
+											  <label for="title">Title *</label>
+											    <input class="form-control" type="text"  id="title" name="title" required>
+											   
+											  </div>
+											  <div class="form-group">
+											<label for="desc_researchPaper">Description *</label>
+											    <textarea class="form-control" rows="3" id="desc_researchPaper" name="researchPaperDesc" maxlength="100" required></textarea>
+											    <small>Character limit : 100</small>
+											  </div>
+											  <div class="form-group">
+
+											    <label for="researchFile">Upload Research Paper *</label><small>(.pdf format only)</small>
+											    <input type="file" class="form-control-file" id="" name="researchFile" required  accept=".pdf" onchange="validate_file_size(this,524288000)">
+											    <small>Max file size : 500 MB </small>
+
+											  </div>
+  
+
+											
+											<button type="submit" class="btn  btn-success">Submit</button>
+										</form>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable">
+						
+							</div>
+							<thead>
+								<tr>
+									<th scope="col">Date Added</th>
+									<th scope="col">Title</th>
+									<th scope="col">Description</th>
+									<th scope="col">Research Paper</th>
+									<th scope="col">Enable/Disable</th>
+									 <th scope="col">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="res : ${researchPapers}">
+								  <td scope="row">
+      							 <span th:text="${res.getDateAdded()}"></span>
+       
+      							</td>
+							      <td><span th:text = "${res.getTitle()}"></span></td>
+							      <td><span th:text = "${res.getDescription()}"></span></td>
+						
+							      <td> <img style=" height: 100px" th:if="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${res.getThumbnailPath()}}"></img>
+     								 <img th:unless="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${res.getResearchPaperPath()}}"
+										style="height: 100px" />
+									<br>
+								  <a th:href="@{/files/}+@{${res.getResearchPaperPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
+								  <a th:if="${res.getResearchPaperPath()!=null and res.getResearchPaperPath()!=''}" th:href="@{/files/}+@{${res.getResearchPaperPath()}}" download >Download</a>
+			
+								</td>
+								 <td>
+	  		
+	   			<div th:if="${res.isShowOnHomepage()}">
+	   				<a class="disableResearchPaper" th:value="${res.getId()}" title="Click to Disable Brochure"><i class="fas fa-times-circle" th:id="${res.getId()}" style="color:red"></i></a>
+	   			</div>
+	   			<div th:unless="${res.isShowOnHomepage()}">
+	   				<a class="enableBrouchure" th:value="${res.getId()}" title="Click to Enable Brochure"><i class="fas fa-check-circle" th:id="${res.getId()}" style="color:green"></i> </a>
+	   			</div>
+	   		
+	  
+	  </td>
+								   <td><a th:href="@{${'/researchPaper/edit/' + res.getId()}}">Edit</a></td>
+								
+							    </tr>
+
+							</tbody>
+						</table>
+					</div>
+
+
+
+				</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>
+

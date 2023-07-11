@@ -264,6 +264,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					"/addEvent/**",
 					"/addTestimonial/**",
 					"/addPromoVideo/**",
+					"/addResearchPaper/**",
 					"/brochure/edit/**",
 					"/promoVideo/edit/**",
 					"/carousel/edit/**",
