@@ -3,6 +3,7 @@ package com.health.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.health.model.ResearchPaper;
 import com.health.repository.ResearchPaperRepository;
 import com.health.service.ResearchPaperService;
@@ -55,6 +56,14 @@ public class ResearchPaperServiceImpl implements ResearchPaperService{
 		// TODO Auto-generated method stub
 		return repo.findAllByshowOnHomepage(value);
 	}
+	
+	@Override
+	public List<ResearchPaper> findAllByShowOnHomePage(){
+		
+		return repo.findAllByshowOnHomepage(true);
+		
+	}
+	
 
 	
 	@Override

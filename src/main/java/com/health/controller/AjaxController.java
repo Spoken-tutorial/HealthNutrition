@@ -48,6 +48,7 @@ import com.health.model.Language;
 import com.health.model.LogManegement;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PromoVideo;
+import com.health.model.ResearchPaper;
 import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
@@ -73,6 +74,7 @@ import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
 import com.health.service.PathofPromoVideoService;
 import com.health.service.PromoVideoService;
+import com.health.service.ResearchPaperService;
 import com.health.service.RoleService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
@@ -107,6 +109,9 @@ public class AjaxController{
 	
 	@Autowired
 	private PromoVideoService promoVideoService;
+	
+	@Autowired
+	private ResearchPaperService researchPaperService;
 	
 	@Autowired
 	private PathofPromoVideoService pathofPromoVideoService
@@ -507,6 +512,30 @@ public class AjaxController{
 			}else {
 				pro.setShowOnHomepage(true);
 				promoVideoService.save(pro);
+				return true;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	
+	@GetMapping("/enableDisableResearchPaper")
+	public @ResponseBody boolean enableDisableResearchPaper(int id){
+		ResearchPaper res = researchPaperService.findById(id);
+
+		try {
+			if(res.isShowOnHomepage()) {
+				res.setShowOnHomepage(false);
+				researchPaperService.save(res);
+				return true;
+
+			}else {
+				res.setShowOnHomepage(true);
+				researchPaperService.save(res);
 				return true;
 			}
 		} catch (Exception e) {

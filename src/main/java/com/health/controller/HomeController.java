@@ -504,6 +504,7 @@ private void getModelData(Model model) {
 		List<Carousel> carousel= caroService.findCarouselForCache(); //findCarousel();	
 		//List<Category> category_objs = catService.findAllCategoryByOrderForCache(); // findAllCategoryByOrder();
 		List<PromoVideo> promoVideos= promoVideoService.findAllByShowOnHomePage();
+		List<ResearchPaper> researchPapers= researchPaperService.findAllByShowOnHomePage();
 		
 		List<Event> evnHome = new ArrayList<>();
 		List<Testimonial> testHome = new ArrayList<>();
@@ -513,6 +514,7 @@ private void getModelData(Model model) {
 		List<Version> versionHome= new ArrayList<>();
 		List<Carousel> carouselHome = new ArrayList<>();
 		List<PromoVideo> promoVideoHome= new ArrayList<>();
+		List<ResearchPaper> researchPapersHome=new ArrayList<>();
 		
 		List<Category> catTempSorted = catService.getCategoriesForCache(); // getCategories(); 
 		
@@ -572,10 +574,16 @@ private void getModelData(Model model) {
 		versionHome=(versions.size()>upperlimit) ? versions.subList(0, upperlimit):versions;
 		carouselHome=(carousel.size()>upperlimit) ? carousel.subList(0, upperlimit):carousel;
 		promoVideoHome=(promoVideos.size()>1) ? promoVideos.subList(0, 1):promoVideos;
+		researchPapersHome=(researchPapers.size()>upperlimit) ? researchPapers.subList(0, upperlimit):researchPapers;
 
 		if(!consulHome.isEmpty()) {
 			model.addAttribute("listOfConsultant", consulHome);
 		}
+		
+		if(!researchPapersHome.isEmpty()) {
+			model.addAttribute("listOfResearchPapers", researchPapersHome);
+		}
+
 
 		if(!testHome.isEmpty()) {
 			model.addAttribute("listofTestimonial", testHome);
@@ -1251,6 +1259,16 @@ private void getModelData(Model model) {
 		List<Category> categories=getCategories();
 		model.addAttribute("categories", categories);
 		return "categories";
+	}
+	
+	
+	@RequestMapping(value = "/researchPapers",method = RequestMethod.GET)
+	public String showResearchPapersGet(Model model) {
+
+		//List<Category> categories=catService.findAll();
+		List<ResearchPaper> researchPapers= researchPaperService.findAllByShowOnHomePage();
+		model.addAttribute("researchPapers", researchPapers);
+		return "researchPapers";
 	}
 
 

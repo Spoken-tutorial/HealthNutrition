@@ -42,6 +42,8 @@ public interface ResearchPaperService {
 	 */
 	ResearchPaper findById(int id);
 
+	List<ResearchPaper> findAllByShowOnHomePage();
+
 	
 
 
