@@ -27,15 +27,16 @@ border-right: 2px solid #014F7A;
   <nav th:replace="index.html :: navbar"></nav>
   </header>
  <div class="container-fluid">
+ <h1 class="text-center" style="color: #014F7A;font-size:1.5rem;">Research Papers</h1>
  <div class="row">
  <div class="col">
- <table id="events_table" class="table table-striped">
+ <table id="events_table" class="table table-striped" data-order='[[ 0, "desc" ]]'>
 					        	<thead>
 								<tr>
 									<th scope="col">Date Added</th>
 									<th scope="col">Title</th>
-									<th scope="col">Description</th>
 									<th scope="col">Research Paper</th>
+									<th scope="col">Description</th>
 									
 								</tr>
 							</thead>
@@ -46,7 +47,6 @@ border-right: 2px solid #014F7A;
        
       							</td>
 							      <td><span th:text = "${res.getTitle()}"></span></td>
-							      <td><span th:text = "${res.getDescription()}"></span></td>
 						
 							      <td> <img style=" height: 100px" th:if="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${res.getThumbnailPath()}}"></img>
      								 <img th:unless="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${res.getResearchPaperPath()}}"
@@ -56,6 +56,7 @@ border-right: 2px solid #014F7A;
 								  <a th:if="${res.getResearchPaperPath()!=null and res.getResearchPaperPath()!=''}" th:href="@{/files/}+@{${res.getResearchPaperPath()}}" download >Download</a>
 			
 								</td>
+								 <td><span th:text = "${res.getDescription()}"></span></td>
 								
 							    </tr>
 

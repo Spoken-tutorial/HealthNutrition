@@ -3,12 +3,12 @@
 <html xmlns:th="https://thymeleaf.org">
 <head th:replace="common/trail :: common-trail (pageTitle='Research Paper - Admin - Health And Nutrition')"></head>
 <style>
-.nav-carousel{
+.nav-researchPaper{
 border-right: 5px solid orange;
 font-size:0.9rem;
 /* text-decoration: underline; */
 }
-.nav-reserachPaper a{
+.nav-researchPaper a{
 color: #044F7A!important;
 font-weight:bold!important;
 }
@@ -42,7 +42,7 @@ font-weight:bold!important;
 					<li class="nav-item"><a class="nav-link active" id="home-tab"
 						data-toggle="tab" href="#add" role="tab" aria-controls="home"
 						aria-selected="true">Add</a></li>
-					<li class="nav-item"><a class="nav-link" id="profile-tab"
+					<li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="profile-tab"
 						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
 						aria-selected="false">View</a></li>
 
@@ -93,7 +93,7 @@ font-weight:bold!important;
 					</div>
 					<div class="tab-pane fade py-3" id="view" role="tabpanel"
 						aria-labelledby="profile-tab">
-						<table class="table table-striped" id="myTable">
+						<table class="table table-striped" id="myTable" data-order='[[ 0, "desc" ]]'>
 						
 							</div>
 							<thead>

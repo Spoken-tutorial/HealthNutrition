@@ -1938,6 +1938,8 @@ private void getModelData(Model model) {
 		}
 
 		model.addAttribute("userInfo", usr);
+		boolean viewSection= false;
+		model.addAttribute("viewSection", viewSection);
 
 		List<ResearchPaper> researchPapers = researchPaperService.findAll();
 
@@ -1984,12 +1986,15 @@ private void getModelData(Model model) {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				viewSection= false;
+				model.addAttribute("viewSection", viewSection);
 				model.addAttribute("error_msg",CommonData.RECORD_ERROR);
 				researchPaperService.delete(researchPaperTemp);
 				return "addResearchPaper";
 			}
 
-	
+		viewSection= false;
+		model.addAttribute("viewSection", viewSection);
 		researchPapers = researchPaperService.findAll();
 		model.addAttribute("researchPapers", researchPapers);
 		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
@@ -5143,6 +5148,7 @@ private void getModelData(Model model) {
 				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
 				researchPaper.setResearchPaperPath(document);
+				researchPaper.setThumbnailPath(null);
 
 			}
 			
@@ -8459,7 +8465,7 @@ private void getModelData(Model model) {
 	
 	
 	
-	@GetMapping("/brochure")
+	@GetMapping("/brochures")
 	public String brochure(Principal principal,Model model){
 
 		User usr=new User();
