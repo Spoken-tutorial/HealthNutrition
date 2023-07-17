@@ -3945,25 +3945,7 @@ private void getModelData(Model model) {
 	 * @param principal Principal object
 	 * @return String object (webpage)
 	 */
-	@RequestMapping(value = "/category", method = RequestMethod.GET)
-	public String viewCategoryGet(Model model,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-
-		List<Category> cat=catService.findAll();
-
-		model.addAttribute("categories", cat);
-
-		return "category";
-	}
-
+	
 	/**
 	 * redirects to edit category page
 	 * @param id int value
@@ -5307,22 +5289,7 @@ private void getModelData(Model model) {
 	 * @param principal Principal object
 	 * @return String object (webpage)
 	 */
-	@RequestMapping(value = "/language", method = RequestMethod.GET)
-	public String viewLanguageGet(Model model,Principal principal) {
 
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-		List<Language> lan=lanService.getAllLanguages();
-		model.addAttribute("lan", lan);
-
-		return "language";
-	}
 
 	/**
 	 * redirects to edit language page given id
@@ -5567,22 +5534,7 @@ private void getModelData(Model model) {
 	 * @param principal Principal object
 	 * @return String object (webpage)
 	 */
-	@RequestMapping(value = "/testimonial", method = RequestMethod.GET)
-	public String viewtestimonialGet(Model model,Principal principal) {
-
-		User usr=new User();
-
-		if(principal!=null) {
-
-			usr=userService.findByUsername(principal.getName());
-		}
-
-		model.addAttribute("userInfo", usr);
-		List<Testimonial> test=testService.findAll();
-		model.addAttribute("testimonials", test);
-
-		return "testimonial";
-	}
+	
 
 	/**
 	 * redirects to edit testimonial page given testimonial id
