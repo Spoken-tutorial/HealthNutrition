@@ -596,12 +596,6 @@ a:hover {
               <i class="fas fa-user-minus sidebar-icon"></i>Remove Role
             </span>
           </li>
-           <li class="nav-item border-lt nav-super-revoke-admin" th:if="${#authorization.expression('hasAuthority(''ADMIN_REVIEWER'')')}">
-            <a class="nav-link revoke_role" th:href="@{/}">
-              
-               Admin Reviewer
-            </a>
-          </li>
           <li class="nav-item border-lt nav-super-revoke-contri" th:if="${#authorization.expression('hasAuthority(''CONTRIBUTOR'')')}">
             <a class="nav-link revoke_role" th:href="@{/revokeRoleContributor}">
               
