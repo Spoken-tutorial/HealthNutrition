@@ -138,9 +138,8 @@ border-right: 2px solid #014F7A;
 											style=" height: 100px" />
 										<br>
 										<a th:href="@{/files/}+@{${filesBro.getWebPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-										<a th:if="${filesBro.getPrintPath()!=null and filesBro.getPrintPath()!=''}" th:href="@{/files/}+@{${filesBro.getPrintPath()}}"
-													download >Download</a>
-										<a th:unless="${filesBro.getPrintPath()!=null and filesBro.getPrintPath()!='' }" th:href="@{/files/}+@{${filesBro.getWebPath()}}" download >Download</a>
+										
+										<a th:href="@{/files/}+@{${filesBro.getWebPath()}}" download >Download</a>
 					                </td>
 					                 <td th:text="${filesBro.getVersion().getBrouchure().getTitle()}"></td>
 					                <td > 

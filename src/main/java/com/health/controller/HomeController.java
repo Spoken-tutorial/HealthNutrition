@@ -2269,7 +2269,6 @@ private void getModelData(Model model) {
 	@RequestMapping(value = "/addBrochure",method = RequestMethod.POST)
 	public String addBrochurePost(Model model,Principal principal,
 								  @RequestParam("brouchure") List<MultipartFile> brochures,
-								  @RequestParam("brouchurePrint") List<MultipartFile> brochurePrints,
 								  @RequestParam(value = "categoryName") int categoryId,
 								  @RequestParam(name = "inputTopicName") int topicId,
 								  @RequestParam(name = "languageName") List<Integer> languageIds,
@@ -2316,14 +2315,6 @@ private void getModelData(Model model) {
 			
 		}
 		
-		for(MultipartFile uniquePrintfile: brochurePrints) {
-			if(!uniquePrintfile.isEmpty()) {
-				if(!ServiceUtility.checkFileExtensionImage(uniquePrintfile) && !ServiceUtility.checkFileExtensiononeFilePDF(uniquePrintfile)){  // throw error
-					model.addAttribute("error_msg","Only image and pdf files are supported");
-					return  addBrochureGet(model, principal);
-				}
-			}
-		}
 		
 		
 		
@@ -2417,14 +2408,7 @@ private void getModelData(Model model) {
 				}
 			
 			
-			if(!brochurePrints.get(i).isEmpty()) {
-			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion+ "/" + "printdoc" + "/" + langName);
-			String pathtoUploadPoster2=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId+"/" +primaryVersion+ "/" + "printdoc" + "/" + langName);
-			int indexToStart2=pathtoUploadPoster2.indexOf("Media");
-			printDocument=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
 			
-			
-			}
 			
 			
 			
@@ -2437,7 +2421,7 @@ private void getModelData(Model model) {
 			
 			addedLanguages.add(langName);
 			
-			filesofbrochureList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, lanService.getById(languageIds.get(i))));
+			filesofbrochureList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, version, lanService.getById(languageIds.get(i))));
 			newbroFileId +=1;
 			
 			
@@ -2462,7 +2446,6 @@ private void getModelData(Model model) {
 				
 				version.setVerId(newVerid);
 				version.setVersionPosterPath(document1);
-				version.setVersionPrintPosterPath(printDocument);
 				version.setBrouchure(brochureTemp);
 				version.setBroVersion(primaryVersion);
 				version.setDateAdded(ServiceUtility.getCurrentTime());
@@ -4620,7 +4603,7 @@ private void getModelData(Model model) {
 	 */
 	@RequestMapping(value = "/updateBrochure", method = RequestMethod.POST)
 	public String updatBrochureGet(HttpServletRequest req,Model model,Principal principal, @RequestParam(name = "languageName") List<Integer> languageIds,
-			@RequestParam("brouchure") List<MultipartFile> brochures, @RequestParam("brouchurePrint") List<MultipartFile> brochurePrints) {
+			@RequestParam("brouchure") List<MultipartFile> brochures) {
 
 		User usr=new User();
 
@@ -4721,15 +4704,7 @@ private void getModelData(Model model) {
 				
 			}
 			
-			for(MultipartFile uniquePrintfile: brochurePrints) {
-				if(!uniquePrintfile.isEmpty()) {
-					if(!ServiceUtility.checkFileExtensionImage(uniquePrintfile) && !ServiceUtility.checkFileExtensiononeFilePDF(uniquePrintfile)){  // throw error
-						model.addAttribute("error_msg","Only image and pdf files are supported");
-						return "addBrochure";
-					}
-				}
-			}
-
+			
 			
 	
 				if(overwriteValue !=0) {
@@ -4766,14 +4741,7 @@ private void getModelData(Model model) {
 					
 					}
 					
-					if(!brochurePrints.get(i).isEmpty()) {
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" + versionValue + "/" + "printdoc" + "/" + langName);
-						String pathtoUploadPoster2=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" +versionValue+ "/" + "printdoc" + "/" + langName);
-						int indexToStart2=pathtoUploadPoster2.indexOf("Media");
-						printDocument=pathtoUploadPoster2.substring(indexToStart2, pathtoUploadPoster2.length());
-						
-						
-					}
+					
 					
 					for(String testlan: addedlanguagesforOverride) {
 						if(testlan==langName) {
@@ -4791,9 +4759,6 @@ private void getModelData(Model model) {
 							fileBro.setWebPath(document1);
 						}
 						
-						if(!brochurePrints.get(i).isEmpty()) {
-							fileBro.setPrintPath(printDocument);
-						}
 						
 						fileBro.setThumbnailPath(null);
 						filesofbrouchureService.save(fileBro);
@@ -4805,7 +4770,7 @@ private void getModelData(Model model) {
 					else {
 						
 						if(!brochures.get(i).isEmpty()) {
-							filesBroList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, printDocument,  version, language));
+							filesBroList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, version, language));
 							newbroFileId = newbroFileId + 1;
 							
 						}
@@ -4820,7 +4785,6 @@ private void getModelData(Model model) {
 				} 
 					if(webfileErrorforOverride==false && duplicatelangforOverride==false) {
 					version.setVersionPosterPath(document1);
-					version.setVersionPrintPosterPath(printDocument);
 					verService.save(version);
 					brouchure.setTitle(title);
 					broService.save(brouchure);
@@ -4861,13 +4825,7 @@ private void getModelData(Model model) {
 						document2=pathtoUploadPoster3.substring(indexToStart3, pathtoUploadPoster3.length());
 						
 						
-						if(!brochurePrints.get(i).isEmpty()) {
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+brochureId+"/" + newVersionValue+ "/" + "printdoc" + "/" + langName);
-						String pathtoUploadPoster4=ServiceUtility.uploadFile(brochurePrints.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" + newVersionValue + "/" + "printdoc" + "/" + langName);	
-						int indexToStart4=pathtoUploadPoster4.indexOf("Media");
-						printDocument2=pathtoUploadPoster4.substring(indexToStart4, pathtoUploadPoster4.length());
 						
-						}
 						 
 						for(String testlan: addedLanguages) {
 							if(testlan==langName) {
@@ -4876,7 +4834,7 @@ private void getModelData(Model model) {
 						}
 						addedLanguages.add(langName);
 						
-						filesBroList1.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document2, printDocument2,  newVer, lanService.getById(languageIds.get(i))));
+						filesBroList1.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document2, newVer, lanService.getById(languageIds.get(i))));
 						newbroFileId +=1;
 						
 						}
@@ -4901,7 +4859,6 @@ private void getModelData(Model model) {
 							newVer.setDateAdded(ServiceUtility.getCurrentTime());
 							newVer.setBroVersion(version.getBroVersion()+1);
 							newVer.setVersionPosterPath(document2);
-							newVer.setVersionPrintPosterPath(printDocument2);
 							verService.save(newVer);
 							
 							filesofbrouchureService.saveAll(filesBroList1);

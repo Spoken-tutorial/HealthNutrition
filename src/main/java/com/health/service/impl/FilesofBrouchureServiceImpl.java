@@ -89,14 +89,7 @@ public class FilesofBrouchureServiceImpl implements  FilesofBrouchureService {
 		
 	}
 	
-	@Override
-	public String GetPrintFileofFirstLan(Version ver) {
-		
-		List<FilesofBrouchure> listofBroFiles=filesofbrouchureRepository.findByVersion(ver);
-		FilesofBrouchure fileBro = listofBroFiles.get(0);
-		return fileBro.getPrintPath();
-		
-	}
+	
 	
 	@Override
 	public FilesofBrouchure findByLanguageandVersion(Language lan, Version ver) {

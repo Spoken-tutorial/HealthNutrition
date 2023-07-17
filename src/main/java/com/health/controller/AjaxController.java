@@ -882,12 +882,9 @@ public class AjaxController{
 			
 			
 			String webFile= filesBro.getWebPath();
-			String printFile= filesBro.getPrintPath();
+			
 			if(webFile!="") {
 				fileList.add(webFile);
-			}
-			if(printFile !="") {
-				fileList.add(printFile);
 			}
 			
 		} catch(Exception e) {

@@ -94,20 +94,14 @@
 											</div>
 											
 										<div class="form-group"  id="lanForWebFile">
-										<label for="title"><h6>Web files available for the languages: </h6></label>
+										<label for="title"><h6>Brochure files available for the languages: </h6></label>
 										<span id="webLan" th:each="filesofBro: ${filesOfBroList}"> 
 										<b><span class="webLanClass"  th:if="${filesofBro.getWebPath() != ''}" th:text="${filesofBro.getLan().getLangName()}"></span></b>
 										</span>
 		
 										</div>
 										
-										<div class="form-group" id="lanForPrintFile" >
-										<label for="title"><h6>Print files available for the languages: </h6></label>
-										<span th:each="filesofBro: ${filesOfBroList}"> 
-										<b><span class="webPrintClass" th:if="${filesofBro.getPrintPath() != ''}" th:text="${filesofBro.getLan().getLangName()}" ></span></b>
-										</span>
-		
-										</div>
+										
 											
 											
 
@@ -115,26 +109,21 @@
 
 										
 <div th:each="lanouter,iter: ${languages}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
-<div class="form-group" style="float:left; width:20%; ">
+<div class="form-group" style="float:left; width:40%; ">
 <label th:for="${'languageNameId' + iter.index}">Select Language </label>
 <select th:id="${'languageNameId' + iter.index}" class="form-control" name="languageName" >
 <option value="0">Select ...</option>
 <option th:each="lan : ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}"></option></select>
  </div>
 
-<div class="form-group" style="float:left;  width:35%; margin-left:15px; margin-right:15px;">
-	<label th:for="${'brouchure' + iter.index}">Brochure for web  </label>
+<div class="form-group" style="float:left;  width:40%; margin-left:15px; margin-right:40px;">
+	<label th:for="${'brouchure' + iter.index}">Brochure file  </label>
 	<input type="file" class="form-control" th:id="${'brouchure' + iter.index}" name="brouchure" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,734003200)"/>
 	<small> (.jpg or .png or .pdf only)</small> 
 	<small>Max file size : 700 MB</small>
 </div>
 
-<div class="form-group" style="float:left;  width:35%; margin-right:30px;">
-	<label th:for="${'brouchurePrint' + iter.index}">Brochure for print </label>
-	<input type="file" class="form-control" th:id="${'brouchurePrint' + iter.index}" name="brouchurePrint" accept=".jpeg,.jpg,.png,.pdf"  onchange="validate_file_size(this,734003200)"/>
-	<small> (.jpg or .png or .pdf only)</small>
-	<small>Max file size : 700 MB</small>
-</div>
+
 </div>
 <br>
 											
@@ -192,9 +181,7 @@
 											style="width: 150px; height: 100px" />
 										<br>
 										<a th:href="@{/files/}+@{${file1.getWebPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-										<a th:if="${file1.getPrintPath()!=null and file1.getPrintPath()!=''}" th:href="@{/files/}+@{${file1.getPrintPath()}}"
-													download >Download</a>
-										<a th:unless="${file1.getPrintPath()!=null and file1.getPrintPath()!='' }" th:href="@{/files/}+@{${file1.getWebPath()}}" download >Download</a>
+										<a  th:href="@{/files/}+@{${file1.getWebPath()}}" download >Download</a>
 					                </td>
 	 	<td> <span th:text="${file1.getLan().getLangName()}"> </span></td>
 	   <td><span th:text="${file1.getVersion().getBroVersion()}"></span></td>

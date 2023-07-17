@@ -38,7 +38,6 @@ public interface FilesofBrouchureService {
 	
 	String GetWebFileofFirstLan(Version ver);
 	
-	String GetPrintFileofFirstLan(Version ver);
 	
 	void  saveAll(List<FilesofBrouchure> filesofbrouchure);
 	

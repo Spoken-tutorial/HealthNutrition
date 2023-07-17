@@ -15,8 +15,6 @@ public class FilesofBrouchure {
 	@Column(name = "Web_path")
 	private String webPath;
 	
-	@Column(name = "Print_path")
-	private String printPath;
 	
 	@Column(name = "thumbnail_path")
 	private String thumbnailPath;
@@ -35,41 +33,38 @@ public class FilesofBrouchure {
 	
 }
 	
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version,
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, Version version,
 			Language lan) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
 		this.webPath = webPath;
-		this.printPath = printPath;
 		this.version = version;
 		this.lan = lan;
 	}
 	 
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath) {
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
 		this.webPath = webPath;
-		this.printPath = printPath;
+		
 		
 	}
 	 
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Language lan) {
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath,  Language lan) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
 		this.webPath = webPath;
-		this.printPath = printPath;
 		this.lan = lan;
 	} 
 	
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version) {
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath,  Version version) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
 		this.webPath = webPath;
-		this.printPath = printPath;
 		this.version = version;
 		
 	}
@@ -107,13 +102,6 @@ public class FilesofBrouchure {
 		this.webPath = webPath;
 	}
 
-	public String getPrintPath() {
-		return printPath;
-	}
-
-	public void setPrintPath(String printPath) {
-		this.printPath = printPath;
-	}
 
 	public Version getVersion() {
 		return version;

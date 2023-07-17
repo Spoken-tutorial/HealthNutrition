@@ -29,8 +29,6 @@ public class Version {
 	@Column(name = "Image_path")
 	private String versionPosterPath;
 	
-	@Column(name = "Print_Image_path")
-	private String versionPrintPosterPath;
 	
 	@ManyToOne
 	@JoinColumn(name = "bro_id")
@@ -105,23 +103,7 @@ public class Version {
 	
 	
 	
-	public String findPrintFileofEnglish() {
-		if (filesofBrouchure.size() == 0)
-			return "";
-		String printFile="";
-		for (FilesofBrouchure file: filesofBrouchure) {
-			if(file.getLan().getLanId()==22) {
-				printFile=file.getPrintPath();
-				break;
-				
-			}
-		}
-		
-		if(printFile==null) {
-			return "";
-		}
-		return printFile;
-	}
+
 	
 	
 	
@@ -145,23 +127,8 @@ public class Version {
 		return webPath;
 	}
 	
-	public String  GetPrintFileofFirstLan() {
-		if (filesofBrouchure.size() == 0)
-			return "";
-		FilesofBrouchure first = filesofBrouchure.iterator().next();
-		String printPath = first.getPrintPath();
-		if(printPath==null)
-			return "";
-		return printPath;
-	}
 	
-	
-	
-	@Override
-	public String toString() {
-		return "Version [verId=" + verId + ", dateAdded=" + dateAdded + ", versionPosterPath=" + versionPosterPath
-				+ ", broVersion=" + broVersion + "]";
-	}
+
 
 	public Version(int verId, Timestamp dateAdded, String versionPosterPath, Brouchure brouchure, int broVersion) {
 		super();
@@ -172,16 +139,6 @@ public class Version {
 		this.broVersion = broVersion;
 	}
 
-	 public Version(int verId, Timestamp dateAdded, String versionPosterPath, String versionPrintPosterPath,
-				Brouchure brouchure, int broVersion) {
-			super();
-			this.verId = verId;
-			this.dateAdded = dateAdded;
-			this.versionPosterPath = versionPosterPath;
-			this.versionPrintPosterPath = versionPrintPosterPath;
-			this.brouchure = brouchure;
-			this.broVersion = broVersion;
-		}
 	 
 	public int getBroVersion() {
 		return broVersion;
@@ -207,20 +164,7 @@ public class Version {
 	
 
 	
-	 public Version(int verId, Timestamp dateAdded, String versionPosterPath, String versionPrintPosterPath,
-			Brouchure brouchure) {
-		super();
-		this.verId = verId;
-		this.dateAdded = dateAdded;
-		this.versionPosterPath = versionPosterPath;
-		this.versionPrintPosterPath = versionPrintPosterPath;
-		this.brouchure = brouchure;
-		
-	}
-
-
-
-
+	
 	public static Comparator<Version> SortByBroVersionInDesc = new Comparator<Version>() {
 		  
 	        // Method
@@ -274,13 +218,7 @@ public class Version {
 		return versionPosterPath;
 	}
 
-	public String getVersionPrintPosterPath() {
-		return versionPrintPosterPath;
-	}
-
-	public void setVersionPrintPosterPath(String versionPrintPosterPath) {
-		this.versionPrintPosterPath = versionPrintPosterPath;
-	}
+	
 
 	public void setVersionPosterPath(String versionPosterPath) {
 		this.versionPosterPath = versionPosterPath;
