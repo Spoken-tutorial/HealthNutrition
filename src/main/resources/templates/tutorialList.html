@@ -96,10 +96,22 @@
 var isPlaying = [];
 		
 		var videos = document.querySelectorAll('video');
+		
+		document.addEventListener('DOMContentLoaded', function() {
+		      // Get the first video element
+		      const firstVideo = document.querySelector('video');
+
+		      // Mute the first video
+		      firstVideo.muted = true;
+		      firstVideo.play();
+		    });
+		
 		for(var i=0; i<videos.length; i++){
 			if(i==0){
-				videos[i].play();
-				videos[i].muted=true;
+				//videos[i].muted=true;
+				//videos[i].play();
+				//videos[i].muted=true;
+				
 			}
 			
 		  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
@@ -120,6 +132,7 @@ var isPlaying = [];
 			 	
 			 	if(flagCheck==0){
 			 		if (!isPlaying[index]) {
+			 			videos[index].muted=true;
 				        videos[index].play();
 				        videos[index].muted=true;
 				        isPlaying[index] = true;
