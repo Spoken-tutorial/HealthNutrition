@@ -18,8 +18,11 @@ function resetInput(id) {
 </script>
 <div class="row" style="width: 100%;">
 <div class="col-md-3 mb-3 input-group">
-            <select class="custom-select d-block form-control" id="categoryname" name="categoryName">
-              <option value="0">Select Category</option>
+            <select class="custom-select d-block form-control selectedValue" id="categoryname" name="categoryName">
+            
+             <option th:if="${localCat !=null}" th:value="${localCat.getCategoryId()}" th:text="${localCat.getCatName()}"></option>
+              <option  value="0">Select Category</option>
+             
               <option th:each="category : ${categories}" th:value="${category.getCategoryId()}" th:text="${category.getCatName()}" ></option>
             </select>
             <span class="input-group-btn" style=" padding-top: 4px;"><button  id="catreset"  > <span style="font-size:8px;">&#10060;</span></button></span>
@@ -29,6 +32,7 @@ function resetInput(id) {
 
 <div class="col-md-3 mb-3 input-group">
 <select class="custom-select d-block form-control" id="inputTopicName" name="topic">
+			  <option th:if="${localCat !=null}" th:value="${localTopic.getTopicId()}" th:text="${localTopic.getTopicName()}"></option>
               <option value="0">Select Topic</option>
               <option th:each="topic : ${topics}" th:value="${topic.getTopicId()}" span th:text="${topic.getTopicName()}"></option>
             </select>
@@ -39,6 +43,7 @@ function resetInput(id) {
 
 <div class="col-md-3 mb-3 input-group">
 <select class="custom-select d-block form-control" id="inputLanguage" name="lan">
+			  <option th:if="${localLan !=null}" th:value="${localLan.getLanId()}" th:text="${localLan.getLangName()}"></option>
               <option value="0">Select Language</option>
               <option th:each="language : ${languages}" th:value="${language.getLanId()}" th:text="${language.getLangName()}"></option> 
             </select>

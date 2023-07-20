@@ -796,7 +796,9 @@ private void getModelData(Model model) {
 		int totalPages = tut.getTotalPages();
 		int firstPage = page + 1 > 2 ? page + 1 - 2 : 1;
 		int lastPage= page + 1 < totalPages - 5 ? page + 1 + 5 : totalPages;
-
+		model.addAttribute("localCat", localCat);
+		model.addAttribute("localTopic", localTopic);
+		model.addAttribute("localLan", localLan);
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
 		model.addAttribute("firstPage", firstPage);
