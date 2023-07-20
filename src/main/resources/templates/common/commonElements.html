@@ -6,7 +6,7 @@
 	</div>
 	<div th:fragment="search_bar">
 		<section id="search-bar" class="container-lg my-5">
-<form th:action="@{/tutorials}" class="form-inline" style="width:100%;" >
+<form th:action="@{/tutorials}" class="form-inline" name="selectOption" id="form1" style="width:100%;" >
 <script type="text/javascript">
 function resetInput(id) {
 	   //document.getElementById(id).value="";
@@ -17,7 +17,7 @@ function resetInput(id) {
 	}
 </script>
 <div class="row" style="width: 100%;">
-<div class="col-md-3 mb-3 input-group">
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
             <select class="custom-select d-block form-control selectedValue" id="categoryname" name="categoryName">
             
              <option th:if="${localCat !=null}" th:value="${localCat.getCategoryId()}" th:text="${localCat.getCatName()}"></option>
@@ -30,9 +30,9 @@ function resetInput(id) {
 </div>
 
 
-<div class="col-md-3 mb-3 input-group">
+<div class="col-md-4 mb-3 input-group" style="width:100%;">
 <select class="custom-select d-block form-control" id="inputTopicName" name="topic">
-			  <option th:if="${localCat !=null}" th:value="${localTopic.getTopicId()}" th:text="${localTopic.getTopicName()}"></option>
+			  <option th:if="${localTopic !=null}" th:value="${localTopic.getTopicId()}" th:text="${localTopic.getTopicName()}"></option>
               <option value="0">Select Topic</option>
               <option th:each="topic : ${topics}" th:value="${topic.getTopicId()}" span th:text="${topic.getTopicName()}"></option>
             </select>
@@ -41,7 +41,7 @@ function resetInput(id) {
 
 
 
-<div class="col-md-3 mb-3 input-group">
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
 <select class="custom-select d-block form-control" id="inputLanguage" name="lan">
 			  <option th:if="${localLan !=null}" th:value="${localLan.getLanId()}" th:text="${localLan.getLangName()}"></option>
               <option value="0">Select Language</option>
@@ -51,29 +51,33 @@ function resetInput(id) {
             
 </div>
 
-          <div class="col-md-2 mb-3" style="width: 100%;">
-           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
-          </div>
+         
 </div>
 </form>
 
 
-<form th:action="@{/tutorialsSearch}" id="searchForm">
-   <div class="row">
-    <div class="col-md-7 mb-2" style="width:100%;">
-  
-      <input name="query" id="query"  th:value="${query}" placeholder="Search Here.................." required style="width:100%; height:125%"/>
-    </div>
-   
-    <div class="col-md-2  mb-2" style="width:40%;">
-    <input type="submit"  value="Filter" style="width:82%; height:123%; color:#fff; background:#1C7871;" />
-    </div>
-     <div class="col-md-2  mb-2"style="width:40%;">
-   <a th:href="@{/}"> <input class="btnClear" type="button" value="Clear" id="btnClear" style="width:82%; height:123%; color:#fff; background:SlateBlue;" /></a>
-    </div>
-    </div> 
+ <div class="row" style="width:100%;">
 	
-</form>
+    <div class="col-md-8 mb-2" style="width:100%; height:120%">
+    <form th:action="@{/tutorialsSearch}"  name="searchOption" id="form2">
+  
+      <input name="query" id="query"  th:value="${query}" placeholder="Search Here.................."  style="width:100%; height:38px"/>
+    </form>
+   
+    </div>
+  
+    <div class="col-md-2  mb-2" style="width:100%;">
+    <button type="submit" class="btn btn-outline-info" id="submitBotton" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
+    </div>
+     <div class="col-md-2 mb-2" style="width: 100%;">
+          <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearForm" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
+           
+     </div>
+   
+  </div> 
+
+
+
 
 
           
@@ -235,7 +239,7 @@ function resetInput(id) {
 	 	<span th:if="${status==4}"> <i class="fas fa-times-circle review-improvement" data-toggle="tooltip" data-placement="top"></i></span>
 	</td>
 
-	
+
 
 </body>
 </html>

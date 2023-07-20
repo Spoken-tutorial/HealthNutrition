@@ -1959,12 +1959,7 @@ $("#languageId1").change(function() {
 		/*
 		Funtion to reset search input
 		*/	
-		$(".btnClear").click(function(){
-       		 $("#myForm").trigger("reset");
-       		 $("#query").setVal("");
-       
-        	return false;
-        });
+		
         	
         	
         	
@@ -2126,17 +2121,36 @@ $("#languageId1").change(function() {
 				
 			});
 			
-			$("#btnClear").click(function(){
-   			 $(".btnClear").click(function(){
-       		 $("#searchForm").trigger("reset");
-    		});
+			$( "#btnClearForm" ).click(function() {
+				
+				$("#query").val("");
+				var languageid = 0;
+				$("#inputLanguage").val("0");
+				var topicid =0; 
+				$("#inputTopicName").val("0");
+				var catgoryid=0;
+				$("#categoryname").val("0");
+				//loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				
+				return false;
+				
 			});
-			
+
 			$("#reset2").click(function(){
  			 $(":reset").css("background-color", "red");
 			});
 			
 			
+  		  $("#submitBotton").click(function(){
+          		if ($("#query").val() === "") {
+               		 $("form[name=selectOption]").submit();
+         		} else {
+               		 $("form[name=searchOption]").submit();
+         		 }
+  		  });
 			
 
 
