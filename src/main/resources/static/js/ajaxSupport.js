@@ -2054,7 +2054,7 @@ $("#languageId1").change(function() {
      
     	 */
     	 
-    	 function loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid){
+    	 function loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid){
 			
 			$.ajax({
 					type : "GET",
@@ -2103,7 +2103,7 @@ $("#languageId1").change(function() {
 				var languageid = $(this).val();
 				var catgoryid = $("#categoryname").val();
 				var topicid=$("#inputTopicName").val();
-				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
 				
 				
 			});
@@ -2115,7 +2115,7 @@ $("#languageId1").change(function() {
 				var topicid = $("#inputTopicName").val();
 				var catgoryid=$("#categoryname").val();
 				//loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
-				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
 				
 				return false;
 				
@@ -2131,12 +2131,35 @@ $("#languageId1").change(function() {
 				var catgoryid=0;
 				$("#categoryname").val("0");
 				//loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
-				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
 				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
 				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
 				
 				return false;
 				
+			});
+			
+			
+			$(document).ready(function(){
+    			$.ajax({ url: "templates/tutorialList.html",
+        		context: document.body,
+        		success: function(){
+				
+				var languageid = $("#inputLanguage").val();
+				var topicid =$("#inputTopicName").val();
+				var catgoryid=$("#categoryname").val();
+				if(languageid!=0){
+					loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
+				}
+				if(catgoryid!=0){
+					loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				}
+				if(topicid!=0){
+					loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				}
+           		
+       			 }
+  			  });
 			});
 
 			$("#reset2").click(function(){
@@ -2144,11 +2167,13 @@ $("#languageId1").change(function() {
 			});
 			
 			
-  		  $("#submitBotton").click(function(){
+  		  $("#submitBotton").click(function(e){
           		if ($("#query").val() === "") {
                		 $("form[name=selectOption]").submit();
+               	
          		} else {
                		 $("form[name=searchOption]").submit();
+               		 
          		 }
   		  });
 			

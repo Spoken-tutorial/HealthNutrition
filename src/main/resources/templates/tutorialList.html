@@ -6,7 +6,7 @@
  <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
   <section th:replace="index.html :: header-bar"></section>
   <nav class="navbar navbar-expand-lg navbar-light bg-light ">
-  <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+  <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Spoken Tutorial" height="50" width="50"> </img></a>
 								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">Spoken <span style="color: orange;font-size:1.8rem;">Tutorial</span>  </span> </span> <span style="color: rgba(0,0,0,0.9);font-size: 1.5rem;" class="ml-3"><span style="border-bottom:2px solid orange;">Health
 & Nutrition </span><span style="color: orange;font-size: 2rem;"></span></span>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,7 @@
 
 		
 <div th:replace="common/trail :: body-bottom-scripts"></div>
+
 <style>
   :root {
   --plyr-color-main: #ff9033;
@@ -88,11 +89,38 @@
     margin-bottom: 25px;
     padding-bottom:25px;
   }
+  
 </style>
+
+<!-- 
+<script  th:inline="javascript"> 
+/*<![CDATA[*/
+var localCat = /*[[${localCat}]]*/ 0;
+var localTopic = /*[[${localTopic}]]*/ 0;
+var localLan = /*[[${localLan}]]*/ 0;
+
+/*]]>*/
+if(localCat!=0){
+	loadTopicAndLanguageByCategory(localCat, localTopic, localLan);
+}
+if(localTopic!=0){
+	
+	loadCategoryAndLanguageByTopic(localCat, localTopic, localLan);
+}
+if(localLan!=0){
+	loadCategoryAndTopicByLanguage(localCat, localTopic, localLan);
+}
+	
+</script>
+ -->
+
 
 
 <script>
 		var projectPath='[(@{/})]';
+		
+		
+  		
 		 
 var isPlaying = [];
 		

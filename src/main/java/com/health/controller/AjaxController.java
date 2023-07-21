@@ -1090,8 +1090,8 @@ public class AjaxController{
 	
 	@RequestMapping("/loadCategoryAndTopicByLanguage")
 	@Cacheable(cacheNames ="languages", key="{#root.methodName, #languageId, #catId, #topicId }" )
-	public @ResponseBody ArrayList<Map<String,Integer>> getCategoryAndTopicByLanguage(@RequestParam(value="languageId") int languageId, @RequestParam(value = "catId") int catId,
-			@RequestParam(value="topicId") int topicId) {
+	public @ResponseBody ArrayList<Map<String,Integer>> getCategoryAndTopicByLanguage( @RequestParam(value = "catId") int catId,
+			@RequestParam(value="topicId") int topicId, @RequestParam(value="languageId") int languageId) {
 		
 		ArrayList<Map<String,Integer>> arlist=new ArrayList<>();
 		Map<String,Integer> cats=new TreeMap<>();
