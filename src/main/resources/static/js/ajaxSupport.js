@@ -4182,7 +4182,7 @@ $("#select-language").change(function(){
 	}
 });
 
-document.getElementById("btn_unpublish").addEventListener("click", function(event){
+$("#btn_unpublish").on("click", function(event){
   event.preventDefault();
 					let category = document.getElementById("select-category").value;
 				let topic = document.getElementById("select-topic").value;

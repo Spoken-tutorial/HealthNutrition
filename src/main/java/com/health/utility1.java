@@ -9,4 +9,4 @@ public class utility1 {
     }
 }
 
-// #onload
+// jQuery-Duplicate-Plugin

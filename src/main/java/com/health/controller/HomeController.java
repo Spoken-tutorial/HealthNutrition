@@ -6748,52 +6748,43 @@ private void getModelData(Model model) {
 		model.addAttribute("topic", topic);
 		
 		TopicCategoryMapping topicCat=topicCatService.findAllByCategoryAndTopic(cat, topic);
+		System.out.println("Test Topic Cat :" + topicCat);
 		Tutorial tutorial = null;
 		
 		ContributorAssignedTutorial conTutorial=conRepo.findByTopicCatAndLanViewPart( topicCat, lan);
+		System.out.println("Test Topic ConTutorial :" + conTutorial);
 		List<Tutorial> tutorials=tutService.findAllByContributorAssignedTutorial(conTutorial);
+		System.out.println("Test Topic Tutorial :" + tutorials);
 		setCompStatus(model,tutorials);
 		setEngLangStatus(model, lan);
 		
 		if(!lan.getLangName().equalsIgnoreCase("english")) {
 			
 			boolean goAhead = false;
-			List<Tutorial> tutTemp = null ;
-			List<ContributorAssignedTutorial> tempCon = conRepo.findByTopicCat(topicCat);
-			List<TopicCategoryMapping> tcm_list = topicCatService.findAllByTopic(topic);
+			Language englishLan= lanService.getByLanName("english");
+			ContributorAssignedTutorial conTutorialforEnglish =conRepo.findByTopicCatAndLanViewPart( topicCat, englishLan);
+			List<Tutorial> tutorialsForEnglish=tutService.findAllByContributorAssignedTutorial(conTutorialforEnglish);
 			
-			for(TopicCategoryMapping tc : tcm_list) {
-				List<ContributorAssignedTutorial> ct = conRepo.findByTopicCat(tc);
-				for(ContributorAssignedTutorial x : ct) {
-					if(x.getLan().getLangName().equalsIgnoreCase("english")) {
-						goAhead =true;
-						tutTemp = tutService.findAllByContributorAssignedTutorial(x);
-						break;
-					}
-				}
+			System.out.println("Growth Chart LangName" + englishLan.getLangName());
+			System.out.println("Growth con" + conTutorialforEnglish.getId());
+			System.out.println(" Growth tut tutorialsForEnglish Size" + tutorialsForEnglish.size());
+			//List<TopicCategoryMapping> tcm_list = topicCatService.findAllByTopic(topic);
+			
+			if(tutorialsForEnglish.size()>0) {
+				System.out.println("tutorialsForEnglish Size" + tutorialsForEnglish.size());
+				System.out.println(tutorialsForEnglish.get(0).getTutorialId());
+				goAhead =true;
+					
+				
 			}
 			
 			if(goAhead == false) {
 				model.addAttribute("error_msg", "Please add English version of tutorial first.");
 				model.addAttribute("disable", true);
 				return "uploadTutorialPost";
-			}else {
-				
-				if(tutTemp.isEmpty()) {
-					model.addAttribute("error_msg", "Please add English version of tutorial first.");
-					model.addAttribute("disable", true);
-					return "uploadTutorialPost";
-					
-				}else {
-					for(Tutorial x : tutTemp) {
-						if(!x.isStatus()) {
-							model.addAttribute("error_msg", "Please publish English version of tutorial first.");
-							model.addAttribute("disable", true);
-							return "uploadTutorialPost";
-						}
-					}
-				}
 			}
+				
+				
 		}
 		if(!tutorials.isEmpty()) {
 //			set video details
