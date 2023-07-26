@@ -2885,12 +2885,9 @@ $("#languageId1").change(function() {
 						let [tutorialId,category,topicid,lang] = setTutorialData();
 						var outline = editor.getData();
 						$.ajax({
-							type : "GET",
+							type : "POST",
 							url : projectPath+"addOutline",
-							headers: {          
-    Accept: "application/json; charset=utf-8",         
-    "Content-Type": "application/json; charset=utf-8"   
-  }  ,
+						
 							data : {
 								"saveOutline" : outline,
 								"id" : tutorialId,

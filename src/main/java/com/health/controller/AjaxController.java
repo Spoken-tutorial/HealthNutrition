@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -1491,7 +1492,7 @@ public class AjaxController{
 	 * @param principal principal object
 	 * @return string
 	 */
-	@RequestMapping("/addOutline")
+	@RequestMapping(value="/addOutline" , method = RequestMethod.POST)
 	public @ResponseBody HashMap<String, String> addOutline(@RequestParam(value = "id") int tutorialId,
 											@RequestParam(value = "saveOutline") String outlineData,
 											@RequestParam(value = "categoryname") String catName,
@@ -1501,6 +1502,8 @@ public class AjaxController{
 		
 		System.out.println("id "+tutorialId+" data "+ outlineData + " catname " + catName + " topicid " + topicId + " lanId " + lang +" Principal "+ principal);
 		HashMap<String, String> temp = new HashMap<>();
+		logger.info("Test Outline");
+		logger.info("Outline length: outline {}", outlineData.length());
 		
 		Category cat=catService.findBycategoryname(catName);
 		int catId=cat.getCategoryId();
