@@ -215,7 +215,8 @@ public class HomeController {
 
 	@Autowired
 	private Environment env;
-
+	
+	
 	@Autowired
 	private UserRoleService usrRoleService;
 	
@@ -1269,6 +1270,9 @@ private void getModelData(Model model) {
 
 		//List<Category> categories=catService.findAll();
 		List<ResearchPaper> researchPapers= researchPaperService.findAllByShowOnHomePage();
+		for(ResearchPaper temp : researchPapers) {
+			makeThumbnailofResearchPaper(temp);
+		}
 		model.addAttribute("researchPapers", researchPapers);
 		return "researchPapers";
 	}
@@ -1970,16 +1974,12 @@ private void getModelData(Model model) {
 		researchPaperTemp.setDescription(researchPaperDesc);
 		researchPaperTemp.setTitle(title);
 		researchPaperTemp.setDateAdded(ServiceUtility.getCurrentTime());
+		
 
 		try {
-
-			
-
-			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaperTemp.getId());
-			String pathtoUploadPoster=ServiceUtility.uploadFile(researchFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaperTemp.getId());
-			int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-			String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+	
+			String folder= CommonData.uploadResearchPaper+researchPaperTemp.getId();
+			String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
 
 			researchPaperTemp.setResearchPaperPath(document);
 
@@ -2386,10 +2386,12 @@ private void getModelData(Model model) {
 			
 			String document1="";
 			String printDocument="";
+			String folder="";
 			int newbroFileId= filesofbrouchureService.getNewId();
 			List<String>addedLanguages= new ArrayList<>();
 			for(int i=0; i<languageIds.size(); i++) {
 				document1="";
+				folder="";
 				printDocument="";
 				
 				if(languageIds.get(i)==0){
@@ -2403,10 +2405,8 @@ private void getModelData(Model model) {
 				
 			
 				if(!brochures.get(i).isEmpty()) {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId + "/" + primaryVersion + "/" + "web" + "/" + langName );
-				String pathtoUploadPoster1=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+newBroId +"/" + primaryVersion + "/" + "web" + "/" + langName );
-				int indexToStart1=pathtoUploadPoster1.indexOf("Media");
-				 document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+				folder= CommonData.uploadBrouchure+newBroId + "/" + primaryVersion + "/" + "web" + "/" + langName;
+				document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
 				}
 			
 			
@@ -4712,13 +4712,15 @@ private void getModelData(Model model) {
 				if(overwriteValue !=0) {
 					 
 					String document1="";
-					String printDocument="";
+					String folder="";
+					
 					int newbroFileId= filesofbrouchureService.getNewId();
 					List<FilesofBrouchure> filesBroList= new ArrayList<>();
 					List<String> addedlanguagesforOverride= new ArrayList<>();
 					for(int i=0; i<languageIds.size(); i++) {
 						document1="";
-						printDocument="";
+						folder="";
+						
 						
 						if(languageIds.get(i)==0){
 							break;
@@ -4735,10 +4737,8 @@ private void getModelData(Model model) {
 					
 					
 					if(!brochures.get(i).isEmpty()) {
-					ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId + "/" + versionValue + "/" + "web" + "/" + langName );
-					String pathtoUploadPoster1=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" + versionValue + "/" + "web" + "/" + langName );
-					int indexToStart1=pathtoUploadPoster1.indexOf("Media");
-					document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+					folder=CommonData.uploadBrouchure+ brochureId + "/" + versionValue + "/" + "web" + "/" + langName;
+					document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
 					
 					
 					}
@@ -4802,14 +4802,15 @@ private void getModelData(Model model) {
 					else {
 						
 						String document2="";
-						String printDocument2="";
+						String folder2="";
 						int newbroFileId= filesofbrouchureService.getNewId();
 						List<FilesofBrouchure> filesBroList1= new ArrayList<>();
 						Version newVer= new Version();
 						List<String> addedLanguages= new ArrayList<>();
 						for(int i=0; i<languageIds.size(); i++) {
 							document2="";
-							printDocument2="";
+							folder2="";
+							
 							
 							if(languageIds.get(i)==0){
 								break;
@@ -4821,10 +4822,8 @@ private void getModelData(Model model) {
 						
 						if(!brochures.get(i).isEmpty()) {
 						
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId + "/" + newVersionValue + "/" + "web" + "/" + langName );
-						String pathtoUploadPoster3=ServiceUtility.uploadFile(brochures.get(i), env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadBrouchure+ brochureId +"/" + newVersionValue + "/" + "web" + "/" + langName );
-						int indexToStart3=pathtoUploadPoster3.indexOf("Media");
-						document2=pathtoUploadPoster3.substring(indexToStart3, pathtoUploadPoster3.length());
+						folder2=CommonData.uploadBrouchure+ brochureId + "/" + newVersionValue + "/" + "web" + "/" + langName;
+						document2=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder2);
 						
 						
 						
@@ -5082,11 +5081,9 @@ private void getModelData(Model model) {
 			researchPaper.setDescription(desc);
 			
 			if(!researchFile.isEmpty()) {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaper.getId());
-				String pathtoUploadPoster=ServiceUtility.uploadFile(researchFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadResearchPaper+researchPaper.getId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				
+				String folder=CommonData.uploadResearchPaper+researchPaper.getId();
+				String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
 
 				researchPaper.setResearchPaperPath(document);
 				researchPaper.setThumbnailPath(null);

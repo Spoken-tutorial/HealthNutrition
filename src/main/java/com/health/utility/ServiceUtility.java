@@ -17,9 +17,12 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import com.health.model.User;
 import com.health.repository.UserRepository;
@@ -30,6 +33,7 @@ import com.health.repository.UserRepository;
  * @version 1.0
  *
  */
+
 public class ServiceUtility {
 	
 	/**
@@ -37,8 +41,11 @@ public class ServiceUtility {
 	 * @return Timestamp object
 	 */
 	
+
+	
 	@Autowired
 	private JavaMailSender mailSender;
+	
 	
 	public static Timestamp getCurrentTime() {								// Current Date
 		
@@ -88,6 +95,20 @@ public class ServiceUtility {
 	 * @return
 	 * @throws Exception not found
 	 */
+	
+	public static String sanitizeFilename(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return fileName;
+        }
+
+        fileName = fileName.replace("‘’", "\"\"");
+
+        fileName = fileName.replace("‘", "'").replace("’", "'");
+
+         return fileName;
+    }
+
+	
 	public static String uploadFile(MultipartFile uploadFile,String pathToUpload) throws Exception{		// uploading file
 		String path=null;	
 		
@@ -102,6 +123,19 @@ public class ServiceUtility {
 		return path;
 	}
 	
+	public static String uploadMediaFile( MultipartFile file,  Environment env, String folder) throws Exception {
+		
+		String fileName=file.getOriginalFilename();
+		String newFileName=sanitizeFilename(fileName);
+        MultipartFile renamedFile = new RenamedMultipartFile(file, newFileName);
+		createFolder(env.getProperty("spring.applicationexternalPath.name")+ folder);
+		String pathtoUploadPoster=ServiceUtility.uploadFile(renamedFile, env.getProperty("spring.applicationexternalPath.name")+ folder);
+		int indexToStart=pathtoUploadPoster.indexOf("Media");
+
+		String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+		return document;
+
+	}
 	
 	
 	/**
