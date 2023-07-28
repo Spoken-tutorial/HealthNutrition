@@ -1,6 +1,8 @@
 package com.health.utility;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,14 +10,19 @@ import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
+import java.util.ArrayList;
 import java.util.Date;
 
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -23,9 +30,13 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-
+import com.health.controller.HomeController;
+import com.health.model.FilesofBrouchure;
 import com.health.model.User;
 import com.health.repository.UserRepository;
+import com.health.service.LogMangementService;
+
+import java.util.List;
 
 /**
  * Utility class
@@ -36,6 +47,8 @@ import com.health.repository.UserRepository;
 
 public class ServiceUtility {
 	
+	private static final Logger logger= LoggerFactory.getLogger(ServiceUtility.class);
+	
 	/**
 	 * To get current time
 	 * @return Timestamp object
@@ -45,6 +58,9 @@ public class ServiceUtility {
 	
 	@Autowired
 	private JavaMailSender mailSender;
+	
+	@Autowired
+	private LogMangementService logMangementService;
 	
 	
 	public static Timestamp getCurrentTime() {								// Current Date
@@ -136,6 +152,74 @@ public class ServiceUtility {
 		return document;
 
 	}
+	
+	public static String generateImageFromPdfAndSave(String pdfFilePath, Environment env, String outputFolderPath) throws IOException {
+    	
+        String pathName = env.getProperty("spring.applicationexternalPath.name");
+		try (PDDocument document = PDDocument.load(new File(pathName + pdfFilePath))) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            BufferedImage image = pdfRenderer.renderImageWithDPI(0, 15); // Render the first page with 300 DPI
+            
+            //logger.info("Image Width and Height:{} {}", image.getWidth(), image.getHeight());
+            
+            if(image.getHeight()>200) {
+            	int newDPI = (int) Math.ceil(15.0 * 200 / image.getHeight());
+            	if (newDPI > 2 && newDPI < 15) {
+            		image = pdfRenderer.renderImageWithDPI(0, newDPI);
+            		//logger.info("After setting dpi {}, Width and Height of Image: {} {}", newDPI, image.getWidth(), image.getHeight());
+            	}
+            }
+            
+            // Save the image to the output folder
+            String fileName = outputFolderPath + "/" + "thumbnail.png";
+            File outputFile = new File(pathName, fileName);
+            ImageIO.write(image, "png", outputFile);
+
+            // Convert the byte array to a Base64-encoded string
+           // String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            return fileName;
+        }
+    }
+	
+	
+	
+	
+	public static List<String> UploadMediaFileAndCreateThumbnail(MultipartFile file,  Environment env, String folder) throws Exception{
+		
+		List<String> documents=new ArrayList<>(2);
+		String pdfFile="";
+		String thumbnail=null;
+		
+		try {
+			pdfFile=uploadMediaFile(file, env, folder);
+			documents.add(pdfFile);
+			 boolean checkPdf=pdfFile.toLowerCase().endsWith(".pdf");
+
+			 if(checkPdf==true) {
+			try {
+				thumbnail= generateImageFromPdfAndSave(pdfFile, env, folder);
+				 
+			}catch(Exception e){
+				logger.error("Exception Generating thumbnail from  :{}", pdfFile, e);
+				//ignore
+			}
+				 
+					
+			 }
+			 documents.add(thumbnail);
+			 return documents;
+			 	 
+		}
+		catch(Exception e) {
+			logger.error("Exception Generating uploading file from  :{}", file, e);
+			throw e;
+		}
+	
+		
+		
+	}
+
 	
 	
 	/**

@@ -33,12 +33,13 @@ public class FilesofBrouchure {
 	
 }
 	
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, Version version,
+	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String thumbnailPath, Version version,
 			Language lan) {
 		super();
 		this.broFileId = broFileId;
 		this.dateAdded = dateAdded;
 		this.webPath = webPath;
+		this.thumbnailPath=thumbnailPath;
 		this.version = version;
 		this.lan = lan;
 	}

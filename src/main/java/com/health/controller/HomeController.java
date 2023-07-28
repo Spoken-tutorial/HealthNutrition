@@ -1270,9 +1270,7 @@ private void getModelData(Model model) {
 
 		//List<Category> categories=catService.findAll();
 		List<ResearchPaper> researchPapers= researchPaperService.findAllByShowOnHomePage();
-		for(ResearchPaper temp : researchPapers) {
-			makeThumbnailofResearchPaper(temp);
-		}
+		
 		model.addAttribute("researchPapers", researchPapers);
 		return "researchPapers";
 	}
@@ -1919,9 +1917,10 @@ private void getModelData(Model model) {
 		model.addAttribute("userInfo", usr);
 
 		List<ResearchPaper> researchPapers = researchPaperService.findAll();
-		for(ResearchPaper temp : researchPapers) {
+		/*for(ResearchPaper temp : researchPapers) {
 			makeThumbnailofResearchPaper(temp);
 		}
+		*/
 
 		model.addAttribute("researchPapers", researchPapers);
 
@@ -1971,22 +1970,24 @@ private void getModelData(Model model) {
 
 		ResearchPaper researchPaperTemp = new ResearchPaper();
 		researchPaperTemp.setId(researchPaperService.getNewId());
-		researchPaperTemp.setDescription(researchPaperDesc);
-		researchPaperTemp.setTitle(title);
 		researchPaperTemp.setDateAdded(ServiceUtility.getCurrentTime());
 		
 
 		try {
 	
 			String folder= CommonData.uploadResearchPaper+researchPaperTemp.getId();
-			String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
+			//String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
+			List<String> documents=ServiceUtility.UploadMediaFileAndCreateThumbnail(researchFile, env, folder);
 
-			researchPaperTemp.setResearchPaperPath(document);
+			researchPaperTemp.setResearchPaperPath(documents.get(0));
+			researchPaperTemp.setThumbnailPath(documents.get(1));
+			researchPaperTemp.setDescription(researchPaperDesc);
+			researchPaperTemp.setTitle(title);
 
 			researchPaperService.save(researchPaperTemp);
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				logger.error("Exception while updating research paper: {} {} {}", title, researchPaperDesc, researchFile, e);
 				e.printStackTrace();
 				viewSection= false;
 				model.addAttribute("viewSection", viewSection);
@@ -2239,16 +2240,10 @@ private void getModelData(Model model) {
 			}*/
 		}
 		Collections.sort(versions, Version.SortByBroVersionTime);
-		for(Version ver: versions) {
-			System.out.println(ver.getDateAdded());
-		}
-		
 		
 		List<FilesofBrouchure> filesofbrochures= filesofbrouchureService.findAll();
 		
-		for(FilesofBrouchure temp : filesofbrochures) {
-			makeThumbnail(temp);
-		}
+		
 		
 		model.addAttribute("brouchures", brouchures);
 		model.addAttribute("versions", versions);
@@ -2384,15 +2379,14 @@ private void getModelData(Model model) {
 		try {
 			List<FilesofBrouchure> filesofbrochureList=new ArrayList<>();
 			
-			String document1="";
-			String printDocument="";
+			List<String> documents=new ArrayList<>();
 			String folder="";
 			int newbroFileId= filesofbrouchureService.getNewId();
 			List<String>addedLanguages= new ArrayList<>();
 			for(int i=0; i<languageIds.size(); i++) {
-				document1="";
+				
 				folder="";
-				printDocument="";
+				documents.clear();
 				
 				if(languageIds.get(i)==0){
 					break;
@@ -2406,7 +2400,8 @@ private void getModelData(Model model) {
 			
 				if(!brochures.get(i).isEmpty()) {
 				folder= CommonData.uploadBrouchure+newBroId + "/" + primaryVersion + "/" + "web" + "/" + langName;
-				document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
+				//document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
+				documents=ServiceUtility.UploadMediaFileAndCreateThumbnail(brochures.get(i), env, folder);
 				}
 			
 			
@@ -2423,7 +2418,7 @@ private void getModelData(Model model) {
 			
 			addedLanguages.add(langName);
 			
-			filesofbrochureList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, version, lanService.getById(languageIds.get(i))));
+			filesofbrochureList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), documents.get(0),documents.get(1), version, lanService.getById(languageIds.get(i))));
 			newbroFileId +=1;
 			
 			
@@ -2447,7 +2442,7 @@ private void getModelData(Model model) {
 				}
 				
 				version.setVerId(newVerid);
-				version.setVersionPosterPath(document1);
+				version.setVersionPosterPath("");
 				version.setBrouchure(brochureTemp);
 				version.setBroVersion(primaryVersion);
 				version.setDateAdded(ServiceUtility.getCurrentTime());
@@ -4711,14 +4706,15 @@ private void getModelData(Model model) {
 	
 				if(overwriteValue !=0) {
 					 
-					String document1="";
+					//String document1="";
+					List<String> documents1= new ArrayList<>(); 
 					String folder="";
 					
 					int newbroFileId= filesofbrouchureService.getNewId();
 					List<FilesofBrouchure> filesBroList= new ArrayList<>();
 					List<String> addedlanguagesforOverride= new ArrayList<>();
 					for(int i=0; i<languageIds.size(); i++) {
-						document1="";
+						documents1.clear();
 						folder="";
 						
 						
@@ -4738,7 +4734,8 @@ private void getModelData(Model model) {
 					
 					if(!brochures.get(i).isEmpty()) {
 					folder=CommonData.uploadBrouchure+ brochureId + "/" + versionValue + "/" + "web" + "/" + langName;
-					document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
+					//document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
+					documents1=ServiceUtility.UploadMediaFileAndCreateThumbnail(brochures.get(i), env, folder);
 					
 					
 					}
@@ -4758,11 +4755,12 @@ private void getModelData(Model model) {
 						
 						
 						if(!brochures.get(i).isEmpty()) {
-							fileBro.setWebPath(document1);
+							fileBro.setWebPath(documents1.get(0));
+							fileBro.setThumbnailPath(documents1.get(1));
 						}
 						
 						
-						fileBro.setThumbnailPath(null);
+						
 						filesofbrouchureService.save(fileBro);
 						//filesBroList.add(fileBro);
 						
@@ -4772,7 +4770,7 @@ private void getModelData(Model model) {
 					else {
 						
 						if(!brochures.get(i).isEmpty()) {
-							filesBroList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document1, version, language));
+							filesBroList.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), documents1.get(0), documents1.get(1), version, language));
 							newbroFileId = newbroFileId + 1;
 							
 						}
@@ -4786,7 +4784,7 @@ private void getModelData(Model model) {
 					
 				} 
 					if(webfileErrorforOverride==false && duplicatelangforOverride==false) {
-					version.setVersionPosterPath(document1);
+					version.setVersionPosterPath("");
 					verService.save(version);
 					brouchure.setTitle(title);
 					broService.save(brouchure);
@@ -4801,14 +4799,15 @@ private void getModelData(Model model) {
 					
 					else {
 						
-						String document2="";
+						//String document2="";
+						List<String> documents2=new ArrayList<>();
 						String folder2="";
 						int newbroFileId= filesofbrouchureService.getNewId();
 						List<FilesofBrouchure> filesBroList1= new ArrayList<>();
 						Version newVer= new Version();
 						List<String> addedLanguages= new ArrayList<>();
 						for(int i=0; i<languageIds.size(); i++) {
-							document2="";
+							documents2.clear();
 							folder2="";
 							
 							
@@ -4823,7 +4822,8 @@ private void getModelData(Model model) {
 						if(!brochures.get(i).isEmpty()) {
 						
 						folder2=CommonData.uploadBrouchure+ brochureId + "/" + newVersionValue + "/" + "web" + "/" + langName;
-						document2=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder2);
+						//document2=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder2);
+						documents2=ServiceUtility.UploadMediaFileAndCreateThumbnail(brochures.get(i), env, folder2);
 						
 						
 						
@@ -4835,7 +4835,7 @@ private void getModelData(Model model) {
 						}
 						addedLanguages.add(langName);
 						
-						filesBroList1.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), document2, newVer, lanService.getById(languageIds.get(i))));
+						filesBroList1.add(new FilesofBrouchure(newbroFileId, ServiceUtility.getCurrentTime(), documents2.get(0), documents2.get(1), newVer, lanService.getById(languageIds.get(i))));
 						newbroFileId +=1;
 						
 						}
@@ -4859,7 +4859,7 @@ private void getModelData(Model model) {
 							newVer.setBrouchure(brouchure);
 							newVer.setDateAdded(ServiceUtility.getCurrentTime());
 							newVer.setBroVersion(version.getBroVersion()+1);
-							newVer.setVersionPosterPath(document2);
+							newVer.setVersionPosterPath("");
 							verService.save(newVer);
 							
 							filesofbrouchureService.saveAll(filesBroList1);
@@ -5083,11 +5083,11 @@ private void getModelData(Model model) {
 			if(!researchFile.isEmpty()) {
 				
 				String folder=CommonData.uploadResearchPaper+researchPaper.getId();
-				String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
-
-				researchPaper.setResearchPaperPath(document);
-				researchPaper.setThumbnailPath(null);
-
+				//String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
+				List<String> documents=ServiceUtility.UploadMediaFileAndCreateThumbnail(researchFile, env, folder);
+				researchPaper.setResearchPaperPath(documents.get(0));
+				researchPaper.setThumbnailPath(documents.get(1));
+				
 			}
 			
 			
@@ -5095,7 +5095,7 @@ private void getModelData(Model model) {
 			researchPaperService.save(researchPaper);
 
 		}catch (Exception e) {
-			// TODO: handle exception
+			logger.error("Exception while updating research paper: {} {} {}", title, desc, researchFile, e);
 			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
 			model.addAttribute("researchPaper", researchPaper);
 			return "updateResearchPaper";        // need to add some error message
@@ -8329,9 +8329,9 @@ private void getModelData(Model model) {
 
 	/* to generate img from 1st page of pdf */
 	
-    private static final String IMAGE_FORMAT = "png";
+   // private static final String IMAGE_FORMAT = "png";
 
-    public String generateImageFromPdfAndSave(String pdfFilePath, String outputFolderPath) throws IOException {
+   /* public String generateImageFromPdfAndSave(String pdfFilePath, String outputFolderPath) throws IOException {
     	logger.info(pdfFilePath + " " + outputFolderPath);
         String pathName = env.getProperty("spring.applicationexternalPath.name");
 		try (PDDocument document = PDDocument.load(new File(pathName + pdfFilePath))) {
@@ -8359,6 +8359,7 @@ private void getModelData(Model model) {
             return fileName;
         }
     }
+    */
     
     
 	
@@ -8412,11 +8413,7 @@ private void getModelData(Model model) {
 		}
 		
 		
-		for(FilesofBrouchure temp: filesList) {
-			
-			 makeThumbnail(temp);
-			
-		}
+		
 		
 		
 		model.addAttribute("filesList", filesList);
@@ -8428,7 +8425,7 @@ private void getModelData(Model model) {
 	}
 
 
-	private void makeThumbnail(FilesofBrouchure temp) {
+	/*private void makeThumbnail(FilesofBrouchure temp) {
 		try {
 			 
 			 boolean checkPdf=temp.getWebPath().toLowerCase().endsWith(".pdf");
@@ -8454,10 +8451,10 @@ private void getModelData(Model model) {
 		    e.printStackTrace();
 	  }
 	}
+	*/
 	
 	
-	
-	private void makeThumbnailofResearchPaper(ResearchPaper temp) {
+	/*private void makeThumbnailofResearchPaper(ResearchPaper temp) {
 		try {
 			 
 			 boolean checkPdf=temp.getResearchPaperPath().toLowerCase().endsWith(".pdf");
@@ -8482,6 +8479,7 @@ private void getModelData(Model model) {
 		    e.printStackTrace();
 	  }
 	}
+	*/
 
 
 	/**
