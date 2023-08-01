@@ -2140,27 +2140,7 @@ $("#languageId1").change(function() {
 			});
 			
 			
-			$(document).ready(function(){
-    			$.ajax({ url: "templates/tutorialList.html",
-        		context: document.body,
-        		success: function(){
-				
-				var languageid = $("#inputLanguage").val();
-				var topicid =$("#inputTopicName").val();
-				var catgoryid=$("#categoryname").val();
-				if(languageid!=0){
-					loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
-				}
-				if(catgoryid!=0){
-					loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
-				}
-				if(topicid!=0){
-					loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
-				}
-           		
-       			 }
-  			  });
-			});
+			
 
 			$("#reset2").click(function(){
  			 $(":reset").css("background-color", "red");

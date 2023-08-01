@@ -64,6 +64,9 @@ public class Testimonial implements  Serializable  {
 	@Column(name = "consent")
 	String consentLetter = null;
 	
+	@Column(name = "thumbnailPath")
+	private String thumbnailPath;
+	
 	/**
 	 * user who adds
 	 */
@@ -81,6 +84,17 @@ public class Testimonial implements  Serializable  {
 	public int getTestimonialId() {
 		return testimonialId;
 	}
+	
+
+	public String getThumbnailPath() {
+		return thumbnailPath;
+	}
+
+
+	public void setThumbnailPath(String thumbnailPath) {
+		this.thumbnailPath = thumbnailPath;
+	}
+
 
 	public void setTestimonialId(int testimonialId) {
 		this.testimonialId = testimonialId;

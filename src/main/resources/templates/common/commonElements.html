@@ -23,7 +23,7 @@ function resetInput(id) {
             
               <option  value="0">Select Category</option>
              
-              <option  th:each="category : ${categories}" th:selected="${category.getCategoryId()==localCat}" th:value="${category.getCategoryId()}" th:text="${category.getCatName()}" ></option>
+              <option  th:each="category : ${categories}" th:selected="${category.value==localCat}" th:value="${category.value}" th:text="${category.key}" ></option>
             </select>
             <span class="input-group-btn" style=" padding-top: 4px;"><button  id="catreset"  > <span style="font-size:8px;">&#10060;</span></button></span>
            
@@ -34,7 +34,7 @@ function resetInput(id) {
 <select class="custom-select d-block form-control" id="inputTopicName" name="topic">
 			 
               <option value="0">Select Topic</option>
-              <option th:each="topic : ${topics}" th:selected="${topic.getTopicId()==localTopic}" th:value="${topic.getTopicId()}" span th:text="${topic.getTopicName()}"></option>
+              <option th:each="topic : ${topics}" th:selected="${topic.value==localTopic}" th:value="${topic.value}" span th:text="${topic.key}"></option>
             </select>
             <div class="input-group-btn"  style=" padding-top: 4px;"><button  id="topicreset" > <span style="font-size:8px;">&#10060;</span></button></div>
 </div>
@@ -45,7 +45,7 @@ function resetInput(id) {
 <select class="custom-select d-block form-control" id="inputLanguage" name="lan">
 			 
               <option value="0">Select Language</option>
-              <option th:each="language : ${languages}"  th:selected="${language.getLanId()==localLan}"th:value="${language.getLanId()}" th:text="${language.getLangName()}"></option> 
+              <option th:each="language : ${languages}"  th:selected="${language.value==localLan}"th:value="${language.value}" th:text="${language.key}"></option> 
             </select>
             <div class="input-group-btn"  style=" padding-top: 4px;"><button  id="langreset" > <span style="font-size:8px;">&#10060;</span></button></div>
             

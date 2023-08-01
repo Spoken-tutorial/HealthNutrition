@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.TreeSet;
@@ -103,6 +104,7 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
+import com.health.controller.AjaxController;
 import com.health.repository.BrouchureRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.TutorialRepository;
@@ -163,6 +165,9 @@ public class HomeController {
 	
 	@Autowired
 	private VersionRepository verRepository;
+	
+	@Autowired
+	private AjaxController ajaxController;
 	
 	@Autowired
 	private TopicCategoryMappingRepository tcmRepository;
@@ -484,14 +489,28 @@ private List<Language> getLanguages() {
 	 */
 
 private void getModelData(Model model) {
-	List<Category> catTempSorted = catService.getCategoriesForCache();
-	List<Language> lanTempSorted = lanService.getLanguagesForCache();
-	List<Topic> topicTemp = topicService.getTopicsForcache(); 
+	getModelData(model, 0, 0, 0);
+
+}
+
+private void getModelData(Model model , int catId, int topicId, int lanId) {
+	 
 	
-	model.addAttribute("categories", catTempSorted);
-	model.addAttribute("languages", lanTempSorted);
-	model.addAttribute("topics", topicTemp);
-	model.addAttribute("languageCount",lanTempSorted.size());
+	ArrayList<Map< String,Integer>> arlist= ajaxController.getTopicAndLanguageByCategory(catId, topicId,lanId);
+	ArrayList<Map< String,Integer>> arlist1= ajaxController.getCategoryAndLanguageByTopic(catId, topicId,lanId);
+	Map<String, Integer> cat=arlist1.get(0);
+	Map<String, Integer> lan=arlist1.get(1);
+	Map<String, Integer> topic=arlist.get(0);
+	
+	System.out.println("Test Map 1" + arlist1);
+	System.out.println("Test Map 2" + arlist);
+	model.addAttribute("categories", cat);
+	model.addAttribute("languages", lan);
+	model.addAttribute("topics", topic);
+	model.addAttribute("localCat", catId);
+	model.addAttribute("localTopic", topicId);
+	model.addAttribute("localLan", lanId);
+	model.addAttribute("languageCount",lan.size());
 }
 	
 
@@ -684,11 +703,13 @@ private void getModelData(Model model) {
 			
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 
-		getModelData(model);
+		
 		
 		model.addAttribute("category", cat);
 		model.addAttribute("language", lan);
 		model.addAttribute("topic", topic);
+		
+		getModelData(model, cat, topic, lan);
 
 		Category localCat = null;
 		Language localLan = null;
@@ -794,12 +815,12 @@ private void getModelData(Model model) {
 		
 		 // sorting based on order value
 		
+		
+		
 		int totalPages = tut.getTotalPages();
 		int firstPage = page + 1 > 2 ? page + 1 - 2 : 1;
 		int lastPage= page + 1 < totalPages - 5 ? page + 1 + 5 : totalPages;
-		model.addAttribute("localCat", cat);
-		model.addAttribute("localTopic", topic);
-		model.addAttribute("localLan", lan);
+		
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
 		model.addAttribute("firstPage", firstPage);
@@ -911,6 +932,9 @@ private void getModelData(Model model) {
 		Language lanName = lanService.getByLanName(lan);
 		TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
 		ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+		int catId=catName.getCategoryId();
+		int topicId=topicName.getTopicId();
+		int lanId= lanName.getLanId();
 		
 		if(catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
 			System.out.println("Problem1");
@@ -980,7 +1004,7 @@ private void getModelData(Model model) {
 //				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
 //				Collections.sort(lanTempSorted);
 
-				getModelData(model);
+				getModelData(model, catId, topicId, lanId);
 //				model.addAttribute("topics", topicTemp);
 				//String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
 				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName())+"/1";
@@ -1497,11 +1521,9 @@ private void getModelData(Model model) {
 		}
 
 		try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryCategory+newCatId);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryCategory+newCatId);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				
+				String folder=CommonData.uploadDirectoryCategory+newCatId;
+				String document=ServiceUtility.uploadMediaFile(files, env, folder);
 
 				Category local=catService.findBycategoryname(categoryName);
 				local.setPosterPath(document);
@@ -1877,11 +1899,8 @@ private void getModelData(Model model) {
 
 			caroService.save(caraTemp);
 
-			ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadCarousel+caraTemp.getId());
-			String pathtoUploadPoster=ServiceUtility.uploadFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadCarousel+caraTemp.getId());
-			int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-			String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+			String folder= CommonData.uploadCarousel+caraTemp.getId();
+			String document=ServiceUtility.uploadMediaFile(file, env, folder);
 
 			caraTemp.setPosterPath(document);
 
@@ -2124,10 +2143,9 @@ private void getModelData(Model model) {
 				
 			
 				if(!promoVideos.get(i).isEmpty()) {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadPromoVideo + newPromoVideoId  + "/" + langName );
-				String pathtoUploadPoster1=ServiceUtility.uploadVideoFile(promoVideos.get(i), env.getProperty("spring.applicationexternalPath.name")+ CommonData.uploadPromoVideo + newPromoVideoId  + "/" + langName );
-				int indexToStart1=pathtoUploadPoster1.indexOf("Media");
-				 document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+				
+				String folder=CommonData.uploadPromoVideo + newPromoVideoId  + "/" + langName;
+				 document1=ServiceUtility.uploadMediaFile(promoVideos.get(i), env, folder);
 				}
 			
 			
@@ -3028,11 +3046,9 @@ private void getModelData(Model model) {
 		}
 
 		try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryQuestion+newQuestionId);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(quesPdf, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryQuestion+newQuestionId);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				
+				String folder= CommonData.uploadDirectoryQuestion+newQuestionId;
+				String document=ServiceUtility.uploadMediaFile(quesPdf, env, folder);
 
 				Question temp=questService.findById(newQuestionId);
 
@@ -3146,10 +3162,8 @@ private void getModelData(Model model) {
 
 		try {
 
-				String pathtoUploadPoster=ServiceUtility.uploadFile(quesPdf, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryQuestion+ques.getQuestionId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				String folder= CommonData.uploadDirectoryQuestion+ques.getQuestionId();
+				String document=ServiceUtility.uploadMediaFile(quesPdf, env, folder);
 
 				ques.setQuestionPath(document);
 
@@ -3304,11 +3318,9 @@ private void getModelData(Model model) {
 		consultant.setDateAdded(ServiceUtility.getCurrentTime());
 		try {
 			if(!photo.isEmpty()) {
-				String photoFolder = env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+newConsultid;
-				ServiceUtility.createFolder(photoFolder);
-				String pathtoUploadPhoto = ServiceUtility.uploadFile(photo, photoFolder);
-				int indexToStart=pathtoUploadPhoto.indexOf("Media");
-				String cons_photo=pathtoUploadPhoto.substring(indexToStart, pathtoUploadPhoto.length());
+				
+				String folder= CommonData.uploadDirectoryConsultant+newConsultid;
+				String cons_photo=ServiceUtility.uploadMediaFile(photo, env, folder);
 				userTemp.setProfilePic(cons_photo);
 			}
 			
@@ -3421,17 +3433,16 @@ private void getModelData(Model model) {
 
 			String pathSampleVideo = null;;
 			try {
-				pathSampleVideo = ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant);
+				String folder1=CommonData.uploadDirectoryConsultant;
+				pathSampleVideo = ServiceUtility.uploadMediaFile(file, env, folder1);
+						
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
-			    ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
-				String pathtoUploadPoster=ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryConsultant+consultant.getConsultantId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				String folder2=CommonData.uploadDirectoryConsultant+consultant.getConsultantId();
+				String document=ServiceUtility.uploadMediaFile(file, env, folder2);
 				consultant.getUser().setFirstName(name);
 				consultant.getUser().setLastName(lastname);
 				consultant.setDescription(desc);
@@ -3609,9 +3620,9 @@ private void getModelData(Model model) {
 			
 				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
 				if(!files.isEmpty()) {
-					String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+newEventid);
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					
+					String folder= CommonData.uploadDirectoryEvent+newEventid;
+					String document=ServiceUtility.uploadMediaFile(files, env, folder);
 					event.setPosterPath(document);
 				}
 				
@@ -3749,7 +3760,7 @@ private void getModelData(Model model) {
 		
 		if(!consent.isEmpty()) {
 			if(!ServiceUtility.checkFileExtensionImage(consent) && !ServiceUtility.checkFileExtensiononeFilePDF(consent)) {
-				model.addAttribute("error_msg",CommonData.VIDEO_CONSENT_FILE_EXTENSION_ERROR);
+				model.addAttribute("error_msg", "Pdf file is required");
 				return "addTestimonial";
 			}
 		}
@@ -3766,40 +3777,10 @@ private void getModelData(Model model) {
 			return "addTestimonial";
 		}
 
-		String pathSampleVideo = null;;
-		try {
-			pathSampleVideo = ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		
 
 
-		IContainer container = IContainer.make();
-		int result=10;
-		result = container.open(pathSampleVideo,IContainer.Type.READ,null);
-
-		try {
-			if(result<0) {
-
-				model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-				return "addTestimonial";
-
-			}else {
-					if(container.getDuration()>CommonData.videoDuration) {
-
-						model.addAttribute("error_msg",CommonData.VIDEO_DURATION_ERROR);
-						Path deletePreviousPath=Paths.get(pathSampleVideo);
-						Files.delete(deletePreviousPath);
-						return "addTestimonial";
-				}
-			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-			return "addTestimonial";
-		}
+		
 
 		int newTestiId=testService.getNewTestimonialId();
 		Testimonial test=new Testimonial();
@@ -3829,23 +3810,19 @@ private void getModelData(Model model) {
 		}
 
 		try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+newTestiId);
-				String pathtoUploadPoster=ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+newTestiId);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-
+				
+				String folder2=CommonData.uploadDirectoryTestimonial+newTestiId;
+				String document=ServiceUtility.uploadMediaFile(file, env, folder2);
 				Testimonial temp=testService.findById(newTestiId);
 
 				temp.setFilePath(document);
 				
 				if(!consent.isEmpty()) {
-					pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+newTestiId);
-					indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 					
-					temp.setConsentLetter(document);
+					String folder=CommonData.uploadDirectoryTestimonial+newTestiId;
+					List<String> documents=ServiceUtility.UploadMediaFileAndCreateThumbnail(consent, env, folder);
+					temp.setConsentLetter(documents.get(0));
+					temp.setThumbnailPath(documents.get(1));
 				}
 				
 
@@ -3860,53 +3837,9 @@ private void getModelData(Model model) {
 			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
 			return "addTestimonial";    // throw a error
 		}
-		}else {
-
-			Testimonial test=new Testimonial();
-			test.setDateAdded(ServiceUtility.getCurrentTime());
-			test.setDescription(desc);
-			test.setName(name);
-			test.setUser(usr);
-			test.setTestimonialId(testService.getNewTestimonialId());
-			test.setFilePath("null");
-
-			if(trainingId != null) {
-				TrainingInformation train = trainingInfoService.getById(Integer.parseInt(trainingId));
-				test.setTraineeInfos(train);
-				test.setApproved(false);
-			}
-
-			Set<Testimonial> testi=new HashSet<Testimonial>();
-			testi.add(test);
-
-			userService.addUserToTestimonial(usr, testi);
-			
-			try {
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-				if(!consent.isEmpty()) {
-					String pathtoUploadPoster=ServiceUtility.uploadFile(consent, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-					
-					test.setConsentLetter(document);
-				}
-				
-
-				testService.save(test);
-
-
-		}catch (Exception e) {
-			// TODO: handle exception
-
-			e.printStackTrace();
-			model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-			return "addTestimonial";    // throw a error
 		}
-			
-			
-		}
-
+		
+		
 		testimonials = testService.findAll();
 		model.addAttribute("testimonials", testimonials);
 		model.addAttribute("success_msg",CommonData.RECORD_SAVE_SUCCESS_MSG);
@@ -4008,12 +3941,9 @@ private void getModelData(Model model) {
 
 		if(!file.isEmpty()) {
 			try {
-					ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryCategory+cat.getCategoryId());
-					String pathtoUploadPoster=ServiceUtility.uploadFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryCategory+cat.getCategoryId());
 
-					int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-					String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+					String folder=CommonData.uploadDirectoryCategory+cat.getCategoryId();
+					String document=ServiceUtility.uploadMediaFile(file, env, folder);
 
 					cat.setPosterPath(document);
 
@@ -4227,10 +4157,9 @@ private void getModelData(Model model) {
 			event.setLocation(venueName);
 
 			if(!files.isEmpty()) {
-				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryEvent+event.getEventId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				String folder=CommonData.uploadDirectoryEvent+event.getEventId();
+				String document=ServiceUtility.uploadMediaFile(files, env, folder);
 
 				event.setPosterPath(document);
 
@@ -4387,10 +4316,9 @@ private void getModelData(Model model) {
 					
 					
 					if(!promoVideoFiles.get(i).isEmpty()) {
-						ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadPromoVideo + promoVideoIdInt  + "/" + langName );
-						String pathtoUploadPoster1=ServiceUtility.uploadVideoFile(promoVideoFiles.get(i), env.getProperty("spring.applicationexternalPath.name")+ CommonData.uploadPromoVideo + promoVideoIdInt + "/" + langName );
-						int indexToStart1=pathtoUploadPoster1.indexOf("Media");
-						document1=pathtoUploadPoster1.substring(indexToStart1, pathtoUploadPoster1.length());
+						
+						String folder=CommonData.uploadPromoVideo + promoVideoIdInt + "/" + langName;
+						document1=ServiceUtility.uploadMediaFile(promoVideoFiles.get(i), env, folder);
 					
 					
 					}
@@ -5202,10 +5130,9 @@ private void getModelData(Model model) {
 			carousel.setDescription(desc);
 			
 			if(!files.isEmpty()) {
-				String pathtoUploadPoster=ServiceUtility.uploadFile(files, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadCarousel+carousel.getId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+			
+				String folder=CommonData.uploadCarousel+carousel.getId();
+				String document=ServiceUtility.uploadMediaFile(files, env, folder);
 
 				carousel.setPosterPath(document);
 
@@ -5539,7 +5466,8 @@ private void getModelData(Model model) {
 	 * @return String object(webpage)
 	 */
 	@RequestMapping(value = "/updateTestimonial", method = RequestMethod.POST)
-	public String updatetestimonialGet(HttpServletRequest req,Model model,Principal principal,@RequestParam("TestiVideo") MultipartFile file) {
+	public String updatetestimonialGet(HttpServletRequest req,Model model,Principal principal,@RequestParam("TestimonialVideo") MultipartFile file,
+			@RequestParam("consent") MultipartFile consent) {
 
 		User usr=new User();
 
@@ -5560,72 +5488,55 @@ private void getModelData(Model model) {
 			model.addAttribute("error_msg", CommonData.TESTIMONIAL_NOT_ERROR);
 			return "updateTestimonial";
 		}
-
-		if(!file.isEmpty()) {
-		try {
-
-			String pathSampleVideo = null;;
-			try {
-				pathSampleVideo = ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial);
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			IContainer container = IContainer.make();
-			int result=10;
-			result = container.open(pathSampleVideo,IContainer.Type.READ,null);
-
-			try {
-				if(result<0) {
-
-					model.addAttribute("error_msg",CommonData.RECORD_ERROR);
-					return "updateTestimonial";
-
-				}else {
-						if(container.getDuration()>CommonData.videoDuration) {
-
-							model.addAttribute("error_msg",CommonData.VIDEO_DURATION_ERROR);
-							Path deletePreviousPath=Paths.get(pathSampleVideo);
-							Files.delete(deletePreviousPath);
-							return "updateTestimonial";
-					}
-				}
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				model.addAttribute("error_msg",CommonData.RECORD_ERROR);
+		
+		if(!consent.isEmpty()) {
+			if(!ServiceUtility.checkFileExtensionImage(consent) && !ServiceUtility.checkFileExtensiononeFilePDF(consent)) {
+				model.addAttribute("error_msg", "Pdf file is required");
 				return "updateTestimonial";
+		}
+		}
+		
+
+	   if(!file.isEmpty()) {
+		   if(!ServiceUtility.checkFileExtensionVideo(file)) { // throw error on extension
+			   model.addAttribute("error_msg",CommonData.VIDEO_FILE_EXTENSION_ERROR);
+			   return "updateTestimonial";
+		}
+	   }
+			
+		test.setName(name);
+		test.setDescription(desc);
+		
+		
+		try {
+			if(!file.isEmpty()) {
+				String folder1=CommonData.uploadDirectoryTestimonial+test.getTestimonialId();
+				String document1=ServiceUtility.uploadMediaFile(file, env, folder1);
+				test.setFilePath(document1);
+			}
+			
+			if(!consent.isEmpty()) {
+				String folder2=CommonData.uploadDirectoryTestimonial+test.getTestimonialId();
+				List<String> documents=ServiceUtility.UploadMediaFileAndCreateThumbnail(consent, env, folder2);
+				test.setConsentLetter(documents.get(0));
+				test.setThumbnailPath(documents.get(1));
 			}
 
-			    ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-				String pathtoUploadPoster=ServiceUtility.uploadVideoFile(file, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTestimonial+test.getTestimonialId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-				test.setName(name);
-				test.setDescription(desc);
-				test.setFilePath(document);
-
-				testService.save(test);
+			testService.save(test);
 
 
-		}catch (Exception e) {
+		}
+		
+		catch (Exception e) {
 			// TODO: handle exception
 
 			e.printStackTrace();
 			model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 			return "updateTestimonial";    // throw a error
 		}
-		}else {
-
-			test.setName(name);
-			test.setDescription(desc);
-
-			testService.save(test);
-		}
-
-
+		
+		
+		model.addAttribute("testimonials", test);
 		model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
 
 		return "updateTestimonial";
@@ -7789,11 +7700,9 @@ private void getModelData(Model model) {
 			int trainingTopicId=trainingTopicServ.getNewId();
 			trainingInfoService.save(trainingData);
 
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryMasterTrainer+newTrainingdata);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(trainingImage, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryMasterTrainer+newTrainingdata);
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+				String folder=CommonData.uploadDirectoryMasterTrainer+newTrainingdata;
+				String document=ServiceUtility.uploadMediaFile(trainingImage, env, folder);
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
 				trainingData.setPosterPath(document);
 
@@ -7879,11 +7788,8 @@ private void getModelData(Model model) {
 		try {
 			feedServ.save(feed);
 
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryMasterTrainerFeedback+feed.getId());
-				String pathtoUploadPoster=ServiceUtility.uploadFile(feedbackFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryMasterTrainerFeedback+feed.getId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				String folder=CommonData.uploadDirectoryMasterTrainerFeedback+feed.getId();
+				String document=ServiceUtility.uploadMediaFile(feedbackFile, env, folder);
 
 				feed.setPath(document);
 				feedServ.save(feed);
@@ -7947,11 +7853,8 @@ private void getModelData(Model model) {
 		try {
 			postQuestionService.save(feed);
 
-				ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadPostQuestion+feed.getId());
-				String pathtoUploadPoster=ServiceUtility.uploadFile(postQuestions, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadPostQuestion+feed.getId());
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
-
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+				String folder=CommonData.uploadPostQuestion+feed.getId();
+				String document=ServiceUtility.uploadMediaFile(postQuestions, env, folder);
 
 				feed.setQuestionPath(document);
 				postQuestionService.save(feed);

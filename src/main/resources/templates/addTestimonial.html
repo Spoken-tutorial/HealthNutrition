@@ -119,18 +119,16 @@ font-weight:bold!important;
 								<tr>
 									<th>Sr.#</th>
 									<th>Name</th>
-									<th>Text to display with video</th>
+									<th>Description</th>
 									<th>Video</th>
-									<div sec:authorize="hasAnyAuthority('SUPER_USER')">
-										<th>Approve/Reject</th>
-									</div>
 									<th>Consent Document</th>
+									<th>Approve/Reject</th>
 									<th>Action</th>
 									<!-- <th>Disable</th> -->
 								</tr>
 							</thead>
 							<tbody>
-								<div >
+								
 									<tr th:each="testimonial : ${testimonials}" style="">
 
 										<td th:text="${testimonial.getTestimonialId()}"></td>
@@ -149,8 +147,17 @@ font-weight:bold!important;
 											<div th:unless="${testimonial.getFilePath() != 'null'}"> NA </div>
 										</td>
 										
-
-										<div>
+										
+									<td> <div th:if="${testimonial.getConsentLetter()!=null and testimonial.getConsentLetter()!=''}"><img style=" height: 100px" th:if="${testimonial.getConsentLetter().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${testimonial.getThumbnailPath()}}"></img>
+     								 <img th:unless="${testimonial.getConsentLetter().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${testimonial.getConsentLetter()}}"
+										style="height: 100px" />
+									<br>
+								  <a th:href="@{/files/}+@{${testimonial.getConsentLetter()}}" target="_blank"> View</a> &nbsp;&nbsp;
+								  <a th:href="@{/files/}+@{${testimonial.getConsentLetter()}}" download >Download</a>
+								</div>
+								<div th:unless="${testimonial.getConsentLetter()!=null and testimonial.getConsentLetter()!=''}">NA</div>
+								</td>
+										
 											<td>
 
 												<div th:if="${testimonial.isApproved()}">
@@ -171,82 +178,16 @@ font-weight:bold!important;
 												</div>
 
 											</td>
-										</div>
-										<td>
-											<div th:if="${testimonial.getConsentLetter() != null}"
-												style="width: 400px;">
-													<iframe style="width: 150px; height: 100px" th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:src="@{/files/}+@{${testimonial.getConsentLetter()}}"></iframe>
-      												 <br><a th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
-													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${testimonial.getConsentLetter()}" alt="Download"></img></a>
-											</div>
-											<div th:unless="${testimonial.getConsentLetter() != null}">NA</div>
-										</td>
+										
+										
 										<td><a
 											th:href="@{${'/testimonial/edit/' + testimonial.getTestimonialId()}}">Edit</a></td>
 
 
 									</tr>
-								</div>
+								
 
-								<div sec:authorize="hasAnyAuthority('MASTER_TRAINER')">
-									<tr th:each="testimonial : ${testimonials}"
-										th:if="${testimonial.getUser().getId() == userInfo.getId()}">
-										<!-- <div th:if="${testimonial.getUser().getId() == userInfo.getId()}"> -->
-										<td th:text="${testimonial.getTestimonialId()}"></td>
-										<td th:text="${testimonial.getName()}"></td>
-
-										<td th:text="${testimonial.getDescription()}"></td>
-										<td>
-											<div th:if="${testimonial.getFilePath() != 'null'}" style="width:400px;">
-												<video controls="controls" style="width: 100%;">
-													<source th:src="@{/files/}+@{${testimonial.getFilePath()}}"
-														type="video/mp4" />
-													Your browser does not support HTML video.
-												</video>
-											</div>
-										</td>
-
-										<div sec:authorize="hasAnyAuthority('SUPER_USER')">
-											<td>
-
-												<div th:if="${testimonial.isApproved()}">
-													<a class="disableTest"
-														th:value="${testimonial.getTestimonialId()}"
-														title="Click to Disable Testimonial"><i
-														class="fas fa-times-circle"
-														th:id="${testimonial.getTestimonialId()}"
-														style="color: red"></i></a>
-												</div>
-												<div th:unless="${testimonial.isApproved()}">
-													<a class="enableTest"
-														th:value="${testimonial.getTestimonialId()}"
-														title="Click to Enable Testimonial"><i
-														class="fas fa-check-circle"
-														th:id="${testimonial.getTestimonialId()}"
-														style="color: green"></i> </a>
-												</div>
-
-											</td>
-										</div>
-										<td>
-											<div th:if="${testimonial.getConsentLetter() != null}"
-												style="width: 400px;">
-													 <iframe style="width: 150px; height: 100px" th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:src="@{/files/}+@{${testimonial.getConsentLetter()}}"></iframe>
-      												 <br><a th:if="${testimonial.getConsentLetter().endsWith('.pdf')}" th:href="@{/files/}+@{${testimonial.getConsentLetter()}}"
-													target="_blank" class="pdfclass"><img id="pdfsource"
-													th:src="${testimonial.getConsentLetter()}" alt="Download"></img></a>
-      										
-											</div>
-											<div th:unless="${testimonial.getConsentLetter() != null}">NA</div>
-										</td>
-										<td><a
-											th:href="@{${'/testimonial/edit/' + testimonial.getTestimonialId()}}">Edit</a></td>
-
-										<!-- </div> -->
-									</tr>
-								</div>
-							</tbody>
+															</tbody>
 						</table>
 					</div>
 				</div>

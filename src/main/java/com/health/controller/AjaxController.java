@@ -302,13 +302,11 @@ public class AjaxController{
 	
 	private String getDocument(Tutorial tut, MultipartFile mediaFile, String comp) {
 		ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp);
-		String pathtoUploadPoster;
 		String document = "";
 		try {
-			pathtoUploadPoster = ServiceUtility.uploadVideoFile(mediaFile, env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp);
-			int indexToStart=pathtoUploadPoster.indexOf("Media");
-			document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
-
+			
+			String folder=CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/"+comp;
+			document=ServiceUtility.uploadMediaFile(mediaFile, env, folder);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1019,7 +1017,7 @@ public class AjaxController{
 	
 	@RequestMapping("/loadCategoryAndLanguageByTopic")
 	@Cacheable(cacheNames ="topics", key="{#root.methodName, #topicId, #catId, #languageId }" )
-	public @ResponseBody ArrayList<Map< String,Integer>> getCategoryAndLanguageByTopic( @RequestParam(value="topicId") int topicId, @RequestParam(value = "catId") int catId,
+	public @ResponseBody ArrayList<Map< String,Integer>> getCategoryAndLanguageByTopic( @RequestParam(value = "catId") int catId, @RequestParam(value="topicId") int topicId, 
 			@RequestParam(value="languageId") int languageId) {
 		ArrayList<Map<String,Integer>> arlist=new ArrayList<>();
 		
@@ -2336,15 +2334,8 @@ public class AjaxController{
 	public @ResponseBody String updateProfilePic(@RequestParam("profilePicture") MultipartFile uploadPhoto,Principal principal) throws Exception{
 
 
-		ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadUserImage+principal.getName());
-
-		String createFolder=env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadUserImage+principal.getName();
-
-		String documentLocal=ServiceUtility.uploadFile(uploadPhoto, createFolder);
-
-		int indexToStart=documentLocal.indexOf("Media");
-
-		String document=documentLocal.substring(indexToStart, documentLocal.length());
+		String folder=CommonData.uploadUserImage+principal.getName();
+		String document=ServiceUtility.uploadMediaFile(uploadPhoto, env, folder);
 
 		User usr=usrservice.findByUsername(principal.getName());
 		usr.setProfilePic(document);
@@ -2424,13 +2415,10 @@ public class AjaxController{
 			Tutorial tut=tutService.getById(tutorialId);
 			
 			try {
-				String path = env.getProperty("spring.applicationexternalPath.name")+CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript";
-				ServiceUtility.createFolder(path);
-				String pathtoUploadPoster=ServiceUtility.uploadFile(File, path);
-				logger.info("Time Script: File uploaded");
-				int indexToStart=pathtoUploadPoster.indexOf("Media");
+				
+				String folder=CommonData.uploadDirectoryTutorial+tut.getTutorialId()+"/TimeScript";
+				String document=ServiceUtility.uploadMediaFile(File, env, folder);
 
-				String document=pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
 
 				tut.setTimeScript(document);
 				tutService.save(tut);

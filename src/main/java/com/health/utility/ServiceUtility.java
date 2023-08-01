@@ -125,7 +125,7 @@ public class ServiceUtility {
     }
 
 	
-	public static String uploadFile(MultipartFile uploadFile,String pathToUpload) throws Exception{		// uploading file
+	private static String uploadFile(MultipartFile uploadFile,String pathToUpload) throws Exception{		// uploading file
 		String path=null;	
 		
 			Path fileNameAndPath =Paths.get(pathToUpload, uploadFile.getOriginalFilename());
@@ -229,7 +229,7 @@ public class ServiceUtility {
 	 * @return
 	 * @throws Exception not found
 	 */
-	public static String uploadVideoFile(MultipartFile file,String pathToUpload) throws Exception{		// uploading file
+	private static String uploadVideoFile(MultipartFile file,String pathToUpload) throws Exception{		// uploading file
 		String path=null;	
 		
 			Path fileNameAndPath =Paths.get(pathToUpload, file.getOriginalFilename());
