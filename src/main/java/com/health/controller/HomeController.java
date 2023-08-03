@@ -924,6 +924,11 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 			@PathVariable (name = "language") String lan,Principal principal,Model model) {
 		
 		Category catName = catService.findBycategoryname(cat);
+		
+		if(catName==null) {
+			return "redirect:/";
+		}
+		
 		if(!catName.isStatus()) {
 			catName=null;
 		}
@@ -943,8 +948,13 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 		
 		
 		
-		
-			 Tutorial tutorial = tutService.findAllByContributorAssignedTutorialEnabled(conTut).get(0);
+			List<Tutorial> tempTutorials=tutService.findAllByContributorAssignedTutorialEnabled(conTut);
+			Tutorial tutorial = null;
+			
+			 if(tempTutorials.size()>0) {
+				tutorial=tempTutorials.get(0);
+			}
+			
 			 List<Tutorial> relatedTutorial = new ArrayList<>();
 			 
 			 if(tutorial == null || tutorial.isStatus() == false) {

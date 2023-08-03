@@ -215,7 +215,7 @@ public class AjaxController{
 	private static final String ZIP_EXTN_ERROR = "File extension must be in ZIP.";
 	private static final String SLIDE_SIZE_ERROR = "File Size must be under 20 MB";
 	private static final String VIDEO_EXTN_ERROR = "File extension must be in MP4.";
-	private static final String VIDEO_SIZE_ERROR = "File Size must be under 400 MB.";
+	private static final String VIDEO_SIZE_ERROR = "File Size must be under 50 MB.";
 	private static final int NULL_TUTORIAL = 0;
 	private static final int ADD_COMPONENT = 0;
 	private static final String DOMAIN = "domain";
@@ -1510,17 +1510,25 @@ public class AjaxController{
 		Language language=langService.getByLanName(lang);
 		ContributorAssignedTutorial cnn=conService.findByTopicCatAndLanViewPart(tcm, language);
 		List<Tutorial> tut= tutService.findAllByContributorAssignedTutorial(cnn);
-		Tutorial tut1= tut.get(0);
-		int tutId1=tut1.getTutorialId();
+		
 		
 		User usr=getUser(principal);
 		Tutorial local = null;
+		
+		int tutId1=0;
+		if(tut.size()>0) {
+			Tutorial tut1= tut.get(0);
+			tutId1=tut1.getTutorialId();
+		}
+		
 		
 		if(tutId1!=0) {
 			Tutorial tut2=tutService.getById(tutId1);
 			temp = addOutlineComp(tut2,outlineData,usr);
 			return  temp;
-		}else {
+		}
+		
+		else {
 			local = createTutorial(catName, topicId, lang,usr);
 			if(local!=null) {
 				temp = addOutlineComp(local,outlineData,usr);
