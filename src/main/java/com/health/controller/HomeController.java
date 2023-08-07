@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.TreeSet;
 import com.health.service.FilesofBrouchureService;
 
@@ -44,6 +45,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.MailException;
@@ -489,11 +491,11 @@ private List<Language> getLanguages() {
 	 */
 
 private void getModelData(Model model) {
-	getModelData(model, 0, 0, 0);
+	getModelData(model, 0, 0, 0,"");
 
 }
 
-private void getModelData(Model model , int catId, int topicId, int lanId) {
+private void getModelData(Model model , int catId, int topicId, int lanId, String query) {
 	 
 	
 	ArrayList<Map< String,Integer>> arlist= ajaxController.getTopicAndLanguageByCategory(catId, topicId,lanId);
@@ -510,7 +512,9 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 	model.addAttribute("localCat", catId);
 	model.addAttribute("localTopic", topicId);
 	model.addAttribute("localLan", lanId);
+	model.addAttribute("query", query);
 	model.addAttribute("languageCount",lan.size());
+	
 }
 	
 
@@ -695,12 +699,35 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 	 * @param page int value
 	 * @return String object (Webpapge)
 	 */
+	
+	private List<Tutorial> searchTutorialsBySentence(String sentence, List<Tutorial> tutorialList) {
+        String[] words = sentence.toLowerCase().split("\\s+");
+        Map<Tutorial, Integer> tutorialMatchCount = new HashMap<>();
+        
+        for (String word : words) {
+            for (Tutorial tutorial : tutorialList) {
+                if (tutorial.getOutline().toLowerCase().contains(word) ||
+                    tutorial.getKeyword().toLowerCase().contains(word)) {
+                    tutorialMatchCount.put(tutorial, tutorialMatchCount.getOrDefault(tutorial, 0) + 1);
+                }
+            }
+        }
+        
+        List<Tutorial> results = tutorialMatchCount.entrySet()
+            .stream()
+            .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+        
+        return results;
+    }
+	
 	@RequestMapping(value = "/tutorials", method = RequestMethod.GET)
 	public String viewCoursesAvailable(HttpServletRequest req,
-			@RequestParam(name = "categoryName") int cat,
-			@RequestParam(name = "topic") int topic,
-			@RequestParam(name = "lan") int lan,
-			
+			@RequestParam(name = "categoryName",required = false, defaultValue = "0") int cat,
+			@RequestParam(name = "topic", required = false, defaultValue = "0") int topic,
+			@RequestParam(name = "lan", required = false, defaultValue = "0") int lan,
+			@RequestParam(name = "query",required = false,defaultValue = "") String query,
 			@RequestParam(name ="page",defaultValue = "0") int page , Principal principal,Model model) {
 
 		
@@ -709,7 +736,9 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 		model.addAttribute("language", lan);
 		model.addAttribute("topic", topic);
 		
-		getModelData(model, cat, topic, lan);
+		if(query.equals("q")) {
+			query="";
+		}
 
 		Category localCat = null;
 		Language localLan = null;
@@ -717,8 +746,7 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 		TopicCategoryMapping localTopicCat = null;
 		List<TopicCategoryMapping> localTopicCatList = null;
 		List<ContributorAssignedTutorial> conAssigTutorialList =null;
-		ContributorAssignedTutorial conAssigTutorial = null;
-
+		
 		Page<Tutorial> tut = null;
 		List<Tutorial> tutToView = new ArrayList<Tutorial>();
 		List<Tutorial> tutToView1 = new ArrayList<Tutorial>();
@@ -730,56 +758,69 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 		}
 
 		model.addAttribute("userInfo", usr);
-		if(cat!=0) {
-			localCat = catService.findByid(cat);
-		}
-			if(topic!=0) {
-			localTopic = topicService.findById(topic);
-		}		
-			if(lan!=0) {
-			localLan= lanService.getById(lan);
-		}
-
-		if(localCat != null && localTopic != null) {
-			localTopicCat = topicCatService.findAllByCategoryAndTopic(localCat, localTopic);
-		}else if (localCat != null) {
-			localTopicCatList = topicCatService.findAllByCategory(localCat);
-		}else if (localTopic != null) {
-			localTopicCatList = topicCatService.findAllByTopicwithCategoryTrue(localTopic);
-		}
-
-		if(localTopicCat != null) {
-
-			if(localLan != null) {
-				conAssigTutorial = conRepo.findByTopicCatAndLanViewPart(localTopicCat, localLan);
-			}else {
-				conAssigTutorialList = conRepo.findByTopicCat(localTopicCat);
-			}
-		}else if(localTopicCatList != null) {
-
-			if(localLan != null) {
-				conAssigTutorialList = conRepo.findAllByTopicCatAndLanViewPartwithCategoryTrue(localTopicCatList, localLan);
-			}else {
-				conAssigTutorialList = conRepo.findAllByTopicCat(localTopicCatList);
-			}
-		}else {
-			if(localLan != null) {
-				conAssigTutorialList = conRepo.findAllByLanWithcategoryTrue(localLan);
-			}
-		}
-
+		
 		Pageable pageable = PageRequest.of(page, 10);
-
-		if(conAssigTutorial != null) {
-			tut = tutService.findAllByconAssignedTutorialPagination(conAssigTutorial,pageable);
+		getModelData(model, cat, topic, lan, query);
+		
+		
+		
+		if(!query.isEmpty()) {
 			
-		} else if(conAssigTutorialList != null) {
-			tut =tutService.findAllByconAssignedTutorialListPagination(conAssigTutorialList, pageable);
+			tut = tutService.SearchOutlineByCombinationOfWords(query, pageable);
 			
-		}else {
-			tut = tutService.findAllPaginationWithEnabledCategoryandTrueTutorial(pageable);
-	
+			if(tut.isEmpty()) {
+				return "redirect:/";
+			}
+			
 		}
+		
+		else {
+			
+			if(cat!=0) {
+				localCat = catService.findByid(cat);
+			}
+				if(topic!=0) {
+				localTopic = topicService.findById(topic);
+			}		
+				if(lan!=0) {
+				localLan= lanService.getById(lan);
+			}
+
+			if(localCat != null && localTopic != null) {
+				localTopicCat = topicCatService.findAllByCategoryAndTopic(localCat, localTopic);
+				localTopicCatList=new ArrayList<>();
+				localTopicCatList.add(localTopicCat);
+			}else if (localCat != null) {
+				localTopicCatList = topicCatService.findAllByCategory(localCat);
+			}else if (localTopic != null) {
+				localTopicCatList = topicCatService.findAllByTopicwithCategoryTrue(localTopic);
+			}
+
+			 if(localTopicCatList != null) {
+
+				if(localLan != null) {
+					conAssigTutorialList = conRepo.findAllByTopicCatAndLan(localTopicCatList, localLan);
+				}else {
+					conAssigTutorialList = conRepo.findAllByTopicCat(localTopicCatList);
+				}
+			}else {
+				if(localLan != null) {
+					conAssigTutorialList = conRepo.findAllByLanWithcategoryTrue(localLan);
+				}
+			}
+
+
+			 if(conAssigTutorialList != null) {
+				tut =tutService.findAllByconAssignedTutorialListPagination(conAssigTutorialList, pageable);
+				
+			}else {
+				tut = tutService.findAllPaginationWithEnabledCategoryandTrueTutorial(pageable);
+		
+			}
+
+		}
+
+		
 
 		for(Tutorial temp :tut) {
 			if(temp.isStatus()) {
@@ -794,6 +835,17 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 			}
 		}
 		
+		/*if(query!=null) {
+			int start = (int) pageable.getOffset();
+		    int end = Math.min((start + pageable.getPageSize()), tutToView1.size());
+			Page<Tutorial> tutorialPage = new PageImpl<>(tutToView1.subList(start, end), pageable, tutToView1.size());
+			tutToView1.clear();
+			for(Tutorial temp: tutorialPage) {
+				tutToView1.add(temp);
+			}
+		}
+		*/
+		
 		if(localCat==null) {
 			Collections.sort(tutToView1, Tutorial.UserVisitComp);
 		}
@@ -801,17 +853,7 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 			Collections.sort(tutToView1, Tutorial.SortByOrderValue);
 		}
 		
-		if(localCat==null) {
-			System.out.println("********Checking Sort by userVisit in Tutorial*********");
-			for(Tutorial tv: tutToView1) {
-				System.out.println(tv.getUserVisit() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-			}
-		}else {
-			System.out.println("********Checking Sort by orderValue in Tutorial*********");
-			for(Tutorial tv: tutToView1) {
-				System.out.println(tv.getConAssignedTutorial().getTopicCatId().getOrder() + " " + tv.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-			}
-		}
+		
 		
 		 // sorting based on order value
 		
@@ -823,6 +865,7 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 		
 		model.addAttribute("tutorials", tutToView1);
 		model.addAttribute("currentPage",page);
+		//model.addAttribute("query", query);
 		model.addAttribute("firstPage", firstPage);
 		model.addAttribute("lastPage", lastPage);
 		model.addAttribute("totalPages",totalPages);
@@ -918,13 +961,17 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 	 * @param model Model object
 	 * @return String object (Webpapge)
 	 */
-	@RequestMapping(value = "/tutorialView/{catName}/{topicName}/{language}", method = RequestMethod.GET)
+	@RequestMapping(value = "/tutorialView/{catName}/{topicName}/{language}/{query}/", method = RequestMethod.GET)
 	public String viewTutorial(HttpServletRequest req,@PathVariable(name = "catName") String cat,
 			@PathVariable (name = "topicName") String topic,
-			@PathVariable (name = "language") String lan,Principal principal,Model model) {
+			@PathVariable (name = "language") String lan, @PathVariable (name = "query") String query,
+			Principal principal,Model model) {
 		
 		Category catName = catService.findBycategoryname(cat);
 		
+		if(query.equals("q")) {
+			query="";
+		}
 		if(catName==null) {
 			return "redirect:/";
 		}
@@ -1014,7 +1061,7 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 //				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
 //				Collections.sort(lanTempSorted);
 
-				getModelData(model, catId, topicId, lanId);
+				getModelData(model, catId, topicId, lanId, query);
 //				model.addAttribute("topics", topicTemp);
 				//String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
 				String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName())+"/1";
@@ -6620,7 +6667,7 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 					if(lan==null) {
 						con_t = conRepo.findAllByTopicCat(tcm);
 					}else {
-						con_t = conRepo.findAllByTopicCatAndLanViewPart(tcm, lan);
+						con_t = conRepo.findAllByTopicCatAndLan(tcm, lan);
 					}
 					for(ContributorAssignedTutorial c : con_t) {
 						List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(c);
@@ -8752,7 +8799,7 @@ private void getModelData(Model model , int catId, int topicId, int lanId) {
 			Language language = lanService.getById(languageId);
 			Category category = catService.findByid(categoryId);
 			List<TopicCategoryMapping> topicCategoryMappings = topicCatService.findAllByCategory(category);
-			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCatAndLanViewPart(topicCategoryMappings, language);
+			List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByTopicCatAndLan(topicCategoryMappings, language);
 			tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
 			
 			for(Tutorial temp :tutorials) {

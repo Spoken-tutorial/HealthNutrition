@@ -67,10 +67,10 @@ public class ContributorAssignedTutorialServiceImpl implements ContributorAssign
 	}
 
 	/**
-	 * @see com.health.service.ContributorAssignedTutorialService#findAllByTopicCatAndLanViewPart(List, Language)
+	 * @see com.health.service.ContributorAssignedTutorialService#findAllByTopicCatAndLan(List, Language)
 	 */
 	@Override
-	public List<ContributorAssignedTutorial> findAllByTopicCatAndLanViewPart(List<TopicCategoryMapping> topCat,Language lan) {
+	public List<ContributorAssignedTutorial> findAllByTopicCatAndLan(List<TopicCategoryMapping> topCat,Language lan) {
 		// TODO Auto-generated method stub
 		List<ContributorAssignedTutorial> localData=new ArrayList<ContributorAssignedTutorial>();
 		

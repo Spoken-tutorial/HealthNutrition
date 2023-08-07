@@ -47,7 +47,19 @@
 			</div>
 		</div>
 		<div class="col-md-6">
-		<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" style="color: black;text-decoration: none;">
+		<a th:if="${!query.isEmpty()}" th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} +'/' + ${query} +'/'}" style="color: black;text-decoration: none;">
+			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
+			<h6 style="color: #014F7A;font-size: 1rem;">
+			<span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span>
+			<span>(</span><i th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}" class=""></i><span>)</span>
+			
+			</h6>
+				<!-- <p th:utext="${tutorial.getOutline()}" class="mx-0"> </p> -->
+				<p th:utext="${#strings.abbreviate(tutorial.getOutline(),600)}" class="mx-0"></p>
+				
+			
+		</a>
+		<a  th:unless="${!query.isEmpty()}"th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} +'/' + 'q' +'/'}" style="color: black;text-decoration: none;">
 			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
 			<h6 style="color: #014F7A;font-size: 1rem;">
 			<span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span>
@@ -65,18 +77,19 @@
 	
 </main>
 
-	<nav aria-label="Page navigation example" class="navbar fixed-bottom navbar-brand" style="left: auto; right: 5px">
+	<nav  aria-label="Page navigation example" class="navbar fixed-bottom navbar-brand" style="left: auto; right: 5px">
 		  <ul class="pagination pagination-sm ">
 		  
 		  
 		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${0}}"> &laquo</a></li>
 		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage -1}}"> &lt</a></li>
-		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
-		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage +1 }}">&gt</a></li>
-		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${totalPages-1}}"> &raquo</a></li>
+		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${currentPage +1 }}">&gt</a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${totalPages-1}}"> &raquo</a></li>
 		  </ul>
 		</nav>
-
+		
+	
 		
 <div th:replace="common/trail :: body-bottom-scripts"></div>
 

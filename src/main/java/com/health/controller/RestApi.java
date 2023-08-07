@@ -141,7 +141,7 @@ public class RestApi {
 		
 		localTopicCatList = topicCatService.findAllByCategory(cat);
 		
-		conAssigTutorialList = conRepo.findAllByTopicCatAndLanViewPart(localTopicCatList, lan);
+		conAssigTutorialList = conRepo.findAllByTopicCatAndLan(localTopicCatList, lan);
 		
 		tut =tutService.findAllByContributorAssignedTutorialList(conAssigTutorialList);
 		

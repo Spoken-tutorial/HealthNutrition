@@ -2147,7 +2147,7 @@ $("#languageId1").change(function() {
 			});
 			
 			
-  		  $("#submitBotton").click(function(e){
+  		 /* $("#submitBotton").click(function(e){
           		if ($("#query").val() === "") {
                		 $("form[name=selectOption]").submit();
                	
@@ -2157,7 +2157,7 @@ $("#languageId1").change(function() {
          		 }
   		  });
 			
-
+	*/
 
 		/*	$('#inputTopicName').change(function() {
 				var topic = $(this).val();

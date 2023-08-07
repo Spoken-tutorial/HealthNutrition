@@ -921,7 +921,7 @@ public class AjaxController{
 		for(TopicCategoryMapping tcm : localcat) {
 			System.out.println(tcm.getOrder() + " " + tcm.getTopic().getTopicName());
 		}
-		List<ContributorAssignedTutorial> cat_list = language != null ? conService.findAllByTopicCatAndLanViewPart(localcat, language) : conService.findAllByTopicCat(localcat);
+		List<ContributorAssignedTutorial> cat_list = language != null ? conService.findAllByTopicCatAndLan(localcat, language) : conService.findAllByTopicCat(localcat);
 
 		//To find Topics
 		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
@@ -1029,7 +1029,7 @@ public class AjaxController{
 		Language language=languageId!=0? langService.getById(languageId):null;
 		
 		List<TopicCategoryMapping> localtopic = topic != null ? topicCatService.findAllByTopic(topic) : topicCatService.findAll();
-		List<ContributorAssignedTutorial> topic_list = language != null ? conService.findAllByTopicCatAndLanViewPart(localtopic, language) : conService.findAllByTopicCat(localtopic);
+		List<ContributorAssignedTutorial> topic_list = language != null ? conService.findAllByTopicCatAndLan(localtopic, language) : conService.findAllByTopicCat(localtopic);
 		
 		//To find category
 		
@@ -1104,7 +1104,7 @@ public class AjaxController{
 		
 		List<TopicCategoryMapping> local = topic != null ? topicCatService.findAllByTopic(topic) : topicCatService.findAll();
 		
-		List<ContributorAssignedTutorial> lang_list = language != null ? conService.findAllByTopicCatAndLanViewPart(local, language) : conService.findAllByTopicCat(local);
+		List<ContributorAssignedTutorial> lang_list = language != null ? conService.findAllByTopicCatAndLan(local, language) : conService.findAllByTopicCat(local);
 		
 		List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(lang_list);
 				
@@ -1122,7 +1122,7 @@ public class AjaxController{
 
 		List<TopicCategoryMapping> local2 = cat != null ? topicCatService.findAllByCategory(cat) : topicCatService.findAll();
 		
-		List<ContributorAssignedTutorial> lang_list2 = language != null ? conService.findAllByTopicCatAndLanViewPart(local2, language) : conService.findAllByTopicCat(local2);
+		List<ContributorAssignedTutorial> lang_list2 = language != null ? conService.findAllByTopicCatAndLan(local2, language) : conService.findAllByTopicCat(local2);
 		
 		List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list2);
 						

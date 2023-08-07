@@ -69,7 +69,7 @@ public interface ContributorAssignedTutorialService {
 	 * @param lan language object
 	 * @return list of ContributorAssignedTutorial object
 	 */
-	List<ContributorAssignedTutorial> findAllByTopicCatAndLanViewPart(List<TopicCategoryMapping> topCat,Language lan);
+	List<ContributorAssignedTutorial> findAllByTopicCatAndLan(List<TopicCategoryMapping> topCat,Language lan);
 	/**
 	 * Find ContributorAssignedTutorial object given TopicCategoryMapping and Language object
 	 * @param topCat TopicCategoryMapping object
