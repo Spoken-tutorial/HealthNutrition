@@ -68,6 +68,39 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer> , J
 	
 	Page<Tutorial> findByOutlineContainingIgnoreCase(String query, Pageable pageable);
 	
+	/*
+	@Query("from Tutorial t where  t IN (:tutorials) and  t.outline  LIKE %?1%") 
+	Page<Tutorial> findByOutlineByQueryPaginationInTutorialList(@Param("tutorials")List<Tutorial> tutorials, String query, Pageable page);
+	
+	@Query("from Tutorial t where  t IN (:tutorials) and  t.outline  LIKE %:query1% and  t.outline  LIKE %:query2%") 
+	Page<Tutorial> findByOutlineByQuerywords2InTutorialList(@Param("tutorials")List<Tutorial> tutorials, @Param("query1") String query1, @Param("query2") String query2, Pageable page);
+	
+	@Query("from Tutorial t where  t IN (:tutorials) and  t.outline  LIKE %:query1%  and  t.outline  LIKE %:query2%   and t.outline LIKE %:query3%") 
+	Page<Tutorial> findByOutlineByQuerywords3InTutorialList(@Param("tutorials")List<Tutorial> tutorials, @Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3, Pageable page);
+	
+	@Query("from Tutorial t where  t IN (:tutorials) and  t.outline LIKE %:query1% and  t.outline  LIKE %:query2%  and t.outline LIKE %:query3% and t.outline  LIKE %:query4%") 
+	Page<Tutorial> findByOutlineByQuerywords4InTutorialList(@Param("tutorials")List<Tutorial> tutorials, @Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3, @Param("query4") String query4, Pageable page);
+	
+	@Query("from Tutorial t where t IN (:tutorials) and  t.outline  LIKE %:query1% and  t.outline  LIKE %:query2% and t.outline  LIKE %:query3% and t.outline  LIKE %:query4% and t.outline LIKE %:query5%") 
+	Page<Tutorial> findByOutlineByQuerywords5InTutorialList(@Param("tutorials")List<Tutorial> tutorials, @Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3,@Param("query4") String query4, @Param("query5") String query5, Pageable page);
+	
+	*/
+	
+	@Query("from Tutorial t where  t.conAssignedTutorial IN (:con) and t.status = true and  t.outline  LIKE %:query1%") 
+	Page<Tutorial> findByOutlineByQueryPaginationconAssignedTutorialList(@Param("con")List<ContributorAssignedTutorial> con,  @Param("query1") String query1, Pageable page);
+	
+	@Query("from Tutorial t where t.conAssignedTutorial IN (:con) and t.status = true and  t.outline  LIKE %:query1% and  t.outline  LIKE %:query2%") 
+	Page<Tutorial> findByOutlineByQuerywords2conAssignedTutorialList(@Param("con")List<ContributorAssignedTutorial> con, @Param("query1") String query1, @Param("query2") String query2, Pageable page);
+	
+	@Query("from Tutorial t where  t.conAssignedTutorial IN (:con) and t.status = true and  t.outline  LIKE %:query1%  and  t.outline  LIKE %:query2%   and t.outline LIKE %:query3%") 
+	Page<Tutorial> findByOutlineByQuerywords3conAssignedTutorialList(@Param("con")List<ContributorAssignedTutorial> con, @Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3, Pageable page);
+	
+	@Query("from Tutorial t where t.conAssignedTutorial IN (:con) and t.status = true and  t.outline LIKE %:query1% and  t.outline  LIKE %:query2%  and t.outline LIKE %:query3% and t.outline  LIKE %:query4%") 
+	Page<Tutorial> findByOutlineByQuerywords4conAssignedTutorialList(@Param("con")List<ContributorAssignedTutorial> con, @Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3, @Param("query4") String query4, Pageable page);
+	
+	@Query("from Tutorial t where t.conAssignedTutorial IN (:con) and t.status = true and  t.outline  LIKE %:query1% and  t.outline  LIKE %:query2% and t.outline  LIKE %:query3% and t.outline  LIKE %:query4% and t.outline LIKE %:query5%") 
+	Page<Tutorial> findByOutlineByQuerywords5conAssignedTutorialList(@Param("con")List<ContributorAssignedTutorial> con, @Param("query1") String query1, @Param("query2") String query2, @Param("query3") String query3,@Param("query4") String query4, @Param("query5") String query5, Pageable page);
+	
 	
 	
 	/**

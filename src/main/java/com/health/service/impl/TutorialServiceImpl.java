@@ -186,6 +186,26 @@ public class TutorialServiceImpl implements TutorialService {
 		
 		return pageOfTutorials;
 	}
+	
+	
+	@Override
+	public Page<Tutorial> findPaginationWithEnabledCategoryandTrueTutorial(List<Tutorial> tutList, Pageable page) {
+		
+		List<Tutorial> tutorials= new ArrayList<>();
+		
+		//List<Tutorial> tutList= tutorialRepo.findAll();
+		for(Tutorial temp : tutList) {
+			if(temp.getConAssignedTutorial().getTopicCatId().getCat().isStatus() && temp.isStatus()) {
+				tutorials.add(temp);
+			}
+		}
+		
+		final int start = (int)page.getOffset();
+		final int end = Math.min((start + page.getPageSize()), tutorials.size());
+		Page<Tutorial> pageOfTutorials = new PageImpl<>(tutorials.subList(start, end), page, tutorials.size());
+		
+		return pageOfTutorials;
+	}
 
 	/**
 	 * @see com.health.service.TutorialService#findAllByconAssignedTutorialPagination(ContributorAssignedTutorial, Pageable)
@@ -496,6 +516,268 @@ public class TutorialServiceImpl implements TutorialService {
 	}
 
 
+	
+	
+	
+	
+	
+	
+	@Override
+	public Page<Tutorial> SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(List<ContributorAssignedTutorial> con, String query, Pageable page) {
+		Page<Tutorial> tutorialPageList=null;
+		query=query.trim();
+		List<String> qList = new ArrayList<String>(Arrays.asList(query.split(" ")));
+		int queryLength=qList.size();
+		if(queryLength>5) {
+			queryLength=5;
+		}
+		
+		tutorialPageList= tutorialRepo.findByOutlineByQueryPaginationconAssignedTutorialList(con,query, page);
+		
+		if(!tutorialPageList.isEmpty()) {
+			return tutorialPageList;
+		}
+		
+		else {
+			
+			if(queryLength<=5) {
+				if(queryLength==5) {
+					
+					tutorialPageList=tutorialRepo.findByOutlineByQuerywords5conAssignedTutorialList(con, qList.get(0), qList.get(1), qList.get(2),qList.get(3),qList.get(4), page);
+					if(tutorialPageList.isEmpty()) {
+						for(int i=0; i<5; i++) {
+							
+							if(i==3 || i==4) {
+								tutorialPageList=tutorialRepo.findByOutlineByQuerywords4conAssignedTutorialList(con, qList.get(0), qList.get(1), qList.get(2),qList.get(i), page);
+								if(!tutorialPageList.isEmpty()) {
+									break;
+									
+								}
+								
+							}
+							if(i==4) {
+								tutorialPageList=tutorialRepo.findByOutlineByQuerywords4conAssignedTutorialList(con, qList.get(0), qList.get(2), qList.get(3),qList.get(i), page);
+								if(!tutorialPageList.isEmpty()) {
+									break;
+									
+								}
+								tutorialPageList=tutorialRepo.findByOutlineByQuerywords4conAssignedTutorialList(con, qList.get(1), qList.get(2), qList.get(3),qList.get(i), page);
+								if(!tutorialPageList.isEmpty()) {
+									break;
+									
+								}
+							}
+							
+						
+						}}
+						
+						if(tutorialPageList.isEmpty()) {
+							for(int i=0; i<5; i++) {
+								if(i==2 || i==3 || i==4) {
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(0), qList.get(1), qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+								}
+								if(i==3||i==4){
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(0), qList.get(2), qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+									
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(1), qList.get(2), qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+								}
+								if(i==4) {
+									
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(0), qList.get(3), qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(1), qList.get(3), qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+								}
+							}
+						}
+						
+
+						if(tutorialPageList.isEmpty()) {
+							for(int i=0; i<5; i++) {
+								if(i!=0) {
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(0),  qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+									if(i!=1 ){
+										tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(1),  qList.get(i), page);
+										if(!tutorialPageList.isEmpty()) {
+											break;
+											
+										}
+										if(i!=2) {
+											tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(2),  qList.get(i), page);
+											if(!tutorialPageList.isEmpty()) {
+												break;
+												
+											}
+											if(i!=3) {
+												tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(3),  qList.get(i), page);
+												if(!tutorialPageList.isEmpty()) {
+													break;
+													
+												}
+										}
+										
+										}
+										
+										
+									}
+								}
+								
+								
+							}
+						}
+					}
+					
+					
+						
+					
+				
+				
+				if(queryLength==4) {
+					
+					tutorialPageList=tutorialRepo.findByOutlineByQuerywords4conAssignedTutorialList(con, qList.get(0), qList.get(1), qList.get(2),qList.get(3), page);
+				
+						
+						if(tutorialPageList.isEmpty()) {
+							for(int i=2; i<4; i++) {
+								if(i==2 || i==3 ) {
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(0), qList.get(1), qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+									if(i==2) {
+										
+										tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(1), qList.get(3), qList.get(i), page);
+										if(!tutorialPageList.isEmpty()) {
+											break;
+											
+										}
+										
+									}
+									
+									if(i==3) {
+										tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(0), qList.get(2), qList.get(i), page);
+										if(!tutorialPageList.isEmpty()) {
+											break;
+											
+										}
+										
+										tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(1), qList.get(2), qList.get(i), page);
+										if(!tutorialPageList.isEmpty()) {
+											break;
+											
+										}
+										
+									}
+									
+								}
+								
+							}
+						}
+						
+
+						if(tutorialPageList.isEmpty()) {
+							for(int i=0; i<4; i++) {
+								if(i!=0) {
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con,qList.get(0),  qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+									if(i!=1 ){
+										tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(1),  qList.get(i), page);
+										if(!tutorialPageList.isEmpty()) {
+											break;
+											
+										}
+										if(i!=2) {
+											tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(2),  qList.get(i), page);
+											if(!tutorialPageList.isEmpty()) {
+												break;
+												
+											}
+											
+										
+										}
+										
+										
+									}
+								}
+								
+								
+							}
+						}
+					
+				}
+				
+				if(queryLength==3) {
+					
+					tutorialPageList=tutorialRepo.findByOutlineByQuerywords3conAssignedTutorialList(con, qList.get(0), qList.get(1), qList.get(2), page);
+					if(tutorialPageList.isEmpty()) {
+						for(int i=0; i<3; i++) {
+							if(i!=0) {
+								tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(0),  qList.get(i), page);
+								if(!tutorialPageList.isEmpty()) {
+									break;
+									
+								}
+								if(i!=1 ){
+									tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con,qList.get(1),  qList.get(i), page);
+									if(!tutorialPageList.isEmpty()) {
+										break;
+										
+									}
+									
+									
+								}
+							}
+							
+							
+						}
+					}
+					
+				}
+				
+				if(queryLength==2) {
+					
+					tutorialPageList=tutorialRepo.findByOutlineByQuerywords2conAssignedTutorialList(con, qList.get(0), qList.get(1), page);
+					if(tutorialPageList.isEmpty()) {
+						tutorialPageList=tutorialRepo.findByOutlineByQueryPaginationconAssignedTutorialList(con, qList.get(0), page);
+						if(tutorialPageList.isEmpty()) {
+						tutorialPageList=tutorialRepo.findByOutlineByQueryPaginationconAssignedTutorialList(con, qList.get(1), page);	
+							
+						}
+					}
+					
+				}
+				
+			}
+				
+		      return tutorialPageList;
+		}
+	}
 
 
 }

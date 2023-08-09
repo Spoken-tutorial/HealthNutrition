@@ -701,13 +701,12 @@ private void getModelData(Model model , int catId, int topicId, int lanId, Strin
 	 */
 	
 	private List<Tutorial> searchTutorialsBySentence(String sentence, List<Tutorial> tutorialList) {
-        String[] words = sentence.toLowerCase().split("\\s+");
+        String[] words = sentence.toLowerCase().split(" ");
         Map<Tutorial, Integer> tutorialMatchCount = new HashMap<>();
         
         for (String word : words) {
             for (Tutorial tutorial : tutorialList) {
-                if (tutorial.getOutline().toLowerCase().contains(word) ||
-                    tutorial.getKeyword().toLowerCase().contains(word)) {
+                if (tutorial.getOutline().toLowerCase().contains(word)) {
                     tutorialMatchCount.put(tutorial, tutorialMatchCount.getOrDefault(tutorial, 0) + 1);
                 }
             }
@@ -748,6 +747,7 @@ private void getModelData(Model model , int catId, int topicId, int lanId, Strin
 		List<ContributorAssignedTutorial> conAssigTutorialList =null;
 		
 		Page<Tutorial> tut = null;
+		Page<Tutorial> querytutorialPages = null;
 		List<Tutorial> tutToView = new ArrayList<Tutorial>();
 		List<Tutorial> tutToView1 = new ArrayList<Tutorial>();
 
@@ -764,26 +764,21 @@ private void getModelData(Model model , int catId, int topicId, int lanId, Strin
 		
 		
 		
-		if(!query.isEmpty()) {
-			
-			tut = tutService.SearchOutlineByCombinationOfWords(query, pageable);
-			
-			if(tut.isEmpty()) {
-				return "redirect:/";
-			}
-			
-		}
 		
-		else {
+		
+		
 			
 			if(cat!=0) {
 				localCat = catService.findByid(cat);
+				model.addAttribute("catforQuery", localCat);
 			}
 				if(topic!=0) {
 				localTopic = topicService.findById(topic);
+				model.addAttribute("topicforQuery", localTopic);
 			}		
 				if(lan!=0) {
 				localLan= lanService.getById(lan);
+				model.addAttribute("lanforQuery", localLan);
 			}
 
 			if(localCat != null && localTopic != null) {
@@ -818,11 +813,30 @@ private void getModelData(Model model , int catId, int topicId, int lanId, Strin
 		
 			}
 
-		}
-
+		
+			List<TopicCategoryMapping> localTopicCatListforQuery = new ArrayList<>();
+			List<ContributorAssignedTutorial> conAssigTutorialListforQuery =null;
+			List<Category>enabledCatList=getCategories();
+			for(Category catTemp : enabledCatList) {
+				localTopicCatListforQuery.addAll(topicCatService.findAllByCategory(catTemp));
+			}
+			conAssigTutorialListforQuery=conRepo.findAllByTopicCat(localTopicCatListforQuery);
 		
 
-		for(Tutorial temp :tut) {
+		if(!query.isEmpty()) {
+			 if(conAssigTutorialList != null) {
+				 tut= tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(conAssigTutorialList, query, pageable);
+			 }
+			 
+			 else {
+				 tut= tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(conAssigTutorialListforQuery, query, pageable);
+				
+				
+			 }
+			
+		}
+
+		/*for(Tutorial temp :tut) {
 			if(temp.isStatus()) {
 				tutToView.add(temp);
 			}
@@ -834,17 +848,15 @@ private void getModelData(Model model , int catId, int topicId, int lanId, Strin
 				tutToView1.add(temp);
 			}
 		}
+		*/
 		
-		/*if(query!=null) {
-			int start = (int) pageable.getOffset();
-		    int end = Math.min((start + pageable.getPageSize()), tutToView1.size());
-			Page<Tutorial> tutorialPage = new PageImpl<>(tutToView1.subList(start, end), pageable, tutToView1.size());
-			tutToView1.clear();
-			for(Tutorial temp: tutorialPage) {
+		for(Tutorial temp :tut) {
+			 {
 				tutToView1.add(temp);
 			}
 		}
-		*/
+
+		
 		
 		if(localCat==null) {
 			Collections.sort(tutToView1, Tutorial.UserVisitComp);
@@ -856,10 +868,16 @@ private void getModelData(Model model , int catId, int topicId, int lanId, Strin
 		
 		
 		 // sorting based on order value
+		int totalPages=0;
+		
+		if(tut!=null) {
+			totalPages = tut.getTotalPages();
+		}
+		else {
+			totalPages = 1;
+		}
 		
 		
-		
-		int totalPages = tut.getTotalPages();
 		int firstPage = page + 1 > 2 ? page + 1 - 2 : 1;
 		int lastPage= page + 1 < totalPages - 5 ? page + 1 + 5 : totalPages;
 		

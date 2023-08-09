@@ -120,7 +120,13 @@ public interface TutorialService {
 	List<Tutorial> getFinalTutorialsForCache();
 
 
-	Page<Tutorial> findAllPaginationWithEnabledCategoryandTrueTutorial(Pageable page); 
+	Page<Tutorial> findAllPaginationWithEnabledCategoryandTrueTutorial(Pageable page);
+
+
+	Page<Tutorial> SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(List<ContributorAssignedTutorial> con,String query, Pageable page);
+
+
+	Page<Tutorial> findPaginationWithEnabledCategoryandTrueTutorial(List<Tutorial> tutList, Pageable page); 
 
 
 	

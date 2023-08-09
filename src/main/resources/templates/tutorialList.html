@@ -37,7 +37,7 @@
 <div th:replace="common/commonElements :: search_bar"></div>
 </div>
 <main id="tutorial_list">
-	<div th:each="tutorial : ${tutorials}" class="row t-wrapper mt-3">
+	<div th:if="${tutorials.size()>0}" th:each="tutorial : ${tutorials}" class="row t-wrapper mt-3">
 		<div class="col-md-6" >
 		<div style="width: 100%; margin: auto;">
 			<video th:id="${'storedVideoId' + tutorial.getTutorialId()}" 
@@ -74,15 +74,20 @@
 		</div>
 	</div>
 	
+	<div th:unless="${tutorials.size()>0}" ><h4>No tutorial found for the query: <span th:text="${query}"></span></h4>
+	<br><h5 th:if="${catforQuery!=null}"><b>Category:</b> <span th:text="${catforQuery.getCatName()}"></span></h5>
+	<h5 th:if="${topicforQuery!=null}"><b>Topic:</b> <span th:text="${topicforQuery.getTopicName()}"></span></h5>
+	<h5 th:if="${lanforQuery!=null}"><b>Language:</b> <span th:text="${lanforQuery.getLangName()}"></span></h5> <br><br></div>
+	
 	
 </main>
 
-	<nav  aria-label="Page navigation example" class="navbar fixed-bottom navbar-brand" style="left: auto; right: 5px">
+	<nav th:if="${tutorials.size()>0}"  aria-label="Page navigation example" class="navbar fixed-bottom navbar-brand" style="left: auto; right: 5px">
 		  <ul class="pagination pagination-sm ">
 		  
 		  
-		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${0}}"> &laquo</a></li>
-		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage -1}}"> &lt</a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${0}}"> &laquo</a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query}+'&page='+${currentPage -1}}"> &lt</a></li>
 		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
 		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${currentPage +1 }}">&gt</a></li>
 		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${totalPages-1}}"> &raquo</a></li>
