@@ -137,7 +137,7 @@
 					<li class="nav-item link-style"><a class="nav-link"
 						id="pills-script-tab" data-toggle="pill" href="#pills-script"
 						role="tab" aria-controls="pills-script" aria-selected="false"><i
-							class="far fa-file-alt mr-2 t-icon"></i> Resources</a></li>
+							class="far fa-file-alt mr-2 t-icon"></i>Scripts &amp; Other Resources</a></li>
 					
 				</ul>
 				<div class="tab-content px-0 py-3" id="pills-tabContent-tutorial"
@@ -167,7 +167,7 @@
 								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a
 								th:if="${tutorial.getScriptStatus() != 0}"
 								th:href="@{/files/}+@{${tutorial.getTimeScript()}}" name="ScriptPdf"
-								target="_blank" id="ScriptPdf" download>Timed Script</a> <a
+								target="_blank" id="ScriptPdf">Timed Script</a> <a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
 								
 							<li class="mb-3" th:unless="${relatedContent}"><i class="fas fa-file-download mr-3"></i> 
