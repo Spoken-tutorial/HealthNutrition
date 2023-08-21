@@ -1,6 +1,8 @@
 package com.health.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,142 +11,129 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.HashSet;
+
 /**
- * Brochure Object to store brochure related data on database 
+ * Brochure Object to store brochure related data on database
+ * 
  * @author Om Prakash Soni
  * @version 1.0
  *
  */
 @Entity
-public class Brouchure implements  Serializable {
+public class Brouchure implements Serializable {
 
-	/**
-	 * unique brochure id 
-	 */
-	@Id
-	private int id;
-	
-	private String title;
-	
-	
-	public String getTitle() {
-		return title;
-	}
+    /**
+     * unique brochure id
+     */
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    @Id
+    private int id;
 
-	
+    private String title;
 
-	/**
-	 * Location to store brochure 
-	 */
-	private String posterPath;
-	
-	/**
-	 * Boolean value to show on Homepage or not
-	 */
-	private boolean showOnHomepage=false;
-	
-	private int primaryVersion;
-	
-	
-	public int getPrimaryVersion() {
-		return primaryVersion;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setPrimaryVersion(int primaryVersion) {
-		this.primaryVersion = primaryVersion;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
+    /**
+     * Location to store brochure
+     */
+    private String posterPath;
 
+    /**
+     * Boolean value to show on Homepage or not
+     */
+    private boolean showOnHomepage = false;
 
-	@OneToMany(mappedBy = "brouchure", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Version> versions=new HashSet<Version>();
-	
+    private int primaryVersion;
 
-	public Set<Version> getVersions() {
-		return versions;
-	}
+    public int getPrimaryVersion() {
+        return primaryVersion;
+    }
 
-	public void setVersions(Set<Version> versions) {
-		this.versions = versions;
-	}
+    public void setPrimaryVersion(int primaryVersion) {
+        this.primaryVersion = primaryVersion;
+    }
 
+    @OneToMany(mappedBy = "brouchure", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Version> versions = new HashSet<Version>();
 
+    public Set<Version> getVersions() {
+        return versions;
+    }
 
-	/**
-	 * Language mapped object it is associated with
-	 */
-	@ManyToOne
-	@JoinColumn(name = "lan_id")
-	private Language lan;
-	
-	/**
-	 * Topic category Mapped object to which it belongs
-	 */
-	@ManyToOne
-	@JoinColumn(name = "topicCat_id")
-	private TopicCategoryMapping topicCatId;
-	
-	@ManyToOne
-	@JoinColumn(name = "cat_id")
-	private Category catId;
-	
-	
+    public void setVersions(Set<Version> versions) {
+        this.versions = versions;
+    }
 
-	public Category getCatId() {
-		return catId;
-	}
+    /**
+     * Language mapped object it is associated with
+     */
+    @ManyToOne
+    @JoinColumn(name = "lan_id")
+    private Language lan;
 
-	public void setCatId(Category catId) {
-		this.catId = catId;
-	}
+    /**
+     * Topic category Mapped object to which it belongs
+     */
+    @ManyToOne
+    @JoinColumn(name = "topicCat_id")
+    private TopicCategoryMapping topicCatId;
 
-	public int getId() {
-		return id;
-	}
+    @ManyToOne
+    @JoinColumn(name = "cat_id")
+    private Category catId;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public Category getCatId() {
+        return catId;
+    }
 
-	public String getPosterPath() {
-		return posterPath;
-	}
+    public void setCatId(Category catId) {
+        this.catId = catId;
+    }
 
-	public void setPosterPath(String posterPath) {
-		this.posterPath = posterPath;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public Language getLan() {
-		return lan;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setLan(Language lan) {
-		this.lan = lan;
-	}
+    public String getPosterPath() {
+        return posterPath;
+    }
 
-	public TopicCategoryMapping getTopicCatId() {
-		return topicCatId;
-	}
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
 
-	public void setTopicCatId(TopicCategoryMapping topicCatId) {
-		this.topicCatId = topicCatId;
-	}
+    public Language getLan() {
+        return lan;
+    }
 
-	public boolean isShowOnHomepage() {
-		return showOnHomepage;
-	}
+    public void setLan(Language lan) {
+        this.lan = lan;
+    }
 
-	public void setShowOnHomepage(boolean showOnHomepage) {
-		this.showOnHomepage = showOnHomepage;
-	}
-	
-	
-	
+    public TopicCategoryMapping getTopicCatId() {
+        return topicCatId;
+    }
+
+    public void setTopicCatId(TopicCategoryMapping topicCatId) {
+        this.topicCatId = topicCatId;
+    }
+
+    public boolean isShowOnHomepage() {
+        return showOnHomepage;
+    }
+
+    public void setShowOnHomepage(boolean showOnHomepage) {
+        this.showOnHomepage = showOnHomepage;
+    }
+
 }

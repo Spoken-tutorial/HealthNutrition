@@ -2,7 +2,6 @@ package com.health.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -11,106 +10,107 @@ import javax.persistence.ManyToOne;
 
 /**
  * this modal is used for master trainer
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class UserIndianLanguageMapping implements  Serializable{
+public class UserIndianLanguageMapping implements Serializable {
 
-	/**
-	 * unique id
-	 */
-	@Id
-	private int id;
-	
-	/**
-	 * redaing check 
-	 */
-	private boolean reading = false;
-	
-	/**
-	 * write check
-	 */
-	private boolean writing = false;
-	
-	/**
-	 * speak check
-	 */
-	private boolean speaking = false;
-	
-	/**
-	 * user object
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lan_id")
-	private IndianLanguage indianlan;
+    /**
+     * unique id
+     */
+    @Id
+    private int id;
 
-	public int getId() {
-		return id;
-	}
+    /**
+     * redaing check
+     */
+    private boolean reading = false;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * write check
+     */
+    private boolean writing = false;
 
-	public boolean isRead() {
-		return reading;
-	}
+    /**
+     * speak check
+     */
+    private boolean speaking = false;
 
-	public void setRead(boolean read) {
-		this.reading = read;
-	}
+    /**
+     * user object
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public boolean isWrite() {
-		return writing;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lan_id")
+    private IndianLanguage indianlan;
 
-	public void setWrite(boolean write) {
-		this.writing = write;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public boolean isSpeak() {
-		return speaking;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setSpeak(boolean speak) {
-		this.speaking = speak;
-	}
+    public boolean isRead() {
+        return reading;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setRead(boolean read) {
+        this.reading = read;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public boolean isWrite() {
+        return writing;
+    }
 
-	public IndianLanguage getIndianlan() {
-		return indianlan;
-	}
+    public void setWrite(boolean write) {
+        this.writing = write;
+    }
 
-	public void setIndianlan(IndianLanguage indianlan) {
-		this.indianlan = indianlan;
-	}
+    public boolean isSpeak() {
+        return speaking;
+    }
 
-	public UserIndianLanguageMapping(int id, boolean read, boolean write, boolean speak, User user,
-			IndianLanguage indianlan) {
-		super();
-		this.id = id;
-		this.reading = read;
-		this.writing = write;
-		this.speaking = speak;
-		this.user = user;
-		this.indianlan = indianlan;
-	}
-	
-	public UserIndianLanguageMapping() {
-		
-	}
-	
+    public void setSpeak(boolean speak) {
+        this.speaking = speak;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public IndianLanguage getIndianlan() {
+        return indianlan;
+    }
+
+    public void setIndianlan(IndianLanguage indianlan) {
+        this.indianlan = indianlan;
+    }
+
+    public UserIndianLanguageMapping(int id, boolean read, boolean write, boolean speak, User user,
+            IndianLanguage indianlan) {
+        super();
+        this.id = id;
+        this.reading = read;
+        this.writing = write;
+        this.speaking = speak;
+        this.user = user;
+        this.indianlan = indianlan;
+    }
+
+    public UserIndianLanguageMapping() {
+
+    }
+
 }

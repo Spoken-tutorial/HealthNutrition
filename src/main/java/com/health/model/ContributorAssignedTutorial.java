@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -16,110 +15,106 @@ import javax.persistence.Table;
 
 /**
  * Pre-tutorial Object to store Pre-tutorial related data on database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-@Table(name="contributor_Role")
-public class ContributorAssignedTutorial implements  Serializable {
-	
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int id;
-	private Timestamp dateAdded;
-		
-	/**
-	 * topicCategory Object
-	 */
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name="topicCat_ID")
-	private TopicCategoryMapping topicCatId;
-	 
-	/**
-	 * language object
-	 */
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name="language_id")
-	private Language lan;
-	
-	/**
-	 * tutorial associated with it
-	 */
-	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
-	private Set<Tutorial> tutorials=new HashSet<Tutorial>();
-	
-	/**
-	 * user to which tutorial is assigned
-	 */
-	@OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
-	private Set<ContributorAssignedMultiUserTutorial> multiUserAssigned=new HashSet<ContributorAssignedMultiUserTutorial>();
+@Table(name = "contributor_Role")
+public class ContributorAssignedTutorial implements Serializable {
 
-	public int getId() {
-		return id;
-	}
+    /**
+     * unique id of object
+     */
+    @Id
+    private int id;
+    private Timestamp dateAdded;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * topicCategory Object
+     */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "topicCat_ID")
+    private TopicCategoryMapping topicCatId;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    /**
+     * language object
+     */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "language_id")
+    private Language lan;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    /**
+     * tutorial associated with it
+     */
+    @OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
+    private Set<Tutorial> tutorials = new HashSet<Tutorial>();
 
-	public TopicCategoryMapping getTopicCatId() {
-		return topicCatId;
-	}
+    /**
+     * user to which tutorial is assigned
+     */
+    @OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
+    private Set<ContributorAssignedMultiUserTutorial> multiUserAssigned = new HashSet<ContributorAssignedMultiUserTutorial>();
 
-	public void setTopicCatId(TopicCategoryMapping topicCatId) {
-		this.topicCatId = topicCatId;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public Language getLan() {
-		return lan;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setLan(Language lan) {
-		this.lan = lan;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public ContributorAssignedTutorial(int id, Timestamp dateAdded, TopicCategoryMapping topicCatId,
-			Language lan) {
-		super();
-		this.id = id;
-		this.dateAdded = dateAdded;
-		this.topicCatId = topicCatId;
-		this.lan = lan;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	
-	public ContributorAssignedTutorial() {
-		
-	}
+    public TopicCategoryMapping getTopicCatId() {
+        return topicCatId;
+    }
 
-	public Set<Tutorial> getTutorials() {
-		return tutorials;
-	}
+    public void setTopicCatId(TopicCategoryMapping topicCatId) {
+        this.topicCatId = topicCatId;
+    }
 
-	public void setTutorials(Set<Tutorial> tutorials) {
-		this.tutorials = tutorials;
-	}
+    public Language getLan() {
+        return lan;
+    }
 
-	public Set<ContributorAssignedMultiUserTutorial> getMultiUserAssigned() {
-		return multiUserAssigned;
-	}
+    public void setLan(Language lan) {
+        this.lan = lan;
+    }
 
-	public void setMultiUserAssigned(Set<ContributorAssignedMultiUserTutorial> multiUserAssigned) {
-		this.multiUserAssigned = multiUserAssigned;
-	}
-	 
-	
- 
-		
+    public ContributorAssignedTutorial(int id, Timestamp dateAdded, TopicCategoryMapping topicCatId, Language lan) {
+        super();
+        this.id = id;
+        this.dateAdded = dateAdded;
+        this.topicCatId = topicCatId;
+        this.lan = lan;
+    }
+
+    public ContributorAssignedTutorial() {
+
+    }
+
+    public Set<Tutorial> getTutorials() {
+        return tutorials;
+    }
+
+    public void setTutorials(Set<Tutorial> tutorials) {
+        this.tutorials = tutorials;
+    }
+
+    public Set<ContributorAssignedMultiUserTutorial> getMultiUserAssigned() {
+        return multiUserAssigned;
+    }
+
+    public void setMultiUserAssigned(Set<ContributorAssignedMultiUserTutorial> multiUserAssigned) {
+        this.multiUserAssigned = multiUserAssigned;
+    }
+
 }

@@ -1,5 +1,11 @@
 package com.health.config;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.List;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -13,18 +19,12 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.List;
-
 /**
- * Shared class used by every sample. Contains methods for authorizing a user and caching credentials.
+ * Shared class used by every sample. Contains methods for authorizing a user
+ * and caching credentials.
  */
 public class Auth {
 
- 
     public static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 
     public static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -46,13 +46,14 @@ public class Auth {
 //            System.exit(1);
 //        }
 
-        // This creates the credentials datastore at ~/.oauth-credentials/${credentialDatastore}
-        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(System.getProperty("user.home") + "/" + CREDENTIALS_DIRECTORY));
+        // This creates the credentials datastore at
+        // ~/.oauth-credentials/${credentialDatastore}
+        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(
+                new File(System.getProperty("user.home") + "/" + CREDENTIALS_DIRECTORY));
         DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
 
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
-                .build();
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+                clientSecrets, scopes).setCredentialDataStore(datastore).build();
 
         // Build the local server and bind it to port 8080
         LocalServerReceiver localReceiver = new LocalServerReceiver.Builder().setPort(8080).build();

@@ -16,41 +16,41 @@ import org.springframework.core.env.Environment;
 
 import com.health.utility.CommonData;
 
-
 @SpringBootApplication
 @EnableCaching
 @PropertySource("classpath:git.properties")
-public class HealthNutrition extends org.springframework.boot.web.servlet.support.SpringBootServletInitializer implements CommandLineRunner {
+public class HealthNutrition extends org.springframework.boot.web.servlet.support.SpringBootServletInitializer
+        implements CommandLineRunner {
 
-	private static final Logger logger = LoggerFactory.getLogger(HealthNutrition.class);
-	
-	@Autowired
-	private Environment env;
+    private static final Logger logger = LoggerFactory.getLogger(HealthNutrition.class);
 
-	@Value("${git.commit.id}")
-	private String gitCommitId;
+    @Autowired
+    private Environment env;
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		return builder.sources(HealthNutrition.class);
-	}
+    @Value("${git.commit.id}")
+    private String gitCommitId;
 
-	public static void main(String[] args)  {
-		SpringApplication.run(HealthNutrition.class, args);
-	}
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(HealthNutrition.class);
+    }
 
-	@Override
-	public void run(String... args) throws Exception {
-		logger.info("Starting application " + gitCommitId);
-		
-		String baseDir = env.getProperty("spring.applicationexternalPath.name");
-		new File(baseDir+CommonData.uploadDirectoryCategory).mkdirs();
-		new File(baseDir+CommonData.uploadDirectoryQuestion).mkdirs();
-		new File(baseDir+CommonData.uploadDirectoryTutorial).mkdirs();
-		new File(baseDir+CommonData.uploadUserImage).mkdirs();
-		new File(baseDir+CommonData.uploadDirectoryTestimonial).mkdirs();
-		new File(baseDir+CommonData.uploadDirectoryMasterTrainer).mkdirs();
-		new File(baseDir+CommonData.uploadDirectoryEvent).mkdirs();
-		new File(baseDir+CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(HealthNutrition.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        logger.info("Starting application " + gitCommitId);
+
+        String baseDir = env.getProperty("spring.applicationexternalPath.name");
+        new File(baseDir + CommonData.uploadDirectoryCategory).mkdirs();
+        new File(baseDir + CommonData.uploadDirectoryQuestion).mkdirs();
+        new File(baseDir + CommonData.uploadDirectoryTutorial).mkdirs();
+        new File(baseDir + CommonData.uploadUserImage).mkdirs();
+        new File(baseDir + CommonData.uploadDirectoryTestimonial).mkdirs();
+        new File(baseDir + CommonData.uploadDirectoryMasterTrainer).mkdirs();
+        new File(baseDir + CommonData.uploadDirectoryEvent).mkdirs();
+        new File(baseDir + CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
+    }
 }

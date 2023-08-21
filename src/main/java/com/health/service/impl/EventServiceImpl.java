@@ -1,10 +1,7 @@
 package com.health.service.impl;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
-
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,102 +17,101 @@ import com.health.service.EventService;
 import com.health.utility.CommonData;
 
 /**
- * Default implementation of the {@link com.health.service.EventService} interface.  
+ * Default implementation of the {@link com.health.service.EventService}
+ * interface.
+ * 
  * @author om prakash soni
  * @version 1.0
  */
 @Service
 public class EventServiceImpl implements EventService {
 
+    @Autowired
+    private EventRepository eventRepo;
 
-	@Autowired
-	private EventRepository eventRepo;
+    @Autowired
+    private RoleRepository roleRepo;
 
-	@Autowired
-	private RoleRepository roleRepo;
+    /**
+     * @see com.health.service.EventService#findAll()
+     */
+    @Override
+    public List<Event> findAll() {
 
-	/**
-	 * @see com.health.service.EventService#findAll()
-	 */
-	@Override
-	public List<Event> findAll() {
+        List<Event> local = eventRepo.getAllEvent();
+        return local;
 
-		List<Event> local = eventRepo.getAllEvent();
-		return local;
+    }
 
-	}
+    /**
+     * @see com.health.service.EventService#deleteProduct(Integer)
+     */
+    @Override
+    public void deleteProduct(Integer id) {
 
-	/**
-	 * @see com.health.service.EventService#deleteProduct(Integer)
-	 */
-	@Override
-	public void deleteProduct(Integer id) {
+        eventRepo.deleteById(id);
 
-		eventRepo.deleteById(id);
+    }
 
-	}
+    /**
+     * @see com.health.service.EventService#findById(int)
+     */
+    @Override
+    public Event findById(int id) {
+        // TODO Auto-generated method stub
+        try {
+            Optional<Event> local = eventRepo.findById(id);
+            return local.get();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+    }
 
+    /**
+     * @see com.health.service.EventService#getNewEventId()
+     */
+    @Override
+    public int getNewEventId() {
+        // TODO Auto-generated method stub
+        try {
+            return eventRepo.getNewId() + 1;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return 1;
+        }
+    }
 
-	/**
-	 * @see com.health.service.EventService#findById(int)
-	 */
-	@Override
-	public Event findById(int id) {
-		// TODO Auto-generated method stub
-		try {
-			Optional<Event> local=eventRepo.findById(id);
-			return local.get();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
+    /**
+     * @see com.health.service.EventService#save(Event)
+     */
+    @Override
+    public void save(Event event) {
+        // TODO Auto-generated method stub
+        eventRepo.save(event);
+    }
 
-	/**
-	 * @see com.health.service.EventService#getNewEventId()
-	 */
-	@Override
-	public int getNewEventId() {
-		// TODO Auto-generated method stub
-		try {
-			return eventRepo.getNewId()+1;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return 1;
-		}
-	}
+    /**
+     * @see com.health.service.EventService#findByUser(User)
+     */
+    @Override
+    public List<Event> findByUser(User usr) {
+        Role adminRole = roleRepo.findByname(CommonData.superUserRole);
+        for (UserRole item : usr.getUserRoles()) {
+            if (item.getRole() == adminRole) {
+                return eventRepo.findAll();
+            }
+        }
+        return eventRepo.findByuser(usr);
+    }
 
-	/**
-	 * @see com.health.service.EventService#save(Event)
-	 */
-	@Override
-	public void save(Event event) {
-		// TODO Auto-generated method stub
-		eventRepo.save(event);
-	}
-
-	/**
-	 * @see com.health.service.EventService#findByUser(User)
-	 */
-	@Override
-	public List<Event> findByUser(User usr) {
-		Role adminRole = roleRepo.findByname(CommonData.superUserRole);
-		for(UserRole item : usr.getUserRoles()) {
-			if(item.getRole()==adminRole) {
-				return (List<Event>) eventRepo.findAll();
-			}
-		}
-			return eventRepo.findByuser(usr);
-	}
-
-	@Override
-	@Cacheable(cacheNames ="events" )
-	public List<Event> findAllEventForCache(){
-		System.out.println("EventCheck");
-		return eventRepo.findAll();
-	}
-
+    @Override
+    @Cacheable(cacheNames = "events")
+    public List<Event> findAllEventForCache() {
+        System.out.println("EventCheck");
+        return eventRepo.findAll();
+    }
 
 }

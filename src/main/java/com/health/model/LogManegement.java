@@ -12,138 +12,138 @@ import javax.persistence.ManyToOne;
 
 /**
  * User Activity object to store log of application in database
+ * 
  * @author om prakash soni
  * @version 1.0
  */
 @Entity
-public class LogManegement implements  Serializable{
+public class LogManegement implements Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int logId;
-	
-	/**
-	 * timestamp on added
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
-	
-	/**
-	 * Component of tutorial on which activity is made
-	 */
-	private String type;
-	
-	/**
-	 * new state
-	 */
-	private int statusChangedTo;
-	
-	/**
-	 * previous state
-	 */
-	private int statusPrevious;
-	
-	/**
-	 * role of user
-	 */
-	private String userRole;
-	
-	/**
-	 * user who made this activity
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	/**
-	 * tutorial on which activity is made
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="Tutorial_id")
-	private Tutorial tutorialInfos;
+    /**
+     * unique id of object
+     */
+    @Id
+    private int logId;
 
-	public int getLogId() {
-		return logId;
-	}
+    /**
+     * timestamp on added
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	public void setLogId(int logId) {
-		this.logId = logId;
-	}
+    /**
+     * Component of tutorial on which activity is made
+     */
+    private String type;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    /**
+     * new state
+     */
+    private int statusChangedTo;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    /**
+     * previous state
+     */
+    private int statusPrevious;
 
-	public String getType() {
-		return type;
-	}
+    /**
+     * role of user
+     */
+    private String userRole;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    /**
+     * user who made this activity
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public int getStatusChangedTo() {
-		return statusChangedTo;
-	}
+    /**
+     * tutorial on which activity is made
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "Tutorial_id")
+    private Tutorial tutorialInfos;
 
-	public void setStatusChangedTo(int statusChangedTo) {
-		this.statusChangedTo = statusChangedTo;
-	}
+    public int getLogId() {
+        return logId;
+    }
 
-	public int getStatusPrevious() {
-		return statusPrevious;
-	}
+    public void setLogId(int logId) {
+        this.logId = logId;
+    }
 
-	public void setStatusPrevious(int statusPrevious) {
-		this.statusPrevious = statusPrevious;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public String getUserRole() {
-		return userRole;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public void setUserRole(String userRole) {
-		this.userRole = userRole;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public int getStatusChangedTo() {
+        return statusChangedTo;
+    }
 
-	public Tutorial getTutorialInfos() {
-		return tutorialInfos;
-	}
+    public void setStatusChangedTo(int statusChangedTo) {
+        this.statusChangedTo = statusChangedTo;
+    }
 
-	public void setTutorialInfos(Tutorial tutorialInfos) {
-		this.tutorialInfos = tutorialInfos;
-	}
+    public int getStatusPrevious() {
+        return statusPrevious;
+    }
 
-	public LogManegement(int logId, Timestamp dateAdded, String type, int statusChangedTo, int statusPrevious,
-			String userRole, User user, Tutorial tutorialInfos) {
-		super();
-		this.logId = logId;
-		this.dateAdded = dateAdded;
-		this.type = type;
-		this.statusChangedTo = statusChangedTo;
-		this.statusPrevious = statusPrevious;
-		this.userRole = userRole;
-		this.user = user;
-		this.tutorialInfos = tutorialInfos;
-	}
+    public void setStatusPrevious(int statusPrevious) {
+        this.statusPrevious = statusPrevious;
+    }
 
-	
-	public LogManegement() {
-		
-	}
-	
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Tutorial getTutorialInfos() {
+        return tutorialInfos;
+    }
+
+    public void setTutorialInfos(Tutorial tutorialInfos) {
+        this.tutorialInfos = tutorialInfos;
+    }
+
+    public LogManegement(int logId, Timestamp dateAdded, String type, int statusChangedTo, int statusPrevious,
+            String userRole, User user, Tutorial tutorialInfos) {
+        super();
+        this.logId = logId;
+        this.dateAdded = dateAdded;
+        this.type = type;
+        this.statusChangedTo = statusChangedTo;
+        this.statusPrevious = statusPrevious;
+        this.userRole = userRole;
+        this.user = user;
+        this.tutorialInfos = tutorialInfos;
+    }
+
+    public LogManegement() {
+
+    }
+
 }

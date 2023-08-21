@@ -1,6 +1,7 @@
 
 package com.health.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,195 +14,188 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.io.Serializable;
 
 import com.health.domain.security.UserRole;
 
 /**
  * Language object to store related information in database
+ * 
  * @author om prakash soni
  * @version 1.0
  */
 @Entity
-public class Language implements Comparable<Language>, Serializable{
+public class Language implements Comparable<Language>, Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	@Column(name = "lan_id",updatable = false,nullable = false)
-	private int lanId;
+    /**
+     * unique id of object
+     */
+    @Id
+    @Column(name = "lan_id", updatable = false, nullable = false)
+    private int lanId;
 
-	/**
-	 * language name
-	 */
-	@Column(nullable = false)
-	private String langName;
+    /**
+     * language name
+     */
+    @Column(nullable = false)
 
-	/**
-	 * timestamp when added
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
+    private String langName;
 
-	/**
-	 * boolean value to show or not
-	 */
-	@Column(name = "status", nullable = false)
-	private boolean status=true;
+    /**
+     * timestamp when added
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	/**
-	 * user who added language
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+    /**
+     * boolean value to show or not
+     */
+    @Column(name = "status", nullable = false)
+    private boolean status = true;
 
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<UserRole> userRoles=new HashSet<UserRole>();
+    /**
+     * user who added language
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Question> questions=new HashSet<Question>();
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserRole> userRoles = new HashSet<UserRole>();
 
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<ContributorAssignedTutorial> conAssignedTutorial=new HashSet<ContributorAssignedTutorial>();
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Question> questions = new HashSet<Question>();
 
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<TrainingInformation> trainingInfos=new HashSet<TrainingInformation>();
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ContributorAssignedTutorial> conAssignedTutorial = new HashSet<ContributorAssignedTutorial>();
 
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Brouchure> brouchure=new HashSet<Brouchure>();
-	
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<FilesofBrouchure>filesofBrouchure=new HashSet<FilesofBrouchure>();
-	
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<PathofPromoVideo>pathofPromoVideo=new HashSet<PathofPromoVideo>();
-	
-	
-	
-	
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<TrainingInformation> trainingInfos = new HashSet<TrainingInformation>();
 
-	public Set<Brouchure> getBrouchure() {
-		return brouchure;
-	}
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Brouchure> brouchure = new HashSet<Brouchure>();
 
-	public void setBrouchure(Set<Brouchure> brouchure) {
-		this.brouchure = brouchure;
-	}
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<FilesofBrouchure> filesofBrouchure = new HashSet<FilesofBrouchure>();
 
-	public Set<PathofPromoVideo> getPathofPromoVideo() {
-		return pathofPromoVideo;
-	}
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<PathofPromoVideo> pathofPromoVideo = new HashSet<PathofPromoVideo>();
 
-	public void setPathofPromoVideo(Set<PathofPromoVideo> pathofPromoVideo) {
-		this.pathofPromoVideo = pathofPromoVideo;
-	}
+    public Set<Brouchure> getBrouchure() {
+        return brouchure;
+    }
 
-	public Set<Event> getEvents() {
-		return events;
-	}
+    public void setBrouchure(Set<Brouchure> brouchure) {
+        this.brouchure = brouchure;
+    }
 
-	public void setEvents(Set<Event> events) {
-		this.events = events;
-	}
+    public Set<PathofPromoVideo> getPathofPromoVideo() {
+        return pathofPromoVideo;
+    }
 
-	public Set<FilesofBrouchure> getFilesofBrouchure() {
-		return filesofBrouchure;
-	}
+    public void setPathofPromoVideo(Set<PathofPromoVideo> pathofPromoVideo) {
+        this.pathofPromoVideo = pathofPromoVideo;
+    }
 
-	public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
-		this.filesofBrouchure = filesofBrouchure;
-	}
+    public Set<Event> getEvents() {
+        return events;
+    }
 
-	@OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Event> events=new HashSet<Event>();
+    public void setEvents(Set<Event> events) {
+        this.events = events;
+    }
 
-	public int getLanId() {
-		return lanId;
-	}
+    public Set<FilesofBrouchure> getFilesofBrouchure() {
+        return filesofBrouchure;
+    }
 
-	public void setLanId(int lanId) {
-		this.lanId = lanId;
-	}
+    public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
+        this.filesofBrouchure = filesofBrouchure;
+    }
 
-	public String getLangName() {
-		return langName;
-	}
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Event> events = new HashSet<Event>();
 
-	public void setLangName(String langName) {
-		this.langName = langName;
-	}
+    public int getLanId() {
+        return lanId;
+    }
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    public void setLanId(int lanId) {
+        this.lanId = lanId;
+    }
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    public String getLangName() {
+        return langName;
+    }
 
-	public boolean isStatus() {
-		return status;
-	}
+    public void setLangName(String langName) {
+        this.langName = langName;
+    }
 
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public boolean isStatus() {
+        return status;
+    }
 
-	public Set<UserRole> getUserRoles() {
-		return userRoles;
-	}
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
-	public void setUserRoles(Set<UserRole> userRoles) {
-		this.userRoles = userRoles;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public Set<Question> getQuestions() {
-		return questions;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public void setQuestions(Set<Question> questions) {
-		this.questions = questions;
-	}
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
+    }
 
+    public void setUserRoles(Set<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
 
-	public Set<ContributorAssignedTutorial> getConAssignedTutorial() {
-		return conAssignedTutorial;
-	}
+    public Set<Question> getQuestions() {
+        return questions;
+    }
 
-	public void setConAssignedTutorial(Set<ContributorAssignedTutorial> conAssignedTutorial) {
-		this.conAssignedTutorial = conAssignedTutorial;
-	}
+    public void setQuestions(Set<Question> questions) {
+        this.questions = questions;
+    }
 
-	public Set<TrainingInformation> getTrainingInfos() {
-		return trainingInfos;
-	}
+    public Set<ContributorAssignedTutorial> getConAssignedTutorial() {
+        return conAssignedTutorial;
+    }
 
-	public void setTrainingInfos(Set<TrainingInformation> trainingInfos) {
-		this.trainingInfos = trainingInfos;
-	}
+    public void setConAssignedTutorial(Set<ContributorAssignedTutorial> conAssignedTutorial) {
+        this.conAssignedTutorial = conAssignedTutorial;
+    }
 
-	@Override
-	public String toString() {
-		return "Language [lanId=" + lanId + ", langName=" + langName +  "]";
-	}
+    public Set<TrainingInformation> getTrainingInfos() {
+        return trainingInfos;
+    }
 
-	@Override
-	public int compareTo(Language o) {
-		// TODO Auto-generated method stub
-		return this.getLangName().compareTo(o.getLangName());
-	}
+    public void setTrainingInfos(Set<TrainingInformation> trainingInfos) {
+        this.trainingInfos = trainingInfos;
+    }
 
+    @Override
+    public String toString() {
+        return "Language [lanId=" + lanId + ", langName=" + langName + "]";
+    }
 
+    @Override
+    public int compareTo(Language o) {
+        // TODO Auto-generated method stub
+        return this.getLangName().compareTo(o.getLangName());
+    }
 
-
-  }
+}
