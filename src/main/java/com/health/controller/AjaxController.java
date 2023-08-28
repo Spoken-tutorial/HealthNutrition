@@ -1165,7 +1165,10 @@ public class AjaxController {
 
         List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat);
         for (TopicCategoryMapping t : local) {
-            topicName.put(t.getTopic().getTopicId(), t.getTopic().getTopicName());
+            if (t.getTopic().isStatus()) {
+                topicName.put(t.getTopic().getTopicId(), t.getTopic().getTopicName());
+            }
+
         }
         return topicName;
 
@@ -1184,8 +1187,10 @@ public class AjaxController {
 
         List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat);
         for (TopicCategoryMapping t : local) {
+            if (t.getTopic().isStatus()) {
+                topicName.put(t.getTopic().getTopicName(), t.getOrder());
+            }
 
-            topicName.put(t.getTopic().getTopicName(), t.getOrder());
         }
 
         return topicName;
@@ -1371,8 +1376,11 @@ public class AjaxController {
 
         List<Category> categoriesTemp = catService.findAll();
 
-        for (Category x : categoriesTemp) {
-            categories.put(x.getCategoryId(), x.getCatName());
+        for (Category cat : categoriesTemp) {
+            if (cat.isStatus()) {
+                categories.put(cat.getCategoryId(), cat.getCatName());
+            }
+
         }
 
         return categories;
@@ -2390,7 +2398,7 @@ public class AjaxController {
 
         List<UserRole> userRoles = usrRoleService
                 .findAllByRoleUserStatus(roleService.findByname(CommonData.domainReviewerRole), user, true);
-        List<String> cat_lang = new ArrayList();
+        List<String> cat_lang = new ArrayList<>();
         if (userRoles.size() > 0) {
             for (UserRole u : userRoles) {
                 if (u.getRole().getRoleId() == 4) {

@@ -321,7 +321,6 @@ public class HomeController {
 
     private void setVideoInfo(Model model, List<Tutorial> tutorials) {
 
-        HashMap<String, Long> video_data = new HashMap<String, Long>();
         if (!tutorials.isEmpty()) {
             for (Tutorial local : tutorials) {
                 if (local.getVideo() != null) {
@@ -2450,30 +2449,37 @@ public class HomeController {
 
         List<Category> category = catService.findAll();
         Collections.sort(category);
-
-        List<Category> getcats = getCategories();
-
-        List<Category> newCategories1 = new ArrayList<>();
-        List<Category> newCategories2 = new ArrayList<>();
-
-        for (Category cat1 : category) {
-            for (Category cat2 : getcats)
-                if (cat1 == cat2)
-                    continue;
-
-            if (cat1.isStatus()) {
-                newCategories1.add(cat1);
-            } else {
-                newCategories2.add(cat1);
+        List<Category> categories = new ArrayList<>();
+        List<Category> getCats = catService.findAll();
+        for (Category cat : getCats) {
+            if (cat.isStatus()) {
+                categories.add(cat);
             }
-
         }
-        newCategories1.addAll(newCategories2);
-        getcats.addAll(newCategories1);
 
-        model.addAttribute("categories", getcats);
+        /*
+         * List<Category> newCategories1 = new ArrayList<>(); List<Category>
+         * newCategories2 = new ArrayList<>();
+         * 
+         * for (Category cat1 : category) { for (Category cat2 : getcats) if (cat1 ==
+         * cat2) continue;
+         * 
+         * if (cat1.isStatus()) { newCategories1.add(cat1); } else {
+         * newCategories2.add(cat1); }
+         * 
+         * } newCategories1.addAll(newCategories2); getcats.addAll(newCategories1);
+         */
 
-        List<Topic> topics = topicService.findAll();
+        model.addAttribute("categories", categories);
+
+        List<Topic> getTopics = topicService.findAll();
+        List<Topic> topics = new ArrayList<>();
+
+        for (Topic topic : getTopics) {
+            if (topic.isStatus()) {
+                topics.add(topic);
+            }
+        }
 
         model.addAttribute("topics", topics);
         model.addAttribute("tcm", tcm);
