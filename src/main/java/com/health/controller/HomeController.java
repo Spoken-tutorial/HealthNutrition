@@ -6488,7 +6488,7 @@ public class HomeController {
         model.addAttribute("topic", topic);
 
         TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-        System.out.println("Test Topic Cat :" + topicCat);
+        System.out.println("Test Topic Category4 :" + topicCat);
         Tutorial tutorial = null;
 
         ContributorAssignedTutorial conTutorial = conRepo.findByTopicCatAndLanViewPart(topicCat, lan);

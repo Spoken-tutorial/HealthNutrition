@@ -10,12 +10,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 import com.health.utility.CommonData;
 
+@ServletComponentScan
 @SpringBootApplication
 @EnableCaching
 @PropertySource("classpath:git.properties")
@@ -53,4 +55,5 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         new File(baseDir + CommonData.uploadDirectoryEvent).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
     }
+
 }
