@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import com.health.service.ConsultantService;
  */
 @Service
 public class ConsultantServiceImpl implements ConsultantService {
+    private static final Logger logger = LoggerFactory.getLogger(ConsultantServiceImpl.class);
 
     @Autowired
     private ConsultantRepository consultantRepo;
@@ -58,7 +61,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in Consultant Service Impl: {}", id, e);
             return null;
         }
     }
@@ -83,7 +86,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             return consultantRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in Consultant Service Impl: {}", consultantRepo.getNewId(), e);
             return 1;
         }
     }
@@ -109,8 +112,6 @@ public class ConsultantServiceImpl implements ConsultantService {
     @Override
     @Cacheable(cacheNames = "consultants")
     public List<Consultant> findAllConsultHomeTrueForCache() {
-
-        System.out.println("ConsultantCheck");
 
         return consultantRepo.findByonHome(true);
 

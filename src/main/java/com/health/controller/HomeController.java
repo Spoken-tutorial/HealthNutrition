@@ -483,8 +483,8 @@ public class HomeController {
         Map<String, Integer> lan = arlist1.get(1);
         Map<String, Integer> topic = arlist.get(0);
 
-        System.out.println("Test Map 1" + arlist1);
-        System.out.println("Test Map 2" + arlist);
+        logger.info("Test Map 1: {}", arlist1);
+        logger.info("Test Map 2: {}", arlist);
         model.addAttribute("categories", cat);
         model.addAttribute("languages", lan);
         model.addAttribute("topics", topic);
@@ -601,7 +601,7 @@ public class HomeController {
             model.addAttribute("listofPromoVideos", promoVideoHome);
             model.addAttribute("PromoVideoLanguages", promoVideoHome.get(0).findAlllanguages());
             model.addAttribute("PromoVideos", promoVideoHome.get(0).getVideoFiles());
-            System.out.println("PromoVideo Test" + promoVideoHome);
+
         }
 
         if (!versionHome.isEmpty()) {
@@ -860,7 +860,7 @@ public class HomeController {
         int lanId = lanName.getLanId();
 
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
-            System.out.println("Problem1");
+            logger.info("Problem1");
             return "redirect:/";
         }
 
@@ -874,7 +874,7 @@ public class HomeController {
         List<Tutorial> relatedTutorial = new ArrayList<>();
 
         if (tutorial == null || tutorial.isStatus() == false) {
-            System.out.println("Problem2");
+            logger.info("Problem2");
             return "redirect:/";
         }
 
@@ -1105,7 +1105,7 @@ public class HomeController {
             model.addAttribute("forgetPasswordEmailSent", true);
         } catch (MailException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in forgot Password: {}", usr, e);
             model.addAttribute("error", true);
         }
 
@@ -1457,7 +1457,7 @@ public class HomeController {
             userService.addUserToCategory(usr, categories);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Category: {}", categories, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "addCategory";
         }
@@ -1474,7 +1474,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Category1: {}", categoryName, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "addCategory";
         }
@@ -1658,7 +1658,7 @@ public class HomeController {
             organizationRoleService.save(role);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in update Organization Role: {}", role, e);
             model.addAttribute("language", role);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "updateOrganizationalRole"; // accomodate view part
@@ -1761,7 +1761,7 @@ public class HomeController {
             userService.addUserToLanguage(usr, languages);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Language: {}", languages, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "addlanguage";
         }
@@ -1866,7 +1866,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Carousel: {}", caraTemp, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             caroService.delete(caraTemp);
             return "addCarousel";
@@ -1962,7 +1962,7 @@ public class HomeController {
         } catch (Exception e) {
             logger.error("Exception while updating research paper: {} {} {}", title, researchPaperDesc, researchFile,
                     e);
-            e.printStackTrace();
+
             viewSection = false;
             model.addAttribute("viewSection", viewSection);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
@@ -1999,7 +1999,7 @@ public class HomeController {
 
         List<PromoVideo> promovideos = promoVideoService.findAll();
         List<PathofPromoVideo> pathofPromoVideos = pathofPromoVideoService.findAll();
-        logger.info("promovideos={} {}", promovideos, promovideos.isEmpty());
+        logger.info("promovideos= {} {}", promovideos, promovideos.isEmpty());
         model.addAttribute("promoVideos", promovideos);
         model.addAttribute("pathofPromoVideos", pathofPromoVideos);
 
@@ -2020,7 +2020,7 @@ public class HomeController {
         }
 
         model.addAttribute("userInfo", usr);
-        System.out.println(languageIds);
+        logger.info("LanguageIds: {}", languageIds);
 
         boolean viewSection = false;
         model.addAttribute("viewSection", viewSection);
@@ -2114,9 +2114,9 @@ public class HomeController {
 
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.error("Error in PromoVideo", e);
                     model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-                    System.out.println("AlokSP Error2");
+
                     return addPromoVideoGet(model, principal);
                 }
 
@@ -2124,7 +2124,7 @@ public class HomeController {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Promo Video ", e);
             viewSection = false;
             model.addAttribute("viewSection", viewSection);
 
@@ -2229,7 +2229,6 @@ public class HomeController {
         }
 
         model.addAttribute("userInfo", usr);
-        System.out.println(languageIds);
 
         boolean viewSection = false;
         model.addAttribute("viewSection", viewSection);
@@ -2362,9 +2361,9 @@ public class HomeController {
 
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.error("Error in Add Brochure: {}", brochureTemp, e);
                     model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-                    System.out.println("AlokSP Error2");
+
                     return addBrochureGet(model, principal);
                 }
 
@@ -2379,13 +2378,13 @@ public class HomeController {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Brochure: {} {} {} {}", newVerid, primaryVersion, version, brochureTemp, e);
             viewSection = false;
             model.addAttribute("viewSection", viewSection);
 
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             verService.delete(version);
-            System.out.println(" AlokSP  Error4");
+
             /*
              * brouchures = broService.findAll(); allVersions= verService.findAll();
              * versions= new ArrayList<>(); for(Brouchure bro: brouchures) { for(Version
@@ -2557,7 +2556,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Topic : {} {}", usr, topics, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return addTopicGet(model, principal);
         }
@@ -2686,7 +2685,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            // e.printStackTrace();
+            logger.error("Error in Update Topic: {}", topic, e);
 
             // model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
@@ -2696,8 +2695,7 @@ public class HomeController {
             topicCatService.save(tcp);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            // e.printStackTrace();
-
+            logger.error("Error in Update Topic: {}", tcp, e);
             // model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
         }
@@ -2795,7 +2793,7 @@ public class HomeController {
             roleService.save(newRole);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add New Role: {}", newRole, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "addNewRole";
         }
@@ -2940,7 +2938,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Upload Question: {} {}", usr, questions, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "uploadQuestion";
         }
@@ -2958,7 +2956,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Upload Question: {} {}", newQuestionId, quesPdf, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "uploadQuestion";
         }
@@ -3068,7 +3066,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Update Question: {} {}", ques, quesPdf, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             model.addAttribute("question", ques);
             return "updateQuestion"; // accomodate view part
@@ -3221,7 +3219,7 @@ public class HomeController {
             }
 
         } catch (Exception e1) {
-            e1.printStackTrace();
+            logger.error("Error in Add Consultant: {} {}", newConsultid, photo, e1);
         }
 
         userService.save(userTemp);
@@ -3249,9 +3247,9 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Consultant: {} {}", consults, userTemp, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-            System.out.println("Problem 1");
+
             return "addConsultant"; // throw a error
         }
 
@@ -3335,7 +3333,7 @@ public class HomeController {
 
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error("Error in Upadte Consultant: {}", file, e1);
                 }
 
                 String folder2 = CommonData.uploadDirectoryConsultant + consultant.getConsultantId();
@@ -3349,7 +3347,7 @@ public class HomeController {
             } catch (Exception e) {
                 // TODO: handle exception
 
-                e.printStackTrace();
+                logger.error("Error in Update Consultant: {} {} {} {}", name, lastname, desc, consultant, e);
                 model.addAttribute("error_msg", CommonData.RECORD_ERROR);
                 model.addAttribute("consultant", consultant);
                 return "updateConsultant"; // throw a error
@@ -3565,12 +3563,12 @@ public class HomeController {
                 userService.addUserToEvent(usr, events);
 
             } catch (Exception e) {
-
+                logger.error("Error in Add Event: {} {}", cat, event, e);
             }
         } catch (Exception e) {
             // TODO: handle exception
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-            e.printStackTrace();
+            logger.error("Error in Add Event", e);
             return "addEvent";
         } finally {
 
@@ -3694,7 +3692,7 @@ public class HomeController {
                 userService.addUserToTestimonial(usr, testi);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("Error in Add Testimonial: {} {}", usr, testi, e);
                 model.addAttribute("error_msg", CommonData.RECORD_ERROR);
                 return "addTestimonial";
             }
@@ -3720,7 +3718,7 @@ public class HomeController {
             } catch (Exception e) {
                 // TODO: handle exception
 
-                e.printStackTrace();
+                logger.error("Error in Add Testimonial: {} {}", consent, newTestiId, e);
                 model.addAttribute("error_msg", CommonData.RECORD_ERROR);
                 return "addTestimonial"; // throw a error
             }
@@ -3843,7 +3841,7 @@ public class HomeController {
             } catch (Exception e) {
                 // TODO: handle exception
 
-                e.printStackTrace();
+                logger.error("Error in Update Category: {}", cat, e);
                 model.addAttribute("category", cat);
                 model.addAttribute("error_msg", CommonData.RECORD_ERROR);
                 return "updateCategory"; // throw a error
@@ -4357,9 +4355,8 @@ public class HomeController {
 
         model.addAttribute("newfilesList", newfilesList);
 
-        System.out.println(version);
         List<FilesofBrouchure> filesOfBroList = filesofbrouchureService.findByVersion(version);
-        System.out.println(filesOfBroList);
+
         model.addAttribute("filesOfBroList", filesOfBroList);
         model.addAttribute("listofVersions", newlistofVersion);
         model.addAttribute("version", version);
@@ -4374,7 +4371,7 @@ public class HomeController {
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
         for (Version ver : versions) {
-            System.out.println(ver.getDateAdded());
+            logger.info("Version Date Added {}", ver.getDateAdded());
         }
         model.addAttribute("brouchures", brouchures);
         model.addAttribute("versions", versions);
@@ -4503,8 +4500,6 @@ public class HomeController {
                     Language language = lanService.getById(languageIds.get(i));
                     String langName = language.getLangName();
 
-                    System.out.println(langName + " " + language + " " + version);
-
                     FilesofBrouchure fileBro = filesofbrouchureService.findByLanguageandVersion(language, version);
 
                     if (!brochures.get(i).isEmpty()) {
@@ -4524,7 +4519,6 @@ public class HomeController {
 
                     if (fileBro != null) {
                         fileBro.setLan(language);
-                        System.out.println(fileBro.getLan().getLangName() + "Alok Kumar Check BrochureFile");
 
                         if (!brochures.get(i).isEmpty()) {
                             fileBro.setWebPath(documents1.get(0));
@@ -4608,8 +4602,6 @@ public class HomeController {
 
                 if (filesError == false && duplicatLanguage == false) {
 
-                    System.out.println("Alok Kumar test");
-
                     brouchure.setTitle(title);
                     brouchure.setPrimaryVersion(version.getBroVersion() + 1);
                     broService.save(brouchure);
@@ -4635,7 +4627,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO: handle exception
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-            System.out.println("Check path error");
+            logger.error("Check path error", e);
 
             version = verRepository.findByBrouchureAndBroVersion(brouchure, brouchure.getPrimaryVersion());
             filesOfBroList = filesofbrouchureService.findByVersion(version);
@@ -4727,7 +4719,7 @@ public class HomeController {
 
         model.addAttribute("listofVersions", newlistofVesrion);
         for (Version ver : listofVersions)
-            System.out.println(ver);
+            logger.info("Version: {}", ver);
         List<Brouchure> brouchures = broService.findAll();
         List<Version> versions = new ArrayList<Version>();
         for (Brouchure bro : brouchures) {
@@ -4736,7 +4728,7 @@ public class HomeController {
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
         for (Version ver : versions) {
-            System.out.println(ver.getDateAdded());
+            logger.info("Version Date Adeed: {}", ver.getDateAdded());
         }
         model.addAttribute("brouchures", brouchures);
         model.addAttribute("versions", versions);
@@ -5052,7 +5044,7 @@ public class HomeController {
             lanService.save(lan);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Update Language: {}", lan, e);
             model.addAttribute("language", lan);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "updateLanguage"; // accomodate view part
@@ -5351,7 +5343,7 @@ public class HomeController {
         catch (Exception e) {
             // TODO: handle exception
 
-            e.printStackTrace();
+            logger.error("Error in Update Testimonial: {}", test.getTestimonialId(), e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "updateTestimonial"; // throw a error
         }
@@ -5459,7 +5451,7 @@ public class HomeController {
         } catch (Exception e) {
             model.addAttribute("error_msg", CommonData.CONTRIBUTOR_ERROR_MSG);
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add Contributor Role : {}", usrRole, e);
         }
 
         List<Language> languages = lanService.getAllLanguages();
@@ -5559,7 +5551,7 @@ public class HomeController {
         } catch (Exception e) {
             model.addAttribute("error_msg", CommonData.CONTRIBUTOR_ERROR_MSG);
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Add External Contributor Role: {}", usrRole, e);
         }
 
         List<Language> languages = lanService.getAllLanguages();
@@ -5678,7 +5670,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.ROLE_ERROR_MSG);
-            e.printStackTrace();
+            logger.error("Error in Add Admin Role: {}", usrRole, e);
             // accommodate error message
         }
 
@@ -5821,7 +5813,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.ROLE_REQUEST_ERROR);
-            e.printStackTrace();
+            logger.error("Error in Add Domain Role: {} {} {}", usrRole, usr, consults, e);
             return "addDomainRole"; // accommodate error message
         }
 
@@ -5952,7 +5944,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.ROLE_REQUEST_ERROR);
-            e.printStackTrace();
+            logger.error("Error in Add Quality Role:{}", usrRole, e);
             // accommodate error message
         }
 
@@ -6080,7 +6072,6 @@ public class HomeController {
                     }
 //					else if(xx=='w') {
 //						tempUser.setWrite(true);
-//						System.out.println(xx);
 //					}
                     else if (xx == 's') {
                         tempUser.setSpeak(true);
@@ -6488,13 +6479,13 @@ public class HomeController {
         model.addAttribute("topic", topic);
 
         TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-        System.out.println("Test Topic Category4 :" + topicCat);
+
         Tutorial tutorial = null;
 
         ContributorAssignedTutorial conTutorial = conRepo.findByTopicCatAndLanViewPart(topicCat, lan);
-        System.out.println("Test Topic ConTutorial :" + conTutorial);
+
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTutorial);
-        System.out.println("Test Topic Tutorial :" + tutorials);
+
         setCompStatus(model, tutorials);
         setEngLangStatus(model, lan);
 
@@ -6506,14 +6497,10 @@ public class HomeController {
                     englishLan);
             List<Tutorial> tutorialsForEnglish = tutService.findAllByContributorAssignedTutorial(conTutorialforEnglish);
 
-            System.out.println("Growth Chart LangName" + englishLan.getLangName());
-            System.out.println("Growth con" + conTutorialforEnglish.getId());
-            System.out.println(" Growth tut tutorialsForEnglish Size" + tutorialsForEnglish.size());
             // List<TopicCategoryMapping> tcm_list = topicCatService.findAllByTopic(topic);
 
             if (tutorialsForEnglish.size() > 0) {
-                System.out.println("tutorialsForEnglish Size" + tutorialsForEnglish.size());
-                System.out.println(tutorialsForEnglish.get(0).getTutorialId());
+
                 goAhead = true;
 
             }
@@ -6720,13 +6707,13 @@ public class HomeController {
             int videoStatus = temp.getVideoStatus();
             if (videoStatus == CommonData.ADMIN_STATUS) {
                 toReview.add(temp);
-                System.out.println(temp);
+                logger.info("Tutorial: {}", temp);
             } else if (videoStatus > CommonData.ADMIN_STATUS) {
                 reviewed.add(temp);
             }
 
             if (temp.getTutorialId() == 654)
-                System.out.println("VideoStatus: " + videoStatus);
+                logger.info("VideoStatus: {}", videoStatus);
         }
 
         model.addAttribute("tutorialToReview", toReview);
@@ -6749,7 +6736,7 @@ public class HomeController {
 
         Tutorial tutorial1 = tutService.getById(tutorialId);
         if (tutorial1 == null) {
-            System.out.println(" problem 2");
+
             return "redirect:/listTutorialForAdminReview";
         }
 
@@ -6760,11 +6747,10 @@ public class HomeController {
         ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
 
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
-            System.out.println(" problem 1");
+
             return "redirect:/listTutorialForAdminReview";
         }
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTut);
-        System.out.println(tutorials);
 
         if (tutorial1.getVideoStatus() != CommonData.ADMIN_STATUS) {
 
@@ -7123,20 +7109,20 @@ public class HomeController {
                 public void progressChanged(MediaHttpUploader uploader) throws IOException {
                     switch (uploader.getUploadState()) {
                     case INITIATION_STARTED:
-                        System.out.println("Initiation Started");
+                        logger.info("Initiation Started");
                         break;
                     case INITIATION_COMPLETE:
-                        System.out.println("Initiation Completed");
+                        logger.info("Initiation Completed");
                         break;
                     case MEDIA_IN_PROGRESS:
-                        System.out.println("Upload in progress");
-                        System.out.println("Upload percentage: " + uploader.getProgress());
+                        logger.info("Upload in progress");
+                        logger.info("Upload percentage: {}", uploader.getProgress());
                         break;
                     case MEDIA_COMPLETE:
-                        System.out.println("Upload Completed!");
+                        logger.info("Upload Completed!");
                         break;
                     case NOT_STARTED:
-                        System.out.println("Upload Not Started!");
+                        logger.info("Upload Not Started!");
                         break;
                     }
                 }
@@ -7145,23 +7131,23 @@ public class HomeController {
 
             Video returnedVideo = videoInsert.execute();
 
-            System.out.println("\n================== Returned Video ==================\n");
-            System.out.println("  - Id: " + returnedVideo.getId());
-            System.out.println("  - Title: " + returnedVideo.getSnippet().getTitle());
-            System.out.println("  - Tags: " + returnedVideo.getSnippet().getTags());
-            System.out.println("  - Privacy Status: " + returnedVideo.getStatus().getPrivacyStatus());
-            System.out.println("  - Video Count: " + returnedVideo.getStatistics().getViewCount());
+            logger.info("\n================== Returned Video ==================\n");
+            logger.info("  - Id: {}", returnedVideo.getId());
+            logger.info("  - Title: {}", returnedVideo.getSnippet().getTitle());
+            logger.info("  - Tags: {}", returnedVideo.getSnippet().getTags());
+            logger.info("  - Privacy Status:{} ", returnedVideo.getStatus().getPrivacyStatus());
+            logger.info("  - Video Count: {}", returnedVideo.getStatistics().getViewCount());
 
         } catch (GoogleJsonResponseException e) {
-            System.err.println("GoogleJsonResponseException code: " + e.getDetails().getCode() + " : "
-                    + e.getDetails().getMessage());
-            e.printStackTrace();
+            logger.error("GoogleJsonResponseException code: {} {} ", e.getDetails().getCode(),
+                    e.getDetails().getMessage(), e);
+
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("IOException:{} ", e.getMessage(), e);
+
         } catch (Throwable t) {
-            System.err.println("Throwable: " + t.getMessage());
-            t.printStackTrace();
+            logger.error("Throwable:{} ", t.getMessage(), t);
+
         }
 
         return "listTutorialPublishQualityReviwer";
@@ -7550,9 +7536,9 @@ public class HomeController {
 
             byte[] bytes = traineeInfo.getBytes();
             String completeData = new String(bytes);
-            System.out.println(completeData);
+            logger.info("complete data : {}", completeData);
             String[] rows = completeData.split("\n");
-            System.out.println("data" + rows.length);
+            logger.info("data: {}", rows.length);
 
             Set<TraineeInformation> trainees = new HashSet<TraineeInformation>();
             int newTraineeId = traineeService.getNewId();
@@ -7569,7 +7555,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Master Trainer Operation : {} ", trainingData, e);
             // throw a error
             model.addAttribute("error_msg", CommonData.EVENT_ERROR);
             return "masterTrainerOperation";
@@ -7637,7 +7623,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.EVENT_ERROR);
-            e.printStackTrace();
+            logger.error("Error in Master Trainer Operation  {}", feed, e);
         }
 
         model.addAttribute("success_msg", CommonData.EVENT_SUCCESS);
@@ -7700,7 +7686,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.EVENT_ERROR);
-            e.printStackTrace();
+            logger.error("Error in Master Trainer Operation  {}", feed, e);
             return "masterTrainerOperation";
         }
 
@@ -7809,7 +7795,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.ROLE_ERROR_MSG);
-            e.printStackTrace();
+            logger.error("Error in assign Roles to Domain : {}", usrRole, e);
             return "assignRoleToDomain"; // accommodate error message
         }
 
@@ -7941,7 +7927,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Profile View  {} {} {} {} {}", firstName, lastName, address, phoneLongValue, dob, e);
             model.addAttribute("error_msg", "Please Try Later");
         }
 
@@ -8180,7 +8166,7 @@ public class HomeController {
      * 
      * } catch (IOException e) {
      * 
-     * e.printStackTrace(); } }
+     * } }
      */
 
     /*
@@ -8204,7 +8190,7 @@ public class HomeController {
      * 
      * } catch (IOException e) {
      * 
-     * e.printStackTrace(); } }
+     * } }
      */
 
     /**
@@ -8290,7 +8276,7 @@ public class HomeController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Update Training: {}", trainingData, e);
             // throw a error
             model.addAttribute("error_msg", CommonData.EVENT_ERROR);
             return "updateTraining";
@@ -8486,8 +8472,8 @@ public class HomeController {
 
         Set<UserRole> ur;
         for (User user : allUser) {
-            System.out.println("*******************************************");
-            System.out.println(user.getUsername() + " " + user.getFullName());
+            logger.info("*******************************************");
+            logger.info("UserName and fullName {} {}", user.getUsername(), user.getFullName());
             List<UserRole> ur1 = usrRoleService.findAllByUser(user);
             // ur=user.getUserRoles();
             for (UserRole temp : ur1) {
@@ -8504,7 +8490,7 @@ public class HomeController {
                     } else {
                         str2 = temp.getLanguage().getLangName();
                     }
-                    System.out.println(str1 + " " + str2 + " " + temp.getRole().getName());
+                    logger.info("String and RoleName: {} {} {}", str1, str2, temp.getRole().getName());
                 }
             }
 
@@ -8695,7 +8681,7 @@ public class HomeController {
         Language lanTemp = lanService.getByLanName(language);
 
         if (catTemp == null || lanTemp == null) {
-            System.out.println("vik");
+
             return "redirect:/cdContentInfo";
         }
 
@@ -8716,11 +8702,11 @@ public class HomeController {
                     totalNumberOfVideo += 1;
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.error("Error in cdContent {}", path, e);
                 }
             }
         }
-        System.out.println(totalSize);
+        logger.info("TotalSize {}", totalSize);
         model.addAttribute("value", totalSize / 1024 / 1024);
         model.addAttribute("totalVideo", totalNumberOfVideo);
         if (totalSize > 0 && totalNumberOfVideo > 0) {

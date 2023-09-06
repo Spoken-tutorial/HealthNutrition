@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import com.health.service.BrouchureService;
 @Service
 public class BrouchureServiceImpl implements BrouchureService {
 
+    private static final Logger logger = LoggerFactory.getLogger(BrouchureServiceImpl.class);
+
     @Autowired
     private BrouchureRepository repo;
 
@@ -40,7 +44,7 @@ public class BrouchureServiceImpl implements BrouchureService {
             return repo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in brochure Service Impl class: {}", repo.getNewId(), e);
             return 1;
         }
     }
@@ -93,7 +97,7 @@ public class BrouchureServiceImpl implements BrouchureService {
             return repo.findById(id).get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("find By Id error in brochure Service Impl class: {}", id, e);
             return null;
         }
     }
@@ -116,7 +120,7 @@ public class BrouchureServiceImpl implements BrouchureService {
     @Override
     @Cacheable(cacheNames = "brouchures")
     public List<Brouchure> findAllBrouchuresForCache() {
-        System.out.println("BrouchureCheck");
+
         return repo.findAllByshowOnHomepage(true);
 
     }

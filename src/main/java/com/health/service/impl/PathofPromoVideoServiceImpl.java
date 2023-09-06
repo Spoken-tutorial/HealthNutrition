@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import com.health.service.PathofPromoVideoService;
 @Service
 public class PathofPromoVideoServiceImpl implements PathofPromoVideoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PathofPromoVideoServiceImpl.class);
+
     @Autowired
     private PathofPromoVideoRepository pathofPromoVideoRepository;
 
@@ -24,7 +28,8 @@ public class PathofPromoVideoServiceImpl implements PathofPromoVideoService {
             return pathofPromoVideoRepository.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in  Path of Promo Video Service Impl: {}",
+                    pathofPromoVideoRepository.getNewId(), e);
             return 1;
         }
     }
@@ -53,7 +58,7 @@ public class PathofPromoVideoServiceImpl implements PathofPromoVideoService {
             return pathofPromoVideoRepository.findById(id).get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("  Id error in  Path of Promo Video Service Impl: {}", id, e);
             return null;
         }
     }

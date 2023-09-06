@@ -163,9 +163,17 @@ public class Category implements Comparable<Category>, Serializable {
     @Override
     public int compareTo(Category o) {
         // TODO Auto-generated method stub
-        System.out.println(o.getCatName());
+
         return this.getCatName().compareTo(o.getCatName());
 
+    }
+
+    @Override
+    public String toString() {
+        return "Category [categoryId=" + categoryId + ", catName=" + catName + ", dateAdded=" + dateAdded + ", status="
+                + status + ", posterPath=" + posterPath + ", description=" + description + ", user=" + user
+                + ", topicCategoryMap=" + topicCategoryMap + ", userRoles=" + userRoles + ", brochures=" + brochures
+                + "]";
     }
 
 }

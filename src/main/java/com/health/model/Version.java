@@ -199,4 +199,11 @@ public class Version {
         this.versionPosterPath = versionPosterPath;
     }
 
+    @Override
+    public String toString() {
+        return "Version [verId=" + verId + ", dateAdded=" + dateAdded + ", versionPosterPath=" + versionPosterPath
+                + ", brouchure=" + brouchure + ", broVersion=" + broVersion + ", filesofBrouchure=" + filesofBrouchure
+                + "]";
+    }
+
 }

@@ -138,9 +138,6 @@ public class RestApi {
         List<ContributorAssignedTutorial> conAssigTutorialList = null;
         List<Tutorial> tut = null;
 
-        System.out.println(cat.getCatName());
-        System.out.println(lan.getLangName());
-
         localTopicCatList = topicCatService.findAllByCategory(cat);
 
         conAssigTutorialList = conRepo.findAllByTopicCatAndLan(localTopicCatList, lan);

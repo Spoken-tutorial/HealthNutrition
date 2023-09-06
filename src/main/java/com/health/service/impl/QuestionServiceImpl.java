@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,8 @@ import com.health.service.QuestionService;
 @Service
 public class QuestionServiceImpl implements QuestionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(QuestionServiceImpl.class);
+
     @Autowired
     private QuestionRepository questionRepo;
 
@@ -35,7 +39,7 @@ public class QuestionServiceImpl implements QuestionService {
             return questionRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in Question Service Impl: {}", questionRepo.getNewId(), e);
             return 1;
         }
     }
@@ -60,7 +64,7 @@ public class QuestionServiceImpl implements QuestionService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" Id error in Question Service Impl: {}", id, e);
             return null;
         }
     }

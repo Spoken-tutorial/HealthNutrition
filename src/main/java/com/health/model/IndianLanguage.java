@@ -57,4 +57,9 @@ public class IndianLanguage implements Serializable {
         this.userLans = userLans;
     }
 
+    @Override
+    public String toString() {
+        return "IndianLanguage [id=" + id + ", lanName=" + lanName + ", userLans=" + userLans + "]";
+    }
+
 }

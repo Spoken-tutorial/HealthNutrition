@@ -91,4 +91,10 @@ public class Consultant implements Serializable {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "Consultant [consultantId=" + consultantId + ", description=" + description + ", dateAdded=" + dateAdded
+                + ", onHome=" + onHome + ", user=" + user + "]";
+    }
+
 }

@@ -117,4 +117,10 @@ public class ContributorAssignedTutorial implements Serializable {
         this.multiUserAssigned = multiUserAssigned;
     }
 
+    @Override
+    public String toString() {
+        return "ContributorAssignedTutorial [id=" + id + ", dateAdded=" + dateAdded + ", topicCatId=" + topicCatId
+                + ", lan=" + lan + ", tutorials=" + tutorials + ", multiUserAssigned=" + multiUserAssigned + "]";
+    }
+
 }

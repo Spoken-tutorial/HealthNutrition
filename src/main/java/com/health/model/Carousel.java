@@ -83,4 +83,10 @@ public class Carousel implements Serializable {
         this.description = description;
     }
 
+    @Override
+    public String toString() {
+        return "Carousel [id=" + id + ", posterPath=" + posterPath + ", showOnHomepage=" + showOnHomepage
+                + ", eventName=" + eventName + ", description=" + description + "]";
+    }
+
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,8 @@ import com.health.service.StateService;
  */
 @Service
 public class StateServiceImpl implements StateService {
+
+    private static final Logger logger = LoggerFactory.getLogger(StateServiceImpl.class);
 
     @Autowired
     private StateRepository stateRepo;
@@ -46,7 +50,7 @@ public class StateServiceImpl implements StateService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in State Service Impl: {}", id, e);
             return null;
         }
     }

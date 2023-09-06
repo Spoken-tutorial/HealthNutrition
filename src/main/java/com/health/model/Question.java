@@ -107,6 +107,12 @@ public class Question implements Serializable {
         this.topicCatId = topicCatId;
     }
 
+    @Override
+    public String toString() {
+        return "Question [questionId=" + questionId + ", questionPath=" + questionPath + ", dateAdded=" + dateAdded
+                + ", user=" + user + ", lan=" + lan + ", topicCatId=" + topicCatId + "]";
+    }
+
 //	@Id
 //	@GeneratedValue(strategy=GenerationType.AUTO) 
 //	

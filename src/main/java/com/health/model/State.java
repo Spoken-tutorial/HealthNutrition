@@ -83,4 +83,10 @@ public class State implements Comparable<State>, Serializable {
         return this.getStateName().compareTo(o.getStateName());
     }
 
+    @Override
+    public String toString() {
+        return "State [id=" + id + ", stateName=" + stateName + ", dateAdded=" + dateAdded + ", Districts=" + Districts
+                + ", events=" + events + "]";
+    }
+
 }

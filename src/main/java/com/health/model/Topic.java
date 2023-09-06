@@ -116,4 +116,10 @@ public class Topic implements Comparable<Topic>, Serializable {
         return this.getTopicName().compareTo(o.getTopicName());
     }
 
+    @Override
+    public String toString() {
+        return "Topic [topicId=" + topicId + ", topicName=" + topicName + ", dateAdded=" + dateAdded + ", status="
+                + status + ", user=" + user + ", topicCategoryMap=" + topicCategoryMap + "]";
+    }
+
 }

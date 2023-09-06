@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import com.health.service.TestimonialService;
  */
 @Service
 public class TestimonialServiceImpl implements TestimonialService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestimonialServiceImpl.class);
 
     @Autowired
     private TestimonialRepository testRepo;
@@ -55,7 +59,7 @@ public class TestimonialServiceImpl implements TestimonialService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in Testimonial Service Impl: {}", id, e);
             return null;
         }
     }
@@ -70,7 +74,7 @@ public class TestimonialServiceImpl implements TestimonialService {
             return testRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in Testimonial Service Impl: {}", testRepo.getNewId(), e);
             return 1;
         }
     }
@@ -97,7 +101,7 @@ public class TestimonialServiceImpl implements TestimonialService {
     @Override
     @Cacheable(cacheNames = "testimonials")
     public List<Testimonial> findAllTestimonialByapprovedForCache() {
-        System.out.println("TestimonialCheck");
+
         return testRepo.findByapproved(true);
     }
 

@@ -87,4 +87,10 @@ public class FeedbackForm implements Serializable {
         this.dateAdded = dateAdded;
     }
 
+    @Override
+    public String toString() {
+        return "FeedbackForm [id=" + id + ", name=" + name + ", email=" + email + ", message=" + message
+                + ", dateAdded=" + dateAdded + "]";
+    }
+
 }

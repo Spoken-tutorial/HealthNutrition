@@ -26,8 +26,6 @@ public class EhcacheConfig {
     @Bean
     public EhCacheCacheManager ehCacheCacheManager() {
 
-        System.out.println();
-
         return new EhCacheCacheManager(ehCacheManagerFactoryBean().getObject());
     }
 

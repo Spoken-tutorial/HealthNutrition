@@ -104,4 +104,11 @@ public class TrainingTopic implements Serializable {
     public TrainingTopic() {
 
     }
+
+    @Override
+    public String toString() {
+        return "TrainingTopic [trainingTopicId=" + trainingTopicId + ", topicCatId=" + topicCatId + ", traineeInfos="
+                + traineeInfos + ", event=" + event + "]";
+    }
+
 }

@@ -2,6 +2,8 @@ package com.health.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import com.health.service.PostQuestionaireService;
 @Service
 public class PostQuestionaireServiceImpl implements PostQuestionaireService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PostQuestionaireServiceImpl.class);
+
     @Autowired
     private PostQuestionaireRepository repo;
 
@@ -33,7 +37,7 @@ public class PostQuestionaireServiceImpl implements PostQuestionaireService {
             return repo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in Post QuestionService Impl: {}", repo.getNewId(), e);
             return 1;
         }
     }

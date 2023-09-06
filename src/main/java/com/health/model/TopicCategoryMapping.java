@@ -192,4 +192,11 @@ public class TopicCategoryMapping implements Serializable {
         this.order = order;
     }
 
+    @Override
+    public String toString() {
+        return "TopicCategoryMapping [topicCategoryId=" + topicCategoryId + ", status=" + status + ", order=" + order
+                + ", cat=" + cat + ", topic=" + topic + ", questions=" + questions + ", conAssignedTutorial="
+                + conAssignedTutorial + ", trainingTopic=" + trainingTopic + ", brochures=" + brochures + "]";
+    }
+
 }

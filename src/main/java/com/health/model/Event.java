@@ -315,4 +315,14 @@ public class Event implements Serializable {
         }
     };
 
+    @Override
+    public String toString() {
+        return "Event [eventId=" + eventId + ", eventName=" + eventName + ", description=" + description + ", location="
+                + location + ", contactPerson=" + contactPerson + ", contactNumber=" + contactNumber + ", email="
+                + email + ", posterPath=" + posterPath + ", startDate=" + startDate + ", endDate=" + endDate
+                + ", dateAdded=" + dateAdded + ", pincode=" + pincode + ", lan=" + lan + ", state=" + state
+                + ", district=" + district + ", city=" + city + ", address=" + address + ", trainingTopicId="
+                + trainingTopicId + ", user=" + user + ", trainings=" + trainings + "]";
+    }
+
 }

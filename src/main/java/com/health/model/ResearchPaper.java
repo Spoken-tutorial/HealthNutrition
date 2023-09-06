@@ -131,4 +131,11 @@ public class ResearchPaper {
         this.showOnHomepage = showOnHomepage;
     }
 
+    @Override
+    public String toString() {
+        return "ResearchPaper [id=" + id + ", title=" + title + ", dateAdded=" + dateAdded + ", description="
+                + description + ", thumbnailPath=" + thumbnailPath + ", ResearchPaperPath=" + ResearchPaperPath
+                + ", showOnHomepage=" + showOnHomepage + "]";
+    }
+
 }

@@ -85,4 +85,10 @@ public class City implements Comparable<City>, Serializable {
         return this.getCityName().compareTo(o.getCityName());
     }
 
+    @Override
+    public String toString() {
+        return "City [id=" + id + ", dateAdded=" + dateAdded + ", cityName=" + cityName + ", district=" + district
+                + ", events=" + events + "]";
+    }
+
 }

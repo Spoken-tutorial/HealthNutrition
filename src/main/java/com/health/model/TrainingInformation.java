@@ -186,4 +186,13 @@ public class TrainingInformation implements Serializable {
         this.postQuestions = postQuestions;
     }
 
+    @Override
+    public String toString() {
+        return "TrainingInformation [trainingId=" + trainingId + ", totalParticipant=" + totalParticipant
+                + ", posterPath=" + posterPath + ", lan=" + lan + ", event=" + event + ", user=" + user + ", dateAdded="
+                + dateAdded + ", address=" + address + ", traineeInfos=" + traineeInfos + ", trainingTopicId="
+                + trainingTopicId + ", masterTrainerFeedback=" + masterTrainerFeedback + ", postQuestions="
+                + postQuestions + ", testimonials=" + testimonials + "]";
+    }
+
 }

@@ -2,6 +2,8 @@ package com.health.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import com.health.service.ContributorAssignedMultiUserTutorialService;
  */
 @Service
 public class ContributorAssignedMultiUserTutorialServiceImpl implements ContributorAssignedMultiUserTutorialService {
+    private static final Logger logger = LoggerFactory.getLogger(ContributorAssignedMultiUserTutorialServiceImpl.class);
 
     @Autowired
     private ContributorAssignedMultiUserTutorialRepository conRepo;
@@ -44,7 +47,8 @@ public class ContributorAssignedMultiUserTutorialServiceImpl implements Contribu
             return conRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in ContributorAssigned MultiUser TutorialService Impl: {}", conRepo.getNewId(),
+                    e);
             return 1;
         }
     }

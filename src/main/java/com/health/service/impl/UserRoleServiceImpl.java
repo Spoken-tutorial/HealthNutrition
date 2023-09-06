@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import com.health.service.UserRoleService;
  */
 @Service
 public class UserRoleServiceImpl implements UserRoleService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserRoleServiceImpl.class);
 
     @Autowired
     private UserRoleRepositary usrRoleRepo;
@@ -61,7 +65,7 @@ public class UserRoleServiceImpl implements UserRoleService {
             return usrRoleRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in User Role Service Impl: {}", usrRoleRepo.getNewId(), e);
             return 1;
         }
     }

@@ -48,7 +48,7 @@ public class TopicServiceImpl implements TopicService {
             return topicRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in Topic Service Impl: {}", topicRepo.getNewId(), e);
             return 1;
         }
     }
@@ -76,7 +76,7 @@ public class TopicServiceImpl implements TopicService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in Topic Service Impl: {}", id, e);
             return null;
         }
     }
@@ -105,7 +105,7 @@ public class TopicServiceImpl implements TopicService {
     @Override
     @Cacheable(cacheNames = "topics")
     public List<Topic> getTopicsForcache() {
-        System.out.println("Topic_check");
+
         List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
         // List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
         Set<Topic> topicTemp = new HashSet<Topic>();
@@ -118,7 +118,7 @@ public class TopicServiceImpl implements TopicService {
         }
         List<Topic> topicTempSorted = new ArrayList<Topic>(topicTemp);
         Collections.sort(topicTempSorted);
-        System.out.println("Topic_check_end");
+
         return topicTempSorted;
     }
 }

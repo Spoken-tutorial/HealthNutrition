@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,8 @@ import com.health.service.TopicCategoryMappingService;
  */
 @Service
 public class TopicCategoryMappingServiceImpl implements TopicCategoryMappingService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TopicCategoryMappingServiceImpl.class);
 
     @Autowired
     private TopicCategoryMappingRepository topicCatRepo;
@@ -46,7 +50,7 @@ public class TopicCategoryMappingServiceImpl implements TopicCategoryMappingServ
             return topicCatRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in TopicCategory Mapping Service Impl: {}", topicCatRepo.getNewId(), e);
             return 1;
         }
     }
@@ -60,9 +64,6 @@ public class TopicCategoryMappingServiceImpl implements TopicCategoryMappingServ
 
         List<TopicCategoryMapping> temp = new ArrayList<TopicCategoryMapping>();
         for (UserRole x : userRoles) {
-
-//			System.out.println("********************************");
-//			System.out.println(topicCatRepo.findAllBycat(x.getCategory()).get(0));
 
             temp.addAll(topicCatRepo.findAllBycat(x.getCategory()));
         }

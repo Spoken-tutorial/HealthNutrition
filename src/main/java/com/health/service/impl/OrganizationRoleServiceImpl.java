@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import com.health.service.OrganizationRoleService;
  */
 @Service
 public class OrganizationRoleServiceImpl implements OrganizationRoleService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationRoleServiceImpl.class);
 
     @Autowired
     OrganizationRoleRepository repo;
@@ -62,7 +66,7 @@ public class OrganizationRoleServiceImpl implements OrganizationRoleService {
             return repo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in  Organization Role Service Impl: {}", repo.getNewId(), e);
             return 1;
         }
 
@@ -79,7 +83,7 @@ public class OrganizationRoleServiceImpl implements OrganizationRoleService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in  Organization Role Service Impl: {}", roleId, e);
             return null;
         }
     }

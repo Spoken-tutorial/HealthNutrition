@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import com.health.service.FilesofBrouchureService;
 @Service
 public class FilesofBrouchureServiceImpl implements FilesofBrouchureService {
 
+    private static final Logger logger = LoggerFactory.getLogger(FilesofBrouchureServiceImpl.class);
+
     @Autowired
     private FilesofBrouchureRepository filesofbrouchureRepository;
 
@@ -24,7 +28,8 @@ public class FilesofBrouchureServiceImpl implements FilesofBrouchureService {
             return filesofbrouchureRepository.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in Files of Brochure  Service Impl: {}", filesofbrouchureRepository.getNewId(),
+                    e);
             return 1;
         }
     }
@@ -52,7 +57,7 @@ public class FilesofBrouchureServiceImpl implements FilesofBrouchureService {
             return filesofbrouchureRepository.findById(id).get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in Files of Brochure  Service Impl: {}", id, e);
             return null;
         }
 

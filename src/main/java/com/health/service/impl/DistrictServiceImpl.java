@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import com.health.service.DistrictService;
  */
 @Service
 public class DistrictServiceImpl implements DistrictService {
+    private static final Logger logger = LoggerFactory.getLogger(DistrictServiceImpl.class);
 
     @Autowired
     private DistrictRepository distRepo;
@@ -47,7 +50,7 @@ public class DistrictServiceImpl implements DistrictService {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in District Service Impl: {}", id, e);
             return null;
         }
     }

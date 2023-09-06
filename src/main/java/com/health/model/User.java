@@ -585,4 +585,21 @@ public class User implements UserDetails, Serializable {
 
     }
 
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", username=" + username + ", dob=" + dob + ", password=" + password + ", firstName="
+                + firstName + ", gender=" + gender + ", lastName=" + lastName + ", address=" + address + ", token="
+                + token + ", age=" + age + ", organization=" + organization + ", orgRolev=" + orgRolev + ", experience="
+                + experience + ", aadharNumber=" + aadharNumber + ", profilePic=" + profilePic + ", email=" + email
+                + ", phone=" + phone + ", registered=" + registered + ", emailVerificationCode=" + emailVerificationCode
+                + ", dateAdded=" + dateAdded + ", userRoles=" + userRoles + ", categories=" + categories + ", topics="
+                + topics + ", languages=" + languages + ", questions=" + questions + ", events=" + events + ", testi="
+                + testi + ", consults=" + consults + ", trainingInfo=" + trainingInfo + ", comments=" + comments
+                + ", logs=" + logs + ", userKnownLans=" + userKnownLans + ", questionsPost=" + questionsPost
+                + ", multiUserOnTutorial=" + multiUserOnTutorial + ", tutorialScriptUser=" + tutorialScriptUser
+                + ", tutorialSlideUser=" + tutorialSlideUser + ", tutorialKeywordUser=" + tutorialKeywordUser
+                + ", tutorialOutlineUser=" + tutorialOutlineUser + ", tutorialVideoUser=" + tutorialVideoUser
+                + ", tutorialPreReqUser=" + tutorialPreReqUser + "]";
+    }
+
 }

@@ -521,7 +521,17 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     @Override
     public String toString() {
-        return "Tutorial [tutorialId=" + tutorialId + ", videoStatus=" + videoStatus + "]";
+        return "Tutorial [tutorialId=" + tutorialId + ", UserVisit=" + UserVisit + ", script=" + script
+                + ", scriptStatus=" + scriptStatus + ", scriptUser=" + scriptUser + ", slide=" + slide
+                + ", slideStatus=" + slideStatus + ", slideUser=" + slideUser + ", keyword=" + keyword
+                + ", keywordStatus=" + keywordStatus + ", keywordUser=" + keywordUser + ", outline=" + outline
+                + ", outlineStatus=" + outlineStatus + ", outlineUser=" + outlineUser + ", preRequistic=" + preRequistic
+                + ", preRequisticStatus=" + preRequisticStatus + ", preRequiticUser=" + preRequiticUser
+                + ", relatedVideo=" + relatedVideo + ", dateAdded=" + dateAdded + ", status=" + status + ", timeScript="
+                + timeScript + ", topicName=" + topicName + ", video=" + video + ", videoStatus=" + videoStatus
+                + ", videoUser=" + videoUser + ", conAssignedTutorial=" + conAssignedTutorial + ", comments=" + comments
+                + ", preRequisticTutorial=" + preRequisticTutorial + ", relatedTutorial=" + relatedTutorial + ", logs="
+                + logs + "]";
     }
 
 }

@@ -159,4 +159,11 @@ public class TraineeInformation implements Serializable {
 
     }
 
+    @Override
+    public String toString() {
+        return "TraineeInformation [TraineeId=" + TraineeId + ", name=" + name + ", email=" + email + ", phone=" + phone
+                + ", age=" + age + ", aadhar=" + aadhar + ", gender=" + gender + ", organization=" + organization
+                + ", traineeInfos=" + traineeInfos + "]";
+    }
+
 }

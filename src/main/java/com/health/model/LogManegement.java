@@ -146,4 +146,11 @@ public class LogManegement implements Serializable {
 
     }
 
+    @Override
+    public String toString() {
+        return "LogManegement [logId=" + logId + ", dateAdded=" + dateAdded + ", type=" + type + ", statusChangedTo="
+                + statusChangedTo + ", statusPrevious=" + statusPrevious + ", userRole=" + userRole + ", user=" + user
+                + ", tutorialInfos=" + tutorialInfos + "]";
+    }
+
 }

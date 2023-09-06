@@ -66,4 +66,9 @@ public class OrganizationRole implements Comparable<OrganizationRole>, Serializa
         return this.getRole().compareTo(o.getRole());
     }
 
+    @Override
+    public String toString() {
+        return "OrganizationRole [roleId=" + roleId + ", role=" + role + ", dateAdded=" + dateAdded + "]";
+    }
+
 }

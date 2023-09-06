@@ -136,4 +136,11 @@ public class Brouchure implements Serializable {
         this.showOnHomepage = showOnHomepage;
     }
 
+    @Override
+    public String toString() {
+        return "Brouchure [id=" + id + ", title=" + title + ", posterPath=" + posterPath + ", showOnHomepage="
+                + showOnHomepage + ", primaryVersion=" + primaryVersion + ", versions=" + versions + ", lan=" + lan
+                + ", topicCatId=" + topicCatId + ", catId=" + catId + "]";
+    }
+
 }

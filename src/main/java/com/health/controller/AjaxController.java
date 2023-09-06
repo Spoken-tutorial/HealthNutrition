@@ -291,7 +291,7 @@ public class AjaxController {
             temp = updateResponse(SUCCESS_TOKEN, TUTORIAL_UPDATE_SUCCESS, tut.getScriptStatus(), tut.getTutorialId(),
                     usr);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in Add Script Comp: {}", tut, e);
             temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getScriptStatus(), tut.getTutorialId(), usr);
             return temp;
         }
@@ -309,9 +309,9 @@ public class AjaxController {
             String folder = CommonData.uploadDirectoryTutorial + tut.getTutorialId() + "/" + comp;
             document = ServiceUtility.uploadMediaFile(mediaFile, env, folder);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in Get Document: {}", e);
         }
-        System.out.println(document);
+        logger.info("Document: {}", document);
         return document;
     }
 
@@ -357,7 +357,7 @@ public class AjaxController {
                 logService.save(log);
             }
         } catch (Exception e) {
-            System.out.println("Error in get addVideo");
+            logger.error("Error in get addVideo", e);
             temp = updateResponse(ERROR_TOKEN, TUTORIAL_UPDATE_ERROR, tut.getVideoStatus(), tut.getTutorialId(), usr);
         }
 
@@ -468,7 +468,7 @@ public class AjaxController {
         try {
             tutService.save(local);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in create Tutorial: {}", local, e);
         }
         return local;
     }
@@ -503,7 +503,7 @@ public class AjaxController {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Enable Disbale Brochure: {}", bro, e);
             return false;
         }
 
@@ -526,7 +526,7 @@ public class AjaxController {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Enable Disbale Promo Video: {}", pro, e);
             return false;
         }
 
@@ -549,7 +549,7 @@ public class AjaxController {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Enable Disbale Research Paper: {}", res, e);
             return false;
         }
 
@@ -595,7 +595,7 @@ public class AjaxController {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Enable Disbale Consultant: {}", con, e);
             return false;
         }
 
@@ -624,7 +624,7 @@ public class AjaxController {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Enable Disbale Testimonial: {}", test, e);
             return false;
         }
 
@@ -678,7 +678,7 @@ public class AjaxController {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error in Update Trainee: {}", trainee, e);
             status.add("failure");
         }
 
@@ -866,7 +866,7 @@ public class AjaxController {
             PathofPromoVideo pathofPromoVideo = pathofPromoVideoService.findByLanguageandPromoVideo(lan, promo);
             return pathofPromoVideo.getVideoPath();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in get the Path of Promo Video: {} {}", lanId, promoId, e);
             return "";
         }
 
@@ -918,9 +918,9 @@ public class AjaxController {
 
         List<TopicCategoryMapping> localcat = cat != null ? topicCatService.findAllByCategory(cat)
                 : topicCatService.findAll();
-        System.out.println("*******Checking Sorting of TopicCat by order");
+        logger.info("*******Checking Sorting of TopicCat by order");
         for (TopicCategoryMapping tcm : localcat) {
-            System.out.println(tcm.getOrder() + " " + tcm.getTopic().getTopicName());
+            logger.info("Order and topic Name: {} {}", tcm.getOrder(), tcm.getTopic().getTopicName());
         }
         List<ContributorAssignedTutorial> cat_list = language != null
                 ? conService.findAllByTopicCatAndLan(localcat, language)
@@ -929,7 +929,7 @@ public class AjaxController {
         // To find Topics
         List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
 
-        System.out.println("****Load By Category****");
+        logger.info("****Load By Category****");
 
         /*
          * for(Tutorial t: tutorials) {
@@ -941,7 +941,7 @@ public class AjaxController {
          * topics.put( topic2.getTopicName(),topic2.getTopicId()); //topics.put(
          * topic2.getTopicName(),tcp.getOrder());
          * 
-         * System.out.println(topic2.getTopicName()+" " + topic2.getTopicId() ); } }
+         * } }
          * 
          * 
          * 
@@ -970,7 +970,7 @@ public class AjaxController {
 
         for (TopicCategoryMapping tcm : tcmList) {
             Topic topic2 = tcm.getTopic();
-            System.out.println(tcm.getOrder() + " " + topic2.getTopicName());
+            logger.info("Order and Topic Name: {} {}", tcm.getOrder(), topic2.getTopicName());
             topics.put(topic2.getTopicName(), topic2.getTopicId());
         }
 
@@ -1125,7 +1125,7 @@ public class AjaxController {
 
         List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list2);
 
-        System.out.println("****Load By Langauge****");
+        logger.info("****Load By Langauge****");
 
         List<TopicCategoryMapping> tcmList = new ArrayList<>();
         for (Tutorial t : tutorials2) {
@@ -1146,7 +1146,7 @@ public class AjaxController {
 
         for (TopicCategoryMapping tcm : tcmList) {
             Topic topic2 = tcm.getTopic();
-            System.out.println(tcm.getOrder() + " " + topic2.getTopicName());
+            logger.info("Order and Topic Name: {} {}", tcm.getOrder(), topic2.getTopicName());
             topics.put(topic2.getTopicName(), topic2.getTopicId());
         }
 
@@ -1503,8 +1503,8 @@ public class AjaxController {
             @RequestParam(value = "categoryname") String catName, @RequestParam(value = "topicid") int topicId,
             @RequestParam(value = "lanId") String lang, Principal principal) {
 
-        System.out.println("id " + tutorialId + " data " + outlineData + " catname " + catName + " topicid " + topicId
-                + " lanId " + lang + " Principal " + principal);
+        logger.info("id data catName topicId lanId Principal : {} {} {} {} {} {} ", tutorialId, outlineData, catName,
+                topicId, lang, principal);
         HashMap<String, String> temp = new HashMap<>();
         logger.info("Test Outline");
         logger.info("Outline length: outline {}", outlineData.length());
@@ -1543,9 +1543,8 @@ public class AjaxController {
 
         // alok
         /*
-         * User usr=getUser(principal); Tutorial local = null;
-         * System.out.println(tutService.getById(tutorialId)+ "alok sp");
-         * if(tutorialId!=0) { Tutorial tut=tutService.getById(tutorialId); temp =
+         * User usr=getUser(principal); Tutorial local = null; if(tutorialId!=0) {
+         * Tutorial tut=tutService.getById(tutorialId); temp =
          * addOutlineComp(tut,outlineData,usr); return temp; }else { local =
          * createTutorial(catName, topicId, lang,usr); if(local!=null) { temp =
          * addOutlineComp(local,outlineData,usr); }else { temp =
@@ -2356,7 +2355,8 @@ public class AjaxController {
         } catch (Exception e) {
 
             status.add("Failure");
-            e.printStackTrace();
+            logger.error("Error in add Contact Data : {} {} {}", contactData.getEmail(), contactData.getMessage(),
+                    contactData.getName(), e);
         }
 
         return status;

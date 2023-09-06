@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,8 @@ import com.health.service.TrainingInformationService;
 @Service
 public class TrainingInformationServiceImpl implements TrainingInformationService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TrainingInformationServiceImpl.class);
+
     @Autowired
     private TrainingInformationRespository trainingInfoRepo;
 
@@ -36,7 +40,7 @@ public class TrainingInformationServiceImpl implements TrainingInformationServic
             return trainingInfoRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in Training Information Service Impl: {}", trainingInfoRepo.getNewId(), e);
             return 1;
         }
     }
@@ -82,7 +86,7 @@ public class TrainingInformationServiceImpl implements TrainingInformationServic
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in Training Information Service Impl: {}", id, e);
             return null;
         }
     }

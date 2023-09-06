@@ -2,6 +2,8 @@ package com.health.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import com.health.service.RoleService;
 
 @Service
 public class RoleServiceImpl implements RoleService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RoleServiceImpl.class);
 
     @Autowired
     private RoleRepository roleRepository;
@@ -64,7 +68,7 @@ public class RoleServiceImpl implements RoleService {
             return (int) (roleRepository.getNewId() + 1);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in Role Service Impl: {}", roleRepository.getNewId(), e);
             return 1;
         }
     }

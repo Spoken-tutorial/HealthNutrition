@@ -113,4 +113,10 @@ public class UserIndianLanguageMapping implements Serializable {
 
     }
 
+    @Override
+    public String toString() {
+        return "UserIndianLanguageMapping [id=" + id + ", reading=" + reading + ", writing=" + writing + ", speaking="
+                + speaking + ", user=" + user + ", indianlan=" + indianlan + "]";
+    }
+
 }

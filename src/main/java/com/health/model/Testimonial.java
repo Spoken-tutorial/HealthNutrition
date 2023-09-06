@@ -160,4 +160,12 @@ public class Testimonial implements Serializable {
         this.consentLetter = consentLetter;
     }
 
+    @Override
+    public String toString() {
+        return "Testimonial [testimonialId=" + testimonialId + ", name=" + name + ", description=" + description
+                + ", filePath=" + filePath + ", dateAdded=" + dateAdded + ", approved=" + approved + ", consentLetter="
+                + consentLetter + ", thumbnailPath=" + thumbnailPath + ", user=" + user + ", traineeInfos="
+                + traineeInfos + "]";
+    }
+
 }

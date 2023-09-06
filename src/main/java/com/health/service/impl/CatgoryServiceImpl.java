@@ -64,7 +64,7 @@ public class CatgoryServiceImpl implements CategoryService {
             return local;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Category Name error in Category Service Impl class: {}", name, e);
             return null;
         }
 
@@ -110,7 +110,7 @@ public class CatgoryServiceImpl implements CategoryService {
             return var.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("find by Id error in Category Service Impl class: {}", id, e);
             return null;
         }
 
@@ -126,7 +126,7 @@ public class CatgoryServiceImpl implements CategoryService {
             return categoryRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in Category Service Impl class: {}", categoryRepo.getNewId(), e);
             return 1;
         }
 
@@ -153,7 +153,6 @@ public class CatgoryServiceImpl implements CategoryService {
     @Override
     // @Cacheable(cacheNames ="categories" )
     public List<Category> findAllCategoryByOrderForCache() {
-        System.out.println("CategoryByOrderCheck");
 
         return categoryRepo.findAllByOrderBy();
     }
@@ -161,7 +160,7 @@ public class CatgoryServiceImpl implements CategoryService {
     @Override
     @Cacheable(cacheNames = "categories")
     public List<Category> getCategoriesForCache() {
-        System.out.println("Category_check");
+
         List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
         /// List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
         Set<Category> catTemp = new HashSet<Category>();
@@ -176,7 +175,7 @@ public class CatgoryServiceImpl implements CategoryService {
 
         List<Category> catTempSorted = new ArrayList<Category>(catTemp);
         Collections.sort(catTempSorted);
-        System.out.println("Category_check_end");
+
         return catTempSorted;
     }
 

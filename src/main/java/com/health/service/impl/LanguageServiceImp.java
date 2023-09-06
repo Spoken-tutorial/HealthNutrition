@@ -61,7 +61,7 @@ public class LanguageServiceImp implements LanguageService {
             return languageRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" New Id error in  Language  Service Impl: {}", languageRepo.getNewId(), e);
             return 1;
         }
     }
@@ -76,7 +76,7 @@ public class LanguageServiceImp implements LanguageService {
             return languageRepo.findBylangName(langName);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" Name error in Language Service Impl: {}", langName, e);
             return null;
         }
 
@@ -95,7 +95,7 @@ public class LanguageServiceImp implements LanguageService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(" Id error in Language Service Impl: {}", lanId, e);
             return null;
         }
     }
@@ -114,7 +114,7 @@ public class LanguageServiceImp implements LanguageService {
     @Override
     @Cacheable(cacheNames = "languages")
     public List<Language> getLanguagesForCache() {
-        System.out.println("Language_check");
+
         List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
         // List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
 
@@ -128,7 +128,6 @@ public class LanguageServiceImp implements LanguageService {
         }
         List<Language> lanTempSorted = new ArrayList<Language>(langTemp);
         Collections.sort(lanTempSorted);
-        System.out.println("Language_check_end");
 
         return lanTempSorted;
     }

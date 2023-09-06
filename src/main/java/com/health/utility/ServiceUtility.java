@@ -123,7 +123,7 @@ public class ServiceUtility {
         Path fileNameAndPath = Paths.get(pathToUpload, uploadFile.getOriginalFilename());
 
         Files.write(fileNameAndPath, uploadFile.getBytes());
-        System.out.println(fileNameAndPath.toString());
+        logger.info("File Name Path1: {} ", fileNameAndPath.toString());
         path = fileNameAndPath.toString();
 
         return path;
@@ -222,7 +222,7 @@ public class ServiceUtility {
         Path fileNameAndPath = Paths.get(pathToUpload, file.getOriginalFilename());
 
         Files.write(fileNameAndPath, file.getBytes());
-        System.out.println(fileNameAndPath.toString());
+        logger.info("File Name And Path: {}", fileNameAndPath.toString());
         path = fileNameAndPath.toString();
 
         return path;
@@ -330,7 +330,7 @@ public class ServiceUtility {
      * @return
      */
     public static boolean checkVideoSizeTestimonial(MultipartFile temp) {
-        System.out.println("Video Size" + temp.getSize());
+        logger.info("Video Size:{}", temp.getSize());
         if (temp.getSize() > CommonData.videoSizeTest) {
 
             return false;
@@ -339,7 +339,7 @@ public class ServiceUtility {
     }
 
     public static boolean checkVideoSizePromoVideo(MultipartFile temp) {
-        System.out.println("Video Size" + temp.getSize());
+        logger.info("Video Size: {}", temp.getSize());
         if (temp.getSize() > CommonData.videoSizePromoVideo) {
 
             return false;

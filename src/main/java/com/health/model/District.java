@@ -100,4 +100,10 @@ public class District implements Comparable<District>, Serializable {
         return this.getDistrictName().compareTo(o.getDistrictName());
     }
 
+    @Override
+    public String toString() {
+        return "District [id=" + id + ", districtName=" + districtName + ", dateAdded=" + dateAdded + ", state=" + state
+                + ", cities=" + cities + ", events=" + events + "]";
+    }
+
 }

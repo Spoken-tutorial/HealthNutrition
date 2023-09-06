@@ -97,4 +97,10 @@ public class PostQuestionaire implements Serializable {
 
     }
 
+    @Override
+    public String toString() {
+        return "PostQuestionaire [id=" + id + ", questionPath=" + questionPath + ", dateAdded=" + dateAdded
+                + ", traineeInfos=" + traineeInfos + ", user=" + user + "]";
+    }
+
 }

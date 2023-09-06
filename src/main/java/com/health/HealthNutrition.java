@@ -43,7 +43,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("Starting application " + gitCommitId);
+        logger.info("Starting application {}", gitCommitId);
 
         String baseDir = env.getProperty("spring.applicationexternalPath.name");
         new File(baseDir + CommonData.uploadDirectoryCategory).mkdirs();

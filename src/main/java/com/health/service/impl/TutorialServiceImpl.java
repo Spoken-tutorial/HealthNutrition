@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,8 @@ import com.health.service.TutorialService;
 @Service
 public class TutorialServiceImpl implements TutorialService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TutorialServiceImpl.class);
+
     @Autowired
     private TutorialRepository tutorialRepo;
 
@@ -44,7 +48,6 @@ public class TutorialServiceImpl implements TutorialService {
     @Override
     @Cacheable(cacheNames = "tutorials")
     public List<Tutorial> getFinalTutorialsForCache() {
-        System.out.println("Tutorial_check");
 
         List<Tutorial> tutorials = tutorialRepo.findAllByStatus(true);
         List<Tutorial> finalTutorials = new ArrayList<>();
@@ -56,7 +59,7 @@ public class TutorialServiceImpl implements TutorialService {
                 finalTutorials.add(temp);
             }
         }
-        System.out.println("Tutorial_check_end");
+
         return finalTutorials;
     }
 
@@ -70,7 +73,7 @@ public class TutorialServiceImpl implements TutorialService {
             return tutorialRepo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in Tutorial Service Impl: {}", tutorialRepo.getNewId(), e);
             return 1;
         }
     }
@@ -111,7 +114,7 @@ public class TutorialServiceImpl implements TutorialService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Id error in Tutorial Service Impl: {}", id, e);
             return null;
         }
     }

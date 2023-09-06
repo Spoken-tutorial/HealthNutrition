@@ -117,4 +117,10 @@ public class Comment implements Serializable {
         this.roleName = roleName;
     }
 
+    @Override
+    public String toString() {
+        return "Comment [commentId=" + commentId + ", comment=" + comment + ", dateAdded=" + dateAdded + ", type="
+                + type + ", roleName=" + roleName + ", user=" + user + ", tutorialInfos=" + tutorialInfos + "]";
+    }
+
 }

@@ -121,4 +121,10 @@ public class FeedbackMasterTrainer implements Serializable {
 
     }
 
+    @Override
+    public String toString() {
+        return "FeedbackMasterTrainer [TrainerFeedId=" + TrainerFeedId + ", description=" + description + ", dateAdded="
+                + dateAdded + ", path=" + path + ", traineeInfos=" + traineeInfos + ", user=" + user + "]";
+    }
+
 }

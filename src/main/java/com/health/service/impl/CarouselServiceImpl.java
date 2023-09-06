@@ -3,6 +3,8 @@ package com.health.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import com.health.service.CarouselService;
  */
 @Service
 public class CarouselServiceImpl implements CarouselService {
+    private static final Logger logger = LoggerFactory.getLogger(CarouselServiceImpl.class);
 
     @Autowired
     private CarouselRepository repo;
@@ -34,7 +37,7 @@ public class CarouselServiceImpl implements CarouselService {
             return repo.getNewId() + 1;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("New Id error in Carousel Service Impl class: {}", repo.getNewId(), e);
             return 1;
         }
     }
@@ -82,7 +85,7 @@ public class CarouselServiceImpl implements CarouselService {
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("find By Id error in Carousel Service Impl class: {}", id, e);
             return null;
         }
     }
@@ -90,7 +93,6 @@ public class CarouselServiceImpl implements CarouselService {
     @Override
     @Cacheable(cacheNames = "carousels")
     public List<Carousel> findCarouselForCache() {
-        System.out.println("CarouselCheck");
         return repo.findAll();
     }
 }
