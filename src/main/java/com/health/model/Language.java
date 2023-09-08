@@ -26,6 +26,8 @@ import com.health.domain.security.UserRole;
 @Entity
 public class Language implements Comparable<Language>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -189,7 +191,15 @@ public class Language implements Comparable<Language>, Serializable {
 
     @Override
     public String toString() {
-        return "Language [lanId=" + lanId + ", langName=" + langName + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Language [lanId=").append(lanId);
+        sb.append(", langName=").append(langName);
+        sb.append(", status=").append(status);
+        sb.append(", user=").append(user);
+        sb.append(", userRoles=").append(userRoles);
+        sb.append(", conAssignedTutorial=").append(conAssignedTutorial);
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override

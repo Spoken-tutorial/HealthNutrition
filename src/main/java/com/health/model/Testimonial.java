@@ -20,6 +20,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Testimonial implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -162,10 +164,19 @@ public class Testimonial implements Serializable {
 
     @Override
     public String toString() {
-        return "Testimonial [testimonialId=" + testimonialId + ", name=" + name + ", description=" + description
-                + ", filePath=" + filePath + ", dateAdded=" + dateAdded + ", approved=" + approved + ", consentLetter="
-                + consentLetter + ", thumbnailPath=" + thumbnailPath + ", user=" + user + ", traineeInfos="
-                + traineeInfos + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Testimonial [testimonialId=").append(testimonialId);
+        sb.append(", name=").append(name);
+        sb.append(", description=").append(description);
+        sb.append(", filePath=").append(filePath);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", approved=").append(approved);
+        sb.append(", consentLetter=").append(consentLetter);
+        sb.append(", thumbnailPath=").append(thumbnailPath);
+        sb.append(", user=").append(user);
+        sb.append(", traineeInfos=").append(traineeInfos);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

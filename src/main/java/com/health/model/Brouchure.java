@@ -22,6 +22,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class Brouchure implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique brochure id
      */
@@ -138,9 +140,18 @@ public class Brouchure implements Serializable {
 
     @Override
     public String toString() {
-        return "Brouchure [id=" + id + ", title=" + title + ", posterPath=" + posterPath + ", showOnHomepage="
-                + showOnHomepage + ", primaryVersion=" + primaryVersion + ", versions=" + versions + ", lan=" + lan
-                + ", topicCatId=" + topicCatId + ", catId=" + catId + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Brouchure [id=").append(id);
+        sb.append(", title=").append(title);
+        sb.append(", posterPath=").append(posterPath);
+        sb.append(", showOnHomepage=").append(showOnHomepage);
+        sb.append(", primaryVersion=").append(primaryVersion);
+        sb.append(", versions=").append(versions);
+        sb.append(", lan=").append(lan);
+        sb.append(", topicCatId=").append(topicCatId);
+        sb.append(", catId=").append(catId);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

@@ -26,6 +26,8 @@ import javax.persistence.Table;
 @Table(name = "tutorial_resource")
 public class Tutorial implements Comparable<Tutorial>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -521,17 +523,39 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     @Override
     public String toString() {
-        return "Tutorial [tutorialId=" + tutorialId + ", UserVisit=" + UserVisit + ", script=" + script
-                + ", scriptStatus=" + scriptStatus + ", scriptUser=" + scriptUser + ", slide=" + slide
-                + ", slideStatus=" + slideStatus + ", slideUser=" + slideUser + ", keyword=" + keyword
-                + ", keywordStatus=" + keywordStatus + ", keywordUser=" + keywordUser + ", outline=" + outline
-                + ", outlineStatus=" + outlineStatus + ", outlineUser=" + outlineUser + ", preRequistic=" + preRequistic
-                + ", preRequisticStatus=" + preRequisticStatus + ", preRequiticUser=" + preRequiticUser
-                + ", relatedVideo=" + relatedVideo + ", dateAdded=" + dateAdded + ", status=" + status + ", timeScript="
-                + timeScript + ", topicName=" + topicName + ", video=" + video + ", videoStatus=" + videoStatus
-                + ", videoUser=" + videoUser + ", conAssignedTutorial=" + conAssignedTutorial + ", comments=" + comments
-                + ", preRequisticTutorial=" + preRequisticTutorial + ", relatedTutorial=" + relatedTutorial + ", logs="
-                + logs + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Tutorial [tutorialId=").append(tutorialId);
+        sb.append(", UserVisit=").append(UserVisit);
+        sb.append(", script=").append(script);
+        sb.append(", scriptStatus=").append(scriptStatus);
+        sb.append(", scriptUser=").append(scriptUser);
+        sb.append(", slide=").append(slide);
+        sb.append(", slideStatus=").append(slideStatus);
+        sb.append(", slideUser=").append(slideUser);
+        sb.append(", keyword=").append(keyword);
+        sb.append(", keywordStatus=").append(keywordStatus);
+        sb.append(", keywordUser=").append(keywordUser);
+        sb.append(", outline=").append(outline);
+        sb.append(", outlineStatus=").append(outlineStatus);
+        sb.append(", outlineUser=").append(outlineUser);
+        sb.append(", preRequistic=").append(preRequistic);
+        sb.append(", preRequisticStatus=").append(preRequisticStatus);
+        sb.append(", preRequiticUser=").append(preRequiticUser);
+        sb.append(", relatedVideo=").append(relatedVideo);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", status=").append(status);
+        sb.append(", timeScript=").append(timeScript);
+        sb.append(", topicName=").append(topicName);
+        sb.append(", video=").append(video);
+        sb.append(", videoStatus=").append(videoStatus);
+        sb.append(", videoUser=").append(videoUser);
+        sb.append(", conAssignedTutorial=").append(conAssignedTutorial);
+        sb.append(", comments=").append(comments);
+        sb.append(", preRequisticTutorial=").append(preRequisticTutorial);
+        sb.append(", relatedTutorial=").append(relatedTutorial);
+        sb.append(", logs=").append(logs);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

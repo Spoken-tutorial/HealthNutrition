@@ -25,6 +25,8 @@ import javax.persistence.Table;
 @Table(name = "topic_category")
 public class TopicCategoryMapping implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -194,9 +196,18 @@ public class TopicCategoryMapping implements Serializable {
 
     @Override
     public String toString() {
-        return "TopicCategoryMapping [topicCategoryId=" + topicCategoryId + ", status=" + status + ", order=" + order
-                + ", cat=" + cat + ", topic=" + topic + ", questions=" + questions + ", conAssignedTutorial="
-                + conAssignedTutorial + ", trainingTopic=" + trainingTopic + ", brochures=" + brochures + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("TopicCategoryMapping [topicCategoryId=").append(topicCategoryId);
+        sb.append(", status=").append(status);
+        sb.append(", order=").append(order);
+        sb.append(", cat=").append(cat);
+        sb.append(", topic=").append(topic);
+        sb.append(", questions=").append(questions);
+        sb.append(", conAssignedTutorial=").append(conAssignedTutorial);
+        sb.append(", trainingTopic=").append(trainingTopic);
+        sb.append(", brochures=").append(brochures);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

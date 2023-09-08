@@ -92,8 +92,14 @@ public class PathofPromoVideo {
 
     @Override
     public String toString() {
-        return "PathofPromoVideo [pathPromoId=" + pathPromoId + ", dateAdded=" + dateAdded + ", videoPath=" + videoPath
-                + ", promoVideo=" + promoVideo + ", lan=" + lan + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("PathofPromoVideo [pathPromoId=").append(pathPromoId);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", videoPath=").append(videoPath);
+        sb.append(", promoVideo=").append(promoVideo);
+        sb.append(", lan=").append(lan);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

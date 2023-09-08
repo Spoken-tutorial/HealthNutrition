@@ -27,6 +27,8 @@ import javax.persistence.Table;
 @Table(name = "topic")
 public class Topic implements Comparable<Topic>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id
      */
@@ -118,8 +120,15 @@ public class Topic implements Comparable<Topic>, Serializable {
 
     @Override
     public String toString() {
-        return "Topic [topicId=" + topicId + ", topicName=" + topicName + ", dateAdded=" + dateAdded + ", status="
-                + status + ", user=" + user + ", topicCategoryMap=" + topicCategoryMap + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Topic [topicId=").append(topicId);
+        sb.append(", topicName=").append(topicName);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", status=").append(status);
+        sb.append(", user=").append(user);
+        sb.append(", topicCategoryMap=").append(topicCategoryMap);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

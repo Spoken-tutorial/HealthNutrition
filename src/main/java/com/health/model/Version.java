@@ -201,9 +201,15 @@ public class Version {
 
     @Override
     public String toString() {
-        return "Version [verId=" + verId + ", dateAdded=" + dateAdded + ", versionPosterPath=" + versionPosterPath
-                + ", brouchure=" + brouchure + ", broVersion=" + broVersion + ", filesofBrouchure=" + filesofBrouchure
-                + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Version [verId=").append(verId);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", versionPosterPath=").append(versionPosterPath);
+        sb.append(", brouchure=").append(brouchure);
+        sb.append(", broVersion=").append(broVersion);
+        sb.append(", filesofBrouchure=").append(filesofBrouchure);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

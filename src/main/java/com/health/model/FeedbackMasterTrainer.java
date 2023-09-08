@@ -20,6 +20,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class FeedbackMasterTrainer implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -123,8 +125,15 @@ public class FeedbackMasterTrainer implements Serializable {
 
     @Override
     public String toString() {
-        return "FeedbackMasterTrainer [TrainerFeedId=" + TrainerFeedId + ", description=" + description + ", dateAdded="
-                + dateAdded + ", path=" + path + ", traineeInfos=" + traineeInfos + ", user=" + user + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("FeedbackMasterTrainer [TrainerFeedId=").append(TrainerFeedId);
+        sb.append(", description=").append(description);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", path=").append(path);
+        sb.append(", traineeInfos=").append(traineeInfos);
+        sb.append(", user=").append(user);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

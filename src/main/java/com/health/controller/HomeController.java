@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,8 +39,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -91,7 +90,6 @@ import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
 import com.health.repository.TopicCategoryMappingRepository;
-import com.health.repository.UserRoleRepositary;
 import com.health.repository.VersionRepository;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
@@ -206,9 +204,6 @@ public class HomeController {
 
     @Autowired
     private UserRoleService usrRoleService;
-
-    @Autowired
-    private UserRoleRepositary userRoleRepo;
 
     @Autowired
     private ContributorAssignedTutorialService conRepo;
@@ -326,9 +321,11 @@ public class HomeController {
                 if (local.getVideo() != null) {
 
                     IContainer container = IContainer.make();
-                    int result = 10;
-                    result = container.open(env.getProperty("spring.applicationexternalPath.name") + local.getVideo(),
-                            IContainer.Type.READ, null);
+                    // int result = 10;
+                    // result =
+                    // container.open(env.getProperty("spring.applicationexternalPath.name") +
+                    // local.getVideo(),
+                    // IContainer.Type.READ, null);
 
                     IStream stream = container.getStream(0);
                     if (stream != null) {
@@ -404,13 +401,22 @@ public class HomeController {
         if (tutorial != null) {
             tutorial_id = Integer.toString(tutorial.getTutorialId());
         }
-        String sm_url = scriptmanager_url + scriptmanager_path + Integer.toString(cat.getCategoryId()) + "/"
-                + tutorial_id + "/" + Integer.toString(lan.getLanId()) + "/" + topic_name + "/" + "1";
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(scriptmanager_url);
+        sb.append(scriptmanager_path);
+        sb.append(cat.getCategoryId());
+        sb.append("/");
+        sb.append(tutorial_id);
+        sb.append("/");
+        sb.append(lan.getLanId());
+        sb.append("/");
+        sb.append(topic_name);
+        sb.append("/");
+        sb.append("1");
+        String sm_url = sb.toString();
         return sm_url;
-    }
-
-    private void getUsers() {
-
     }
 
     private List<Category> getCategories() {
@@ -627,7 +633,7 @@ public class HomeController {
      * A controller to clear all caches Author: Alok Kumar
      */
 
-    @RequestMapping(value = "/clearAllCaches", method = RequestMethod.GET)
+    @GetMapping("/clearAllCaches")
     public String ClearAllCache(Principal principal, Model model) {
 
         for (String name : cacheManager.getCacheNames()) {
@@ -658,26 +664,7 @@ public class HomeController {
      * @return String object (Webpapge)
      */
 
-    private List<Tutorial> searchTutorialsBySentence(String sentence, List<Tutorial> tutorialList) {
-        String[] words = sentence.toLowerCase().split(" ");
-        Map<Tutorial, Integer> tutorialMatchCount = new HashMap<>();
-
-        for (String word : words) {
-            for (Tutorial tutorial : tutorialList) {
-                if (tutorial.getOutline().toLowerCase().contains(word)) {
-                    tutorialMatchCount.put(tutorial, tutorialMatchCount.getOrDefault(tutorial, 0) + 1);
-                }
-            }
-        }
-
-        List<Tutorial> results = tutorialMatchCount.entrySet().stream()
-                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())).map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-
-        return results;
-    }
-
-    @RequestMapping(value = "/tutorials", method = RequestMethod.GET)
+    @GetMapping("/tutorials")
     public String viewCoursesAvailable(HttpServletRequest req,
             @RequestParam(name = "categoryName", required = false, defaultValue = "0") int cat,
             @RequestParam(name = "topic", required = false, defaultValue = "0") int topic,
@@ -701,8 +688,7 @@ public class HomeController {
         List<ContributorAssignedTutorial> conAssigTutorialList = null;
 
         Page<Tutorial> tut = null;
-        Page<Tutorial> querytutorialPages = null;
-        List<Tutorial> tutToView = new ArrayList<Tutorial>();
+
         List<Tutorial> tutToView1 = new ArrayList<Tutorial>();
 
         User usr = new User();
@@ -833,7 +819,7 @@ public class HomeController {
      * @param model     Model object
      * @return String object (Webpapge)
      */
-    @RequestMapping(value = "/tutorialView/{catName}/{topicName}/{language}/{query}/", method = RequestMethod.GET)
+    @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
             @PathVariable(name = "query") String query, Principal principal, Model model) {
@@ -897,7 +883,6 @@ public class HomeController {
             if (x == tutorial) {
                 continue;
             }
-            Category cat1 = x.getConAssignedTutorial().getTopicCatId().getCat();
 
             if (x.getConAssignedTutorial().getLan().getLangName()
                     .equalsIgnoreCase(tutorial.getConAssignedTutorial().getLan().getLangName())) {
@@ -930,12 +915,21 @@ public class HomeController {
 //				Collections.sort(lanTempSorted);
 
         getModelData(model, catId, topicId, lanId, query);
-//				model.addAttribute("topics", topicTemp);
+        StringBuilder sb = new StringBuilder();
+        sb.append(scriptmanager_url);
+        sb.append(scriptmanager_path);
+        sb.append(String.valueOf(category.getCategoryId()));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getTutorialId()));
+        sb.append("/");
+        sb.append(String.valueOf(lanName.getLanId()));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+        sb.append("/1");
+        // model.addAttribute("topics", topicTemp);
         // String sm_url = scriptmanager_url + scriptmanager_path +
         // String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
-        String sm_url = scriptmanager_url + scriptmanager_path + String.valueOf(category.getCategoryId()) + "/"
-                + String.valueOf(tutorial.getTutorialId()) + "/" + String.valueOf(lanName.getLanId()) + "/"
-                + String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()) + "/1";
+        String sm_url = sb.toString();
         model.addAttribute("sm_url", sm_url);
         return "tutorial";
     }
@@ -958,7 +952,7 @@ public class HomeController {
      * @param model Model object
      * @return String object (Webpapge)
      */
-    @RequestMapping(value = "/showEvent", method = RequestMethod.GET)
+    @GetMapping("/showEvent")
     public String showEventGet(Model model) {
 
         List<Event> events = eventservice.findAll();
@@ -973,7 +967,7 @@ public class HomeController {
      * @param model Model object
      * @return String object (Webpapge)
      */
-    @RequestMapping(value = "/showConsultant", method = RequestMethod.GET)
+    @GetMapping("/showConsultant")
     public String showConsultantGet(Model model) {
 
         List<Consultant> consults = consultService.findAll();
@@ -981,9 +975,6 @@ public class HomeController {
 
         HashMap<Integer, String> map = new HashMap<>();
 
-        User user = userService.findByEmail("bellatonyp@gmail.com");
-        Set<UserRole> roles = user.getUserRoles();
-        Set<Category> categorys = user.getCategories();
         for (Consultant c : consults) {
             String s = "";
             if (c.isOnHome()) {
@@ -1009,7 +1000,7 @@ public class HomeController {
         return "Consultants";
     }
 
-    @RequestMapping(value = "/showLanguages", method = RequestMethod.GET)
+    @GetMapping("/showLanguages")
     public String showLanguagesGet(Model model) {
 
         HashMap<String, Integer> map = new HashMap<>();
@@ -1062,7 +1053,7 @@ public class HomeController {
      * @param model Model object
      * @return String object (Webpapge)
      */
-    @RequestMapping(value = "/showTestimonial", method = RequestMethod.GET)
+    @GetMapping("/showTestimonial")
     public String showTestimonialGet(Model model) {
 
         List<Testimonial> testi = testService.findByApproved(true);
@@ -1078,7 +1069,7 @@ public class HomeController {
      * @param model   model object
      * @return String object (Webpapge)
      */
-    @RequestMapping(value = "/forgetPassword", method = RequestMethod.POST)
+    @PostMapping("/forgetPassword")
     public String forgetPasswordPost(HttpServletRequest request, @ModelAttribute("email") String email, Model model) {
 
         model.addAttribute("classActiveForgetPassword", true);
@@ -1133,7 +1124,7 @@ public class HomeController {
      * @param principal Princiapl Object
      * @return String object (Webpapge)
      */
-    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    @GetMapping("/reset")
     public ModelAndView resetPasswordGet(ModelAndView mv, @RequestParam("token") String token, Principal principal) {
 
         if (principal != null) {
@@ -1165,7 +1156,7 @@ public class HomeController {
      * @param principal HttpServletRequest object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+    @PostMapping("/resetPassword")
     public ModelAndView resetPasswordPost(ModelAndView mv, HttpServletRequest req, Principal principal) {
 
         String newPassword = req.getParameter("Password");
@@ -1213,7 +1204,7 @@ public class HomeController {
      * @param model Model object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    @GetMapping("/categories")
     public String showCategoriesGet(Model model) {
 
         // List<Category> categories=catService.findAll();
@@ -1222,7 +1213,7 @@ public class HomeController {
         return "categories";
     }
 
-    @RequestMapping(value = "/researchPapers", method = RequestMethod.GET)
+    @GetMapping("/researchPapers")
     public String showResearchPapersGet(Model model) {
 
         // List<Category> categories=catService.findAll();
@@ -1252,7 +1243,7 @@ public class HomeController {
      * @return String object(Webpage)
      * @throws Exception
      */
-    @RequestMapping(value = "/newUser", method = RequestMethod.POST) // in use
+    @PostMapping("/newUser") // in use
     public String newUserPost(HttpServletRequest request, @ModelAttribute("username") String username,
             @ModelAttribute("firstName") String firstName, @ModelAttribute("lastName") String lastName,
             @ModelAttribute("email") String userEmail, @ModelAttribute("password") String password,
@@ -1338,7 +1329,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/dashBoard", method = RequestMethod.GET)
+    @GetMapping("/dashBoard")
     public String dashBoardGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -1375,7 +1366,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addCategory", method = RequestMethod.GET)
+    @GetMapping("/addCategory")
     public String addCategoryGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -1403,7 +1394,7 @@ public class HomeController {
      * @param files     MultipartFile object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addCategory", method = RequestMethod.POST)
+    @PostMapping("/addCategory")
     public String addCategoryPost(Model model, Principal principal, HttpServletRequest req,
             @RequestParam("categoryImage") MultipartFile files) {
 
@@ -1500,7 +1491,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addOrganizationRole", method = RequestMethod.GET)
+    @GetMapping("/addOrganizationRole")
     public String addOrganizationRoleGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -1528,7 +1519,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addOrganizationRole", method = RequestMethod.POST)
+    @PostMapping("/addOrganizationRole")
     public String addOrganizationRolePost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -1585,7 +1576,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/organization_role/edit/{name}", method = RequestMethod.GET)
+    @GetMapping("/organization_role/edit/{name}")
     public String editOrganizationRoleGet(@PathVariable(name = "name") String orgname, Model model,
             Principal principal) {
 
@@ -1613,7 +1604,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/update_organization_role", method = RequestMethod.POST)
+    @PostMapping("/update_organization_role")
     public String updateOrganizationRolePost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -1688,7 +1679,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addLanguage", method = RequestMethod.GET)
+    @GetMapping("/addLanguage")
     public String addLanguageGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -1716,7 +1707,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addLanguage", method = RequestMethod.POST)
+    @PostMapping("/addLanguage")
     public String addLanguagePost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -1791,7 +1782,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addCarousel", method = RequestMethod.GET)
+    @GetMapping("/addCarousel")
     public String addCarouselGet(Model model, Principal principal) {
         User usr = new User();
         if (principal != null) {
@@ -1816,7 +1807,7 @@ public class HomeController {
      * @param desc      String object
      * @return String object
      */
-    @RequestMapping(value = "/addCarousel", method = RequestMethod.POST)
+    @PostMapping("/addCarousel")
     public String addCarouselPost(Model model, Principal principal, @RequestParam("file") MultipartFile file,
             @RequestParam(value = "eventName") String name, @RequestParam(name = "eventDesc") String desc) {
 
@@ -1888,7 +1879,7 @@ public class HomeController {
      * ADD Research Paper
      *************************************/
 
-    @RequestMapping(value = "/addResearchPaper", method = RequestMethod.GET)
+    @GetMapping("/addResearchPaper")
     public String addResearchPaperGet(Model model, Principal principal) {
         User usr = new User();
         if (principal != null) {
@@ -1907,7 +1898,7 @@ public class HomeController {
         return "addResearchPaper";
     }
 
-    @RequestMapping(value = "/addResearchPaper", method = RequestMethod.POST)
+    @PostMapping("/addResearchPaper")
     public String addResearchPaperPost(Model model, Principal principal,
             @RequestParam("researchFile") MultipartFile researchFile, @RequestParam(value = "title") String title,
             @RequestParam(name = "researchPaperDesc") String researchPaperDesc) {
@@ -1986,7 +1977,7 @@ public class HomeController {
      * ADD PROMOVIDEO
      *********************************/
 
-    @RequestMapping(value = "/addPromoVideo", method = RequestMethod.GET)
+    @GetMapping("/addPromoVideo")
     public String addPromoVideoGet(Model model, Principal principal) {
         User usr = new User();
         if (principal != null) {
@@ -2006,7 +1997,7 @@ public class HomeController {
         return "addPromoVideo";
     }
 
-    @RequestMapping(value = "/addPromoVideo", method = RequestMethod.POST)
+    @PostMapping("/addPromoVideo")
     public String addPromoVideoPost(Model model, Principal principal,
             @RequestParam("promoVideo") List<MultipartFile> promoVideos,
             @RequestParam(name = "languageName") List<Integer> languageIds,
@@ -2057,7 +2048,6 @@ public class HomeController {
 
         boolean filesError = false;
         boolean duplicatLanguage = false;
-        Language lan = lanService.getById(languageIds.get(0));
 
         int newPromoVideoId = promoVideoService.getNewId();
         PromoVideo promoVideoTemp = new PromoVideo();
@@ -2081,7 +2071,6 @@ public class HomeController {
                 if (!promoVideos.get(i).isEmpty()) {
 
                     String langName = lanService.getById(languageIds.get(i)).getLangName();
-                    PathofPromoVideo pathofPromoVideo = new PathofPromoVideo();
 
                     if (!promoVideos.get(i).isEmpty()) {
 
@@ -2170,7 +2159,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addBrochure", method = RequestMethod.GET)
+    @GetMapping("/addBrochure")
     public String addBrochureGet(Model model, Principal principal) {
         User usr = new User();
         if (principal != null) {
@@ -2194,8 +2183,6 @@ public class HomeController {
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
 
-        List<FilesofBrouchure> filesofbrochures = filesofbrouchureService.findAll();
-
         model.addAttribute("brouchures", brouchures);
         model.addAttribute("versions", versions);
         model.addAttribute("filesofbrouchureService", filesofbrouchureService);
@@ -2214,7 +2201,7 @@ public class HomeController {
      * @param languageId int value
      * @return String object
      */
-    @RequestMapping(value = "/addBrochure", method = RequestMethod.POST)
+    @PostMapping("/addBrochure")
     public String addBrochurePost(Model model, Principal principal,
             @RequestParam("brouchure") List<MultipartFile> brochures,
             @RequestParam(value = "categoryName") int categoryId, @RequestParam(name = "inputTopicName") int topicId,
@@ -2327,7 +2314,6 @@ public class HomeController {
                 if (!brochures.get(i).isEmpty()) {
 
                     String langName = lanService.getById(languageIds.get(i)).getLangName();
-                    FilesofBrouchure filesOfbrouchure = new FilesofBrouchure();
 
                     if (!brochures.get(i).isEmpty()) {
                         folder = CommonData.uploadBrouchure + newBroId + "/" + primaryVersion + "/" + "web" + "/"
@@ -2431,7 +2417,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addTopic", method = RequestMethod.GET)
+    @GetMapping("/addTopic")
     public String addTopicGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -2441,8 +2427,6 @@ public class HomeController {
             usr = userService.findByUsername(principal.getName());
         }
         List<TopicCategoryMapping> tcm = topicCatService.findAll();
-
-        TopicCategoryMapping tcp = new TopicCategoryMapping();
 
         model.addAttribute("userInfo", usr);
 
@@ -2496,7 +2480,7 @@ public class HomeController {
      * @param orderValue int value
      * @return String object
      */
-    @RequestMapping(value = "/addTopic", method = RequestMethod.POST)
+    @PostMapping("/addTopic")
     public String addTopicPost(Model model, Principal principal, @RequestParam(name = "topicId") int topicId,
             @RequestParam(name = "categoryName") int categoryId, @RequestParam(name = "topicName") String topicName,
             @RequestParam(name = "orderValue") int orderValue) {
@@ -2597,7 +2581,7 @@ public class HomeController {
      * return "updateTopic"; // need to accomdate view part }
      */
 
-    @RequestMapping(value = "/topic/edit/{topicCatId}", method = RequestMethod.GET)
+    @GetMapping("/topic/edit/{topicCatId}")
     public String editTopicGet(@PathVariable(name = "topicCatId") int topicCatId, Model model, Principal principal) {
 
         User usr = new User();
@@ -2631,7 +2615,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/updateTopic", method = RequestMethod.POST)
+    @PostMapping("/updateTopic")
     public String updateTopicPost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -2726,7 +2710,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addRole", method = RequestMethod.GET)
+    @GetMapping("/addRole")
     public String addRoleGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -2754,7 +2738,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addRole", method = RequestMethod.POST)
+    @PostMapping("/addRole")
     public String addRolePost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -2821,7 +2805,7 @@ public class HomeController {
      * @param principal principal object
      * @return Strig object (webpage)
      */
-    @RequestMapping(value = "/uploadQuestion", method = RequestMethod.GET)
+    @GetMapping("/uploadQuestion")
     public String addQuestionGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -2859,7 +2843,7 @@ public class HomeController {
      * @param languageId int value
      * @return string object
      */
-    @RequestMapping(value = "/uploadQuestion", method = RequestMethod.POST)
+    @PostMapping("/uploadQuestion")
     public String addQuestionPost(Model model, Principal principal, @RequestParam("questionName") MultipartFile quesPdf,
             @RequestParam(value = "categoryName") int categoryId, @RequestParam(name = "inputTopicName") int topicId,
             @RequestParam(name = "languageyName") int languageId) {
@@ -2978,7 +2962,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/question/edit/{catName}/{topicName}/{language}", method = RequestMethod.GET)
+    @GetMapping("/question/edit/{catName}/{topicName}/{language}")
     public String editQuestionGet(@PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan, Model model,
             Principal principal) {
@@ -3017,7 +3001,7 @@ public class HomeController {
      * @param quesPdf   MultipartFile object
      * @return String object
      */
-    @RequestMapping(value = "/updateQuestion", method = RequestMethod.POST)
+    @PostMapping("/updateQuestion")
     public String updateQuestionPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("questionName") MultipartFile quesPdf) {
 
@@ -3096,7 +3080,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (Webpage)
      */
-    @RequestMapping(value = "/addConsultant", method = RequestMethod.GET)
+    @GetMapping("/addConsultant")
     public String addConsultantGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -3131,7 +3115,7 @@ public class HomeController {
      * @param email     String object
      * @return String object
      */
-    @RequestMapping(value = "/addConsultant", method = RequestMethod.POST)
+    @PostMapping("/addConsultant")
     public String addConsultantPost(Model model, Principal principal, @RequestParam("nameConsaltant") String name,
             @RequestParam("lastname") String lastname, @RequestParam("categoryName") int catId,
             @RequestParam("lanName") int lanId, @RequestParam("email") String email, @RequestParam("desc") String desc,
@@ -3267,7 +3251,7 @@ public class HomeController {
         return "addConsultant";
     }
 
-    @RequestMapping(value = "/consultant/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/consultant/edit/{id}")
     public String editConsultant(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -3297,7 +3281,7 @@ public class HomeController {
         return "updateConsultant";
     }
 
-    @RequestMapping(value = "/updateConsultant", method = RequestMethod.POST)
+    @PostMapping("/updateConsultant")
     public String updateConnsultant(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("photo") MultipartFile file) {
 
@@ -3325,11 +3309,8 @@ public class HomeController {
         if (!file.isEmpty()) {
             try {
 
-                String pathSampleVideo = null;
                 ;
                 try {
-                    String folder1 = CommonData.uploadDirectoryConsultant;
-                    pathSampleVideo = ServiceUtility.uploadMediaFile(file, env, folder1);
 
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
@@ -3381,7 +3362,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object
      */
-    @RequestMapping(value = "/addEvent", method = RequestMethod.GET)
+    @GetMapping("/addEvent")
     public String addEventGet(Model model, Principal principal) {
         User usr = new User();
         if (principal != null) {
@@ -3412,7 +3393,7 @@ public class HomeController {
      * @param catName   int value
      * @return String (webpage)
      */
-    @RequestMapping(value = "/addEvent", method = RequestMethod.POST)
+    @PostMapping("/addEvent")
     public String addEventPost(Model model, Principal principal, HttpServletRequest req,
             @RequestParam("Image") MultipartFile files, @RequestParam(value = "inputTopic") int[] topicId,
             @RequestParam(value = "categoryName") int catName) {
@@ -3596,7 +3577,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/addTestimonial", method = RequestMethod.GET)
+    @GetMapping("/addTestimonial")
     public String addTestimonialGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -3631,7 +3612,7 @@ public class HomeController {
      * @param trainingId String
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addTestimonial", method = RequestMethod.POST)
+    @PostMapping("/addTestimonial")
     public String addTestimonialPost(Model model, Principal principal,
             @RequestParam("uploadTestimonial") MultipartFile file, @RequestParam("consent") MultipartFile consent,
             @RequestParam("testimonialName") String name, @RequestParam("description") String desc,
@@ -3755,7 +3736,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/category/edit/{catName}", method = RequestMethod.GET)
+    @GetMapping("/category/edit/{catName}")
     public String editCategoryGet(@PathVariable(name = "catName") String catName, Model model, Principal principal) {
 
         User usr = new User();
@@ -3787,7 +3768,7 @@ public class HomeController {
      * @param file      MultipartFile object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/updateCategory", method = RequestMethod.POST)
+    @PostMapping("/updateCategory")
     public String updateCategoryGet(Model model, Principal principal, HttpServletRequest req,
             @RequestParam("categoryImage") MultipartFile file) {
 
@@ -3875,7 +3856,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/eventDetails/{id}", method = RequestMethod.GET)
+    @GetMapping("/eventDetails/{id}")
     public String eventGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -3905,7 +3886,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/event", method = RequestMethod.GET)
+    @GetMapping("/event")
     public String viewEventGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -3931,7 +3912,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/event/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/event/edit/{id}")
     public String editEventGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -3970,7 +3951,7 @@ public class HomeController {
      * @param files     MultipartFile object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/updateEvent", method = RequestMethod.POST)
+    @PostMapping("/updateEvent")
     public String updateEventGet(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("Image") MultipartFile files) {
 
@@ -4080,7 +4061,7 @@ public class HomeController {
      * Edit Section of PromoVideo
      **********************/
 
-    @RequestMapping(value = "/promoVideo/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/promoVideo/edit/{id}")
     public String promoVideoGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -4115,7 +4096,7 @@ public class HomeController {
         return "updatePromoVideo";
     }
 
-    @RequestMapping(value = "/updatePromoVideo", method = RequestMethod.POST)
+    @PostMapping("/updatePromoVideo")
     public String updatePromoVideoGet(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam("promoVideo") List<MultipartFile> promoVideoFiles) {
@@ -4283,7 +4264,7 @@ public class HomeController {
      * Author: Alok Kumar
      */
 
-    @RequestMapping(value = "/brochure/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/brochure/edit/{id}")
     public String BrochureGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -4383,7 +4364,7 @@ public class HomeController {
      * Author: Alok Kumar
      * 
      */
-    @RequestMapping(value = "/updateBrochure", method = RequestMethod.POST)
+    @PostMapping("/updateBrochure")
     public String updatBrochureGet(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam("brouchure") List<MultipartFile> brochures) {
@@ -4744,7 +4725,7 @@ public class HomeController {
      * Edit Section of Research Paper
      ********************************/
 
-    @RequestMapping(value = "/researchPaper/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/researchPaper/edit/{id}")
     public String editResearchPaerGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -4773,7 +4754,7 @@ public class HomeController {
         return "updateResearchPaper";
     }
 
-    @RequestMapping(value = "/updateResearchPaper", method = RequestMethod.POST)
+    @PostMapping("/updateResearchPaper")
     public String updateResearchPaperPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("researchFile") MultipartFile researchFile) {
 
@@ -4848,7 +4829,7 @@ public class HomeController {
      * Author: Alok Kumar
      */
 
-    @RequestMapping(value = "/carousel/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/carousel/edit/{id}")
     public String editCarouselGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -4881,7 +4862,7 @@ public class HomeController {
      * Author:Alok Kumar
      */
 
-    @RequestMapping(value = "/updateCarousel", method = RequestMethod.POST)
+    @PostMapping("/updateCarousel")
     public String updateCaroUselPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("Image") MultipartFile files) {
 
@@ -4967,7 +4948,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/language/edit/{lanName}", method = RequestMethod.GET)
+    @GetMapping("/language/edit/{lanName}")
     public String editLanguageGet(@PathVariable(name = "lanName") String lanTemp, Model model, Principal principal) {
 
         User usr = new User();
@@ -4998,7 +4979,7 @@ public class HomeController {
      * @param req       HttpServletRequest object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/updateLanguage", method = RequestMethod.POST)
+    @PostMapping("/updateLanguage")
     public String updateLanguagePost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -5073,7 +5054,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/domainReviewer", method = RequestMethod.GET)
+    @GetMapping("/domainReviewer")
     public String viewDomaineGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5109,7 +5090,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/qualityReviewer", method = RequestMethod.GET)
+    @GetMapping("/qualityReviewer")
     public String viewQualityeGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5144,7 +5125,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/masterTrainer", method = RequestMethod.GET)
+    @GetMapping("/masterTrainer")
     public String viewMasterTrainerGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5171,7 +5152,7 @@ public class HomeController {
      * VIEW SECTION OF QUESTIONNAIRE
      ************************************/
 
-    @RequestMapping(value = "/downloadQuestion", method = RequestMethod.GET)
+    @GetMapping("/downloadQuestion")
     public String PostQuestionaireGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5210,7 +5191,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/testimonialList", method = RequestMethod.GET)
+    @GetMapping("/testimonialList")
     public String viewtestimonialListGet(Model model, Principal principal) {
         List<Testimonial> test = new ArrayList<>();
         List<Testimonial> test1 = testService.findAll();
@@ -5241,7 +5222,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/testimonial/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/testimonial/edit/{id}")
     public String edittestimonialGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -5280,7 +5261,7 @@ public class HomeController {
      * @param file      MultipartFile object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/updateTestimonial", method = RequestMethod.POST)
+    @PostMapping("/updateTestimonial")
     public String updatetestimonialGet(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("TestimonialVideo") MultipartFile file, @RequestParam("consent") MultipartFile consent) {
 
@@ -5369,7 +5350,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addContributorRole", method = RequestMethod.GET)
+    @GetMapping("/addContributorRole")
     public String addContributorGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5395,7 +5376,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addContributorRole", method = RequestMethod.POST)
+    @PostMapping("/addContributorRole")
     public String addContributorPost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -5468,7 +5449,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addExternalContributorRole", method = RequestMethod.GET)
+    @GetMapping("/addExternalContributorRole")
     public String addExternalContributorGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5494,7 +5475,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addExternalContributorRole", method = RequestMethod.POST)
+    @PostMapping("/addExternalContributorRole")
     public String addExternalContributorPost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -5568,7 +5549,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addAdminRole", method = RequestMethod.GET)
+    @GetMapping("/addAdminRole")
     public String addAdminPost(Model model, Principal principal) {
 
         User usr = new User();
@@ -5597,7 +5578,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addAdminRole", method = RequestMethod.POST)
+    @PostMapping("/addAdminRole")
     public String addAdminPost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -5692,7 +5673,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addDomainRole", method = RequestMethod.GET)
+    @GetMapping("/addDomainRole")
     public String addDomainGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5722,7 +5703,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addDomainRole", method = RequestMethod.POST)
+    @PostMapping("/addDomainRole")
     public String addDomainPost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -5834,7 +5815,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addQualityRole", method = RequestMethod.GET)
+    @GetMapping("/addQualityRole")
     public String addQualityGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -5864,7 +5845,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addQualityRole", method = RequestMethod.POST)
+    @PostMapping("/addQualityRole")
     public String addQualityPost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -5965,7 +5946,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addMasterTrainerRole", method = RequestMethod.GET)
+    @GetMapping("/addMasterTrainerRole")
     public String addMasterTrainerGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -6009,7 +5990,7 @@ public class HomeController {
      * @param req       HttpServletRequest
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addMasterTrainerRole", method = RequestMethod.POST)
+    @PostMapping("/addMasterTrainerRole")
     public String addMasterTrainerPost(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -6134,7 +6115,6 @@ public class HomeController {
             model.addAttribute("error_msg", "Error in submitting request");
             // throw error
         }
-        List<IndianLanguage> languages = iLanService.findAll();
 
         model.addAttribute("userInfo", usr);
         model.addAttribute("success_msg", "Request submitted for role successfully");
@@ -6157,7 +6137,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/approveRole", method = RequestMethod.GET)
+    @GetMapping("/approveRole")
     public String approveRoleGet(Model model, Principal principal) {
 
         User usr = new User();
@@ -6223,7 +6203,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/assignContributor/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/assignContributor/edit/{id}")
     public String editAssignContributor(@PathVariable Long id, Model model, Principal principal) {
 
         User usr = new User();
@@ -6248,7 +6228,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/assignTutorialToContributor", method = RequestMethod.GET)
+    @GetMapping("/assignTutorialToContributor")
     public String assignTutorialToContributoreGet(Model model, Principal principal) {
 
         model.addAttribute("userInfo", getUser(principal, userService));
@@ -6282,7 +6262,7 @@ public class HomeController {
      * @param topics          list of String object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/assignTutorialToContributor", method = RequestMethod.POST)
+    @PostMapping("/assignTutorialToContributor")
     public String assignTutorialToContributorePost(Model model, Principal principal,
             @RequestParam(name = "contributorName") String contributorName,
             @RequestParam(name = "languageName") String lanName,
@@ -6322,7 +6302,7 @@ public class HomeController {
         Language lan = lanService.getByLanName(lanName);
         Category cat = catService.findByid(Integer.parseInt(catName));
         User userAssigned = userService.findByUsername(contributorName);
-        Set<ContributorAssignedTutorial> conTutorials = new HashSet<ContributorAssignedTutorial>();
+
         int conNewId = conRepo.getNewId();
         int conMutliUserNewId = conMultiUser.getNewId();
 
@@ -6398,7 +6378,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/uploadTutorial", method = RequestMethod.GET)
+    @GetMapping("/uploadTutorial")
     public String uploadTutorialGet(Model model, Principal principal) {
         User usr = getUser(principal, userService);
         model.addAttribute("userInfo", usr);
@@ -6463,7 +6443,7 @@ public class HomeController {
      * @param langName     String object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/uploadTutorial", method = RequestMethod.POST)
+    @PostMapping("/uploadTutorial")
     public String uploadTutorialPost(Model model, Principal principal,
             @RequestParam(value = "categoryName") String categoryName, @RequestParam(name = "inputTopic") int topicId,
             @RequestParam(name = "inputLanguage") String langName) {
@@ -6537,7 +6517,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "listTutorialForContributorReview", method = RequestMethod.GET)
+    @GetMapping("listTutorialForContributorReview")
     public String listContributorReviewTutorialGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -6576,7 +6556,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "Contributor/review/{catName}/{topicName}/{language}", method = RequestMethod.GET)
+    @GetMapping("Contributor/review/{catName}/{topicName}/{language}")
     public String listContributorReviewTutorialGet(@PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan, Model model,
             Principal principal) {
@@ -6628,9 +6608,11 @@ public class HomeController {
         if (tutorial.getVideo() != null) {
 
             IContainer container = IContainer.make();
-            int result = 10;
-            result = container.open(env.getProperty("spring.applicationexternalPath.name") + tutorial.getVideo(),
-                    IContainer.Type.READ, null);
+            // int result = 10;
+            // result =
+            // container.open(env.getProperty("spring.applicationexternalPath.name") +
+            // tutorial.getVideo(),
+            // IContainer.Type.READ, null);
 
             IStream stream = container.getStream(0);
             IStreamCoder coder = stream.getStreamCoder();
@@ -6689,7 +6671,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "listTutorialForAdminReview", method = RequestMethod.GET)
+    @GetMapping("listTutorialForAdminReview")
     public String listAdminReviewTutorialGet(Model model, Principal principal) {
         User usr = getUser(principal, userService);
         model.addAttribute("userInfo", usr);
@@ -6729,7 +6711,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "adminreview/review/{tutorialId}", method = RequestMethod.GET)
+    @GetMapping("adminreview/review/{tutorialId}")
     public String listAdminReviewTutorialGet(@PathVariable int tutorialId, Model model, Principal principal) {
         User usr = getUser(principal, userService);
         model.addAttribute("userInfo", usr);
@@ -6785,7 +6767,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "listTutorialForDomainReview", method = RequestMethod.GET)
+    @GetMapping("listTutorialForDomainReview")
     public String listDomainReviewTutorialGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -6841,7 +6823,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "domainreview/review/{tutorialId}", method = RequestMethod.GET)
+    @GetMapping("domainreview/review/{tutorialId}")
     public String listDomainReviewTutorialGet(@PathVariable int tutorialId, Model model, Principal principal) {
         User usr = getUser(principal, userService);
         model.addAttribute("userInfo", usr);
@@ -6895,7 +6877,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "listTutorialForQualityReview", method = RequestMethod.GET)
+    @GetMapping("listTutorialForQualityReview")
     public String listQualityReviewTutorialGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -6956,7 +6938,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "tutorialToPublish", method = RequestMethod.GET)
+    @GetMapping("tutorialToPublish")
     public String tutorialToPublishGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -7005,7 +6987,7 @@ public class HomeController {
      * @param redirectAttributes RedirectAttributes object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "publish/{id}", method = RequestMethod.GET)
+    @GetMapping("publish/{id}")
     public String publishTutorialGet(@PathVariable int id, Model model, Principal principal,
             RedirectAttributes redirectAttributes) {
         User usr = new User();
@@ -7162,7 +7144,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "qualityreview/review/{tutorialId}", method = RequestMethod.GET)
+    @GetMapping("qualityreview/review/{tutorialId}")
     public String listQualityReviewTutorialGet(@PathVariable int tutorialId, Model model, Principal principal) {
 
         User usr = getUser(principal, userService);
@@ -7210,7 +7192,7 @@ public class HomeController {
      * OPERATION AT MASTER TRAINER
      ******************************************/
 
-    @RequestMapping(value = "/trainerProfile", method = RequestMethod.GET)
+    @GetMapping("/trainerProfile")
     public String profileMasterTrainerGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -7232,7 +7214,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/masterTrainerOperation", method = RequestMethod.GET)
+    @GetMapping("/masterTrainerOperation")
     public String MasterTrainerGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -7269,7 +7251,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/details", method = RequestMethod.GET)
+    @GetMapping("/details")
     public String MasterTrainerDetailsGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -7301,7 +7283,7 @@ public class HomeController {
      * @param lanName   String object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/downloadQuestion", method = RequestMethod.POST)
+    @PostMapping("/downloadQuestion")
     public String downloadQuestionPost(Model model, Principal principal,
             @RequestParam(value = "catMasterId") int catName, @RequestParam(value = "lanMasterTrId") int topicId,
             @RequestParam(value = "dwnByLanguageId") String lanName) {
@@ -7345,7 +7327,7 @@ public class HomeController {
      * @param principal Principal Object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/viewTrainee", method = RequestMethod.GET)
+    @GetMapping("/viewTrainee")
     public String downloadQuestionPost(Model model, Principal principal) {
         User usr = new User();
 
@@ -7373,7 +7355,7 @@ public class HomeController {
      * @param principal principal object
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/trainee/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/trainee/edit/{id}")
     public String editTraineeGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -7410,7 +7392,7 @@ public class HomeController {
      * @param req       HttpServletRequest object
      * @return String object (Webpage)
      */
-    @RequestMapping(value = "/updateTrainee", method = RequestMethod.POST)
+    @PostMapping("/updateTrainee")
     public String editTraineeGet(Model model, Principal principal, HttpServletRequest req) {
 
         User usr = new User();
@@ -7482,7 +7464,7 @@ public class HomeController {
      * @param totaltrainee        int value
      * @return String object (webpage)
      */
-    @RequestMapping(value = "/addTrainingInfo", method = RequestMethod.POST)
+    @PostMapping("/addTrainingInfo")
     public String addTrainingInfoPost(Model model, Principal principal,
             @RequestParam("ParticipantsPhoto") MultipartFile trainingImage,
             @RequestParam("traineeInformation") MultipartFile traineeInfo, @RequestParam(value = "event") int eventId,
@@ -7526,7 +7508,7 @@ public class HomeController {
 
         try {
             trainingInfoService.save(trainingData);
-            int trainingTopicId = trainingTopicServ.getNewId();
+
             trainingInfoService.save(trainingData);
 
             String folder = CommonData.uploadDirectoryMasterTrainer + newTrainingdata;
@@ -7577,7 +7559,7 @@ public class HomeController {
      * @param desc          String object
      * @return String object (Webpage)
      */
-    @RequestMapping(value = "/uploadfeedback", method = RequestMethod.POST)
+    @PostMapping("/uploadfeedback")
     public String uploadFeedbackPost(Model model, Principal principal, @RequestParam(value = "catMasId") int catId,
             @RequestParam(value = "feedbackmasterId") int trainingTitle,
             @RequestParam(value = "feedbackForm") MultipartFile feedbackFile,
@@ -7641,7 +7623,7 @@ public class HomeController {
      * @param postQuestions MultipartFile object
      * @return String object(Webpage)
      */
-    @RequestMapping(value = "/uploadPostQuestionaire", method = RequestMethod.POST)
+    @PostMapping("/uploadPostQuestionaire")
     public String uploadQuestionPost(Model model, Principal principal, @RequestParam(value = "catMasPostId") int catId,
             @RequestParam(value = "postTraining") int trainingTitle,
             @RequestParam(value = "postQuestions") MultipartFile postQuestions) {
@@ -7706,7 +7688,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object(Webpage)
      */
-    @RequestMapping(value = "/assignRoleToAdmin", method = RequestMethod.GET)
+    @GetMapping("/assignRoleToAdmin")
     public String assignRoleToDomainGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -7737,7 +7719,7 @@ public class HomeController {
      * @param lan       String object
      * @return String object(Webpage)
      */
-    @RequestMapping(value = "/assignRoleToAdmin", method = RequestMethod.POST)
+    @PostMapping("/assignRoleToAdmin")
     public String assignRoleToDomainPost(Model model, Principal principal, @RequestParam(value = "category") String cat,
             @RequestParam(value = "language") String lan) {
         User usr = new User();
@@ -7816,7 +7798,7 @@ public class HomeController {
      * @param principal Principal object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/profile", method = RequestMethod.GET)
+    @GetMapping("/profile")
     public String profileUserGet(Model model, Principal principal) {
         User usr = new User();
 
@@ -7884,7 +7866,7 @@ public class HomeController {
      * @param desc      String object
      * @return String object(Webpage)
      */
-    @RequestMapping(value = "/profile", method = RequestMethod.POST)
+    @PostMapping("/profile")
     public String updateuserdataPost(HttpServletRequest req, Model model, Principal principal,
             @ModelAttribute("firstName") String firstName, @ModelAttribute("lastName") String lastName,
             @ModelAttribute("phone") String phone, @ModelAttribute("address") String address,
@@ -8118,7 +8100,7 @@ public class HomeController {
 
         List<Brouchure> brouchures = broService.findAllBrouchuresForCache();
         List<Language> languages = lanService.getAllLanguages();
-        List<Version> allVersions = verService.findAll();
+
         List<Version> versions = new ArrayList<Version>();
         for (Brouchure bro : brouchures) {
             Version ver = verService.findByBrouchureAndPrimaryVersion(bro, bro.getPrimaryVersion());
@@ -8201,7 +8183,7 @@ public class HomeController {
      * @param model     Model object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/training/edit/{id}", method = RequestMethod.GET)
+    @GetMapping("/training/edit/{id}")
     public String editTrainingGet(@PathVariable int id, Model model, Principal principal) {
 
         User usr = new User();
@@ -8243,7 +8225,7 @@ public class HomeController {
      * @param trainingId   int value
      * @return String object(Webpage)
      */
-    @RequestMapping(value = "/updateTraining", method = RequestMethod.POST)
+    @PostMapping("/updateTraining")
     public String updateTrainingPost(Model model, Principal principal, @RequestParam(value = "stateName") int state,
             @RequestParam(value = "districtName") int district, @RequestParam(value = "cityName") int city,
             @RequestParam(value = "totalPar") int totaltrainee,
@@ -8335,7 +8317,7 @@ public class HomeController {
      * @param model     Model object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/tutorialStatus/{id}", method = RequestMethod.GET)
+    @GetMapping("/tutorialStatus/{id}")
     public String publishTutorial(@PathVariable int id, Principal principal, Model model) {
 
         User usr = new User();
@@ -8412,7 +8394,7 @@ public class HomeController {
      * @param model     Model object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/uploadTimescript", method = RequestMethod.GET)
+    @GetMapping("/uploadTimescript")
     public String uploadTimescriptGet(Principal principal, Model model) {
 
         User usr = new User();
@@ -8454,7 +8436,7 @@ public class HomeController {
      * @param model     Model object
      * @return String object(webpage)
      */
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @GetMapping("/users")
     public String usersGet(Principal principal, Model model) {
 
         User usr = new User();
@@ -8470,7 +8452,6 @@ public class HomeController {
         model.addAttribute("users", allUser);
         model.addAttribute("usrRoleService", usrRoleService);
 
-        Set<UserRole> ur;
         for (User user : allUser) {
             logger.info("*******************************************");
             logger.info("UserName and fullName {} {}", user.getUsername(), user.getFullName());
@@ -8499,7 +8480,7 @@ public class HomeController {
         return "showUsers";
     }
 
-    @RequestMapping(value = "/statistics", method = RequestMethod.GET)
+    @GetMapping("/statistics")
     public String statistics(Principal principal, Model model,
             @RequestParam(name = "categoryId", defaultValue = "0") int categoryId,
             @RequestParam(name = "languageId", defaultValue = "0") int languageId) {
@@ -8630,7 +8611,7 @@ public class HomeController {
         return "statistics";
     }
 
-    @RequestMapping(value = "/cdContentInfo", method = RequestMethod.GET)
+    @GetMapping("/cdContentInfo")
     public String cdContentInfoGet(Principal principal, Model model) {
 
         User usr = new User();
@@ -8653,7 +8634,7 @@ public class HomeController {
         return "cdContent";
     }
 
-    @RequestMapping(value = "/cdContentInfo", method = RequestMethod.POST)
+    @PostMapping("/cdContentInfo")
     public String cdContentInfoPost(@RequestParam(name = "categoryName") String category,
             @RequestParam(name = "lan") String language, Principal principal, Model model) {
 
@@ -8720,7 +8701,7 @@ public class HomeController {
         return "cdContent";
     }
 
-    @RequestMapping(value = "/unpublishTopic", method = RequestMethod.GET)
+    @GetMapping("/unpublishTopic")
     public String unpublishTopic(Model model, Principal principal) {
 
         User usr = getUser(principal, userService);
@@ -8754,7 +8735,6 @@ public class HomeController {
         for (LogManegement l : lms) {
             if (!l.getTutorialInfos().isStatus()) {
                 tutorials.add(l.getTutorialInfos());
-                Tutorial t = l.getTutorialInfos();
 
             }
         }
@@ -8769,7 +8749,7 @@ public class HomeController {
 
     }
 
-    @RequestMapping(value = "/unpublishTopic", method = RequestMethod.POST)
+    @PostMapping("/unpublishTopic")
     public String unpublishTopicPost(HttpServletRequest request, @ModelAttribute("category") Integer categoryId,
             @ModelAttribute("topic") Integer topicId, @ModelAttribute("language") String language, Model model,
             Principal principal) {
@@ -8792,8 +8772,7 @@ public class HomeController {
         model.addAttribute("tutorial_id", t.getTutorialId());
 
         List<Category> categories_lst = catService.findAll();
-        List<String> categories = new ArrayList<String>();
-        ;
+
         HashMap<Integer, String> map = new HashMap<>();
         for (Category c : categories_lst) {
             map.put(c.getCategoryId(), c.getCatName());

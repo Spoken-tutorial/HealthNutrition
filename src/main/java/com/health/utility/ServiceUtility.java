@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.health.model.User;
 import com.health.repository.UserRepository;
-import com.health.service.LogMangementService;
 
 /**
  * Utility class
@@ -53,9 +52,6 @@ public class ServiceUtility {
 
     @Autowired
     private JavaMailSender mailSender;
-
-    @Autowired
-    private LogMangementService logMangementService;
 
     public static Timestamp getCurrentTime() { // Current Date
 

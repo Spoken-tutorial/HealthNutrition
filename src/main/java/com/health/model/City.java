@@ -23,6 +23,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class City implements Comparable<City>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -87,8 +89,14 @@ public class City implements Comparable<City>, Serializable {
 
     @Override
     public String toString() {
-        return "City [id=" + id + ", dateAdded=" + dateAdded + ", cityName=" + cityName + ", district=" + district
-                + ", events=" + events + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("City [id=").append(id);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", cityName=").append(cityName);
+        sb.append(", district=").append(district);
+        sb.append(", events=").append(events);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

@@ -26,6 +26,9 @@ import com.health.model.User;
 @Entity
 @Table(name = "user_role")
 public class UserRole implements Comparable<UserRole>, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */

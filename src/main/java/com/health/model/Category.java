@@ -27,6 +27,8 @@ import com.health.domain.security.UserRole;
 @Table(name = "category")
 public class Category implements Comparable<Category>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id to identify object
      */
@@ -170,10 +172,19 @@ public class Category implements Comparable<Category>, Serializable {
 
     @Override
     public String toString() {
-        return "Category [categoryId=" + categoryId + ", catName=" + catName + ", dateAdded=" + dateAdded + ", status="
-                + status + ", posterPath=" + posterPath + ", description=" + description + ", user=" + user
-                + ", topicCategoryMap=" + topicCategoryMap + ", userRoles=" + userRoles + ", brochures=" + brochures
-                + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Category [categoryId=").append(categoryId);
+        sb.append(", catName=").append(catName);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", status=").append(status);
+        sb.append(", posterPath=").append(posterPath);
+        sb.append(", description=").append(description);
+        sb.append(", user=").append(user);
+        sb.append(", topicCategoryMap=").append(topicCategoryMap);
+        sb.append(", userRoles=").append(userRoles);
+        sb.append(", brochures=").append(brochures);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

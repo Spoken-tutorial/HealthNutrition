@@ -15,6 +15,8 @@ import javax.persistence.Id;
 @Entity
 public class Carousel implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id to identify object
      */
@@ -85,8 +87,14 @@ public class Carousel implements Serializable {
 
     @Override
     public String toString() {
-        return "Carousel [id=" + id + ", posterPath=" + posterPath + ", showOnHomepage=" + showOnHomepage
-                + ", eventName=" + eventName + ", description=" + description + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Carousel [id=").append(id);
+        sb.append(", posterPath=").append(posterPath);
+        sb.append(", showOnHomepage=").append(showOnHomepage);
+        sb.append(", eventName=").append(eventName);
+        sb.append(", description=").append(description);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

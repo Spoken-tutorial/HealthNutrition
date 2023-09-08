@@ -20,6 +20,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class PostQuestionaire implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -99,8 +101,14 @@ public class PostQuestionaire implements Serializable {
 
     @Override
     public String toString() {
-        return "PostQuestionaire [id=" + id + ", questionPath=" + questionPath + ", dateAdded=" + dateAdded
-                + ", traineeInfos=" + traineeInfos + ", user=" + user + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("PostQuestionaire [id=").append(id);
+        sb.append(", questionPath=").append(questionPath);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", traineeInfos=").append(traineeInfos);
+        sb.append(", user=").append(user);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

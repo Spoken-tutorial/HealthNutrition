@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -652,12 +651,12 @@ public class AjaxController {
             @RequestParam(value = "traineeId") int traineeId) {
         List<String> status = new ArrayList<String>();
 
-        User usr = new User();
+        // User usr = new User();
 
-        if (principal != null) {
+        // if (principal != null) {
 
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        // usr = usrservice.findByUsername(principal.getName());
+        // }
 
         long aadharNumber = Long.parseLong(addharNo);
         long phoneNumber = Long.parseLong(phone);
@@ -737,6 +736,7 @@ public class AjaxController {
      * @param id int
      * @return list of string
      */
+
     @RequestMapping("/loadTraineeByTrainingId")
     public @ResponseBody List<TraineeInformation> getTraineeInfoOnTrainingId(@RequestParam(value = "id") int id) {
 
@@ -760,6 +760,7 @@ public class AjaxController {
      * @param id int
      * @return HashMap
      */
+
     @RequestMapping("/loadTitleNameInMasterTraining")
     public @ResponseBody HashMap<Integer, String> getTopicNameFromMasterTrainer(@RequestParam(value = "id") int id) {
 
@@ -791,6 +792,7 @@ public class AjaxController {
      * @param id int
      * @return HashMap
      */
+
     @RequestMapping("/loadDistrictByState")
     public @ResponseBody HashMap<Integer, String> getDistrictByState(@RequestParam(value = "id") int id) {
 
@@ -814,6 +816,7 @@ public class AjaxController {
      * @param id int
      * @return HashMap
      */
+
     @RequestMapping("/loadCityByDistrict")
     public @ResponseBody HashMap<Integer, String> getCityByDistrict(@RequestParam(value = "id") int id) {
 
@@ -837,6 +840,7 @@ public class AjaxController {
      * @param id int
      * @return HashMap
      */
+
     @RequestMapping("/loadTopicByCategory")
     public @ResponseBody HashMap<Integer, String> getTopicByCategory(@RequestParam(value = "id") int id) {
 
@@ -847,7 +851,7 @@ public class AjaxController {
         List<TopicCategoryMapping> local = topicCatService.findAllByCategory(cat);
         List<ContributorAssignedTutorial> cat_list = conService.findAllByTopicCat(local);
         List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
-        HashSet<Topic> topics = new HashSet<>();
+        // HashSet<Topic> topics = new HashSet<>();
         for (Tutorial t : tutorials) {
             topicName.put(t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),
                     t.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
@@ -900,6 +904,7 @@ public class AjaxController {
     /*
      * Function to load Topic and Language by category Author: Alok Kumar
      */
+
     @RequestMapping("/loadTopicAndLanguageByCategory")
     @Cacheable(cacheNames = "categories", key = "{#root.methodName, #catId, #topicId, #languageId }")
     public @ResponseBody ArrayList<Map<String, Integer>> getTopicAndLanguageByCategory(
@@ -1178,6 +1183,7 @@ public class AjaxController {
      * A new function by to load topic by Category
      * 
      */
+
     @RequestMapping("/loadTopicByCategoryInAddTopic")
     public @ResponseBody TreeMap<String, Integer> getTopicByCategoryAddTopic(@RequestParam(value = "id") int id) {
 
@@ -1206,6 +1212,7 @@ public class AjaxController {
      * @return hashMao
      * 
      */
+
     @RequestMapping("/loadTopicByCategoryPreRequistic")
     public @ResponseBody HashMap<Integer, String> getTopicByCategoryPreRequistic(@RequestParam(value = "id") String id,
             @RequestParam(value = "tutorialId") int tutorialId, @RequestParam(value = "langName") String langName) {
@@ -1259,6 +1266,7 @@ public class AjaxController {
      * @param id int
      * @return String object
      */
+
     @RequestMapping("/enableRoleById")
     public @ResponseBody String enableRoleById(@RequestParam(value = "id") long id) {
 
@@ -1295,6 +1303,7 @@ public class AjaxController {
      * @param id int
      * @return String
      */
+
     @RequestMapping("/deleteRole")
     public @ResponseBody String deleteMasterRoleById(@RequestParam(value = "id") long id) {
 
@@ -1344,6 +1353,7 @@ public class AjaxController {
      * @param username string
      * @return list of string
      */
+
     @RequestMapping("/loadLanguageByUser")
     public @ResponseBody List<String> getLanguageByContributor(@RequestParam(value = "id") String username) {
 
@@ -1369,6 +1379,7 @@ public class AjaxController {
      * 
      * @return hashmap
      */
+
     @RequestMapping("/loadCategory")
     public @ResponseBody HashMap<Integer, String> getCategory() {
 
@@ -1393,6 +1404,7 @@ public class AjaxController {
      * @param principal Principal object
      * @return hashmap
      */
+
     @RequestMapping("/loadTopicByCategoryOnContributorRole")
     public @ResponseBody HashMap<Integer, String> getTopicByCategoryOnContributorRole(
             @RequestParam(value = "id") String catName, Principal principal) {
@@ -1437,6 +1449,7 @@ public class AjaxController {
      * @param principal Principal object
      * @return Set
      */
+
     @RequestMapping("/loadLanguageForContributorRoleTutorial")
     public @ResponseBody Set<String> getLanguageByContributorRole(@RequestParam(value = "id") String catName,
             @RequestParam(value = "topicId") int topicId, Principal principal) {
@@ -1475,6 +1488,7 @@ public class AjaxController {
      * @param tutorialId int
      * @return string
      */
+
     @RequestMapping("/viewOutline")
     public @ResponseBody String viewOutline(@RequestParam(value = "id") int tutorialId) {
 
@@ -1497,7 +1511,7 @@ public class AjaxController {
      * @param principal   principal object
      * @return string
      */
-    @RequestMapping(value = "/addOutline", method = RequestMethod.POST)
+    @PostMapping("/addOutline")
     public @ResponseBody HashMap<String, String> addOutline(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "saveOutline") String outlineData,
             @RequestParam(value = "categoryname") String catName, @RequestParam(value = "topicid") int topicId,
@@ -1510,7 +1524,7 @@ public class AjaxController {
         logger.info("Outline length: outline {}", outlineData.length());
 
         Category cat = catService.findBycategoryname(catName);
-        int catId = cat.getCategoryId();
+
         Topic topic = topicService.findById(topicId);
         TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat, topic);
         Language language = langService.getByLanName(lang);
@@ -1559,6 +1573,7 @@ public class AjaxController {
      * @param tutorialId int
      * @return string
      */
+
     @RequestMapping("/viewKeyword")
     public @ResponseBody String viewkeyword(@RequestParam(value = "id") int tutorialId) {
 
@@ -1581,6 +1596,7 @@ public class AjaxController {
      * @param principal   principal object
      * @return string
      */
+
     @RequestMapping("/addKeyword")
     public @ResponseBody HashMap<String, String> addKeyword(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "savekeyword") String keywordData,
@@ -1613,6 +1629,7 @@ public class AjaxController {
      * @param principal  Principal object
      * @return String object
      */
+
     @RequestMapping("/addPreRequisticWhenNotRequired")
     public @ResponseBody HashMap<String, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "categoryname") String catName, @RequestParam(value = "topicid") int topicId,
@@ -1647,6 +1664,7 @@ public class AjaxController {
      * @param principal  Principal object
      * @return string
      */
+
     @RequestMapping("/addPreRequistic")
     public @ResponseBody HashMap<String, String> addPreRequistic(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "categoryname") String catName, @RequestParam(value = "topicid") int topicId,
@@ -1684,6 +1702,7 @@ public class AjaxController {
      * @param principal  Principal object
      * @return string
      */
+
     @RequestMapping("/addVideo")
     public @ResponseBody HashMap<String, String> addKeyword(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "videoFileName") MultipartFile videoFile,
@@ -1730,6 +1749,7 @@ public class AjaxController {
      * @param principal  Principal object
      * @return string
      */
+
     @RequestMapping("/addSlide")
     public @ResponseBody HashMap<String, String> addSlide(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "uploadsSlideFile") MultipartFile videoFile,
@@ -1774,6 +1794,7 @@ public class AjaxController {
      * @param principal  Principal object
      * @return string
      */
+
     @RequestMapping("/addScript")
     public @ResponseBody HashMap<String, String> addScript(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "categoryname") String catName, @RequestParam(value = "topicid") int topicId,
@@ -1800,7 +1821,8 @@ public class AjaxController {
      * @param principal  Principal object
      * @return String
      */
-    @RequestMapping("/acceptAdminVideo")
+
+    @GetMapping("/acceptAdminVideo")
     public @ResponseBody HashMap<String, String> addAdminVideo(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         User usr = getUser(principal);
@@ -2450,12 +2472,12 @@ public class AjaxController {
     public @ResponseBody String addTimeScript(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "uploadsScriptFile") MultipartFile File, Principal principal) {
 
-        User usr = new User();
+        // User usr = new User();
 
-        if (principal != null) {
+        // if (principal != null) {
 
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        // usr = usrservice.findByUsername(principal.getName());
+        // }
         logger.info("Time Script: tut id {}", tutorialId);
         if (tutorialId != 0) {
             Tutorial tut = tutService.getById(tutorialId);
@@ -2501,10 +2523,12 @@ public class AjaxController {
 //	    }
 //	}
 //	intern end
-    private String getSiteURL(HttpServletRequest request) {
-        String siteURL = request.getRequestURL().toString();
-        return siteURL.replace(request.getServletPath(), "");
-    }
+
+    /*
+     * private String getSiteURL(HttpServletRequest request) { String siteURL =
+     * request.getRequestURL().toString(); return
+     * siteURL.replace(request.getServletPath(), ""); }
+     */
 
     /***********************************
      * END

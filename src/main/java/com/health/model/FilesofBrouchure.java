@@ -122,7 +122,12 @@ public class FilesofBrouchure {
 
     @Override
     public String toString() {
-        return "FilesofBrouchure [broFileId=" + broFileId + ", version=" + version + ", lan=" + lan + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("FilesofBrouchure [broFileId=").append(broFileId);
+        sb.append(", version=").append(version);
+        sb.append(", lan=").append(lan);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

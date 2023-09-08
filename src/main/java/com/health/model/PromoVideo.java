@@ -159,7 +159,12 @@ public class PromoVideo {
 
     @Override
     public String toString() {
-        return "PromoVideo [promoId=" + promoId + ", title=" + title + ", dateAdded=" + dateAdded + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("PromoVideo [promoId=").append(promoId);
+        sb.append(", title=").append(title);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

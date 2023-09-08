@@ -18,6 +18,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class TrainingTopic implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -107,8 +109,13 @@ public class TrainingTopic implements Serializable {
 
     @Override
     public String toString() {
-        return "TrainingTopic [trainingTopicId=" + trainingTopicId + ", topicCatId=" + topicCatId + ", traineeInfos="
-                + traineeInfos + ", event=" + event + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("TrainingTopic [trainingTopicId=").append(trainingTopicId);
+        sb.append(", topicCatId=").append(topicCatId);
+        sb.append(", traineeInfos=").append(traineeInfos);
+        sb.append(", event=").append(event);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

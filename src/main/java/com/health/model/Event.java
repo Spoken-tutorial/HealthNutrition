@@ -25,6 +25,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class Event implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -317,12 +319,29 @@ public class Event implements Serializable {
 
     @Override
     public String toString() {
-        return "Event [eventId=" + eventId + ", eventName=" + eventName + ", description=" + description + ", location="
-                + location + ", contactPerson=" + contactPerson + ", contactNumber=" + contactNumber + ", email="
-                + email + ", posterPath=" + posterPath + ", startDate=" + startDate + ", endDate=" + endDate
-                + ", dateAdded=" + dateAdded + ", pincode=" + pincode + ", lan=" + lan + ", state=" + state
-                + ", district=" + district + ", city=" + city + ", address=" + address + ", trainingTopicId="
-                + trainingTopicId + ", user=" + user + ", trainings=" + trainings + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Event [eventId=").append(eventId);
+        sb.append(", eventName=").append(eventName);
+        sb.append(", description=").append(description);
+        sb.append(", location=").append(location);
+        sb.append(", contactPerson=").append(contactPerson);
+        sb.append(", contactNumber=").append(contactNumber);
+        sb.append(", email=").append(email);
+        sb.append(", posterPath=").append(posterPath);
+        sb.append(", startDate=").append(startDate);
+        sb.append(", endDate=").append(endDate);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", pincode=").append(pincode);
+        sb.append(", lan=").append(lan);
+        sb.append(", state=").append(state);
+        sb.append(", district=").append(district);
+        sb.append(", city=").append(city);
+        sb.append(", address=").append(address);
+        sb.append(", trainingTopicId=").append(trainingTopicId);
+        sb.append(", user=").append(user);
+        sb.append(", trainings=").append(trainings);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

@@ -18,6 +18,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class UserIndianLanguageMapping implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id
      */
@@ -115,8 +117,15 @@ public class UserIndianLanguageMapping implements Serializable {
 
     @Override
     public String toString() {
-        return "UserIndianLanguageMapping [id=" + id + ", reading=" + reading + ", writing=" + writing + ", speaking="
-                + speaking + ", user=" + user + ", indianlan=" + indianlan + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("UserIndianLanguageMapping [id=").append(id);
+        sb.append(", reading=").append(reading);
+        sb.append(", writing=").append(writing);
+        sb.append(", speaking=").append(speaking);
+        sb.append(", user=").append(user);
+        sb.append(", indianlan=").append(indianlan);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

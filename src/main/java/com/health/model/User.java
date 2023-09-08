@@ -34,6 +34,8 @@ import com.health.domain.security.UserRole;
 @Entity
 public class User implements UserDetails, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id
      */
@@ -587,19 +589,49 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", username=" + username + ", dob=" + dob + ", password=" + password + ", firstName="
-                + firstName + ", gender=" + gender + ", lastName=" + lastName + ", address=" + address + ", token="
-                + token + ", age=" + age + ", organization=" + organization + ", orgRolev=" + orgRolev + ", experience="
-                + experience + ", aadharNumber=" + aadharNumber + ", profilePic=" + profilePic + ", email=" + email
-                + ", phone=" + phone + ", registered=" + registered + ", emailVerificationCode=" + emailVerificationCode
-                + ", dateAdded=" + dateAdded + ", userRoles=" + userRoles + ", categories=" + categories + ", topics="
-                + topics + ", languages=" + languages + ", questions=" + questions + ", events=" + events + ", testi="
-                + testi + ", consults=" + consults + ", trainingInfo=" + trainingInfo + ", comments=" + comments
-                + ", logs=" + logs + ", userKnownLans=" + userKnownLans + ", questionsPost=" + questionsPost
-                + ", multiUserOnTutorial=" + multiUserOnTutorial + ", tutorialScriptUser=" + tutorialScriptUser
-                + ", tutorialSlideUser=" + tutorialSlideUser + ", tutorialKeywordUser=" + tutorialKeywordUser
-                + ", tutorialOutlineUser=" + tutorialOutlineUser + ", tutorialVideoUser=" + tutorialVideoUser
-                + ", tutorialPreReqUser=" + tutorialPreReqUser + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("User [id=").append(id);
+        sb.append(", username=").append(username);
+        sb.append(", dob=").append(dob);
+        sb.append(", password=").append(password);
+        sb.append(", firstName=").append(firstName);
+        sb.append(", gender=").append(gender);
+        sb.append(", lastName=").append(lastName);
+        sb.append(", address=").append(address);
+        sb.append(", token=").append(token);
+        sb.append(", age=").append(age);
+        sb.append(", organization=").append(organization);
+        sb.append(", orgRolev=").append(orgRolev);
+        sb.append(", experience=").append(experience);
+        sb.append(", aadharNumber=").append(aadharNumber);
+        sb.append(", profilePic=").append(profilePic);
+        sb.append(", email=").append(email);
+        sb.append(", phone=").append(phone);
+        sb.append(", registered=").append(registered);
+        sb.append(", emailVerificationCode=").append(emailVerificationCode);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", userRoles=").append(userRoles);
+        sb.append(", categories=").append(categories);
+        sb.append(", topics=").append(topics);
+        sb.append(", languages=").append(languages);
+        sb.append(", questions=").append(questions);
+        sb.append(", events=").append(events);
+        sb.append(", testi=").append(testi);
+        sb.append(", consults=").append(consults);
+        sb.append(", trainingInfo=").append(trainingInfo);
+        sb.append(", comments=").append(comments);
+        sb.append(", logs=").append(logs);
+        sb.append(", userKnownLans=").append(userKnownLans);
+        sb.append(", questionsPost=").append(questionsPost);
+        sb.append(", multiUserOnTutorial=").append(multiUserOnTutorial);
+        sb.append(", tutorialScriptUser=").append(tutorialScriptUser);
+        sb.append(", tutorialSlideUser=").append(tutorialSlideUser);
+        sb.append(", tutorialKeywordUser=").append(tutorialKeywordUser);
+        sb.append(", tutorialOutlineUser=").append(tutorialOutlineUser);
+        sb.append(", tutorialVideoUser=").append(tutorialVideoUser);
+        sb.append(", tutorialPreReqUser=").append(tutorialPreReqUser);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

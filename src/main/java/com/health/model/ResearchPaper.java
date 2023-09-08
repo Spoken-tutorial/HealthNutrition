@@ -133,9 +133,16 @@ public class ResearchPaper {
 
     @Override
     public String toString() {
-        return "ResearchPaper [id=" + id + ", title=" + title + ", dateAdded=" + dateAdded + ", description="
-                + description + ", thumbnailPath=" + thumbnailPath + ", ResearchPaperPath=" + ResearchPaperPath
-                + ", showOnHomepage=" + showOnHomepage + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("ResearchPaper [id=").append(id);
+        sb.append(", title=").append(title);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", description=").append(description);
+        sb.append(", thumbnailPath=").append(thumbnailPath);
+        sb.append(", ResearchPaperPath=").append(ResearchPaperPath);
+        sb.append(", showOnHomepage=").append(showOnHomepage);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

@@ -19,6 +19,8 @@ import javax.persistence.Table;
 @Table(name = "feedbackForm")
 public class FeedbackForm implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -89,8 +91,14 @@ public class FeedbackForm implements Serializable {
 
     @Override
     public String toString() {
-        return "FeedbackForm [id=" + id + ", name=" + name + ", email=" + email + ", message=" + message
-                + ", dateAdded=" + dateAdded + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("FeedbackForm [id=").append(id);
+        sb.append(", name=").append(name);
+        sb.append(", email=").append(email);
+        sb.append(", message=").append(message);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

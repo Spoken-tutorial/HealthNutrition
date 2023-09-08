@@ -19,6 +19,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class LogManegement implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -148,9 +150,17 @@ public class LogManegement implements Serializable {
 
     @Override
     public String toString() {
-        return "LogManegement [logId=" + logId + ", dateAdded=" + dateAdded + ", type=" + type + ", statusChangedTo="
-                + statusChangedTo + ", statusPrevious=" + statusPrevious + ", userRole=" + userRole + ", user=" + user
-                + ", tutorialInfos=" + tutorialInfos + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("LogManegement [logId=").append(logId);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", type=").append(type);
+        sb.append(", statusChangedTo=").append(statusChangedTo);
+        sb.append(", statusPrevious=").append(statusPrevious);
+        sb.append(", userRole=").append(userRole);
+        sb.append(", user=").append(user);
+        sb.append(", tutorialInfos=").append(tutorialInfos);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

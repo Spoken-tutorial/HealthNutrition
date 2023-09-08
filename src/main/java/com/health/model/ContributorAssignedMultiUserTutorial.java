@@ -99,8 +99,13 @@ public class ContributorAssignedMultiUserTutorial implements Serializable {
 
     @Override
     public String toString() {
-        return "ContributorAssignedMultiUserTutorial [id=" + id + ", dateAdded=" + dateAdded + ", user=" + user
-                + ", conAssignedTutorial=" + conAssignedTutorial + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("ContributorAssignedMultiUserTutorial [id=").append(id);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", user=").append(user);
+        sb.append(", conAssignedTutorial=").append(conAssignedTutorial);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

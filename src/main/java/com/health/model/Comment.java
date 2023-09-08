@@ -19,6 +19,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Comment implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -119,8 +121,16 @@ public class Comment implements Serializable {
 
     @Override
     public String toString() {
-        return "Comment [commentId=" + commentId + ", comment=" + comment + ", dateAdded=" + dateAdded + ", type="
-                + type + ", roleName=" + roleName + ", user=" + user + ", tutorialInfos=" + tutorialInfos + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Comment [commentId=").append(commentId);
+        sb.append(", comment=").append(comment);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", type=").append(type);
+        sb.append(", roleName=").append(roleName);
+        sb.append(", user=").append(user);
+        sb.append(", tutorialInfos=").append(tutorialInfos);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

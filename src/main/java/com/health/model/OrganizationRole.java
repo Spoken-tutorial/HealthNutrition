@@ -17,6 +17,8 @@ import javax.persistence.Id;
 @Entity
 public class OrganizationRole implements Comparable<OrganizationRole>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * unique id of object
      */
@@ -68,7 +70,12 @@ public class OrganizationRole implements Comparable<OrganizationRole>, Serializa
 
     @Override
     public String toString() {
-        return "OrganizationRole [roleId=" + roleId + ", role=" + role + ", dateAdded=" + dateAdded + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("OrganizationRole [roleId=").append(roleId);
+        sb.append(", role=").append(role);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
     }
 
 }

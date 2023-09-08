@@ -24,6 +24,7 @@ import javax.persistence.Table;
 @Table(name = "contributor_Role")
 public class ContributorAssignedTutorial implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     /**
      * unique id of object
      */
@@ -119,8 +120,15 @@ public class ContributorAssignedTutorial implements Serializable {
 
     @Override
     public String toString() {
-        return "ContributorAssignedTutorial [id=" + id + ", dateAdded=" + dateAdded + ", topicCatId=" + topicCatId
-                + ", lan=" + lan + ", tutorials=" + tutorials + ", multiUserAssigned=" + multiUserAssigned + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("ContributorAssignedTutorial [id=").append(id);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", topicCatId=").append(topicCatId);
+        sb.append(", lan=").append(lan);
+        sb.append(", tutorials=").append(tutorials);
+        sb.append(", multiUserAssigned=").append(multiUserAssigned);
+        sb.append("]");
+        return sb.toString();
     }
 
 }
