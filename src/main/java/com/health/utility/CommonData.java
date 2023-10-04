@@ -143,7 +143,7 @@ public class CommonData {
 
     public static String uploadPostQuestion = "Media/Content/PostQuestion/";
 
-    public static String uploadBrouchure = "Media/Content/Brouchure/";
+    public static String uploadBrouchure = "Media/Content/Brochure/";
 
     public static String uploadPromoVideo = "Media/Content/PromoVideo/";
 

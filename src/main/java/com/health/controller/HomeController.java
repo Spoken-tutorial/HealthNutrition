@@ -7605,7 +7605,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.EVENT_ERROR);
-            logger.error("Error in Master Trainer Operation  {}", feed, e);
+            logger.error("Error in Master Trainer Operation1  {}", feed, e);
         }
 
         model.addAttribute("success_msg", CommonData.EVENT_SUCCESS);
