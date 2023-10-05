@@ -367,13 +367,19 @@ public class HomeController {
         }
     }
 
-//1***********
     static void setEngLangStatus(Model model, Language lan) {
-        if (!lan.getLangName().equalsIgnoreCase("english")) {
-            model.addAttribute("isEnglish", false);
-        } else {
-            model.addAttribute("isEnglish", true);
+        try {
+
+            if (!lan.getLangName().equalsIgnoreCase("english")) {
+                model.addAttribute("isEnglish", false);
+            } else {
+                model.addAttribute("isEnglish", true);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in set English Status: {}", lan, e);
         }
+
     }
 
     private String setPreReqInfo(Tutorial tut) {
@@ -6467,6 +6473,7 @@ public class HomeController {
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTutorial);
 
         setCompStatus(model, tutorials);
+        logger.info("Test upload Tutorial langName{} and lan {}", langName, lan);
         setEngLangStatus(model, lan);
 
         if (!lan.getLangName().equalsIgnoreCase("english")) {
@@ -7050,6 +7057,8 @@ public class HomeController {
             Credential credential = Auth.authorize(scopes, "uploadvideo");
 
             youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, credential).build();
+
+            logger.info("Youtube Scope: {} and youtube : {}", scopes, youtube);
 
             Video videoObjectDefiningMetadata = new Video();
 

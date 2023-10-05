@@ -122,8 +122,6 @@ public class UserIndianLanguageMapping implements Serializable {
         sb.append(", reading=").append(reading);
         sb.append(", writing=").append(writing);
         sb.append(", speaking=").append(speaking);
-        sb.append(", user=").append(user);
-        sb.append(", indianlan=").append(indianlan);
         sb.append("]");
         return sb.toString();
     }

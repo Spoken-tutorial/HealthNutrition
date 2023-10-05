@@ -100,7 +100,6 @@ public class Consultant implements Serializable {
         sb.append(", description=").append(description);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", onHome=").append(onHome);
-        sb.append(", user=").append(user);
         sb.append("]");
         return sb.toString();
     }

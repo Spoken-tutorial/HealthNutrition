@@ -130,8 +130,6 @@ public class FeedbackMasterTrainer implements Serializable {
         sb.append(", description=").append(description);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", path=").append(path);
-        sb.append(", traineeInfos=").append(traineeInfos);
-        sb.append(", user=").append(user);
         sb.append("]");
         return sb.toString();
     }

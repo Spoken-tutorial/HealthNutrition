@@ -205,9 +205,6 @@ public class Version {
         sb.append("Version [verId=").append(verId);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", versionPosterPath=").append(versionPosterPath);
-        sb.append(", brouchure=").append(brouchure);
-        sb.append(", broVersion=").append(broVersion);
-        sb.append(", filesofBrouchure=").append(filesofBrouchure);
         sb.append("]");
         return sb.toString();
     }

@@ -106,11 +106,17 @@ public class ServiceUtility {
             return fileName;
         }
 
-        fileName = fileName.replace("‘’", "\"\"");
-
-        fileName = fileName.replace("‘", "'").replace("’", "'");
-
-        return fileName;
+        String newFileName = fileName.replace("\u2018\u2018", "\"") // ‘‘
+                .replace("\u2019\u2019", "\"") // ’’
+                .replace("\u2018", "'") // ‘
+                .replace("\u2019", "'") // ’
+                .replace("\u2014", "-") // —
+                .replace("\u3164", " ") // Invisible Space
+                .replace("\u2022", "."); // •
+        if (!fileName.equals(newFileName)) {
+            logger.info("Replaced fileName: {} New FileName: {}", fileName, newFileName);
+        }
+        return newFileName;
     }
 
     private static String uploadFile(MultipartFile uploadFile, String pathToUpload) throws Exception { // uploading file

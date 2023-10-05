@@ -108,9 +108,6 @@ public class District implements Comparable<District>, Serializable {
         sb.append("District [id=").append(id);
         sb.append(", districtName=").append(districtName);
         sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", state=").append(state);
-        sb.append(", cities=").append(cities);
-        sb.append(", events=").append(events);
         sb.append("]");
         return sb.toString();
     }

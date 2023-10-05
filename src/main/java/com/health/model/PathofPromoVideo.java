@@ -96,8 +96,7 @@ public class PathofPromoVideo {
         sb.append("PathofPromoVideo [pathPromoId=").append(pathPromoId);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", videoPath=").append(videoPath);
-        sb.append(", promoVideo=").append(promoVideo);
-        sb.append(", lan=").append(lan);
+
         sb.append("]");
         return sb.toString();
     }

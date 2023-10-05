@@ -332,14 +332,6 @@ public class Event implements Serializable {
         sb.append(", endDate=").append(endDate);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", pincode=").append(pincode);
-        sb.append(", lan=").append(lan);
-        sb.append(", state=").append(state);
-        sb.append(", district=").append(district);
-        sb.append(", city=").append(city);
-        sb.append(", address=").append(address);
-        sb.append(", trainingTopicId=").append(trainingTopicId);
-        sb.append(", user=").append(user);
-        sb.append(", trainings=").append(trainings);
         sb.append("]");
         return sb.toString();
     }

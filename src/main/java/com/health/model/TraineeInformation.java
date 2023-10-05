@@ -172,7 +172,6 @@ public class TraineeInformation implements Serializable {
         sb.append(", aadhar=").append(aadhar);
         sb.append(", gender=").append(gender);
         sb.append(", organization=").append(organization);
-        sb.append(", traineeInfos=").append(traineeInfos);
         sb.append("]");
         return sb.toString();
     }

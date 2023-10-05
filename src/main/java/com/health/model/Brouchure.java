@@ -146,10 +146,7 @@ public class Brouchure implements Serializable {
         sb.append(", posterPath=").append(posterPath);
         sb.append(", showOnHomepage=").append(showOnHomepage);
         sb.append(", primaryVersion=").append(primaryVersion);
-        sb.append(", versions=").append(versions);
-        sb.append(", lan=").append(lan);
-        sb.append(", topicCatId=").append(topicCatId);
-        sb.append(", catId=").append(catId);
+
         sb.append("]");
         return sb.toString();
     }

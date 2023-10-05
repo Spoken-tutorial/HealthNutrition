@@ -125,8 +125,6 @@ public class Topic implements Comparable<Topic>, Serializable {
         sb.append(", topicName=").append(topicName);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", status=").append(status);
-        sb.append(", user=").append(user);
-        sb.append(", topicCategoryMap=").append(topicCategoryMap);
         sb.append("]");
         return sb.toString();
     }

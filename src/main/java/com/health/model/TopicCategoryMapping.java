@@ -200,12 +200,6 @@ public class TopicCategoryMapping implements Serializable {
         sb.append("TopicCategoryMapping [topicCategoryId=").append(topicCategoryId);
         sb.append(", status=").append(status);
         sb.append(", order=").append(order);
-        sb.append(", cat=").append(cat);
-        sb.append(", topic=").append(topic);
-        sb.append(", questions=").append(questions);
-        sb.append(", conAssignedTutorial=").append(conAssignedTutorial);
-        sb.append(", trainingTopic=").append(trainingTopic);
-        sb.append(", brochures=").append(brochures);
         sb.append("]");
         return sb.toString();
     }

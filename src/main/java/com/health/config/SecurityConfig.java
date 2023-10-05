@@ -36,17 +36,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * public matcher doesn't require authentication
      */
-    private static final String[] PUBLIC_MATCHERS = { "/css/**", "/js/**", "/image/**", "/", "/files/**", "/newUser",
-            "/Media/**", "/forgetPassword", "/feedcustomerdat", "/feedbackForUser", "/login", "/tutorials", "/s/**",
-            "/loadByCategoryTuturial", "/addContactForm", "/ControllerHealth", "/showTutorial", "/findTutorialByLanand",
-            "/showListTutorial", "/showVideoWithContained", "/showListOfTutorial", "/showListTutorial",
-            "/viewVideo/view/{id}", "viewVideoList/view/{id}", "/showListConsultants", "/categories", "/showEvent",
-            "/eventDetails", "/listTopicsByCategory", "/listLangByCategoryTopic", "/testimonialList", "/brochures",
-            "/researchPapers", "/fonts/**", "/eventDetails/**", "/tutorialView/**", "/getConsultantDetails/**",
-            "/reset/**", "/resetPassword/**", "/getCatAndLan/**", "/getTopicOnCatAndLan/**", "/getRolesOnCatLanUser/**",
-            "/getTutorial/**", "/statistics", "/statistics/**", "/tutCountOnCat/**", "/tutCountOnLan/**",
-            "/cdContentInfo/**", "/getContributorByTutLanUser/**", "/showConsultant/**", "/showLanguages/**",
-            "/unpublishTutorial/**", "/loadTopicByCategory/**", "/loadLanguageByCategoryTopic/**",
+    private static final String[] PUBLIC_MATCHERS = { "/VenoBox/**", "/css/**", "/js/**", "/image/**", "/", "/files/**",
+            "/newUser", "/Media/**", "/forgetPassword", "/feedcustomerdat", "/feedbackForUser", "/login", "/tutorials",
+            "/s/**", "/loadByCategoryTuturial", "/addContactForm", "/ControllerHealth", "/showTutorial",
+            "/findTutorialByLanand", "/showListTutorial", "/showVideoWithContained", "/showListOfTutorial",
+            "/showListTutorial", "/viewVideo/view/{id}", "viewVideoList/view/{id}", "/showListConsultants",
+            "/categories", "/showEvent", "/eventDetails", "/listTopicsByCategory", "/listLangByCategoryTopic",
+            "/testimonialList", "/brochures", "/researchPapers", "/fonts/**", "/eventDetails/**", "/tutorialView/**",
+            "/getConsultantDetails/**", "/reset/**", "/resetPassword/**", "/getCatAndLan/**", "/getTopicOnCatAndLan/**",
+            "/getRolesOnCatLanUser/**", "/getTutorial/**", "/statistics", "/statistics/**", "/tutCountOnCat/**",
+            "/tutCountOnLan/**", "/cdContentInfo/**", "/getContributorByTutLanUser/**", "/showConsultant/**",
+            "/showLanguages/**", "/unpublishTutorial/**", "/loadTopicByCategory/**", "/loadLanguageByCategoryTopic/**",
             "/loadTopicAndLanguageByCategory/**", "/loadCategoryAndLanguageByTopic/**",
             "/loadCategoryAndTopicByLanguage/**", "/tutorialsSearch/**", "/tutorialsSearch1/**" };
 

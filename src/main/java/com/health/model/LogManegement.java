@@ -156,9 +156,6 @@ public class LogManegement implements Serializable {
         sb.append(", type=").append(type);
         sb.append(", statusChangedTo=").append(statusChangedTo);
         sb.append(", statusPrevious=").append(statusPrevious);
-        sb.append(", userRole=").append(userRole);
-        sb.append(", user=").append(user);
-        sb.append(", tutorialInfos=").append(tutorialInfos);
         sb.append("]");
         return sb.toString();
     }

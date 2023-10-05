@@ -64,7 +64,6 @@ public class IndianLanguage implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("IndianLanguage [id=").append(id);
         sb.append(", lanName=").append(lanName);
-        sb.append(", userLans=").append(userLans);
         sb.append("]");
         return sb.toString();
     }

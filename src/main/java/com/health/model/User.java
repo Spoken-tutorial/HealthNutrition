@@ -601,35 +601,15 @@ public class User implements UserDetails, Serializable {
         sb.append(", token=").append(token);
         sb.append(", age=").append(age);
         sb.append(", organization=").append(organization);
-        sb.append(", orgRolev=").append(orgRolev);
-        sb.append(", experience=").append(experience);
+
         sb.append(", aadharNumber=").append(aadharNumber);
-        sb.append(", profilePic=").append(profilePic);
+
         sb.append(", email=").append(email);
         sb.append(", phone=").append(phone);
         sb.append(", registered=").append(registered);
         sb.append(", emailVerificationCode=").append(emailVerificationCode);
         sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", userRoles=").append(userRoles);
-        sb.append(", categories=").append(categories);
-        sb.append(", topics=").append(topics);
-        sb.append(", languages=").append(languages);
-        sb.append(", questions=").append(questions);
-        sb.append(", events=").append(events);
-        sb.append(", testi=").append(testi);
-        sb.append(", consults=").append(consults);
-        sb.append(", trainingInfo=").append(trainingInfo);
-        sb.append(", comments=").append(comments);
-        sb.append(", logs=").append(logs);
-        sb.append(", userKnownLans=").append(userKnownLans);
-        sb.append(", questionsPost=").append(questionsPost);
-        sb.append(", multiUserOnTutorial=").append(multiUserOnTutorial);
-        sb.append(", tutorialScriptUser=").append(tutorialScriptUser);
-        sb.append(", tutorialSlideUser=").append(tutorialSlideUser);
-        sb.append(", tutorialKeywordUser=").append(tutorialKeywordUser);
-        sb.append(", tutorialOutlineUser=").append(tutorialOutlineUser);
-        sb.append(", tutorialVideoUser=").append(tutorialVideoUser);
-        sb.append(", tutorialPreReqUser=").append(tutorialPreReqUser);
+
         sb.append("]");
         return sb.toString();
     }

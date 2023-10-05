@@ -93,8 +93,6 @@ public class City implements Comparable<City>, Serializable {
         sb.append("City [id=").append(id);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", cityName=").append(cityName);
-        sb.append(", district=").append(district);
-        sb.append(", events=").append(events);
         sb.append("]");
         return sb.toString();
     }

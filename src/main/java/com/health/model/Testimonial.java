@@ -173,8 +173,6 @@ public class Testimonial implements Serializable {
         sb.append(", approved=").append(approved);
         sb.append(", consentLetter=").append(consentLetter);
         sb.append(", thumbnailPath=").append(thumbnailPath);
-        sb.append(", user=").append(user);
-        sb.append(", traineeInfos=").append(traineeInfos);
         sb.append("]");
         return sb.toString();
     }

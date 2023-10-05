@@ -91,8 +91,6 @@ public class State implements Comparable<State>, Serializable {
         sb.append("State [id=").append(id);
         sb.append(", stateName=").append(stateName);
         sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", Districts=").append(Districts);
-        sb.append(", events=").append(events);
         sb.append("]");
         return sb.toString();
     }

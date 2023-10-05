@@ -102,8 +102,6 @@ public class ContributorAssignedMultiUserTutorial implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("ContributorAssignedMultiUserTutorial [id=").append(id);
         sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", user=").append(user);
-        sb.append(", conAssignedTutorial=").append(conAssignedTutorial);
         sb.append("]");
         return sb.toString();
     }

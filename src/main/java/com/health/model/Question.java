@@ -115,9 +115,6 @@ public class Question implements Serializable {
         sb.append("Question [questionId=").append(questionId);
         sb.append(", questionPath=").append(questionPath);
         sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", user=").append(user);
-        sb.append(", lan=").append(lan);
-        sb.append(", topicCatId=").append(topicCatId);
         sb.append("]");
         return sb.toString();
     }

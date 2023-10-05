@@ -111,9 +111,6 @@ public class TrainingTopic implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("TrainingTopic [trainingTopicId=").append(trainingTopicId);
-        sb.append(", topicCatId=").append(topicCatId);
-        sb.append(", traineeInfos=").append(traineeInfos);
-        sb.append(", event=").append(event);
         sb.append("]");
         return sb.toString();
     }

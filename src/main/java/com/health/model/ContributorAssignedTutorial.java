@@ -123,10 +123,6 @@ public class ContributorAssignedTutorial implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("ContributorAssignedTutorial [id=").append(id);
         sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", topicCatId=").append(topicCatId);
-        sb.append(", lan=").append(lan);
-        sb.append(", tutorials=").append(tutorials);
-        sb.append(", multiUserAssigned=").append(multiUserAssigned);
         sb.append("]");
         return sb.toString();
     }

@@ -195,9 +195,6 @@ public class Language implements Comparable<Language>, Serializable {
         sb.append("Language [lanId=").append(lanId);
         sb.append(", langName=").append(langName);
         sb.append(", status=").append(status);
-        sb.append(", user=").append(user);
-        sb.append(", userRoles=").append(userRoles);
-        sb.append(", conAssignedTutorial=").append(conAssignedTutorial);
         sb.append("]");
         return sb.toString();
     }

@@ -194,16 +194,6 @@ public class TrainingInformation implements Serializable {
         sb.append("TrainingInformation [trainingId=").append(trainingId);
         sb.append(", totalParticipant=").append(totalParticipant);
         sb.append(", posterPath=").append(posterPath);
-        sb.append(", lan=").append(lan);
-        sb.append(", event=").append(event);
-        sb.append(", user=").append(user);
-        sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", address=").append(address);
-        sb.append(", traineeInfos=").append(traineeInfos);
-        sb.append(", trainingTopicId=").append(trainingTopicId);
-        sb.append(", masterTrainerFeedback=").append(masterTrainerFeedback);
-        sb.append(", postQuestions=").append(postQuestions);
-        sb.append(", testimonials=").append(testimonials);
         sb.append("]");
         return sb.toString();
     }

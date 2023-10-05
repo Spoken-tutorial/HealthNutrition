@@ -124,8 +124,9 @@ public class FilesofBrouchure {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("FilesofBrouchure [broFileId=").append(broFileId);
-        sb.append(", version=").append(version);
-        sb.append(", lan=").append(lan);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", webPath=").append(webPath);
+        sb.append(", thumbnailPath=").append(thumbnailPath);
         sb.append("]");
         return sb.toString();
     }

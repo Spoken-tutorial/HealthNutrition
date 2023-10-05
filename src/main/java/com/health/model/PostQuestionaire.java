@@ -105,8 +105,6 @@ public class PostQuestionaire implements Serializable {
         sb.append("PostQuestionaire [id=").append(id);
         sb.append(", questionPath=").append(questionPath);
         sb.append(", dateAdded=").append(dateAdded);
-        sb.append(", traineeInfos=").append(traineeInfos);
-        sb.append(", user=").append(user);
         sb.append("]");
         return sb.toString();
     }
