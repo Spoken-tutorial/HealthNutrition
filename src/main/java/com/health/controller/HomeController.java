@@ -861,11 +861,13 @@ public class HomeController {
         }
 
         List<Tutorial> tempTutorials = tutService.findAllByContributorAssignedTutorialEnabled(conTut);
-        Tutorial tutorial = null;
+        if (tempTutorials == null || tempTutorials.size() == 0) {
+            logger.error("Temp Tutorial Error: {}", tempTutorials);
+            return "redirect:/";
 
-        if (tempTutorials.size() > 0) {
-            tutorial = tempTutorials.get(0);
         }
+
+        Tutorial tutorial = tempTutorials.get(0);
 
         List<Tutorial> relatedTutorial = new ArrayList<>();
 
@@ -2447,6 +2449,13 @@ public class HomeController {
         }
         List<TopicCategoryMapping> tcm = topicCatService.findAll();
 
+        List<TopicCategoryMapping> tcm1 = new ArrayList<>();
+
+        for (TopicCategoryMapping temp : tcm) {
+            if (temp.getCat().isStatus() && temp.getTopic().isStatus())
+                tcm1.add(temp);
+        }
+
         model.addAttribute("userInfo", usr);
 
         List<Category> category = catService.findAll();
@@ -2484,7 +2493,7 @@ public class HomeController {
         }
 
         model.addAttribute("topics", topics);
-        model.addAttribute("tcm", tcm);
+        model.addAttribute("tcm", tcm1);
         return "addTopic";
 
     }
@@ -6315,6 +6324,12 @@ public class HomeController {
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
 
         List<ContributorAssignedTutorial> userRoles = conRepo.findAll();
+        List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
+        for (ContributorAssignedTutorial temp : userRoles) {
+            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
+                userRoles1.add(temp);
+            }
+        }
 
         List<UserRole> userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
         userRolesTemp.addAll(usrRoleService.findAllByRoleAndStatusAndRevoked(role1, true, false));
@@ -6324,7 +6339,7 @@ public class HomeController {
             userRolesUniqueTemp.add(x.getUser());
         }
         model.addAttribute("userByContributors", userRolesUniqueTemp);
-        model.addAttribute("userByContributorsAssigned", userRoles);
+        model.addAttribute("userByContributorsAssigned", userRoles1);
 
         return "assignContributorList";
     }
@@ -6363,6 +6378,12 @@ public class HomeController {
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
 
         List<ContributorAssignedTutorial> userRoles = conRepo.findAll();
+        List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
+        for (ContributorAssignedTutorial temp : userRoles) {
+            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
+                userRoles1.add(temp);
+            }
+        }
 
         List<UserRole> userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
         userRolesTemp.addAll(usrRoleService.findAllByRoleAndStatusAndRevoked(role1, true, false));
@@ -6376,7 +6397,7 @@ public class HomeController {
             userRolesUniqueTemp.add(x.getUser());
         }
 
-        model.addAttribute("userByContributorsAssigned", userRoles);
+        model.addAttribute("userByContributorsAssigned", userRoles1);
 
         model.addAttribute("userByContributors", userRolesUniqueTemp);
 
@@ -6433,13 +6454,20 @@ public class HomeController {
 
         userRoles = conRepo.findAll();
 
+        userRoles1 = new ArrayList<>();
+        for (ContributorAssignedTutorial temp : userRoles) {
+            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
+                userRoles1.add(temp);
+            }
+        }
+
         userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
 
         for (UserRole x : userRolesTemp) {
             userRolesUniqueTemp.add(x.getUser());
         }
 
-        model.addAttribute("userByContributorsAssigned", userRoles);
+        model.addAttribute("userByContributorsAssigned", userRoles1);
 
         model.addAttribute("userByContributors", userRolesUniqueTemp);
 
@@ -6500,7 +6528,7 @@ public class HomeController {
                     }
                     for (ContributorAssignedTutorial c : con_t) {
                         List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(c);
-                        if (!tut.isEmpty()) {
+                        if (tut != null && tut.size() > 0) {
                             if (tut.get(0).isStatus()) {
                                 preReqCatSet.add(category);
                             }
@@ -6673,22 +6701,19 @@ public class HomeController {
             return "redirect:/listTutorialForContributorReview";
         }
 
-        Tutorial tutorial = tutService.findAllByContributorAssignedTutorial(conTut).get(0);
+        List<Tutorial> findAllByContributorAssignedTutorial = tutService.findAllByContributorAssignedTutorial(conTut);
 
-        logger.info("Variable of listContributorReviewTutorialGet tutorial : {}", tutorial);
+        logger.info("Variable of listContributorReviewTutorialGet tutorial : {}", findAllByContributorAssignedTutorial);
 
-        if (tutorial == null) {
+        if (findAllByContributorAssignedTutorial == null || findAllByContributorAssignedTutorial.size() == 0) {
+
             // throw a error
             model.addAttribute("error_msg", CommonData.STATUS_ERROR);
             model.addAttribute("tutorialNotExist", "Bad request"); // throw proper error
             return "redirect:/listTutorialForContributorReview";
 
         }
-
-//		if(tutorial.getConAssignedTutorial().getUser().getId() != usr.getId()) {
-//
-//			return "redirect:/listTutorialForContributorReview";
-//		}
+        Tutorial tutorial = findAllByContributorAssignedTutorial.get(0);
 
         model.addAttribute("statusOutline", CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
         model.addAttribute("statusScript", CommonData.tutorialStatus[tutorial.getScriptStatus()]);
@@ -8866,6 +8891,10 @@ public class HomeController {
         TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat, topic);
         ContributorAssignedTutorial con = conRepo.findByTopicCatAndLanViewPart(tcm, lan);
         List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(con);
+
+        if (tut == null || tut.size() == 0) {
+            return "unpublishTopic";
+        }
         Tutorial t = tut.get(0);
         model.addAttribute("tut", tut);
         model.addAttribute("tutorial_id", t.getTutorialId());
