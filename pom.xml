@@ -77,6 +77,11 @@
             <artifactId>google-oauth-client-jetty</artifactId>
             <version>${project.oauth.version}</version>
         </dependency>
+       
+        <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+		</dependency>
 
         <dependency>
             <groupId>com.google.collections</groupId>

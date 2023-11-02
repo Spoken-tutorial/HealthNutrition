@@ -6,6 +6,8 @@
 color : #014F7A;}
 #sm_url:hover, #cat:hover{
 background: none!important;}
+#sm_url_Ver2:hover, #cat:hover{
+background: none!important;}
 </style>
 <head th:replace="common/trail :: common-trail (pageTitle='Content - Quality Review - Health And Nutrition')"></head>
 <body>
@@ -197,7 +199,14 @@ background: none!important;}
 												<!-- todo --><div class="alert alert-msg" style="display: none;"></div>
 												<div th:if="${tutorial.getScriptStatus()!=3}" class="alert alert-info ">Not valid for review</div>
 												<!-- todo --><div class="alert alert-info" role="alert">
-  												<i class="fas fa-external-link-alt"></i> <a th:href="${sm_url}" class="alert-link" style="text-decoration: underline;color: #014F7A;" target="_blank" id="sm_url">Click here to proceed to Script Manager</a>
+												<div th:if="${!sm_url.isEmpty()}">
+														<i class="fas fa-external-link-alt"></i> <a   th:href="${sm_url}" class="alert-link" style="text-decoration: underline;color: #014F7A;" target="_blank" id="sm_url">Click here to proceed to view  Existing Script</a>
+												</div>
+												<div>
+													<i class="fas fa-external-link-alt"></i> <a th:href="${sm_url_Ver2}" class="alert-link" style="text-decoration: underline;color: #014F7A;" target="_blank" id="sm_url_Ver2">Create a New Original Script (Requires login on scriptmanager)</a>
+												</div>
+  											
+												
 												</div>
 													<div th:if="${tutorial.getScriptStatus()==3}">
 														<div th:replace="common/commonElements :: review_feedback('script','quality')"></div>

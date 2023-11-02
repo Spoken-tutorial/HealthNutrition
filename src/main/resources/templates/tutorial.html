@@ -149,11 +149,14 @@
 					<div class="tab-pane fade px-5" id="pills-script" role="tabpanel"
 						aria-labelledby="pills-script-tab">
 						<ul class="pl-10">
-							<li class="mb-3"><i class="fas fa-file-download mr-3"></i> 
+							<li th:if="${!sm_url.isEmpty()}" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
 							
 							<a
 								th:href="@{${sm_url}}" name="ScriptPdf"
 								target="_blank" id="ScriptPdf">Original Script</a>
+								
+								
+								
 								
 								<!-- th:if="${tutorial.getScript()}" -->
 								<!-- <a
@@ -163,6 +166,14 @@
 								
 							<a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
+								<li  sec:authorize="isAuthenticated()" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
+								<a 
+								th:href="@{${sm_url2}}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Create a New Original Script (Requires login on scriptmanager)</a>
+								<a
+								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
 								
 								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a
 								th:if="${tutorial.getScriptStatus() != 0}"

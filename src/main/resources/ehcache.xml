@@ -150,6 +150,22 @@
 <!--        <persistence strategy="LOCALRESTARTABLE" />-->
     </cache>
     
+   <cache name="scriptapi"
+           maxEntriesLocalHeap="5"
+           maxEntriesLocalDisk="10"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+            timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+         
+
+           >
+        <persistence strategy="localTempSwap" />
+<!--        <persistence strategy="LOCALRESTARTABLE" />-->
+    </cache>
+       
 
 
 </ehcache>

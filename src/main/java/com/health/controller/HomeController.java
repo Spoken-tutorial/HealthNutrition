@@ -22,11 +22,17 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,6 +52,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
@@ -268,6 +276,9 @@ public class HomeController {
     @Autowired
     private LogMangementService logMangementService;
 
+    @Value("${scriptmanager_api}")
+    private String scriptmanager_api;
+
     @Value("${scriptmanager_url}")
     private String scriptmanager_url;
 
@@ -396,8 +407,70 @@ public class HomeController {
         return pre_req;
     }
 
+    @Cacheable(cacheNames = "scriptapi")
+    static List<Integer> getApiVersion(String scripmanager_api, int catId, int TutorialId, int lanId) {
+
+        int x = 1;
+        List<Integer> listofScriptVersions = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(scripmanager_api);
+        sb.append("/");
+        sb.append(catId);
+        sb.append("/");
+        sb.append(TutorialId);
+        sb.append("/");
+        sb.append(lanId);
+        sb.append("/");
+        String api_url = sb.toString();
+
+        try {
+
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+
+            HttpGet httpGet = new HttpGet(api_url);
+
+            HttpResponse response = httpClient.execute(httpGet);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if (statusCode == 200) {
+                String jsonResponse = EntityUtils.toString(response.getEntity());
+                System.out.println("Alok" + jsonResponse);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+
+                JsonNode publishedArray = jsonNode.get("published");
+
+                for (int i = 0; i < publishedArray.size(); i++) {
+                    listofScriptVersions.add(publishedArray.get(i).asInt());
+                }
+
+                httpClient.close();
+                Collections.reverse(listofScriptVersions);
+                System.out.println("Alok List" + listofScriptVersions);
+                return listofScriptVersions;
+            } else {
+                System.out.println("API request failed with status code: " + statusCode);
+
+                listofScriptVersions.add(x);
+                return listofScriptVersions;
+            }
+
+            // Close the HTTP client
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            listofScriptVersions.add(x);
+            return listofScriptVersions;
+
+        }
+
+    }
+
     static String setScriptManagerUrl(Model model, String scriptmanager_url, String scriptmanager_path,
-            Tutorial tutorial, Topic topic, Language lan, Category cat) {
+            Tutorial tutorial, Topic topic, Language lan, Category cat, int x) {
         String topic_name = topic.getTopicName();
         topic_name = topic_name.replaceAll(" ", "-");
         model.addAttribute("topic_name", topic_name);
@@ -420,11 +493,30 @@ public class HomeController {
         sb.append("/");
         sb.append(topic_name);
         sb.append("/");
-        sb.append("1");
+        sb.append(x);
         String sm_url = sb.toString();
         return sm_url;
     }
 
+    /*
+     * static String setScriptManagerUrlforVersion2(Model model, String
+     * scriptmanager_url, String scriptmanager_path, Tutorial tutorial, Topic topic,
+     * Language lan, Category cat) { String topic_name = topic.getTopicName();
+     * topic_name = topic_name.replaceAll(" ", "-");
+     * model.addAttribute("topic_name", topic_name);
+     * model.addAttribute("script_manager_view_url", scriptmanager_url +
+     * scriptmanager_path); model.addAttribute("sm_default_param",
+     * CommonData.SM_DEFAULT_PARAM); String tutorial_id = ""; if (tutorial != null)
+     * { tutorial_id = Integer.toString(tutorial.getTutorialId()); }
+     * 
+     * StringBuilder sb = new StringBuilder();
+     * 
+     * sb.append(scriptmanager_url); sb.append(scriptmanager_path);
+     * sb.append(cat.getCategoryId()); sb.append("/"); sb.append(tutorial_id);
+     * sb.append("/"); sb.append(lan.getLanId()); sb.append("/");
+     * sb.append(topic_name); sb.append("/"); sb.append("2"); String sm_url =
+     * sb.toString(); return sm_url; }
+     */
     private List<Category> getCategories() {
         List<Tutorial> tutorials = tutService.findAllByStatus(true);
         Set<Category> catTemp = new HashSet<Category>();
@@ -834,6 +926,14 @@ public class HomeController {
 
         Category catName = catService.findBycategoryname(cat);
 
+        User usr = new User();
+
+        if (principal != null) {
+
+            usr = userService.findByUsername(principal.getName());
+        }
+        Set<UserRole> usrRoles = usr.getUserRoles();
+
         if (query.equals("q")) {
             query = "";
         }
@@ -927,7 +1027,12 @@ public class HomeController {
 //				Collections.sort(lanTempSorted);
 
         getModelData(model, catId, topicId, lanId, query);
+        List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
+                tutorial.getTutorialId(), lanName.getLanId());
+        String sm_url = "";
+        String sm_url2 = "";
         StringBuilder sb = new StringBuilder();
+
         sb.append(scriptmanager_url);
         sb.append(scriptmanager_path);
         sb.append(String.valueOf(category.getCategoryId()));
@@ -937,12 +1042,23 @@ public class HomeController {
         sb.append(String.valueOf(lanName.getLanId()));
         sb.append("/");
         sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
-        sb.append("/1");
-        // model.addAttribute("topics", topicTemp);
-        // String sm_url = scriptmanager_url + scriptmanager_path +
-        // String.valueOf(category.getCategoryId())+"/"+String.valueOf(tutorial.getTutorialId())+"/"+String.valueOf(lanName.getLanId())+"/"+String.valueOf(tutorial.getTopicName())+"/1";
-        String sm_url = sb.toString();
+        sb.append("/");
+        if (scriptVerList != null && scriptVerList.size() > 0) {
+            StringBuilder sb2 = new StringBuilder(sb);
+            sb2.append(scriptVerList.get(0));
+            sm_url = sb2.toString();
+        }
+
+        if (usrRoles != null && usrRoles.size() > 0) {
+            StringBuilder sb1 = new StringBuilder(sb);
+            System.out.println(usrRoles);
+            sb1.append('2');
+            sm_url2 = sb1.toString();
+
+        }
+
         model.addAttribute("sm_url", sm_url);
+        model.addAttribute("sm_url2", sm_url2);
         return "tutorial";
     }
 
@@ -6614,9 +6730,20 @@ public class HomeController {
             setCompComment(model, tutorials, comService);
             for (Tutorial local : tutorials) {
                 tutorial = local;
-                String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, lan,
-                        cat);
+
+                List<Integer> scriptversionList = getApiVersion(scriptmanager_api, cat.getCategoryId(),
+                        tutorial.getTutorialId(), lan.getLanId());
+                String sm_url = "";
+                if (scriptversionList != null && scriptversionList.size() > 0) {
+                    sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic, lan,
+                            cat, scriptversionList.get(0));
+
+                }
+
+                String sm_url_Ver2 = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial, topic,
+                        lan, cat, 2);
                 model.addAttribute("sm_url", sm_url);
+                model.addAttribute("sm_url_Ver2", sm_url_Ver2);
                 model.addAttribute("tutorial", local);
                 if (local.getPreRequisticStatus() != 0) {
                     model.addAttribute("pre_req", setPreReqInfo(local));
@@ -6973,9 +7100,21 @@ public class HomeController {
         setVideoInfo(model, tutorials);
         model.addAttribute("tutorial", tutorial1);
         setEngLangStatus(model, language);
-        String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic, language,
-                category);
+
+        List<Integer> scriptversionList = getApiVersion(scriptmanager_api, category.getCategoryId(),
+                tutorial1.getTutorialId(), language.getLanId());
+        String sm_url = "";
+        if (scriptversionList != null && scriptversionList.size() > 0) {
+            sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic, language,
+                    category, scriptversionList.get(0));
+
+        }
         model.addAttribute("sm_url", sm_url);
+
+        String sm_url_Ver2 = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic,
+                language, category, 2);
+
+        model.addAttribute("sm_url_Ver2", sm_url_Ver2);
 
         return "addContentDomainReview";
 
@@ -7297,9 +7436,19 @@ public class HomeController {
         setCompStatus(model, tutorials);
         setVideoInfo(model, tutorials);
         setEngLangStatus(model, language);
-        String sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic, language,
-                category);
+
+        List<Integer> scriptversionList = getApiVersion(scriptmanager_api, category.getCategoryId(),
+                tutorial1.getTutorialId(), language.getLanId());
+        String sm_url = "";
+        if (scriptversionList != null && scriptversionList.size() > 0) {
+            sm_url = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic, language,
+                    category, scriptversionList.get(0));
+
+        }
         model.addAttribute("sm_url", sm_url);
+        String sm_url_Ver2 = setScriptManagerUrl(model, scriptmanager_url, scriptmanager_path, tutorial1, topic,
+                language, category, 2);
+        model.addAttribute("sm_url_Ver2", sm_url_Ver2);
 
         return "addContentQualityReview";
 
