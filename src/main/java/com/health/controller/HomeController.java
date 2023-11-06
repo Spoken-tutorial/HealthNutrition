@@ -393,6 +393,55 @@ public class HomeController {
 
     }
 
+    private boolean checkRole(User usr, Category cat, Language lan) {
+
+        boolean flag = false;
+
+        if (usr == null) {
+            return flag;
+        }
+
+        UserRole usrRole = new UserRole();
+        List<UserRole> usrRoles = new ArrayList<>();
+
+        List<Role> roles = new ArrayList<>();
+        roles.add(roleService.findByname(CommonData.superUserRole));
+        roles.add(roleService.findByname(CommonData.contributorRole));
+        roles.add(roleService.findByname(CommonData.qualityReviewerRole));
+        roles.add(roleService.findByname(CommonData.domainReviewerRole));
+        roles.add(roleService.findByname(CommonData.domainReviewerRole));
+
+        for (int i = 0; i < roles.size(); i++) {
+
+            if (i == 0) {
+                usrRoles = usrRoleService.findByRoleUser(usr, roles.get(i));
+                if (usrRoles != null && usrRoles.size() > 0) {
+                    flag = true;
+                    break;
+                }
+
+            } else if (i == 1) {
+                usrRoles = usrRoleService.findByLanUser(lan, usr, roles.get(i));
+                if (usrRoles != null && usrRoles.size() > 0) {
+                    flag = true;
+                    break;
+                }
+
+            } else {
+                usrRole = usrRoleService.findByLanCatUser(lan, cat, usr, roles.get(i));
+                if (usrRole != null) {
+                    flag = true;
+                    break;
+
+                }
+            }
+
+        }
+
+        return flag;
+
+    }
+
     private String setPreReqInfo(Tutorial tut) {
         String prefix = "Selected prerequisite : ";
         String pre_req = "";
@@ -928,12 +977,6 @@ public class HomeController {
 
         User usr = new User();
 
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-        Set<UserRole> usrRoles = usr.getUserRoles();
-
         if (query.equals("q")) {
             query = "";
         }
@@ -1049,12 +1092,16 @@ public class HomeController {
             sm_url = sb2.toString();
         }
 
-        if (usrRoles != null && usrRoles.size() > 0) {
-            StringBuilder sb1 = new StringBuilder(sb);
-            System.out.println(usrRoles);
-            sb1.append('2');
-            sm_url2 = sb1.toString();
+        if (principal != null) {
 
+            usr = userService.findByUsername(principal.getName());
+            boolean flag = checkRole(usr, category, lanName);
+            if (flag) {
+                StringBuilder sb1 = new StringBuilder(sb);
+                sb1.append('2');
+                sm_url2 = sb1.toString();
+
+            }
         }
 
         model.addAttribute("sm_url", sm_url);
@@ -1464,6 +1511,8 @@ public class HomeController {
         if (principal != null) {
 
             usr = userService.findByUsername(principal.getName());
+            usr.setLoggedInTime(ServiceUtility.getCurrentTime());
+            userService.save(usr);
         }
         logger.info("User of DashBoardGetMethod {}", usr);
         model.addAttribute("userInfo", usr);

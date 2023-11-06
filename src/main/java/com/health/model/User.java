@@ -156,6 +156,9 @@ public class User implements UserDetails, Serializable {
     @Column(name = "dateAdded", updatable = false)
     private Timestamp dateAdded;
 
+    @Column(name = "loggedintime")
+    private Timestamp loggedInTime;
+
     /**
      * user roles
      */
@@ -396,6 +399,14 @@ public class User implements UserDetails, Serializable {
 
     public void setDateAdded(Timestamp dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public void setLoggedInTime(Timestamp loggedInTime) {
+        this.loggedInTime = loggedInTime;
+    }
+
+    public Timestamp getLoggedInTime() {
+        return loggedInTime;
     }
 
     public Long getId() {

@@ -371,15 +371,18 @@
 							<div class="alert d-none w-100" role="alert" id="alert-script"></div>
 
 							<div class="alert alert-info" role="alert">
-								<div th:if="${!sm_url.isEmpty()}">
+								<div th:if="${sm_url}">
+									<div th:if="${!sm_url.isEmpty()}">
 									<i th:if="${sm_url}" class="fas fa-external-link-alt"></i> <a th:if="${sm_url}" th:href="${sm_url}"
 									class="alert-link" style="text-decoration: underline;"
-									target="_blank" id="sm_url">Click here to proceed to view Existing Script
+									target="_blank" id="sm_url">Click here to view Existing Script
 									</a>
 									<a th:unless="${sm_url}" class="alert-link" style="text-decoration: underline;"
 									target="_blank" id="sm_url">Please upload component or video first. Please refresh if already added.</a>
 								
 								</div>
+								</div>
+								
 								
 									<div>
 									<i th:if="${sm_url_Ver2}" class="fas fa-external-link-alt"></i> <a th:if="${sm_url_Ver2}" th:href="${sm_url_Ver2}"

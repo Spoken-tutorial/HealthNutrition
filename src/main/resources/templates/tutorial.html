@@ -167,7 +167,7 @@
 							<a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
 								
-								<li  sec:authorize="isAuthenticated()" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
+								<li  th:if="${!sm_url2.isEmpty()}" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
 								<a 
 								th:href="@{${sm_url2}}" name="ScriptPdf"
 								target="_blank" id="ScriptPdf">Create a New Original Script (Requires login on scriptmanager)</a>
