@@ -24,7 +24,7 @@ public interface CarouselRepository extends CrudRepository<Carousel, Integer> {
      * @return primitive integer value
      */
     @Query("select max(id) from Carousel")
-    int getNewId();
+    Integer getNewId();
 
     @CacheEvict(cacheNames = "carousels", allEntries = true)
     void deleteById(int id);

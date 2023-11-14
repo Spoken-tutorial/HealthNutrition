@@ -219,11 +219,10 @@ public class AjaxController {
     private static final String ADMIN_REVIEWER = "admin-rev";
 
     private User getUser(Principal principal) {
-        User usr = new User();
         if (principal != null) {
-            usr = usrservice.findByUsername(principal.getName());
+            return usrservice.findByUsername(principal.getName());
         }
-        return usr;
+        return new User();
     }
 
     // private HashMap<Integer, String> updateResponse(String res, String msg, int
@@ -311,7 +310,7 @@ public class AjaxController {
         } catch (Exception e) {
             logger.error("Error in Get Document: {}", e);
         }
-        logger.info("Document: {}", document);
+
         return document;
     }
 
@@ -701,13 +700,7 @@ public class AjaxController {
         List<String> status = new ArrayList<String>();
         boolean statusPassword = false;
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
         if (newPass.length() < 6) {
             status.add("passwordLengthError");
             return status;
@@ -929,18 +922,13 @@ public class AjaxController {
 
         List<TopicCategoryMapping> localcat = cat != null ? topicCatService.findAllByCategory(cat)
                 : topicCatService.findAll();
-        logger.info("*******Checking Sorting of TopicCat by order");
-        for (TopicCategoryMapping tcm : localcat) {
-            logger.info("Order and topic Name: {} {}", tcm.getOrder(), tcm.getTopic().getTopicName());
-        }
+
         List<ContributorAssignedTutorial> cat_list = language != null
                 ? conService.findAllByTopicCatAndLan(localcat, language)
                 : conService.findAllByTopicCat(localcat);
 
         // To find Topics
         List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(cat_list);
-
-        logger.info("****Load By Category****");
 
         /*
          * for(Tutorial t: tutorials) {
@@ -981,11 +969,9 @@ public class AjaxController {
 
         for (TopicCategoryMapping tcm : tcmList) {
             Topic topic2 = tcm.getTopic();
-            logger.info("Order and Topic Name: {} {}", tcm.getOrder(), topic2.getTopicName());
+
             topics.put(topic2.getTopicName(), topic2.getTopicId());
         }
-
-        // topics=HashMapSorting.sortHashMapByValue(topics);
 
         arlist.add(topics);
 
@@ -1000,7 +986,6 @@ public class AjaxController {
 
         cat_list = conService.findAllByTopicCat(localcat);
 
-        // To find Languages
         for (ContributorAssignedTutorial c : cat_list) {
             if (!tutService.findAllByContributorAssignedTutorialEnabled(c).isEmpty()) {
                 languages.put(c.getLan().getLangName(), c.getLan().getLanId());
@@ -1136,8 +1121,6 @@ public class AjaxController {
 
         List<Tutorial> tutorials2 = tutService.findAllByconAssignedTutorialAndStatus(lang_list2);
 
-        logger.info("****Load By Langauge****");
-
         List<TopicCategoryMapping> tcmList = new ArrayList<>();
         for (Tutorial t : tutorials2) {
             Category c = t.getConAssignedTutorial().getTopicCatId().getCat();
@@ -1157,7 +1140,7 @@ public class AjaxController {
 
         for (TopicCategoryMapping tcm : tcmList) {
             Topic topic2 = tcm.getTopic();
-            logger.info("Order and Topic Name: {} {}", tcm.getOrder(), topic2.getTopicName());
+
             topics.put(topic2.getTopicName(), topic2.getTopicId());
         }
 
@@ -1417,12 +1400,7 @@ public class AjaxController {
 
         HashMap<Integer, String> topicName = new HashMap<>();
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
 
         Category cat = catService.findBycategoryname(catName);
         logger.info("Variables of getTopicByCategoryOnContributorRole cat: {}", cat);
@@ -1463,12 +1441,7 @@ public class AjaxController {
 
         Set<String> languages = new HashSet<String>();
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
         Category cat = catService.findBycategoryname(catName);
         Topic topic = topicService.findById(topicId);
         TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
@@ -1527,11 +1500,8 @@ public class AjaxController {
             @RequestParam(value = "categoryname") String catName, @RequestParam(value = "topicid") int topicId,
             @RequestParam(value = "lanId") String lang, Principal principal) {
 
-        logger.info("id data catName topicId lanId Principal : {} {} {} {} {} {} ", tutorialId, outlineData, catName,
-                topicId, lang, principal);
         HashMap<String, String> temp = new HashMap<>();
-        logger.info("Test Outline");
-        logger.info("Outline length: outline {}", outlineData.length());
+
         logger.info("Variables of addOutline tutorialId : {} topicId : {} catName : {} langName {}", tutorialId,
                 topicId, catName, lang);
         Category cat = catService.findBycategoryname(catName);
@@ -1865,12 +1835,7 @@ public class AjaxController {
             Principal principal) {
 
         HashMap<String, String> temp = new HashMap<String, String>();
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
         logger.info("Variable of acceptDomainOutline tutorialId : {}", tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
@@ -1900,12 +1865,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptDomainScript(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
         logger.info("Variable of acceptDomainScript tutorialId : {}", tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT,
@@ -1932,12 +1892,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptDomainVideo(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
         logger.info("Variable of acceptDomainVideo tutorialId : {}", tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO,
@@ -1964,12 +1919,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptDomainSlide(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
         logger.info("Variable of acceptDomainSlide tutorialId : {}", tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE,
@@ -1995,12 +1945,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptDomainKeywords(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
         logger.info("Variable of acceptDomainKeywords tutorialId : {}", tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
@@ -2026,12 +1971,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptDomainPreRequistic(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
         logger.info("Variable of acceptDomainPreRequistic tutorialId : {}", tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
@@ -2324,12 +2264,7 @@ public class AjaxController {
     public @ResponseBody String commentByContributor(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "type") String type, @RequestParam(value = "msg") String msg, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = usrservice.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
 
         Tutorial tut = tutService.getById(tutorialId);
 
@@ -2503,7 +2438,7 @@ public class AjaxController {
 
         // usr = usrservice.findByUsername(principal.getName());
         // }
-        logger.info("Time Script: tut id {}", tutorialId);
+
         if (tutorialId != 0) {
             Tutorial tut = tutService.getById(tutorialId);
 
@@ -2514,8 +2449,6 @@ public class AjaxController {
 
                 tut.setTimeScript(document);
                 tutService.save(tut);
-
-                logger.info("Time Script: Info Database updated");
 
                 return CommonData.Script_SAVE_SUCCESS_MSG;
 

@@ -289,12 +289,12 @@ public class HomeController {
 
     private static final String VIDEO_FILE_FORMAT = "video/*";
 
-    private User getUser(Principal principal, UserService usrservice) {
-        User usr = new User();
+    private User getUser(Principal principal) {
+
         if (principal != null) {
-            usr = usrservice.findByUsername(principal.getName());
+            return userService.findByUsername(principal.getName());
         }
-        return usr;
+        return new User();
     }
 
     static void setCompStatus(Model model, List<Tutorial> tutorials) {
@@ -616,13 +616,6 @@ public class HomeController {
         return lanTempSorted;
     }
 
-    /**
-     * Index page Url
-     * 
-     * @param model Model Object
-     * @return String object (Webpapge)
-     */
-
     private void getModelData(Model model) {
         getModelData(model, 0, 0, 0, "");
 
@@ -635,9 +628,6 @@ public class HomeController {
         Map<String, Integer> cat = arlist1.get(0);
         Map<String, Integer> lan = arlist1.get(1);
         Map<String, Integer> topic = arlist.get(0);
-
-        logger.info("Test Map 1: {}", arlist1);
-        logger.info("Test Map 2: {}", arlist);
         model.addAttribute("categories", cat);
         model.addAttribute("languages", lan);
         model.addAttribute("topics", topic);
@@ -657,16 +647,13 @@ public class HomeController {
         List<Consultant> consults = consultService.findAllConsultHomeTrueForCache(); // findAllConsultHomeTrue();
         List<Brouchure> brochures = broService.findAllBrouchuresForCache(); // findAllBrouchures();
         List<Carousel> carousel = caroService.findCarouselForCache(); // findCarousel();
-        // List<Category> category_objs = catService.findAllCategoryByOrderForCache();
-        // // findAllCategoryByOrder();
         List<PromoVideo> promoVideos = promoVideoService.findAllByShowOnHomePage();
         List<ResearchPaper> researchPapers = researchPaperService.findAllByShowOnHomePage();
-
         List<Event> evnHome = new ArrayList<>();
         List<Testimonial> testHome = new ArrayList<>();
         List<Consultant> consulHome = new ArrayList<>();
         List<Category> categoryHome = new ArrayList<>();
-        // List<Brouchure> brochureHome = new ArrayList<>();
+
         List<Version> versionHome = new ArrayList<>();
         List<Carousel> carouselHome = new ArrayList<>();
         List<PromoVideo> promoVideoHome = new ArrayList<>();
@@ -683,8 +670,6 @@ public class HomeController {
             }
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
-        // model.addAttribute("brouchures", brochures);
-        // model.addAttribute("versions", versions);
 
         getModelData(model);
 
@@ -716,13 +701,10 @@ public class HomeController {
                 break;
             }
         }
-//		set upper limit for categories count
+
         upperlimit = 4;
-        // categoryHome=(categories.size()>upperlimit) ? categories.subList(0,
-        // upperlimit):categories;
+
         categoryHome = (catTempSorted.size() > upperlimit) ? catTempSorted.subList(0, upperlimit) : catTempSorted;
-        // brochureHome=(brochures.size()>upperlimit) ? brochures.subList(0,
-        // upperlimit):brochures;
         versionHome = (versions.size() > upperlimit) ? versions.subList(0, upperlimit) : versions;
         carouselHome = (carousel.size() > upperlimit) ? carousel.subList(0, upperlimit) : carousel;
         promoVideoHome = (promoVideos.size() > 1) ? promoVideos.subList(0, 1) : promoVideos;
@@ -770,7 +752,7 @@ public class HomeController {
         if (!carouselHome.isEmpty()) {
             model.addAttribute("carousel", carouselHome.get(0));
             model.addAttribute("carouselList", carouselHome.subList(1, carouselHome.size()));
-            // model.addAttribute("carouselList", carouselHome.size());
+
         }
 
         return "index";
@@ -787,29 +769,11 @@ public class HomeController {
             cacheManager.getCache(name).clear(); // clear cache by name
         }
 
-        User usr = new User();
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
         model.addAttribute("userInfo", usr);
         model.addAttribute("success_msg", CommonData.All_Caches_Clear_MSG);
         return "ClearAllCaches";
     }
-
-    /**
-     * Redirects to Tutorials Page
-     * 
-     * @param req       HttpServletRequest object
-     * @param cat       String object
-     * @param topic     String object
-     * @param lan       String object
-     * @param principal principal object
-     * @param model     model object
-     * @param page      int value
-     * @return String object (Webpapge)
-     */
 
     @GetMapping("/tutorials")
     public String viewCoursesAvailable(HttpServletRequest req,
@@ -818,6 +782,9 @@ public class HomeController {
             @RequestParam(name = "lan", required = false, defaultValue = "0") int lan,
             @RequestParam(name = "query", required = false, defaultValue = "") String query,
             @RequestParam(name = "page", defaultValue = "0") int page, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("category", cat);
         model.addAttribute("language", lan);
@@ -837,12 +804,6 @@ public class HomeController {
         Page<Tutorial> tut = null;
 
         List<Tutorial> tutToView1 = new ArrayList<Tutorial>();
-
-        User usr = new User();
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
 
         model.addAttribute("userInfo", usr);
 
@@ -915,14 +876,6 @@ public class HomeController {
 
         }
 
-        /*
-         * for(Tutorial temp :tut) { if(temp.isStatus()) { tutToView.add(temp); } }
-         * 
-         * for(Tutorial temp :tutToView) { Category c =
-         * temp.getConAssignedTutorial().getTopicCatId().getCat(); if(c.isStatus()) {
-         * tutToView1.add(temp); } }
-         */
-
         for (Tutorial temp : tut) {
             {
                 tutToView1.add(temp);
@@ -949,25 +902,13 @@ public class HomeController {
 
         model.addAttribute("tutorials", tutToView1);
         model.addAttribute("currentPage", page);
-        // model.addAttribute("query", query);
         model.addAttribute("firstPage", firstPage);
         model.addAttribute("lastPage", lastPage);
         model.addAttribute("totalPages", totalPages);
 
-        logger.info("variables of ViewCoursesAvailabe methods query: {} cat:{} lan: {} topic: {}  localTopicCat: {}",
-                query, cat, lan, topic, localTopicCat);
-        return "tutorialList"; // add view name (filename)
+        return "tutorialList";
     }
 
-    /**
-     * redirects to tutorial specific page
-     * 
-     * @param req       HttpServletRequest object
-     * @param id        integer value
-     * @param principal Principal object
-     * @param model     Model object
-     * @return String object (Webpapge)
-     */
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
@@ -975,7 +916,8 @@ public class HomeController {
 
         Category catName = catService.findBycategoryname(cat);
 
-        User usr = new User();
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         if (query.equals("q")) {
             query = "";
@@ -988,8 +930,6 @@ public class HomeController {
             catName = null;
         }
 
-        logger.info("Variables of viewTutorial method query: {} cat: {} lan: {} topic: {}", query, cat, lan, topic);
-
         Topic topicName = topicService.findBytopicName(topic);
         Language lanName = lanService.getByLanName(lan);
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
@@ -999,13 +939,11 @@ public class HomeController {
         int lanId = lanName.getLanId();
 
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
-            logger.info("Problem1");
             return "redirect:/";
         }
 
         List<Tutorial> tempTutorials = tutService.findAllByContributorAssignedTutorialEnabled(conTut);
         if (tempTutorials == null || tempTutorials.size() == 0) {
-            logger.error("Temp Tutorial Error: {}", tempTutorials);
             return "redirect:/";
 
         }
@@ -1015,7 +953,7 @@ public class HomeController {
         List<Tutorial> relatedTutorial = new ArrayList<>();
 
         if (tutorial == null || tutorial.isStatus() == false) {
-            logger.info("Problem2");
+
             return "redirect:/";
         }
 
@@ -1047,7 +985,6 @@ public class HomeController {
         }
 
         Collections.sort(relatedTutorial, Tutorial.UserVisitComp);
-        // Collections.sort(relatedTutorial);
 
         model.addAttribute("tutorials", relatedTutorial);
 
@@ -1062,12 +999,6 @@ public class HomeController {
             lanTemp.add(conAssignedTutorial.getLan().getLangName());
             topicTemp.add(conAssignedTutorial.getTopicCatId().getTopic().getTopicName());
         }
-
-//				List<String> catTempSorted =new ArrayList<String>(catTemp);
-//				Collections.sort(catTempSorted);
-//				
-//				List<String> lanTempSorted =new ArrayList<String>(lanTemp);
-//				Collections.sort(lanTempSorted);
 
         getModelData(model, catId, topicId, lanId, query);
         List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
@@ -1087,6 +1018,7 @@ public class HomeController {
         sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
         sb.append("/");
         if (scriptVerList != null && scriptVerList.size() > 0) {
+            System.out.println(scriptVerList);
             StringBuilder sb2 = new StringBuilder(sb);
             sb2.append(scriptVerList.get(0));
             sm_url = sb2.toString();
@@ -1109,42 +1041,26 @@ public class HomeController {
         return "tutorial";
     }
 
-    /**
-     * Redirects to Login Page
-     * 
-     * @param model Model object
-     * @return String object (Webpapge)
-     */
     @RequestMapping("/login") // in use
     public String loginGet(Model model) {
         model.addAttribute("classActiveLogin", true);
         return "signup";
     }
 
-    /**
-     * Redirects to ShowEvent Page
-     * 
-     * @param model Model object
-     * @return String object (Webpapge)
-     */
     @GetMapping("/showEvent")
-    public String showEventGet(Model model) {
-
+    public String showEventGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Event> events = eventservice.findAll();
 
         model.addAttribute("Events", events);
         return "events";
     }
 
-    /**
-     * Redirects to Consultant Page
-     * 
-     * @param model Model object
-     * @return String object (Webpapge)
-     */
     @GetMapping("/showConsultant")
-    public String showConsultantGet(Model model) {
-
+    public String showConsultantGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Consultant> consults = consultService.findAll();
         model.addAttribute("listConsultant", consults);
 
@@ -1169,17 +1085,16 @@ public class HomeController {
             }
 
         }
-        // map.put(100,"teststring");
 
         model.addAttribute("map", map);
         return "Consultants";
     }
 
     @GetMapping("/showLanguages")
-    public String showLanguagesGet(Model model) {
-
+    public String showLanguagesGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         HashMap<String, Integer> map = new HashMap<>();
-        // List<Language> langs = lanService.getAllLanguages();
         List<Language> langs = getLanguages();
         for (Language lang : langs) {
             List<ContributorAssignedTutorial> con = conRepo.findAllByLan(lang);
@@ -1197,59 +1112,29 @@ public class HomeController {
             map.put(lang.getLangName(), finalTutorials.size());
         }
         model.addAttribute("map", map);
-
-//		List<Consultant> consults = consultService.findAll();
-//		model.addAttribute("listConsultant", consults);
-//		
-//		HashMap<Integer, String> map = new HashMap<>();
-//		User user = userService.findByEmail("bellatonyp@gmail.com");
-//		Set<UserRole> roles = user.getUserRoles();
-//		Set<Category> categorys = user.getCategories();
-//		for(Consultant c:consults) {
-//			String s="";
-//			Set<UserRole> userRoles = c.getUser().getUserRoles();
-//			for(UserRole ur:userRoles) {
-//				if(ur.getRole().getName().equals(CommonData.domainReviewerRole)) {
-//					s= s+ ur.getCategory().getCatName()+" , ";
-//				}
-//			}
-//			map.put(c.getConsultantId(),s.substring(0, s.length()-2));
-//			
-//		}
-//		map.put(100,"teststring");
-//
-//		model.addAttribute("map", map);
         return "languages";
     }
 
-    /**
-     * Redirects to Testimonail Page
-     * 
-     * @param model Model object
-     * @return String object (Webpapge)
-     */
     @GetMapping("/showTestimonial")
-    public String showTestimonialGet(Model model) {
+    public String showTestimonialGet(HttpServletRequest req, Principal principal, Model model) {
 
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Testimonial> testi = testService.findByApproved(true);
         model.addAttribute("Testimonials", testi);
         return "signup";
     }
 
-    /**
-     * redirects to Forget Password Post method
-     * 
-     * @param request HttpServletRequest object
-     * @param email   String object
-     * @param model   model object
-     * @return String object (Webpapge)
-     */
     @PostMapping("/forgetPassword")
     public String forgetPasswordPost(HttpServletRequest request, @ModelAttribute("email") String email, Model model) {
 
         model.addAttribute("classActiveForgetPassword", true);
 
         User usr = userService.findByEmail(email);
+        if (usr != null) {
+
+            logger.info("{} {} {}", usr.getUsername(), request.getMethod(), request.getRequestURI());
+        }
 
         if (usr == null) {
             model.addAttribute("emailNotExist", true);
@@ -1300,11 +1185,12 @@ public class HomeController {
      * @return String object (Webpapge)
      */
     @GetMapping("/reset")
-    public ModelAndView resetPasswordGet(ModelAndView mv, @RequestParam("token") String token, Principal principal) {
+    public ModelAndView resetPasswordGet(ModelAndView mv, @RequestParam("token") String token, HttpServletRequest req,
+            Principal principal) {
 
         if (principal != null) {
             User localUser = userService.findByUsername(principal.getName());
-
+            logger.info("{} {} {}", localUser.getUsername(), req.getMethod(), req.getRequestURI());
             mv.addObject("LoggedUser", localUser);
 
             mv.setViewName("accessDeniedPage");
@@ -1315,6 +1201,8 @@ public class HomeController {
         if (usr == null) {
             mv.setViewName("redirect:/");
             return mv;
+        } else {
+            logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         }
 
         mv.addObject("resetToken", usr.getToken());
@@ -1340,7 +1228,7 @@ public class HomeController {
 
         if (principal != null) {
             User localUser = userService.findByUsername(principal.getName());
-
+            logger.info("{} {} {}", localUser.getUsername(), req.getMethod(), req.getRequestURI());
             mv.addObject("LoggedUser", localUser);
 
             mv.setViewName("redirect:/");
@@ -1351,6 +1239,8 @@ public class HomeController {
         if (usr == null) {
             mv.addObject("Error", "Invalid Request");
             return mv;
+        } else {
+            logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         }
 
         if (!newPassword.contentEquals(confNewPassword)) {
@@ -1380,18 +1270,20 @@ public class HomeController {
      * @return String object(webpage)
      */
     @GetMapping("/categories")
-    public String showCategoriesGet(Model model) {
+    public String showCategoriesGet(HttpServletRequest req, Principal principal, Model model) {
 
-        // List<Category> categories=catService.findAll();
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
         List<Category> categories = getCategories();
         model.addAttribute("categories", categories);
         return "categories";
     }
 
     @GetMapping("/researchPapers")
-    public String showResearchPapersGet(Model model) {
-
-        // List<Category> categories=catService.findAll();
+    public String showResearchPapersGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<ResearchPaper> researchPapers = researchPaperService.findAllByShowOnHomePage();
 
         model.addAttribute("researchPapers", researchPapers);
@@ -1475,12 +1367,6 @@ public class HomeController {
 
     }
 
-    /**
-     * Redirects to adduser page
-     * 
-     * @param model Model Object
-     * @return String object (webpage)
-     */
     @RequestMapping("/newUser") // in use
     public String newUserGet(Model model) {
 
@@ -1489,23 +1375,8 @@ public class HomeController {
 
     }
 
-    /**************************
-     * END
-     ****************************************************/
-
-    /****************************
-     * DASHBAORD PAGE FOR ALL USER
-     *****************************************/
-
-    /**
-     * redirects to user Dashboard page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/dashBoard")
-    public String dashBoardGet(Model model, Principal principal) {
+    public String dashBoardGet(HttpServletRequest req, Model model, Principal principal) {
 
         User usr = new User();
         if (principal != null) {
@@ -1514,7 +1385,7 @@ public class HomeController {
             usr.setLoggedInTime(ServiceUtility.getCurrentTime());
             userService.save(usr);
         }
-        logger.info("User of DashBoardGetMethod {}", usr);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<UserRole> userRoles = usrRoleService.findAllByUser(usr);
@@ -1523,7 +1394,6 @@ public class HomeController {
 
         for (int i = 0; i < userRoles.size(); i++) {
             if (!userRoles.get(i).getStatus()) {
-//				roleIds.add(userRoles.get(i).getRole().getRoleId());
                 pendingUserRoles.add(userRoles.get(i));
             }
         }
@@ -1532,26 +1402,11 @@ public class HomeController {
         return "roleAdminDetail";
     }
 
-    /******************************************
-     * ADD CATEGORY
-     *************************************************/
-
-    /**
-     * redirects to add category page
-     * 
-     * @param model     model Object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addCategory")
-    public String addCategoryGet(Model model, Principal principal) {
+    public String addCategoryGet(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -1562,26 +1417,12 @@ public class HomeController {
 
     }
 
-    /**
-     * Url to add category to object
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest object
-     * @param files     MultipartFile object
-     * @return String object (webpage)
-     */
     @PostMapping("/addCategory")
     public String addCategoryPost(Model model, Principal principal, HttpServletRequest req,
             @RequestParam("categoryImage") MultipartFile files) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         List<Category> categoriesTemp = catService.findAll();
         model.addAttribute("categories", categoriesTemp);
@@ -1646,7 +1487,7 @@ public class HomeController {
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "addCategory";
         }
-        logger.info("Variables of AddCategoryPost categoryName {}  categoryDesc {} ", categoryName, categoryDesc);
+
         categoriesTemp = catService.findAll();
         model.addAttribute("categories", categoriesTemp);
         model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
@@ -1654,29 +1495,11 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-    /************************************
-     * ADD ORGANIZATIONAL ROLE
-     **********************************************/
-
-    /**
-     * redirect to add organization role page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addOrganizationRole")
-    public String addOrganizationRoleGet(Model model, Principal principal) {
+    public String addOrganizationRoleGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -1688,24 +1511,11 @@ public class HomeController {
 
     }
 
-    /**
-     * add organization role object to database
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addOrganizationRole")
     public String addOrganizationRolePost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<OrganizationRole> orgRoles = organizationRoleService.findAll();
@@ -1732,8 +1542,6 @@ public class HomeController {
         orgRole.setRoleId(organizationRoleService.getnewRoleId());
         orgRole.setRole(roleName);
         organizationRoleService.save(orgRole);
-        logger.info("AddOrganizationRolePost role: {}", roleName);
-
         Set<OrganizationRole> roles = new HashSet<OrganizationRole>();
         roles.add(orgRole);
 
@@ -1746,52 +1554,26 @@ public class HomeController {
 
     }
 
-    /**
-     * redirect to edit organization role page given id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/organization_role/edit/{name}")
-    public String editOrganizationRoleGet(@PathVariable(name = "name") String orgname, Model model,
-            Principal principal) {
+    public String editOrganizationRoleGet(@PathVariable(name = "name") String orgname, HttpServletRequest req,
+            Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         OrganizationRole role = organizationRoleService.getByRole(orgname);
-        logger.info("Variables of EditOrganizationRole orgname: {}  role: {}", orgname, role);
 
         model.addAttribute("role", role);
 
         return "updateOrganizationalRole";
     }
 
-    /**
-     * update organization role object to database
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/update_organization_role")
     public String updateOrganizationRolePost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -1799,7 +1581,6 @@ public class HomeController {
         String lanIdInString = req.getParameter("roleId");
         int roleId = Integer.parseInt(lanIdInString);
         OrganizationRole role = organizationRoleService.getById(roleId);
-//		Language lan = lanService.getById(lanId);
 
         if (role == null) {
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
@@ -1833,9 +1614,7 @@ public class HomeController {
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             return "updateOrganizationalRole"; // accomodate view part
         }
-        logger.info("UpdateOrganizationRolePost roleName : {} lanIdInString : {} roleId : {} role : {} ", roleName,
-                lanIdInString, roleId, role);
-//		role = lanService.getById(lanId);
+
         role = organizationRoleService.getById(roleId);
         model.addAttribute("role", role);
         model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
@@ -1844,31 +1623,11 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * ADD LANGUAGE
-     **********************************************/
-
-    /**
-     * redirect to add language page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addLanguage")
-    public String addLanguageGet(Model model, Principal principal) {
+    public String addLanguageGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Language> languages = lanService.getAllLanguages();
@@ -1879,23 +1638,11 @@ public class HomeController {
 
     }
 
-    /**
-     * add language object to database
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addLanguage")
     public String addLanguagePost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -1938,8 +1685,6 @@ public class HomeController {
         }
 
         languagesTemp = lanService.getAllLanguages();
-        logger.info("Variables of AddLanguagePost Language Name {}", language_formatted);
-
         model.addAttribute("languages", languagesTemp);
 
         model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
@@ -1948,27 +1693,10 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /******************************
-     * ADD CAROUSEL
-     ******************************************/
-
-    /**
-     * redirect to add carousel page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addCarousel")
-    public String addCarouselGet(Model model, Principal principal) {
-        User usr = new User();
-        if (principal != null) {
-            usr = userService.findByUsername(principal.getName());
-        }
+    public String addCarouselGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Carousel> cara = caroService.findAll();
@@ -1978,26 +1706,13 @@ public class HomeController {
         return "addCarousel";
     }
 
-    /**
-     * Add Carousel object
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param file      MultipartFile
-     * @param name      String object
-     * @param desc      String object
-     * @return String object
-     */
     @PostMapping("/addCarousel")
-    public String addCarouselPost(Model model, Principal principal, @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "eventName") String name, @RequestParam(name = "eventDesc") String desc) {
+    public String addCarouselPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam("file") MultipartFile file, @RequestParam(value = "eventName") String name,
+            @RequestParam(name = "eventDesc") String desc) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -2019,7 +1734,6 @@ public class HomeController {
             model.addAttribute("error_msg", CommonData.JPG_PNG_EXT);
             return "addCarousel";
         }
-        logger.info("Variables of addCarouselPost name: {} desc: {}", name, desc);
 
         Carousel caraTemp = new Carousel();
         caraTemp.setId(caroService.getNewId());
@@ -2053,27 +1767,13 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /*****************************
-     * ADD Research Paper
-     *************************************/
-
     @GetMapping("/addResearchPaper")
-    public String addResearchPaperGet(Model model, Principal principal) {
-        User usr = new User();
-        if (principal != null) {
-            usr = userService.findByUsername(principal.getName());
-        }
+    public String addResearchPaperGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<ResearchPaper> researchPapers = researchPaperService.findAll();
-        /*
-         * for(ResearchPaper temp : researchPapers) {
-         * makeThumbnailofResearchPaper(temp); }
-         */
 
         model.addAttribute("researchPapers", researchPapers);
 
@@ -2081,17 +1781,12 @@ public class HomeController {
     }
 
     @PostMapping("/addResearchPaper")
-    public String addResearchPaperPost(Model model, Principal principal,
+    public String addResearchPaperPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("researchFile") MultipartFile researchFile, @RequestParam(value = "title") String title,
             @RequestParam(name = "researchPaperDesc") String researchPaperDesc) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         boolean viewSection = false;
         model.addAttribute("viewSection", viewSection);
@@ -2122,17 +1817,14 @@ public class HomeController {
         try {
 
             String folder = CommonData.uploadResearchPaper + researchPaperTemp.getId();
-            // String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
             List<String> documents = ServiceUtility.UploadMediaFileAndCreateThumbnail(researchFile, env, folder);
 
             researchPaperTemp.setResearchPaperPath(documents.get(0));
             researchPaperTemp.setThumbnailPath(documents.get(1));
             researchPaperTemp.setDescription(researchPaperDesc);
             researchPaperTemp.setTitle(title);
-
             researchPaperService.save(researchPaperTemp);
-            logger.info("Variables of addResearchPaperPost title: {} desc: {} researchPaperFile: {} thumbnail: {} ",
-                    title, researchPaperDesc, documents.get(0), documents.get(1));
+
         } catch (Exception e) {
             logger.error("Exception while updating research paper: {} {} {}", title, researchPaperDesc, researchFile,
                     e);
@@ -2154,18 +1846,10 @@ public class HomeController {
 
     }
 
-    /************************************************************************************/
-
-    /**************************************
-     * ADD PROMOVIDEO
-     *********************************/
-
     @GetMapping("/addPromoVideo")
-    public String addPromoVideoGet(Model model, Principal principal) {
-        User usr = new User();
-        if (principal != null) {
-            usr = userService.findByUsername(principal.getName());
-        }
+    public String addPromoVideoGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Language> lans = lanService.getAllLanguages();
@@ -2173,7 +1857,7 @@ public class HomeController {
 
         List<PromoVideo> promovideos = promoVideoService.findAll();
         List<PathofPromoVideo> pathofPromoVideos = pathofPromoVideoService.findAll();
-        logger.info("promovideos= {} {}", promovideos, promovideos.isEmpty());
+
         model.addAttribute("promoVideos", promovideos);
         model.addAttribute("pathofPromoVideos", pathofPromoVideos);
 
@@ -2181,20 +1865,14 @@ public class HomeController {
     }
 
     @PostMapping("/addPromoVideo")
-    public String addPromoVideoPost(Model model, Principal principal,
+    public String addPromoVideoPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("promoVideo") List<MultipartFile> promoVideos,
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam(name = "title") String title) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-        logger.info("LanguageIds: {}", languageIds);
 
         boolean viewSection = false;
         model.addAttribute("viewSection", viewSection);
@@ -2212,12 +1890,12 @@ public class HomeController {
 
                 if (!ServiceUtility.checkFileExtensionVideo(uniquefile)) { // throw error on extension
                     model.addAttribute("error_msg", CommonData.VIDEO_FILE_EXTENSION_ERROR);
-                    return addPromoVideoGet(model, principal);
+                    return addPromoVideoGet(req, model, principal);
                 }
 
                 if (!ServiceUtility.checkVideoSizePromoVideo(uniquefile)) {
                     model.addAttribute("error_msg", "File size must be less than 1 GB");
-                    return addPromoVideoGet(model, principal);
+                    return addPromoVideoGet(req, model, principal);
                 }
 
             }
@@ -2226,7 +1904,7 @@ public class HomeController {
 
         if (title == null) { // throw error
             model.addAttribute("error_msg", "Please Try again");
-            return addPromoVideoGet(model, principal);
+            return addPromoVideoGet(req, model, principal);
         }
 
         boolean filesError = false;
@@ -2237,7 +1915,6 @@ public class HomeController {
         promoVideoTemp.setPromoId(newPromoVideoId);
         promoVideoTemp.setTitle(title);
         promoVideoTemp.setDateAdded(ServiceUtility.getCurrentTime());
-        logger.info("Title of PromoVideoPost: {}", title);
 
         try {
             List<PathofPromoVideo> pathofPromoVideoList = new ArrayList<>();
@@ -2290,7 +1967,7 @@ public class HomeController {
                     logger.error("Error in PromoVideo", e);
                     model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
-                    return addPromoVideoGet(model, principal);
+                    return addPromoVideoGet(req, model, principal);
                 }
 
                 pathofPromoVideoService.saveAll(pathofPromoVideoList);
@@ -2303,7 +1980,7 @@ public class HomeController {
 
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
-            return addPromoVideoGet(model, principal);
+            return addPromoVideoGet(req, model, principal);
 
         }
 
@@ -2325,30 +2002,13 @@ public class HomeController {
 
             model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
         }
-        return addPromoVideoGet(model, principal);
+        return addPromoVideoGet(req, model, principal);
     }
 
-    /***************************************
-     * END
-     ********************************************/
-
-    /******************************
-     * ADD BROUCHURE
-     ******************************************/
-
-    /**
-     * redirect to add brochure page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addBrochure")
-    public String addBrochureGet(Model model, Principal principal) {
-        User usr = new User();
-        if (principal != null) {
-            usr = userService.findByUsername(principal.getName());
-        }
+    public String addBrochureGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         List<Category> category = catService.findAll();
         model.addAttribute("categories", category);
@@ -2360,10 +2020,7 @@ public class HomeController {
         for (Brouchure bro : brouchures) {
             Version ver = verService.findByBrouchureAndPrimaryVersion(bro, bro.getPrimaryVersion());
             versions.add(ver);
-            /*
-             * for(Version ver: allVersions) { if(bro.getId()==ver.getBrouchure().getId() &&
-             * bro.getPrimaryVersion()==ver.getBroVersion()) versions.add(ver); }
-             */
+
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
 
@@ -2386,19 +2043,14 @@ public class HomeController {
      * @return String object
      */
     @PostMapping("/addBrochure")
-    public String addBrochurePost(Model model, Principal principal,
+    public String addBrochurePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("brouchure") List<MultipartFile> brochures,
             @RequestParam(value = "categoryName") int categoryId, @RequestParam(name = "inputTopicName") int topicId,
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam(value = "primaryVersion") int primaryVersion, @RequestParam(name = "title") String title) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         boolean viewSection = false;
@@ -2425,7 +2077,7 @@ public class HomeController {
                 if (!ServiceUtility.checkFileExtensionImage(uniquefile)
                         && !ServiceUtility.checkFileExtensiononeFilePDF(uniquefile)) { // throw error
                     model.addAttribute("error_msg", "Only image and pdf files are supported");
-                    return addBrochureGet(model, principal);
+                    return addBrochureGet(req, model, principal);
                 }
             }
 
@@ -2435,24 +2087,16 @@ public class HomeController {
 
         Topic topic = topicService.findById(topicId);
 
-        /*
-         * if(cat == null) { // throw error
-         * model.addAttribute("error_msg","Please Try again"); return "addBrochure"; }
-         * 
-         * if(topic == null) { // throw error
-         * model.addAttribute("error_msg","Please Try again"); return "addBrochure"; }
-         */
-        // int versionInt = Integer.parseInt(version);
         String versionStr = Integer.toString(primaryVersion);
 
         if (versionStr == null) { // throw error
             model.addAttribute("error_msg", "Please Try again");
-            return addBrochureGet(model, principal);
+            return addBrochureGet(req, model, principal);
         }
 
         if (title == null) { // throw error
             model.addAttribute("error_msg", "Please Try again");
-            return addBrochureGet(model, principal);
+            return addBrochureGet(req, model, principal);
         }
 
         boolean filesError = false;
@@ -2466,8 +2110,6 @@ public class HomeController {
         brochureTemp.setLan(lan);
         brochureTemp.setTitle(title);
         brochureTemp.setPrimaryVersion(primaryVersion);
-
-        logger.info("Variables of AddPromoVideoPost title {} lan : {} primaryVersion: {} ", title, lan, primaryVersion);
 
         if (cat != null) {
             brochureTemp.setCatId(cat);
@@ -2504,7 +2146,7 @@ public class HomeController {
                     if (!brochures.get(i).isEmpty()) {
                         folder = CommonData.uploadBrouchure + newBroId + "/" + primaryVersion + "/" + "web" + "/"
                                 + langName;
-                        // document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
+
                         documents = ServiceUtility.UploadMediaFileAndCreateThumbnail(brochures.get(i), env, folder);
                     }
 
@@ -2536,7 +2178,7 @@ public class HomeController {
                     logger.error("Error in Add Brochure: {}", brochureTemp, e);
                     model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
-                    return addBrochureGet(model, principal);
+                    return addBrochureGet(req, model, principal);
                 }
 
                 version.setVerId(newVerid);
@@ -2557,16 +2199,7 @@ public class HomeController {
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             verService.delete(version);
 
-            /*
-             * brouchures = broService.findAll(); allVersions= verService.findAll();
-             * versions= new ArrayList<>(); for(Brouchure bro: brouchures) { for(Version
-             * ver: allVersions) { if(bro.getId()==ver.getBrouchure().getId() &&
-             * bro.getPrimaryVersion()==ver.getBroVersion()) versions.add(ver); } }
-             * Collections.sort(versions, Version.SortByBroVersionTime);
-             * model.addAttribute("brouchures", brouchures); model.addAttribute("versions",
-             * versions);
-             */
-            return addBrochureGet(model, principal);
+            return addBrochureGet(req, model, principal);
 
         }
 
@@ -2585,33 +2218,14 @@ public class HomeController {
 
             model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
         }
-        return addBrochureGet(model, principal);
+        return addBrochureGet(req, model, principal);
     }
 
-    /********************************
-     * END
-     ****************************************************/
-
-    /************************************
-     * ADD TOPIC
-     **********************************************/
-
-    /**
-     * redirect to add topic page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addTopic")
-    public String addTopicGet(Model model, Principal principal) {
+    public String addTopicGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<TopicCategoryMapping> tcm = topicCatService.findAll();
 
         List<TopicCategoryMapping> tcm1 = new ArrayList<>();
@@ -2633,19 +2247,6 @@ public class HomeController {
             }
         }
 
-        /*
-         * List<Category> newCategories1 = new ArrayList<>(); List<Category>
-         * newCategories2 = new ArrayList<>();
-         * 
-         * for (Category cat1 : category) { for (Category cat2 : getcats) if (cat1 ==
-         * cat2) continue;
-         * 
-         * if (cat1.isStatus()) { newCategories1.add(cat1); } else {
-         * newCategories2.add(cat1); }
-         * 
-         * } newCategories1.addAll(newCategories2); getcats.addAll(newCategories1);
-         */
-
         model.addAttribute("categories", categories);
 
         List<Topic> getTopics = topicService.findAll();
@@ -2663,35 +2264,19 @@ public class HomeController {
 
     }
 
-    /**
-     * add topic into database
-     * 
-     * @param model      Model object
-     * @param principal  Principal object
-     * @param categoryId int value
-     * @param topicName  String object
-     * @param orderValue int value
-     * @return String object
-     */
     @PostMapping("/addTopic")
-    public String addTopicPost(Model model, Principal principal, @RequestParam(name = "topicId") int topicId,
-            @RequestParam(name = "categoryName") int categoryId, @RequestParam(name = "topicName") String topicName,
-            @RequestParam(name = "orderValue") int orderValue) {
+    public String addTopicPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "topicId") int topicId, @RequestParam(name = "categoryName") int categoryId,
+            @RequestParam(name = "topicName") String topicName, @RequestParam(name = "orderValue") int orderValue) {
 
-        User usr = new User();
-
-        if (principal != null) {
-            usr = userService.findByUsername(principal.getName());
-        }
-
-        logger.info("Variables of addTopicPost  categoryId: {} topicId: {} topicName: {} orderValue: {}", categoryId,
-                topicId, topicName, orderValue);
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         Category cat = catService.findByid(categoryId);
 
         if (cat == null) {
             model.addAttribute("error_msg", "Category Doesn't Exist");
-            return addTopicGet(model, principal);
+            return addTopicGet(req, model, principal);
         }
 
         Topic topicTemp;
@@ -2710,12 +2295,12 @@ public class HomeController {
                         topicTemp, orderValue);
                 topicCatService.save(localTopicMap);
                 model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
-                return addTopicGet(model, principal);
+                return addTopicGet(req, model, principal);
 
             } else {
 
                 model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-                return addTopicGet(model, principal);
+                return addTopicGet(req, model, principal);
             }
         }
 
@@ -2738,61 +2323,27 @@ public class HomeController {
             // TODO Auto-generated catch block
             logger.error("Error in Add Topic : {} {}", usr, topics, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
-            return addTopicGet(model, principal);
+            return addTopicGet(req, model, principal);
         }
 
         model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
 
-        return addTopicGet(model, principal);
+        return addTopicGet(req, model, principal);
 
     }
 
-    /**
-     * redirects to page of topic given id
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param id        int value
-     * @return String object (webpage)
-     */
-    /*
-     * @RequestMapping(value = "/topic/edit/{topicName}", method =
-     * RequestMethod.GET) public String editTopicGet(@PathVariable(name =
-     * "topicName") String topicTemp,Model model,Principal principal) {
-     * 
-     * User usr=new User();
-     * 
-     * if(principal!=null) {
-     * 
-     * usr=userService.findByUsername(principal.getName()); }
-     * 
-     * model.addAttribute("userInfo", usr);
-     * 
-     * Topic topic=topicService.findBytopicName(topicTemp);
-     * 
-     * if(topic == null) { return "redirect:/addTopic"; }
-     * 
-     * model.addAttribute("topic",topic);
-     * 
-     * return "updateTopic"; // need to accomdate view part }
-     */
-
     @GetMapping("/topic/edit/{topicCatId}")
-    public String editTopicGet(@PathVariable(name = "topicCatId") int topicCatId, Model model, Principal principal) {
+    public String editTopicGet(@PathVariable(name = "topicCatId") int topicCatId, HttpServletRequest req, Model model,
+            Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
         TopicCategoryMapping tcp = tcmRepository.findById(topicCatId).get();
 
         Topic topic = tcp.getTopic();
-        logger.info("Variables of TopicEdit topicCatId: {} topic: {} ", topicCatId, topic);
 
         if (topic == null) {
             return "redirect:/addTopic";
@@ -2804,23 +2355,11 @@ public class HomeController {
         return "updateTopic"; // need to accomdate view part
     }
 
-    /**
-     * update topic object
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/updateTopic")
     public String updateTopicPost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -2835,8 +2374,6 @@ public class HomeController {
 
         TopicCategoryMapping tcp = tcmRepository.findById(topicCatId).get();
         Topic topic = topicService.findById(topicId);
-
-        logger.info(" variables of updateTopicPost topic: {} TopicName: {}", topic, topicname);
 
         if (topic == null || tcp == null) {
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
@@ -2863,16 +2400,12 @@ public class HomeController {
         topic.setTopicName(topicname);
         tcp.setOrder(orderValue);
 
-        logger.info(" variables of updateTopicPost topicName: {} OrderValue: {}", topicname, orderValue);
-
         try {
             topicService.save(topic);
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
             logger.error("Error in Update Topic: {}", topic, e);
-
-            // model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
         }
         try {
@@ -2881,7 +2414,6 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             logger.error("Error in Update Topic: {}", tcp, e);
-            // model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
         }
 
@@ -2896,30 +2428,11 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * ADD ROLE
-     **********************************************/
-
-    /**
-     * redirect to add role page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addRole")
-    public String addRoleGet(Model model, Principal principal) {
+    public String addRoleGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -2931,24 +2444,11 @@ public class HomeController {
 
     }
 
-    /**
-     * add role object into database
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addRole")
     public String addRolePost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Role> roles = roleService.findAll();
@@ -2965,7 +2465,6 @@ public class HomeController {
 
         if (roleService.findByname(roleName) != null) {
 
-//			model.addAttribute("msg1", true);
             model.addAttribute("error_msg", CommonData.RECORD_EXISTS);
             return "addNewRole";
         }
@@ -2973,7 +2472,6 @@ public class HomeController {
         Role newRole = new Role();
         newRole.setRoleId(roleService.getNewRoleId());
         newRole.setName(roleName);
-        logger.info("Variables of AddRolePost roleName: {}", roleName);
 
         try {
             roleService.save(newRole);
@@ -2992,30 +2490,11 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * ADD QUESTION
-     **********************************************/
-
-    /**
-     * redirects to upload question page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return Strig object (webpage)
-     */
     @GetMapping("/uploadQuestion")
-    public String addQuestionGet(Model model, Principal principal) {
+    public String addQuestionGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -3034,29 +2513,13 @@ public class HomeController {
 
     }
 
-    /**
-     * upload question object into database
-     * 
-     * @param model      Model object
-     * @param principal  principal object
-     * @param quesPdf    MultipartFile
-     * @param categoryId int value
-     * @param topicId    int value
-     * @param languageId int value
-     * @return string object
-     */
     @PostMapping("/uploadQuestion")
-    public String addQuestionPost(Model model, Principal principal, @RequestParam("questionName") MultipartFile quesPdf,
-            @RequestParam(value = "categoryName") int categoryId, @RequestParam(name = "inputTopicName") int topicId,
-            @RequestParam(name = "languageyName") int languageId) {
+    public String addQuestionPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam("questionName") MultipartFile quesPdf, @RequestParam(value = "categoryName") int categoryId,
+            @RequestParam(name = "inputTopicName") int topicId, @RequestParam(name = "languageyName") int languageId) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Question> questionsTemp = questService.findAll();
@@ -3156,26 +2619,13 @@ public class HomeController {
 
     }
 
-    /**
-     * redirect to edit question page given id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/question/edit/{catName}/{topicName}/{language}")
     public String editQuestionGet(@PathVariable(name = "catName") String cat,
-            @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan, Model model,
-            Principal principal) {
+            @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") HttpServletRequest req,
+            String lan, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Category catName = catService.findBycategoryname(cat);
@@ -3191,29 +2641,15 @@ public class HomeController {
 
         model.addAttribute("question", ques);
 
-        return "updateQuestion"; // question edit page
+        return "updateQuestion";
     }
 
-    /**
-     * update question object
-     * 
-     * @param req       HttpServletRequest
-     * @param model     Model object
-     * @param principal principal object
-     * @param quesPdf   MultipartFile object
-     * @return String object
-     */
     @PostMapping("/updateQuestion")
     public String updateQuestionPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("questionName") MultipartFile quesPdf) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         String quesIdInString = req.getParameter("id");
@@ -3267,31 +2703,10 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * ADD CONSULTANT
-     **********************************************/
-
-    /**
-     * redirect to add consultant page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object (Webpage)
-     */
     @GetMapping("/addConsultant")
-    public String addConsultantGet(Model model, Principal principal) {
-
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String addConsultantGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Consultant> consultants = consultService.findAll();
@@ -3306,30 +2721,16 @@ public class HomeController {
 
     }
 
-    /**
-     * Add consultant to the system
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param name      String object
-     * @param catId     int value
-     * @param lanId     int value
-     * @param email     String object
-     * @return String object
-     */
     @PostMapping("/addConsultant")
-    public String addConsultantPost(Model model, Principal principal, @RequestParam("nameConsaltant") String name,
-            @RequestParam("lastname") String lastname, @RequestParam("categoryName") int catId,
-            @RequestParam("lanName") int lanId, @RequestParam("email") String email, @RequestParam("desc") String desc,
+    public String addConsultantPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam("nameConsaltant") String name, @RequestParam("lastname") String lastname,
+            @RequestParam("categoryName") int catId, @RequestParam("lanName") int lanId,
+            @RequestParam("email") String email, @RequestParam("desc") String desc,
             @RequestParam("photo") MultipartFile photo) {
 
-        User usr = new User();
+        User usr = getUser(principal);
 
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Consultant> consultants = consultService.findAll();
@@ -3339,9 +2740,6 @@ public class HomeController {
         model.addAttribute("categories", cat);
         model.addAttribute("consultants", consultants);
         model.addAttribute("languages", lans);
-
-        logger.info("Variables of addConsultantPost  name: {} lastname: {} catId: {} lanId: {} email: {} desc: {}",
-                name, lastname, catId, lanId, email, desc);
 
         if (!ServiceUtility.checkEmailValidity(email)) { // throw email wromng error
 
@@ -3457,29 +2855,19 @@ public class HomeController {
     }
 
     @GetMapping("/consultant/edit/{id}")
-    public String editConsultant(@PathVariable int id, Model model, Principal principal) {
+    public String editConsultant(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
         Consultant consultant = consultService.findById(id);
-//		Testimonial test=testService.findById(id);
 
         if (consultant == null) {
 
             return "redirect:/addConsultant";
         }
-
-//		if(consultant.getUser().getId() != usr.getId()) {
-//
-//			return "redirect:/addConsultant";
-//		}
 
         model.addAttribute("consultant", consultant);
 
@@ -3490,20 +2878,14 @@ public class HomeController {
     public String updateConnsultant(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("photo") MultipartFile file) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         String consultant_id = req.getParameter("consultant_id");
         String name = req.getParameter("name");
         String lastname = req.getParameter("lastname");
         String desc = req.getParameter("desc");
-        logger.info("Variables of Update Consultant consultant_id: {} name: {}  lastname: {} desc : {}", consultant_id,
-                name, lastname, desc);
+
         Consultant consultant = consultService.findById(Integer.parseInt(consultant_id));
 
         if (consultant == null) {
@@ -3554,28 +2936,12 @@ public class HomeController {
         return "updateConsultant";
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * ADD EVENT
-     **********************************************/
-    /**
-     * redirect to add page
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @return String object
-     */
     @GetMapping("/addEvent")
-    public String addEventGet(Model model, Principal principal) {
-        User usr = new User();
-        if (principal != null) {
-            usr = userService.findByUsername(principal.getName());
-        }
+    public String addEventGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-        // List<Event> events = eventservice.findByUser(usr);
+
         List<Event> events = eventservice.findAll();
         model.addAttribute("events", events);
         List<State> states = stateService.findAll();
@@ -3588,28 +2954,13 @@ public class HomeController {
         return "addEvent";
     }
 
-    /**
-     * Add Event object into database
-     * 
-     * @param model     Model object
-     * @param principal principal object
-     * @param req       HttpServletRequest object
-     * @param files     MultipartFile
-     * @param topicId   list of integer value
-     * @param catName   int value
-     * @return String (webpage)
-     */
     @PostMapping("/addEvent")
     public String addEventPost(Model model, Principal principal, HttpServletRequest req,
             @RequestParam("Image") MultipartFile files, @RequestParam(value = "inputTopic") int[] topicId,
             @RequestParam(value = "categoryName") int catName) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -3638,12 +2989,6 @@ public class HomeController {
         String cityName = req.getParameter("cityName");
         String addressInformationName = req.getParameter("addressInformationName");
         String language = req.getParameter("language");
-
-        logger.info(
-                "Variables of addEventPost eventName : {} desc : {} venueName : {} contactPerson : {} contactNumber : {} email : {} pinCode: {}"
-                        + " stateName : {} districtName: {} cityName : {}  addressInformationName: {} language : {}",
-                eventName, desc, venueName, contactPerson, contactNumber, email, pinCode, stateName, districtName,
-                cityName, addressInformationName, language);
 
         Date startDate;
         Date endDate;
@@ -3738,7 +3083,6 @@ public class HomeController {
             Category cat = catService.findByid(catName);
 
             try {
-//				trainingInfoService.save(trainingData);
                 int trainingTopicId = trainingTopicServ.getNewId();
                 for (int topicID : topicId) {
                     Topic topicTemp = topicService.findById(topicID);
@@ -3774,31 +3118,11 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * ADD TESTIMONIAL
-     **********************************************/
-
-    /**
-     * redirects page to add testimonial page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object(webpage)
-     */
     @GetMapping("/addTestimonial")
-    public String addTestimonialGet(Model model, Principal principal) {
+    public String addTestimonialGet(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Testimonial> testimonials = testService.findAll();
@@ -3812,31 +3136,14 @@ public class HomeController {
 
     }
 
-    /**
-     * Add testimonial into database
-     * 
-     * @param model      Model object
-     * @param principal  Principal object
-     * @param file       MultipartFile
-     * @param consent    MultipartFile
-     * @param name       String
-     * @param desc       String
-     * @param trainingId String
-     * @return String object (webpage)
-     */
     @PostMapping("/addTestimonial")
-    public String addTestimonialPost(Model model, Principal principal,
+    public String addTestimonialPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("uploadTestimonial") MultipartFile file, @RequestParam("consent") MultipartFile consent,
             @RequestParam("testimonialName") String name, @RequestParam("description") String desc,
             @RequestParam(value = "trainingName", required = false) String trainingId) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Testimonial> testimonials = testService.findAll();
@@ -3871,8 +3178,6 @@ public class HomeController {
             test.setUser(usr);
             test.setTestimonialId(newTestiId);
             test.setFilePath("null");
-
-            logger.info("Variables of addTestimonialPost name : {} desc : {} usr : {}", name, desc, usr);
 
             if (trainingId != null) {
                 TrainingInformation train = trainingInfoService.getById(Integer.parseInt(trainingId));
@@ -3926,45 +3231,15 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * UPDATE SECTION AND VIEW OF CATEGORY
-     **********************************************/
-
-    /**
-     * redirects to add category page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
-
-    /**
-     * redirects to edit category page
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/category/edit/{catName}")
-    public String editCategoryGet(@PathVariable(name = "catName") String catName, Model model, Principal principal) {
+    public String editCategoryGet(@PathVariable(name = "catName") String catName, HttpServletRequest req, Model model,
+            Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Category cat = catService.findBycategoryname(catName);
-
-        logger.info("Variables of editCategoryGet cat: {}", cat);
 
         if (cat == null) {
             return "redirect:/category";
@@ -3975,25 +3250,12 @@ public class HomeController {
         return "updateCategory";
     }
 
-    /**
-     * update category object
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest object
-     * @param file      MultipartFile object
-     * @return String object (webpage)
-     */
     @PostMapping("/updateCategory")
     public String updateCategoryPost(Model model, Principal principal, HttpServletRequest req,
             @RequestParam("categoryImage") MultipartFile file) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -4002,8 +3264,6 @@ public class HomeController {
         String categoryDesc = req.getParameter("categoryDesc");
 
         Category cat = catService.findByid(Integer.parseInt(catId));
-        logger.info("Variables of updateCategoryPost  catId: {} catName: {} categoryDesc : {}", catId, catName,
-                categoryDesc);
 
         if (cat == null) {
             // accommodate error message
@@ -4058,37 +3318,14 @@ public class HomeController {
         return "updateCategory";
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * UPDATE AND VIEW SECTION OF EVENT
-     **********************************************/
-
-    /**
-     * redirects to event details in homepage
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/eventDetails/{id}")
-    public String eventGet(@PathVariable int id, Model model, Principal principal) {
+    public String eventGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Event event = eventservice.findById(id);
-
-        logger.info("Variables of eventGet event : {}", event);
 
         if (event == null) {
             return "redirect:/event";
@@ -4099,23 +3336,11 @@ public class HomeController {
         return "event";
     }
 
-    /**
-     * redirects to add event page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/event")
-    public String viewEventGet(Model model, Principal principal) {
+    public String viewEventGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Event> event = eventservice.findAll();
@@ -4124,64 +3349,31 @@ public class HomeController {
         return "event";
     }
 
-    /**
-     * redirects to edit event page given id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/event/edit/{id}")
-    public String editEventGet(@PathVariable int id, Model model, Principal principal) {
+    public String editEventGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Event event = eventservice.findById(id);
-        logger.info("Variables of editEventGet : {}", event);
 
         if (event == null) {
 
             return "redirect:/addEvent";
         }
 
-        /*
-         * if(event.getUser().getId() != usr.getId()) {
-         * 
-         * return "redirect:/addEvent"; }
-         */
-
         model.addAttribute("events", event);
 
         return "updateEvent";
     }
 
-    /**
-     * update event object
-     * 
-     * @param req       HttpServletRequest object
-     * @param model     Model object
-     * @param principal Principal object
-     * @param files     MultipartFile object
-     * @return String object (webpage)
-     */
     @PostMapping("/updateEvent")
     public String updateEventPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("Image") MultipartFile files) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -4215,13 +3407,7 @@ public class HomeController {
                 model.addAttribute("error_msg", "End date must be after Start date");
                 return "updateEvent";
             }
-            /*
-             * if(!contactNumber.isEmpty()) { if(contactNumber.length() != 10) { // throw
-             * error on wrong phone number
-             * 
-             * model.addAttribute("error_msg","Contact number must be 10 digit"); return
-             * "updateEvent"; } }
-             */
+
             if (!email.isEmpty()) {
                 if (!ServiceUtility.checkEmailValidity(email)) { // throw error on wrong email
 
@@ -4250,10 +3436,6 @@ public class HomeController {
             event.setEventName(eventName);
             event.setLocation(venueName);
 
-            logger.info(
-                    "Variables of updateEventPost contactPerson : {} email : {} desc : {} contact : {} eventName : {} venueName : {}",
-                    contactPerson, email, desc, contact, eventName, venueName);
-
             if (!files.isEmpty()) {
 
                 String folder = CommonData.uploadDirectoryEvent + event.getEventId();
@@ -4278,30 +3460,16 @@ public class HomeController {
         return "updateEvent";
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * Edit Section of PromoVideo
-     **********************/
-
     @GetMapping("/promoVideo/edit/{id}")
-    public String promoVideoGet(@PathVariable int id, Model model, Principal principal) {
+    public String promoVideoGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
-        // Event event= eventservice.findById(id);
         PromoVideo promoVideo = promoVideoService.findById(id);
 
-        logger.info("Variables of PromoVideoGet promoVideo : {}", promoVideo);
         if (promoVideo == null) {
 
             return "redirect:/addPromoVideo";
@@ -4327,20 +3495,14 @@ public class HomeController {
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam("promoVideo") List<MultipartFile> promoVideoFiles) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
         String title = req.getParameter("title");
         String promoVideoId = req.getParameter("promoVideoId");
         int promoVideoIdInt = Integer.parseInt(promoVideoId);
-
-        logger.info("Variables of updatePromoVideoPost promoVideoId : {} title : {}", promoVideoId, title);
 
         List<Language> languages = lanService.getAllLanguages();
         model.addAttribute("languages", languages);
@@ -4480,33 +3642,14 @@ public class HomeController {
         return "updatePromoVideo";
     }
 
-    /*************************************
-     * END
-     **********************************************/
-
-    /***************************************
-     * Edit Section of Brochure
-     *******************************************/
-
-    /*
-     * Author: Alok Kumar
-     */
-
     @GetMapping("/brochure/edit/{id}")
-    public String BrochureGet(@PathVariable int id, Model model, Principal principal) {
+    public String BrochureGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
-        // Event event= eventservice.findById(id);
         Brouchure brochure = broService.findById(id);
-        logger.info("Variables of BrochureGet brochure : {}", brochure);
         if (brochure == null) {
 
             return "redirect:/addBrochure";
@@ -4518,13 +3661,6 @@ public class HomeController {
         model.addAttribute("languages", languages);
 
         Language langByBrochure = brochure.getLan();
-        /*
-         * TopicCategoryMapping tcm=brouchure.getTopicCatId(); Category
-         * catBrouchure=tcm.getCat(); Topic topicBrouchure=tcm.getTopic();
-         * model.addAttribute("catBrouchure", catBrouchure);
-         * model.addAttribute("topicBrouchure", topicBrouchure);
-         * 
-         */
 
         Set<Version> verSet = brochure.getVersions();
 
@@ -4580,7 +3716,7 @@ public class HomeController {
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
         for (Version ver : versions) {
-            logger.info("Version Date Added {}", ver.getDateAdded());
+
         }
         model.addAttribute("brouchures", brouchures);
         model.addAttribute("versions", versions);
@@ -4588,21 +3724,13 @@ public class HomeController {
         return "updateBrochure";
     }
 
-    /*
-     * Author: Alok Kumar
-     * 
-     */
     @PostMapping("/updateBrochure")
     public String updatBrochurePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam("brouchure") List<MultipartFile> brochures) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -4623,7 +3751,6 @@ public class HomeController {
         model.addAttribute("languages", languages);
 
         Brouchure brouchure = broService.findById(Integer.parseInt(brochureId));
-        logger.info("Variables of updatBrochurePost brochure : {}", brouchure);
 
         if (brouchure == null) {
             model.addAttribute("error_msg", "Brouchure doesn't exist");
@@ -4715,7 +3842,7 @@ public class HomeController {
                     if (!brochures.get(i).isEmpty()) {
                         folder = CommonData.uploadBrouchure + brochureId + "/" + versionValue + "/" + "web" + "/"
                                 + langName;
-                        // document1=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder);
+
                         documents1 = ServiceUtility.UploadMediaFileAndCreateThumbnail(brochures.get(i), env, folder);
 
                     }
@@ -4736,7 +3863,6 @@ public class HomeController {
                         }
 
                         filesofbrouchureService.save(fileBro);
-                        // filesBroList.add(fileBro);
 
                     }
 
@@ -4767,7 +3893,6 @@ public class HomeController {
 
             else {
 
-                // String document2="";
                 List<String> documents2 = new ArrayList<>();
                 String folder2 = "";
                 int newbroFileId = filesofbrouchureService.getNewId();
@@ -4788,7 +3913,7 @@ public class HomeController {
 
                         folder2 = CommonData.uploadBrouchure + brochureId + "/" + newVersionValue + "/" + "web" + "/"
                                 + langName;
-                        // document2=ServiceUtility.uploadMediaFile(brochures.get(i), env, folder2);
+
                         documents2 = ServiceUtility.UploadMediaFileAndCreateThumbnail(brochures.get(i), env, folder2);
 
                         for (String testlan : addedLanguages) {
@@ -4829,8 +3954,6 @@ public class HomeController {
                     verSet = brouchure.getVersions();
                     listofVersions = new ArrayList<>(verSet);
                     model.addAttribute("listofVersions", listofVersions);
-                    logger.info("Variables of updatBrochurePost title : {} BroVersion : {}", title,
-                            (version.getBroVersion() + 1));
 
                 }
 
@@ -4930,8 +4053,7 @@ public class HomeController {
         model.addAttribute("newfilesList", newfilesList);
 
         model.addAttribute("listofVersions", newlistofVesrion);
-        for (Version ver : listofVersions)
-            logger.info("Version: {}", ver);
+
         List<Brouchure> brouchures = broService.findAll();
         List<Version> versions = new ArrayList<Version>();
         for (Brouchure bro : brouchures) {
@@ -4939,48 +4061,28 @@ public class HomeController {
             versions.add(ver);
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
-        for (Version ver : versions) {
-            logger.info("Version Date Adeed: {}", ver.getDateAdded());
-        }
+
         model.addAttribute("brouchures", brouchures);
         model.addAttribute("versions", versions);
 
         return "updateBrochure";
     }
 
-    /************************************
-     * END
-     ******************************************************************/
-
-    /******************************************
-     * Edit Section of Research Paper
-     ********************************/
-
     @GetMapping("/researchPaper/edit/{id}")
-    public String editResearchPaperGet(@PathVariable int id, Model model, Principal principal) {
+    public String editResearchPaperGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
         ResearchPaper researchPaper = researchPaperService.findById(id);
-        logger.info("Variables of editResearchPaperGet researchPaper: {}", researchPaper);
 
         if (researchPaper == null) {
 
             return "redirect:/addResearchPaper";
         }
 
-        /*
-         * if(carousel.getUser().getId() != usr.getId()) {
-         * 
-         * return "redirect:/addResearchPaper"; }
-         */
         model.addAttribute("researchPaper", researchPaper);
 
         return "updateResearchPaper";
@@ -4990,12 +4092,8 @@ public class HomeController {
     public String updateResearchPaperPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("researchFile") MultipartFile researchFile) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -5004,8 +4102,6 @@ public class HomeController {
         String desc = req.getParameter("description");
 
         ResearchPaper researchPaper = researchPaperService.findById(Integer.parseInt(rseacrhPaperId));
-        logger.info("Variables of updateResearchPaperPost researchPaper: {} title : {} desc : {}", researchPaper, title,
-                desc);
 
         if (researchPaper == null) {
             model.addAttribute("error_msg", "ResearchPaper doesn't exist");
@@ -5029,7 +4125,6 @@ public class HomeController {
             if (!researchFile.isEmpty()) {
 
                 String folder = CommonData.uploadResearchPaper + researchPaper.getId();
-                // String document=ServiceUtility.uploadMediaFile(researchFile, env, folder);
                 List<String> documents = ServiceUtility.UploadMediaFileAndCreateThumbnail(researchFile, env, folder);
                 researchPaper.setResearchPaperPath(documents.get(0));
                 researchPaper.setThumbnailPath(documents.get(1));
@@ -5042,7 +4137,7 @@ public class HomeController {
             logger.error("Exception while updating research paper: {} {} {}", title, desc, researchFile, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
             model.addAttribute("researchPaper", researchPaper);
-            return "updateResearchPaper"; // need to add some error message
+            return "updateResearchPaper";
         }
 
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
@@ -5051,62 +4146,31 @@ public class HomeController {
         return "updateResearchPaper";
     }
 
-    /***********************************************
-     * End
-     ********************************************************/
-
-    /**************************************
-     * Edit section of Carousel
-     ************************************************/
-
-    /*
-     * Author: Alok Kumar
-     */
-
     @GetMapping("/carousel/edit/{id}")
-    public String editCarouselGet(@PathVariable int id, Model model, Principal principal) {
+    public String editCarouselGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Carousel carousel = caroService.findById(id);
-        logger.info("Variables of editCarouselGet carousel : {}", carousel);
 
         if (carousel == null) {
 
             return "redirect:/addEvent";
         }
 
-        /*
-         * if(carousel.getUser().getId() != usr.getId()) {
-         * 
-         * return "redirect:/addEvent"; }
-         */
         model.addAttribute("carousels", carousel);
 
         return "updateCarousel";
     }
 
-    /*
-     * Author:Alok Kumar
-     */
-
     @PostMapping("/updateCarousel")
     public String updateCaroUselPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("Image") MultipartFile files) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -5115,7 +4179,6 @@ public class HomeController {
         String desc = req.getParameter("description");
 
         Carousel carousel = caroService.findById(Integer.parseInt(carouselId));
-        logger.info("Variables of updateCaroUselPost title: {} desc : {} carousel : {}", eventName, desc, carousel);
 
         model.addAttribute("carousels", carousel);
 
@@ -5160,44 +4223,16 @@ public class HomeController {
         return "updateCarousel";
     }
 
-    /************************************************
-     * END
-     ***********************************************************/
-
-    /************************************
-     * VIEW SECTION OF LANGAUAGE
-     **********************************************/
-
-    /**
-     * redirects to add language page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
-
-    /**
-     * redirects to edit language page given id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/language/edit/{lanName}")
-    public String editLanguageGet(@PathVariable(name = "lanName") String lanTemp, Model model, Principal principal) {
+    public String editLanguageGet(HttpServletRequest req, @PathVariable(name = "lanName") String lanTemp, Model model,
+            Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
         Language lan = lanService.getByLanName(lanTemp);
-        logger.info("Variables of editLanguageGet lan : {}", lan);
 
         if (lan == null) {
             return "redirect:/addLanguage";
@@ -5208,23 +4243,11 @@ public class HomeController {
         return "updateLanguage"; // need to accomdate view part
     }
 
-    /**
-     * update language object
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest object
-     * @return String object (webpage)
-     */
     @PostMapping("/updateLanguage")
     public String updateLanguagePost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -5233,7 +4256,6 @@ public class HomeController {
         int lanId = Integer.parseInt(lanIdInString);
 
         Language lan = lanService.getById(lanId);
-        logger.info("Variables of updateLanguagePost  languagename : {} lan : {}", languagename, lan);
 
         if (lan == null) {
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
@@ -5277,35 +4299,14 @@ public class HomeController {
 
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /***********************************
-     * VIEW SECTION OF DOMAIN REVIEWER
-     ************************************/
-
-    /**
-     * redirects to domain reviewer page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/domainReviewer")
-    public String viewDomaineGet(Model model, Principal principal) {
+    public String viewDomaineGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Role domain = roleService.findByname(CommonData.domainReviewerRole);
-        logger.info("Variables of viewDomaineGet domain : {}", domain);
 
         List<UserRole> domains = usrRoleService.findAllByRole(domain);
 
@@ -5314,35 +4315,13 @@ public class HomeController {
         return "viewDomainReviewer";
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /***********************************
-     * VIEW SECTION OF QUALITY REVIEWER
-     ************************************/
-
-    /**
-     * redirects to quality reviewer page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/qualityReviewer")
-    public String viewQualityeGet(Model model, Principal principal) {
+    public String viewQualityeGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         Role quality = roleService.findByname(CommonData.qualityReviewerRole);
-        logger.info("Variables of viewQualityeGet quality : {}", quality);
-
         List<UserRole> qualities = usrRoleService.findAllByRole(quality);
 
         model.addAttribute("qualities", qualities);
@@ -5350,31 +4329,11 @@ public class HomeController {
         return "viewQualityReviewer";
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /***********************************
-     * VIEW SECTION OF MASTER TRAINER
-     ************************************/
-
-    /**
-     * redirects to master trainer page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/masterTrainer")
-    public String viewMasterTrainerGet(Model model, Principal principal) {
+    public String viewMasterTrainerGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         Role master = roleService.findByname(CommonData.masterTrainerRole);
 
@@ -5384,23 +4343,11 @@ public class HomeController {
         return "viewMasterTrainer";
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /***********************************
-     * VIEW SECTION OF QUESTIONNAIRE
-     ************************************/
-
     @GetMapping("/downloadQuestion")
-    public String PostQuestionaireGet(Model model, Principal principal) {
+    public String PostQuestionaireGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
         List<PostQuestionaire> postQuestionnaires = postQuestionService.findAll();
@@ -5410,29 +4357,10 @@ public class HomeController {
         return "viewQuestionnaire";
     }
 
-    /************************************
-     * END
-     **********************************************/
-    /************************************
-     * BROCHURE
-     **********************************************/
-
-    /************************************
-     * END
-     **********************************************/
-    /************************************
-     * UPDATE AND VIEW SECTION OF TESTIMONIAL
-     **********************************************/
-
-    /**
-     * redirects to testimonial page on homepage
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/testimonialList")
-    public String viewtestimonialListGet(Model model, Principal principal) {
+    public String viewtestimonialListGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Testimonial> test = new ArrayList<>();
         List<Testimonial> test1 = testService.findAll();
         for (Testimonial temp : test1) {
@@ -5446,84 +4374,41 @@ public class HomeController {
         return "testimonialList";
     }
 
-    /**
-     * redirects to testimonial page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
-
-    /**
-     * redirects to edit testimonial page given testimonial id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/testimonial/edit/{id}")
-    public String edittestimonialGet(@PathVariable int id, Model model, Principal principal) {
+    public String edittestimonialGet(HttpServletRequest req, @PathVariable int id, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Testimonial test = testService.findById(id);
-        logger.info("Variables of edittestimonialGet Testimonial : {}", test);
 
         if (test == null) {
 
             return "redirect:/addTestimonial";
         }
 
-        /*
-         * if(test.getUser().getId() != usr.getId()) {
-         * 
-         * return "redirect:/addTestimonial"; }
-         */
-
         model.addAttribute("testimonials", test);
 
         return "updateTestimonial";
     }
 
-    /**
-     * Update testimonial object in database
-     * 
-     * @param req       HttpServletRequest object
-     * @param model     Model object
-     * @param principal Principal object
-     * @param file      MultipartFile object
-     * @return String object(webpage)
-     */
     @PostMapping("/updateTestimonial")
     public String updateTestimonialPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("TestimonialVideo") MultipartFile file, @RequestParam("consent") MultipartFile consent) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
         String testiId = req.getParameter("testimonialId");
         String name = req.getParameter("testimonialName");
         String desc = req.getParameter("desc");
 
-        logger.info("Variables of updatetTestimonialPost name : {}, desc: {}", name, desc);
-
         Testimonial test = testService.findById(Integer.parseInt(testiId));
 
         if (test == null) {
-            // accommodate error message
+
             model.addAttribute("error_msg", CommonData.TESTIMONIAL_NOT_ERROR);
             return "updateTestimonial";
         }
@@ -5578,31 +4463,11 @@ public class HomeController {
         return "updateTestimonial";
     }
 
-    /************************************
-     * END
-     **********************************************/
-
-    /************************************
-     * ROLE MANGAEMENT OPERATION
-     **********************************************/
-
-    /**
-     * redirects to add contributor page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addContributorRole")
-    public String addContributorGet(Model model, Principal principal) {
+    public String addContributorGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Language> languages = lanService.getAllLanguages();
@@ -5611,23 +4476,11 @@ public class HomeController {
         return "addContributorRole";
     }
 
-    /**
-     * add contributor role into system
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addContributorRole")
     public String addContributorPost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -5648,11 +4501,8 @@ public class HomeController {
         Role role = roleService.findByname(CommonData.contributorRole);
         List<UserRole> userRoles = usrRoleService.findByLanUser(lan, usr, role);
 
-        logger.info("Variables of addContributorPost usr: {} lanName : {}, role: {}", usr, lanName, role);
-
         if (!userRoles.isEmpty()) {
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
+
             List<Language> languages = lanService.getAllLanguages();
             List<Category> categories = catService.findAll();
 
@@ -5688,23 +4538,11 @@ public class HomeController {
         return "addContributorRole";
     }
 
-    /**
-     * redirects to add contributor page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addExternalContributorRole")
-    public String addExternalContributorGet(Model model, Principal principal) {
+    public String addExternalContributorGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Language> languages = lanService.getAllLanguages();
@@ -5713,23 +4551,11 @@ public class HomeController {
         return "addExternalContributorRole";
     }
 
-    /**
-     * add contributor role into system
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addExternalContributorRole")
     public String addExternalContributorPost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -5749,11 +4575,8 @@ public class HomeController {
 
         Role role = roleService.findByname(CommonData.externalContributorRole);
         List<UserRole> userRoles = usrRoleService.findByLanUser(lan, usr, role);
-        logger.info("Variables of addExternalContributorPost usr: {} lanName : {}, role: {}", usr, lanName, role);
         if (!userRoles.isEmpty()) {
 
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
             List<Language> languages = lanService.getAllLanguages();
             List<Category> categories = catService.findAll();
 
@@ -5789,23 +4612,11 @@ public class HomeController {
         return "addExternalContributorRole";
     }
 
-    /**
-     * redirects to add admin role page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addAdminRole")
-    public String addAdminPost(Model model, Principal principal) {
+    public String addAdminPost(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Language> languages = lanService.getAllLanguages();
@@ -5817,23 +4628,11 @@ public class HomeController {
         return "addAdminRole";
     }
 
-    /**
-     * add admin role into system
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addAdminRole")
     public String addAdminPost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -5871,7 +4670,6 @@ public class HomeController {
         }
 
         Role role = roleService.findByname(CommonData.adminReviewerRole);
-        logger.info("Variables of addAdminPost usr: {} cat : {} lan : {} role : {}", usr, cat, lan, role);
 
         if (usrRoleService.findByLanCatUser(lan, cat, usr, role) != null) {
 
@@ -5914,23 +4712,11 @@ public class HomeController {
         return "addAdminRole";
     }
 
-    /**
-     * redirects to add domain role page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addDomainRole")
-    public String addDomainGet(Model model, Principal principal) {
+    public String addDomainGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Language> languages = lanService.getAllLanguages();
@@ -5943,23 +4729,11 @@ public class HomeController {
         return "addDomainRole";
     }
 
-    /**
-     * add domain role into system
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addDomainRole")
     public String addDomainPost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -5987,8 +4761,6 @@ public class HomeController {
 
         if (lan == null) {
 
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
             List<Language> languages = lanService.getAllLanguages();
             List<Category> categories = catService.findAll();
 
@@ -6002,12 +4774,8 @@ public class HomeController {
 
         Role role = roleService.findByname(CommonData.domainReviewerRole);
 
-        logger.info("Variables of addDomainPost usr: {} cat : {} lan : {} role : {}", usr, cat, lan, role);
-
         if (usrRoleService.findByLanCatUser(lan, cat, usr, role) != null) {
 
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
             List<Language> languages = lanService.getAllLanguages();
             List<Category> categories = catService.findAll();
 
@@ -6058,22 +4826,11 @@ public class HomeController {
         return "addDomainRole";
     }
 
-    /**
-     * redirects to add quality page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addQualityRole")
-    public String addQualityGet(Model model, Principal principal) {
+    public String addQualityGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -6087,23 +4844,11 @@ public class HomeController {
         return "addQualityRole";
     }
 
-    /**
-     * add quality role into system
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addQualityRole")
     public String addQualityPost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -6116,8 +4861,6 @@ public class HomeController {
 
         if (cat == null) {
 
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
             List<Language> languages = lanService.getAllLanguages();
             List<Category> categories = catService.findAll();
 
@@ -6131,8 +4874,6 @@ public class HomeController {
 
         if (lan == null) {
 
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
             List<Language> languages = lanService.getAllLanguages();
             List<Category> categories = catService.findAll();
 
@@ -6146,12 +4887,8 @@ public class HomeController {
 
         Role role = roleService.findByname(CommonData.qualityReviewerRole);
 
-        logger.info("Variables of addQualityPost usr: {} cat : {} lan : {} role : {}", usr, cat, lan, role);
-
         if (usrRoleService.findByLanCatUser(lan, cat, usr, role) != null) {
 
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
             List<Language> languages = lanService.getAllLanguages();
             List<Category> categories = catService.findAll();
 
@@ -6191,24 +4928,12 @@ public class HomeController {
         return "addQualityRole";
     }
 
-    /**
-     * redirects to add master trainer page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/addMasterTrainerRole")
-    public String addMasterTrainerGet(Model model, Principal principal) {
+    public String addMasterTrainerGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<IndianLanguage> languages = iLanService.findAll();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-
-        }
 
         model.addAttribute("userInfo", usr);
         model.addAttribute("languages", languages);
@@ -6234,23 +4959,11 @@ public class HomeController {
         return "addMasterTrainerRole";
     }
 
-    /**
-     * add master trainer into system
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest
-     * @return String object (webpage)
-     */
     @PostMapping("/addMasterTrainerRole")
     public String addMasterTrainerPost(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -6302,11 +5015,7 @@ public class HomeController {
 
                     if (xx == 'r') {
                         tempUser.setRead(true);
-                    }
-//					else if(xx=='w') {
-//						tempUser.setWrite(true);
-//					}
-                    else if (xx == 's') {
+                    } else if (xx == 's') {
                         tempUser.setSpeak(true);
                     }
                 }
@@ -6374,31 +5083,11 @@ public class HomeController {
         return "addMasterTrainerRole";
     }
 
-    /************************************
-     * END
-     ****************************************************************/
-
-    /***********************************
-     * Approve Role
-     ************************************************/
-
-    /**
-     * redirects to approve role page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/approveRole")
-    public String approveRoleGet(Model model, Principal principal) {
+    public String approveRoleGet(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Role contributor = roleService.findByname(CommonData.contributorRole);
@@ -6439,31 +5128,12 @@ public class HomeController {
         return "approveRole";
     }
 
-    /******************************************
-     * END
-     **************************************************/
-
-    /***************************************
-     * ASSIGN CONTRINUTOR (NOT IN USE FOR NOW)
-     ****************************************/
-
-    /**
-     * redirects to assign contributor edit page
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/assignContributor/edit/{id}")
-    public String editAssignContributor(@PathVariable Long id, Model model, Principal principal) {
+    public String editAssignContributor(HttpServletRequest req, @PathVariable Long id, Model model,
+            Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         Role role = roleService.findByname(CommonData.contributorRole);
         List<UserRole> userRoles = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
 
@@ -6473,17 +5143,11 @@ public class HomeController {
         return "updateAssignContributor";
     }
 
-    /**
-     * redirects to assign contributor page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/assignTutorialToContributor")
-    public String assignTutorialToContributoreGet(Model model, Principal principal) {
-
-        model.addAttribute("userInfo", getUser(principal, userService));
+    public String assignTutorialToContributoreGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", getUser(principal));
 
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
@@ -6509,35 +5173,16 @@ public class HomeController {
         return "assignContributorList";
     }
 
-    /**
-     * Assign tutorial to contributor
-     * 
-     * @param model           Model object
-     * @param principal       Principal object
-     * @param contributorName String object
-     * @param lanName         String object
-     * @param catName         String object
-     * @param topics          list of String object
-     * @return String object (webpage)
-     */
     @PostMapping("/assignTutorialToContributor")
-    public String assignTutorialToContributorePost(Model model, Principal principal,
+    public String assignTutorialToContributorePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "contributorName") String contributorName,
             @RequestParam(name = "languageName") String lanName,
             @RequestParam(name = "contributorCategory") String catName,
             @RequestParam(name = "inputTopic") String[] topics) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-
-        logger.info("Variables of assignTutorialToContributor contributorName: {} lanName: {}, topics: {} ",
-                contributorName, lanName, topics);
 
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
@@ -6582,9 +5227,6 @@ public class HomeController {
 
                 ContributorAssignedTutorial x = conRepo.findByTopicCatAndLanViewPart(topicCat, lan);
 
-                logger.info("Variables of assignTutorialToContributor topicCat: {}  ContributorAssignedTutorial : {} ",
-                        topicCat, x);
-
                 if (x == null) {
 
                     ContributorAssignedTutorial temp = new ContributorAssignedTutorial(conNewId++,
@@ -6594,28 +5236,20 @@ public class HomeController {
                             conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, temp);
                     conMultiUser.save(multiUser);
 
-                    // conTutorials.add(temp);
-
                 } else {
-                    // throw error for repeated task
-
-                    // model.addAttribute("error_msg", CommonData.CONTRIBUTOR_ERROR_MSG);
 
                     ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
                             conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, x);
                     conMultiUser.save(multiUser);
 
-                    // return "assignContributorList";
                 }
 
             } else {
-                // throw error as topic doesn't exist
+
                 model.addAttribute("error_msg", CommonData.CONTRIBUTOR_TOPIC_ERROR);
                 return "assignContributorList";
             }
         }
-
-        // userService.addUserToContributorTutorial(userAssigned, conTutorials);
 
         userRoles = conRepo.findAll();
 
@@ -6641,23 +5275,10 @@ public class HomeController {
         return "assignContributorList";
     }
 
-    /********************************************
-     * END
-     *************************************************/
-
-    /***********************************
-     * CONTRIBUTOR ROLE OPERATION
-     *************************************/
-    /**
-     * redirects page to uplaod tutorial under contributor role
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object(webpage)
-     */
     @GetMapping("/uploadTutorial")
-    public String uploadTutorialGet(Model model, Principal principal) {
-        User usr = getUser(principal, userService);
+    public String uploadTutorialGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<String> catName = new ArrayList<String>();
@@ -6678,9 +5299,7 @@ public class HomeController {
         List<Category> categories = new ArrayList<Category>();
         List<Category> preReqCategories = new ArrayList<Category>();
         Set<Category> preReqCatSet = new HashSet<Category>();
-//		get all category
         categories = catService.findAll();
-//		for each category; 
         for (Category category : categories) {
             if (category.isStatus()) {
                 List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(category);
@@ -6710,22 +5329,14 @@ public class HomeController {
         return preReqCategories;
     }
 
-    /**
-     * load tutorial component page to add various component for the tutorial
-     * 
-     * @param model        Model object
-     * @param principal    Principal object
-     * @param categoryName String object
-     * @param topicId      int value
-     * @param langName     String object
-     * @return String object (webpage)
-     */
     @PostMapping("/uploadTutorial")
-    public String uploadTutorialPost(Model model, Principal principal,
+    public String uploadTutorialPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(value = "categoryName") String categoryName, @RequestParam(name = "inputTopic") int topicId,
             @RequestParam(name = "inputLanguage") String langName) {
 
-        model.addAttribute("userInfo", getUser(principal, userService));
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
         Language lan = lanService.getByLanName(langName);
         model.addAttribute("language", lan);
         List<Category> categories = getPreReqCategories(lan);
@@ -6741,13 +5352,10 @@ public class HomeController {
 
         ContributorAssignedTutorial conTutorial = conRepo.findByTopicCatAndLanViewPart(topicCat, lan);
 
-        logger.info("Variables of uploadTutorialPost  cat : {} topic : {} lan : {} topicCat : {} conTutorial : {} ",
-                cat, topic, lan, topicCat, conTutorial);
-
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTutorial);
 
         setCompStatus(model, tutorials);
-        logger.info("Test upload Tutorial langName{} and lan {}", langName, lan);
+
         setEngLangStatus(model, lan);
 
         if (!lan.getLangName().equalsIgnoreCase("english")) {
@@ -6757,8 +5365,6 @@ public class HomeController {
             ContributorAssignedTutorial conTutorialforEnglish = conRepo.findByTopicCatAndLanViewPart(topicCat,
                     englishLan);
             List<Tutorial> tutorialsForEnglish = tutService.findAllByContributorAssignedTutorial(conTutorialforEnglish);
-
-            // List<TopicCategoryMapping> tcm_list = topicCatService.findAllByTopic(topic);
 
             if (tutorialsForEnglish.size() > 0) {
 
@@ -6774,7 +5380,7 @@ public class HomeController {
 
         }
         if (!tutorials.isEmpty()) {
-//			set video details
+
             setVideoInfo(model, tutorials);
             setCompComment(model, tutorials, comService);
             for (Tutorial local : tutorials) {
@@ -6802,22 +5408,10 @@ public class HomeController {
         return "uploadTutorialPost";
     }
 
-    /**
-     * List all the tutorial for contributor to review
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("listTutorialForContributorReview")
-    public String listContributorReviewTutorialGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String listContributorReviewTutorialGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Set<Tutorial> tutorials = new HashSet<Tutorial>();
@@ -6831,34 +5425,18 @@ public class HomeController {
             tutorials.addAll(tutService.findAllByContributorAssignedTutorial(conTemp));
         }
 
-        // List<Tutorial> tutorials =
-        // tutService.findAllByContributorAssignedTutorialList(conTutorials);
-
         model.addAttribute("tutorial", tutorials);
 
         return "listTutorialContributorReviwer";
 
     }
 
-    /**
-     * redirect to contributor review page given tutorial id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("Contributor/review/{catName}/{topicName}/{language}")
-    public String listContributorReviewTutorialGet(@PathVariable(name = "catName") String cat,
+    public String listContributorReviewTutorialGet(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan, Model model,
             Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Category> categories = catService.findAll();
         model.addAttribute("categories", categories);
         model.addAttribute("userInfo", usr);
@@ -6869,17 +5447,11 @@ public class HomeController {
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
         ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
 
-        logger.info(
-                "Variables of listContributorReviewTutorialGet cat : {} topic : {} lan : {} topicCatMap : {} conTut :{} ",
-                catName, topicName, lanName, topicCatMap, conTut);
-
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
             return "redirect:/listTutorialForContributorReview";
         }
 
         List<Tutorial> findAllByContributorAssignedTutorial = tutService.findAllByContributorAssignedTutorial(conTut);
-
-        logger.info("Variable of listContributorReviewTutorialGet tutorial : {}", findAllByContributorAssignedTutorial);
 
         if (findAllByContributorAssignedTutorial == null || findAllByContributorAssignedTutorial.size() == 0) {
 
@@ -6903,11 +5475,6 @@ public class HomeController {
         if (tutorial.getVideo() != null) {
 
             IContainer container = IContainer.make();
-            // int result = 10;
-            // result =
-            // container.open(env.getProperty("spring.applicationexternalPath.name") +
-            // tutorial.getVideo(),
-            // IContainer.Type.READ, null);
 
             IStream stream = container.getStream(0);
             IStreamCoder coder = stream.getStreamCoder();
@@ -6951,24 +5518,10 @@ public class HomeController {
 
     }
 
-    /****************************************
-     * END
-     ********************************************************/
-
-    /**********************************
-     * operation at Admin End
-     *****************************************/
-
-    /**
-     * List all the tutorial for Admin reviewer to review
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("listTutorialForAdminReview")
-    public String listAdminReviewTutorialGet(Model model, Principal principal) {
-        User usr = getUser(principal, userService);
+    public String listAdminReviewTutorialGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         HashSet<Tutorial> toReview = new HashSet<>();
         HashSet<Tutorial> reviewed = new HashSet<>();
@@ -6984,13 +5537,11 @@ public class HomeController {
             int videoStatus = temp.getVideoStatus();
             if (videoStatus == CommonData.ADMIN_STATUS) {
                 toReview.add(temp);
-                logger.info("Tutorial: {}", temp);
+
             } else if (videoStatus > CommonData.ADMIN_STATUS) {
                 reviewed.add(temp);
             }
 
-            if (temp.getTutorialId() == 654)
-                logger.info("VideoStatus: {}", videoStatus);
         }
 
         model.addAttribute("tutorialToReview", toReview);
@@ -6998,17 +5549,12 @@ public class HomeController {
         return "listTutorialAdminReviwer";
     }
 
-    /**
-     * redirect to admin review page given tutorial id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("adminreview/review/{tutorialId}")
-    public String listAdminReviewTutorialGet(@PathVariable int tutorialId, Model model, Principal principal) {
-        User usr = getUser(principal, userService);
+    public String listAdminReviewTutorialGet(HttpServletRequest req, @PathVariable int tutorialId, Model model,
+            Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Tutorial tutorial1 = tutService.getById(tutorialId);
@@ -7016,7 +5562,7 @@ public class HomeController {
 
             return "redirect:/listTutorialForAdminReview";
         }
-        logger.info("Variable of listAdminReviewTutorialGet tutorial Id: {}", tutorialId);
+
         Category catName = tutorial1.getConAssignedTutorial().getTopicCatId().getCat();
         Topic topicName = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
         Language lanName = tutorial1.getConAssignedTutorial().getLan();
@@ -7047,30 +5593,10 @@ public class HomeController {
 
     }
 
-    /***********************************
-     * END
-     ***************************************************************/
-
-    /***************************
-     * OPERATION AT DOMAIN REVIEWER END
-     ***********************************/
-
-    /**
-     * List all the tutorial for domain reviewer to review
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("listTutorialForDomainReview")
-    public String listDomainReviewTutorialGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String listDomainReviewTutorialGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         HashSet<Tutorial> toReview = new HashSet<>();
         HashSet<Tutorial> published = new HashSet<>();
@@ -7110,17 +5636,11 @@ public class HomeController {
         return "listTutorialDomainReviewer";
     }
 
-    /**
-     * redirect to domain review page given tutorial id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("domainreview/review/{tutorialId}")
-    public String listDomainReviewTutorialGet(@PathVariable int tutorialId, Model model, Principal principal) {
-        User usr = getUser(principal, userService);
+    public String listDomainReviewTutorialGet(HttpServletRequest req, @PathVariable int tutorialId, Model model,
+            Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Tutorial tutorial1 = tutService.getById(tutorialId);
@@ -7128,7 +5648,7 @@ public class HomeController {
         if (tutorial1 == null) {
             return "redirect:/listTutorialForDomainReview";
         }
-        logger.info("Variable of listDomainReviewTutorialGet tutorial Id: {}", tutorialId);
+
         Category category = tutorial1.getConAssignedTutorial().getTopicCatId().getCat();
         Topic topic = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
         Language language = tutorial1.getConAssignedTutorial().getLan();
@@ -7169,30 +5689,10 @@ public class HomeController {
 
     }
 
-    /***********************************
-     * END
-     *******************************************************/
-
-    /***************************
-     * OPERATION AT QUALITY REVIEWER END
-     ***********************************/
-
-    /**
-     * List all the tutorial for quality review
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("listTutorialForQualityReview")
-    public String listQualityReviewTutorialGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String listQualityReviewTutorialGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         HashSet<Tutorial> toReview = new HashSet<>();
         HashSet<Tutorial> published = new HashSet<>();
@@ -7238,22 +5738,10 @@ public class HomeController {
 
     }
 
-    /**
-     * redirects page to view all the tutorial to be published
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object (webpage)
-     */
     @GetMapping("tutorialToPublish")
-    public String tutorialToPublishGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String tutorialToPublishGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         HashSet<Tutorial> published = new HashSet<>();
         Role role = roleService.findByname(CommonData.qualityReviewerRole);
@@ -7283,32 +5771,17 @@ public class HomeController {
         return "listTutorialPublishQualityReviwer";
 
     }
-    // getStreamCoder()
 
-    /**
-     * publish the tutorial under quality role
-     * 
-     * @param id                 int value
-     * @param model              Model object
-     * @param principal          principal object
-     * @param redirectAttributes RedirectAttributes object
-     * @return String object (webpage)
-     */
     @GetMapping("publish/{id}")
-    public String publishTutorialGet(@PathVariable int id, Model model, Principal principal,
+    public String publishTutorialGet(HttpServletRequest req, @PathVariable int id, Model model, Principal principal,
             RedirectAttributes redirectAttributes) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
         Tutorial tutorial = tutService.getById(id);
-        logger.info("Variable of  publishTutorialGet  TutorialId: {}", id);
+
         if (tutorial == null) {
-            // throw a error
             model.addAttribute("tutorialNotExist", "Bad request"); // throw proper error
             return "redirect:/tutorialToPublish";
 
@@ -7357,8 +5830,6 @@ public class HomeController {
             Credential credential = Auth.authorize(scopes, "uploadvideo");
 
             youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, credential).build();
-
-            logger.info("Youtube Scope: {} and youtube : {}", scopes, youtube);
 
             Video videoObjectDefiningMetadata = new Video();
 
@@ -7445,22 +5916,16 @@ public class HomeController {
 
     }
 
-    /**
-     * redirects to quality review page given tutorial id
-     * 
-     * @param id        int value
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object(webpage)
-     */
     @GetMapping("qualityreview/review/{tutorialId}")
-    public String listQualityReviewTutorialGet(@PathVariable int tutorialId, Model model, Principal principal) {
+    public String listQualityReviewTutorialGet(HttpServletRequest req, @PathVariable int tutorialId, Model model,
+            Principal principal) {
 
-        User usr = getUser(principal, userService);
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Tutorial tutorial1 = tutService.getById(tutorialId);
-        logger.info("Variable of  listQualityReviewTutorialGet TutorialId: {}", tutorialId);
+
         Category category = tutorial1.getConAssignedTutorial().getTopicCatId().getCat();
         Topic topic = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
         Language language = tutorial1.getConAssignedTutorial().getLan();
@@ -7503,45 +5968,21 @@ public class HomeController {
 
     }
 
-    /***********************************
-     * END
-     *******************************************************/
-
-    /*************************
-     * OPERATION AT MASTER TRAINER
-     ******************************************/
-
     @GetMapping("/trainerProfile")
-    public String profileMasterTrainerGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String profileMasterTrainerGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         return "traineeView";
 
     }
 
-    /**
-     * redirects to master trainer operation page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object(webpage)
-     */
     @GetMapping("/masterTrainerOperation")
-    public String MasterTrainerGet(Model model, Principal principal) {
-        User usr = new User();
+    public String MasterTrainerGet(HttpServletRequest req, Model model, Principal principal) {
 
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Event> events = eventservice.findByUser(usr);
@@ -7563,22 +6004,10 @@ public class HomeController {
 
     }
 
-    /**
-     * redirects page to view master trainer details
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object(webpage)
-     */
     @GetMapping("/details")
-    public String MasterTrainerDetailsGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String MasterTrainerDetailsGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<PostQuestionaire> postQuestionnaire = postQuestionService.findByUser(usr);
@@ -7592,27 +6021,12 @@ public class HomeController {
 
     }
 
-    /**
-     * Download question
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param catName   int value
-     * @param topicId   int value
-     * @param lanName   String object
-     * @return String object(webpage)
-     */
     @PostMapping("/downloadQuestion")
-    public String downloadQuestionPost(Model model, Principal principal,
+    public String downloadQuestionPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(value = "catMasterId") int catName, @RequestParam(value = "lanMasterTrId") int topicId,
             @RequestParam(value = "dwnByLanguageId") String lanName) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Category cat = catService.findByid(catName);
@@ -7639,22 +6053,10 @@ public class HomeController {
 
     }
 
-    /**
-     * redirects page to view all the trainee
-     * 
-     * @param model     Model object
-     * @param principal Principal Object
-     * @return String object(webpage)
-     */
     @GetMapping("/viewTrainee")
-    public String downloadQuestionPost(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String downloadQuestionPost(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         List<TraineeInformation> trainees = traineeService.findAll();
         List<Category> categories = catService.findAll();
@@ -7666,23 +6068,11 @@ public class HomeController {
 
     }
 
-    /**
-     * redirects to edit trainee information given trainee id
-     * 
-     * @param id        int value
-     * @param model     model object
-     * @param principal principal object
-     * @return String object (webpage)
-     */
     @GetMapping("/trainee/edit/{id}")
-    public String editTraineeGet(@PathVariable int id, Model model, Principal principal) {
+    public String editTraineeGet(HttpServletRequest req, @PathVariable int id, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -7703,23 +6093,11 @@ public class HomeController {
         return "editTrainee"; // need to accomdate view part
     }
 
-    /**
-     * update trainee information
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param req       HttpServletRequest object
-     * @return String object (Webpage)
-     */
     @PostMapping("/updateTrainee")
     public String editTraineeGet(Model model, Principal principal, HttpServletRequest req) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -7737,14 +6115,13 @@ public class HomeController {
         model.addAttribute("trainee", trainee);
 
         if (aadhar.length() != 12) {
-            // throw error
+
             model.addAttribute("error_msg", "Invalid aadhar number");
             return "editTrainee";
         }
 
         if (phone.length() != 10) {
 
-            // throw error
             model.addAttribute("error_msg", "Invalid phone number");
             return "editTrainee";
         }
@@ -7771,48 +6148,27 @@ public class HomeController {
         return "editTrainee"; // need to accomdate view part
     }
 
-    /**
-     * Add training information into object
-     * 
-     * @param model               Model object
-     * @param principal           Principal object
-     * @param trainingImage       MultipartFile object
-     * @param traineeInfo         MultipartFile object
-     * @param eventId             int value
-     * @param trainingInformation String object
-     * @param totaltrainee        int value
-     * @return String object (webpage)
-     */
     @PostMapping("/addTrainingInfo")
-    public String addTrainingInfoPost(Model model, Principal principal,
+    public String addTrainingInfoPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("ParticipantsPhoto") MultipartFile trainingImage,
             @RequestParam("traineeInformation") MultipartFile traineeInfo, @RequestParam(value = "event") int eventId,
             @RequestParam(value = "traningInfo") String trainingInformation,
             @RequestParam(value = "totalPar") int totaltrainee) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Event event = eventservice.findById(eventId);
 
-//		Set<TrainingTopic> trainingTopicTemp = new HashSet<>();
-
         if (!ServiceUtility.checkFileExtensiononeFileCSV(traineeInfo)) {
 
-            // throw error on output
             model.addAttribute("error_msg", CommonData.CSV_ERROR);
             return "masterTrainerOperation";
         }
 
         if (!ServiceUtility.checkFileExtensionZip(trainingImage)) {
 
-            // throw error on output
             model.addAttribute("error_msg", CommonData.ZIP_ERROR);
             return "masterTrainerOperation";
         }
@@ -7837,9 +6193,8 @@ public class HomeController {
 
             byte[] bytes = traineeInfo.getBytes();
             String completeData = new String(bytes);
-            logger.info("complete data : {}", completeData);
+
             String[] rows = completeData.split("\n");
-            logger.info("data: {}", rows.length);
 
             Set<TraineeInformation> trainees = new HashSet<TraineeInformation>();
             int newTraineeId = traineeService.getNewId();
@@ -7857,7 +6212,7 @@ public class HomeController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             logger.error("Error in Master Trainer Operation : {} ", trainingData, e);
-            // throw a error
+
             model.addAttribute("error_msg", CommonData.EVENT_ERROR);
             return "masterTrainerOperation";
         }
@@ -7867,30 +6222,15 @@ public class HomeController {
 
     }
 
-    /**
-     * upload feedback given by master trainer
-     * 
-     * @param model         Model object
-     * @param principal     Principal object
-     * @param catId         int value
-     * @param trainingTitle int value
-     * @param feedbackFile  MultipartFile object
-     * @param desc          String object
-     * @return String object (Webpage)
-     */
     @PostMapping("/uploadfeedback")
-    public String uploadFeedbackPost(Model model, Principal principal, @RequestParam(value = "catMasId") int catId,
-            @RequestParam(value = "feedbackmasterId") int trainingTitle,
+    public String uploadFeedbackPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(value = "catMasId") int catId, @RequestParam(value = "feedbackmasterId") int trainingTitle,
             @RequestParam(value = "feedbackForm") MultipartFile feedbackFile,
             @RequestParam(value = "traningInformation") String desc) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
 
         model.addAttribute("userInfo", usr);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Category> cats = catService.findAll();
 
         List<State> states = stateService.findAll();
@@ -7932,27 +6272,12 @@ public class HomeController {
 
     }
 
-    /**
-     * upload post questionnaire under master trainer role
-     * 
-     * @param model         Model object
-     * @param principal     Principal object
-     * @param catId         int value
-     * @param trainingTitle int value
-     * @param postQuestions MultipartFile object
-     * @return String object(Webpage)
-     */
     @PostMapping("/uploadPostQuestionaire")
-    public String uploadQuestionPost(Model model, Principal principal, @RequestParam(value = "catMasPostId") int catId,
-            @RequestParam(value = "postTraining") int trainingTitle,
+    public String uploadQuestionPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(value = "catMasPostId") int catId, @RequestParam(value = "postTraining") int trainingTitle,
             @RequestParam(value = "postQuestions") MultipartFile postQuestions) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         List<Category> cats = catService.findAll();
 
@@ -7996,26 +6321,10 @@ public class HomeController {
 
     }
 
-    /************************
-     * DOMAIN ROLE CONSULTANT MAPPING
-     *************************************/
-
-    /**
-     * redirects to admin role request page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object(Webpage)
-     */
     @GetMapping("/assignRoleToAdmin")
-    public String assignRoleToDomainGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String assignRoleToDomainGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Category> categories = catService.findAll();
@@ -8029,25 +6338,11 @@ public class HomeController {
 
     }
 
-    /**
-     * Assign role to admin given category name and language name
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @param cat       String object
-     * @param lan       String object
-     * @return String object(Webpage)
-     */
     @PostMapping("/assignRoleToAdmin")
-    public String assignRoleToDomainPost(Model model, Principal principal, @RequestParam(value = "category") String cat,
-            @RequestParam(value = "language") String lan) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+    public String assignRoleToDomainPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(value = "category") String cat, @RequestParam(value = "language") String lan) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Category> categories = catService.findAll();
@@ -8058,7 +6353,6 @@ public class HomeController {
 
         Category category = catService.findBycategoryname(cat);
         Language language = lanService.getByLanName(lan);
-        logger.info("Variables of assignRoleToDomainPost category: {} languages: {}", cat, lan);
 
         if (language == null) {
             model.addAttribute("error_msg", "Please select language");
@@ -8090,10 +6384,6 @@ public class HomeController {
         try {
             usrRoleService.save(usrRole);
 
-//			SimpleMailMessage newEmail = mailConstructor.domainRoleMailSend(usrTemp);
-//
-//			mailSender.send(newEmail);
-
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.ROLE_ERROR_MSG);
@@ -8103,29 +6393,14 @@ public class HomeController {
 
         model.addAttribute("success_msg", CommonData.ADMIN_REVIEWER_REQ);
 
-        return "assignRoleToDomain"; // add html page
+        return "assignRoleToDomain";
 
     }
 
-    /******************************
-     * END
-     ***********************************************************/
-
-    /**
-     * redirects to profile page
-     * 
-     * @param model     Model object
-     * @param principal Principal object
-     * @return String object(webpage)
-     */
     @GetMapping("/profile")
-    public String profileUserGet(Model model, Principal principal) {
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+    public String profileUserGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
 
@@ -8133,23 +6408,12 @@ public class HomeController {
 
     }
 
-    /**
-     * Revoke role from user interface
-     * 
-     * @param usrRoleId long value
-     * @param principal Principal object
-     * @param model     Model object
-     * @return String object (Webpage)
-     */
     @GetMapping("/revokeRole/{usrRoleId}")
-    public String revokeRoleByRole(@PathVariable long usrRoleId, Principal principal, Model model) {
+    public String revokeRoleByRole(HttpServletRequest req, @PathVariable long usrRoleId, Principal principal,
+            Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         UserRole usrRole = usrRoleService.findById(usrRoleId);
 
@@ -8168,39 +6432,18 @@ public class HomeController {
         return "revokeRole";
     }
 
-    /************************
-     * PROFILE UPDATE SECTION
-     *****************************************/
-
-    /**
-     * update profile data on user object
-     * 
-     * @param req       HttpServletRequest object
-     * @param model     Model object
-     * @param principal Principal object
-     * @param firstName String object
-     * @param lastName  String object
-     * @param phone     String object
-     * @param address   String object
-     * @param dob       String object
-     * @param desc      String object
-     * @return String object(Webpage)
-     */
     @PostMapping("/profile")
     public String updateuserdataPost(HttpServletRequest req, Model model, Principal principal,
             @ModelAttribute("firstName") String firstName, @ModelAttribute("lastName") String lastName,
             @ModelAttribute("phone") String phone, @ModelAttribute("address") String address,
             @ModelAttribute("birthday") String dob, @ModelAttribute("description") String desc) {
-        User usr = new User();
 
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         long phoneLongValue;
-        if (phone.length() > 10) { // need to accommodate
+        if (phone.length() > 10) {
 
             model.addAttribute("error_msg", "Entered Mobile Number is not of 10 digit");
             return "profileView";
@@ -8239,23 +6482,11 @@ public class HomeController {
 
     }
 
-    /**
-     * redirects to revoke role page under Contributor role
-     * 
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/revokeRoleContributor")
-    public String revokeRoleByContributor(Principal principal, Model model) {
+    public String revokeRoleByContributor(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Role role = roleService.findByname(CommonData.contributorRole);
@@ -8267,23 +6498,11 @@ public class HomeController {
         return "revokeRole";
     }
 
-    /**
-     * redirects to revoke role page under Admin role
-     * 
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/revokeRoleDomain")
-    public String revokeRoleByDomain(Principal principal, Model model) {
+    public String revokeRoleByDomain(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Role role = roleService.findByname(CommonData.domainReviewerRole);
@@ -8295,23 +6514,11 @@ public class HomeController {
         return "revokeRole";
     }
 
-    /**
-     * redirects to revoke role page under Quality role
-     * 
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/revokeRoleQuality")
-    public String revokeRoleBYQuality(Principal principal, Model model) {
+    public String revokeRoleBYQuality(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Role role = roleService.findByname(CommonData.qualityReviewerRole);
@@ -8323,23 +6530,11 @@ public class HomeController {
         return "revokeRole";
     }
 
-    /**
-     * redirects to revoke role page under master role
-     * 
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/revokeRoleMaster")
-    public String revokeRoleMaster(Principal principal, Model model) {
+    public String revokeRoleMaster(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Role role = roleService.findByname(CommonData.masterTrainerRole);
@@ -8351,72 +6546,12 @@ public class HomeController {
         return "revokeRole";
     }
 
-    /**
-     * redirects to brochure page
-     * 
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
-
-    /* to generate img from 1st page of pdf */
-
-    // private static final String IMAGE_FORMAT = "png";
-
-    /*
-     * public String generateImageFromPdfAndSave(String pdfFilePath, String
-     * outputFolderPath) throws IOException { logger.info(pdfFilePath + " " +
-     * outputFolderPath); String pathName =
-     * env.getProperty("spring.applicationexternalPath.name"); try (PDDocument
-     * document = PDDocument.load(new File(pathName + pdfFilePath))) { PDFRenderer
-     * pdfRenderer = new PDFRenderer(document); BufferedImage image =
-     * pdfRenderer.renderImageWithDPI(0, 15); // Render the first page with 300 DPI
-     * 
-     * logger.info("Image Width and Height:{} {}", image.getWidth(),
-     * image.getHeight());
-     * 
-     * if(image.getHeight()>200) { int newDPI = (int) Math.ceil(15.0 * 200 /
-     * image.getHeight()); if (newDPI > 2 && newDPI < 15) { image =
-     * pdfRenderer.renderImageWithDPI(0, newDPI);
-     * logger.info("After setting dpi {}, Width and Height of Image: {} {}", newDPI,
-     * image.getWidth(), image.getHeight()); } }
-     * 
-     * // Save the image to the output folder String fileName = outputFolderPath +
-     * "/" + "thumbnail.png"; File outputFile = new File(pathName, fileName);
-     * ImageIO.write(image, "png", outputFile);
-     * 
-     * // Convert the byte array to a Base64-encoded string // String base64Image =
-     * Base64.getEncoder().encodeToString(imageBytes);
-     * 
-     * return fileName; } }
-     */
-
     @GetMapping("/brochures")
-    public String brochure(Principal principal, Model model) {
+    public String brochure(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-
-        /*
-         * List<Category> cat = catService.findAll();
-         * 
-         * Map<Category, List<TopicCategoryMapping>> dataToSend = new HashMap<Category,
-         * List<TopicCategoryMapping>>();
-         * 
-         * for(Category temp : cat) { List<TopicCategoryMapping> tempTopic =
-         * topicCatService.findAllByCategory(temp); dataToSend.put(temp, tempTopic);
-         * 
-         * }
-         * 
-         * model.addAttribute("brochuresData", dataToSend);
-         * 
-         */
 
         List<Brouchure> brouchures = broService.findAllBrouchuresForCache();
         List<Language> languages = lanService.getAllLanguages();
@@ -8444,75 +6579,14 @@ public class HomeController {
         model.addAttribute("versions", versions);
         model.addAttribute("languages", languages);
 
-        return "brochures"; // view name
+        return "brochures";
     }
 
-    /*
-     * private void makeThumbnail(FilesofBrouchure temp) { try {
-     * 
-     * boolean checkPdf=temp.getWebPath().toLowerCase().endsWith(".pdf");
-     * 
-     * if(checkPdf==true && temp.getThumbnailPath()==null) { int
-     * brochureId=temp.getVersion().getBrouchure().getId(); int versionValue=
-     * temp.getVersion().getBroVersion(); String langName=
-     * temp.getLan().getLangName(); String pdfpath=temp.getWebPath();
-     * 
-     * 
-     * String str=CommonData.uploadBrouchure+ brochureId + "/" + versionValue + "/"
-     * + "web" + "/" + langName ; ServiceUtility.createFolder(str); String
-     * document1= generateImageFromPdfAndSave(pdfpath, str);
-     * temp.setThumbnailPath(document1); filesofbrouchureService.save(temp);
-     * 
-     * }
-     * 
-     * 
-     * } catch (IOException e) {
-     * 
-     * } }
-     */
-
-    /*
-     * private void makeThumbnailofResearchPaper(ResearchPaper temp) { try {
-     * 
-     * boolean checkPdf=temp.getResearchPaperPath().toLowerCase().endsWith(".pdf");
-     * 
-     * if(checkPdf==true && temp.getThumbnailPath()==null) { int
-     * researchPaperId=temp.getId();
-     * 
-     * String pdfpath=temp.getResearchPaperPath();
-     * 
-     * 
-     * String str=CommonData.uploadResearchPaper+researchPaperId ;
-     * ServiceUtility.createFolder(str); String document1=
-     * generateImageFromPdfAndSave(pdfpath, str); temp.setThumbnailPath(document1);
-     * researchPaperService.save(temp);
-     * 
-     * }
-     * 
-     * 
-     * } catch (IOException e) {
-     * 
-     * } }
-     */
-
-    /**
-     * redirects page to edit the training data given training id
-     * 
-     * @param id        int value
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/training/edit/{id}")
-    public String editTrainingGet(@PathVariable int id, Model model, Principal principal) {
+    public String editTrainingGet(HttpServletRequest req, @PathVariable int id, Model model, Principal principal) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         TrainingInformation training = trainingInfoService.getById(id);
@@ -8528,37 +6602,18 @@ public class HomeController {
 
         model.addAttribute("training", training);
 
-        return "updateTraining"; // need to accomdate view part
+        return "updateTraining";
     }
 
-    /**
-     * update training object
-     * 
-     * @param model        model object
-     * @param principal    Principal Object
-     * @param state        int value
-     * @param district     int value
-     * @param city         int value
-     * @param totaltrainee int value
-     * @param address      int value
-     * @param pinCode      int value
-     * @param trainingId   int value
-     * @return String object(Webpage)
-     */
     @PostMapping("/updateTraining")
-    public String updateTrainingPost(Model model, Principal principal, @RequestParam(value = "stateName") int state,
-            @RequestParam(value = "districtName") int district, @RequestParam(value = "cityName") int city,
-            @RequestParam(value = "totalPar") int totaltrainee,
+    public String updateTrainingPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(value = "stateName") int state, @RequestParam(value = "districtName") int district,
+            @RequestParam(value = "cityName") int city, @RequestParam(value = "totalPar") int totaltrainee,
             @RequestParam(value = "addressInformationName") String address,
             @RequestParam(value = "pinCode") int pinCode, @RequestParam(value = "trainingId") int trainingId) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<State> states = stateService.findAll();
 
         model.addAttribute("states", states);
@@ -8590,23 +6645,11 @@ public class HomeController {
 
     }
 
-    /**
-     * Redirects page to list all the tutorial under super admin interface
-     * 
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/tutorialStatus")
-    public String tutorialStatus(Principal principal, Model model) {
+    public String tutorialStatus(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         List<Tutorial> published = new ArrayList<Tutorial>();
         List<Tutorial> tutorials = tutService.findAll();
@@ -8629,30 +6672,16 @@ public class HomeController {
         return "listTutorialSuperAdmin";
     }
 
-    /**
-     * publish or unpublish tutorial from the system under super admin role
-     * 
-     * @param id        tutorial id int value
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/tutorialStatus/{id}")
-    public String publishTutorial(@PathVariable int id, Principal principal, Model model) {
+    public String publishTutorial(HttpServletRequest req, @PathVariable int id, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         List<Tutorial> published = new ArrayList<Tutorial>();
         List<Tutorial> tutorials;
 
         Tutorial tut = tutService.getById(id);
-        logger.info("Variables of publishTutorial tutorial {}", tut);
 
         if (tut.isStatus()) {
             tut.setStatus(false);
@@ -8709,23 +6738,11 @@ public class HomeController {
 
     }
 
-    /**
-     * Redirects to upload time script for the tutorial
-     * 
-     * @param principal Principal Object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/uploadTimescript")
-    public String uploadTimescriptGet(Principal principal, Model model) {
+    public String uploadTimescriptGet(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Set<Tutorial> tutorials = new HashSet<Tutorial>();
@@ -8751,23 +6768,11 @@ public class HomeController {
         return "uploadTimescript";
     }
 
-    /**
-     * Url to show entire user in a system on super admin interface
-     * 
-     * @param principal Principal object
-     * @param model     Model object
-     * @return String object(webpage)
-     */
     @GetMapping("/users")
-    public String usersGet(Principal principal, Model model) {
+    public String usersGet(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<User> allUser = userService.findAll();
@@ -8775,10 +6780,9 @@ public class HomeController {
         model.addAttribute("usrRoleService", usrRoleService);
 
         for (User user : allUser) {
-            logger.info("*******************************************");
-            logger.info("UserName and fullName {} {}", user.getUsername(), user.getFullName());
+
             List<UserRole> ur1 = usrRoleService.findAllByUser(user);
-            // ur=user.getUserRoles();
+
             for (UserRole temp : ur1) {
                 if (temp.getStatus()) {
                     String str1 = new String();
@@ -8793,7 +6797,7 @@ public class HomeController {
                     } else {
                         str2 = temp.getLanguage().getLangName();
                     }
-                    logger.info("String and RoleName: {} {} {}", str1, str2, temp.getRole().getName());
+
                 }
             }
 
@@ -8803,20 +6807,16 @@ public class HomeController {
     }
 
     @GetMapping("/statistics")
-    public String statistics(Principal principal, Model model,
+    public String statistics(HttpServletRequest req, Principal principal, Model model,
             @RequestParam(name = "categoryId", defaultValue = "0") int categoryId,
             @RequestParam(name = "languageId", defaultValue = "0") int languageId) {
 
-        User usr = new User();
-        if (principal != null) {
-            usr = userService.findByUsername(principal.getName());
-        }
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-        // List<Category> cat = catService.findAll();
+
         List<Category> cat = getCategories();
 
-        // List<Category> categories = catService.findAllByOrder();
-        // List<Language> lan =lanService.getAllLanguages();
         List<Language> lan = getLanguages();
 
         List<ContributorAssignedTutorial> contributor_Role = conRepo.findAll();
@@ -8934,15 +6934,10 @@ public class HomeController {
     }
 
     @GetMapping("/cdContentInfo")
-    public String cdContentInfoGet(Principal principal, Model model) {
+    public String cdContentInfoGet(HttpServletRequest req, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         List<Category> cat = catService.findAll();
@@ -8957,16 +6952,11 @@ public class HomeController {
     }
 
     @PostMapping("/cdContentInfo")
-    public String cdContentInfoPost(@RequestParam(name = "categoryName") String category,
+    public String cdContentInfoPost(HttpServletRequest req, @RequestParam(name = "categoryName") String category,
             @RequestParam(name = "lan") String language, Principal principal, Model model) {
 
-        User usr = new User();
-
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         long totalSize = 0;
@@ -9009,7 +6999,7 @@ public class HomeController {
                 }
             }
         }
-        logger.info("TotalSize {}", totalSize);
+
         model.addAttribute("value", totalSize / 1024 / 1024);
         model.addAttribute("totalVideo", totalNumberOfVideo);
         if (totalSize > 0 && totalNumberOfVideo > 0) {
@@ -9024,10 +7014,10 @@ public class HomeController {
     }
 
     @GetMapping("/unpublishTopic")
-    public String unpublishTopic(Model model, Principal principal) {
+    public String unpublishTopic(HttpServletRequest req, Model model, Principal principal) {
 
-        User usr = getUser(principal, userService);
-
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         List<Category> categories = catService.findAll();
         List<Category> filtered_categories = new ArrayList<Category>();
@@ -9037,15 +7027,12 @@ public class HomeController {
             }
         }
 
-        // alok code start
         List<Topic> tops = topicService.findAll();
         List<String> topics = new ArrayList<String>();
         for (Topic t : tops) {
             topics.add(t.getTopicName());
 
         }
-
-        // alok code ends
 
         List<Language> langs = lanService.getAllLanguages();
         List<String> langauges = new ArrayList<String>();
@@ -9076,6 +7063,9 @@ public class HomeController {
             @ModelAttribute("topic") Integer topicId, @ModelAttribute("language") String language, Model model,
             Principal principal) {
 
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), request.getMethod(), request.getRequestURI());
+
         model.addAttribute("classActiveForgetPassword", true);
         Category cat = catService.findByid(categoryId);
         Topic topic = topicService.findById(topicId);
@@ -9096,7 +7086,7 @@ public class HomeController {
         Tutorial t = tut.get(0);
         model.addAttribute("tut", tut);
         model.addAttribute("tutorial_id", t.getTutorialId());
-        logger.info("Variables of unpublishTopicPost cat: {} topic : {} lan : {}  tutorial : {} ", cat, topic, lan, t);
+
         List<Category> categories_lst = catService.findAll();
 
         HashMap<Integer, String> map = new HashMap<>();
@@ -9119,21 +7109,6 @@ public class HomeController {
             topicName.put(temp.getTopic().getTopicId(), temp.getTopic().getTopicName());
 
         }
-        /*
-         * //alok code starts List<TopicCategoryMapping> local =
-         * topicCatService.findAllByCategory(cat) ; List<ContributorAssignedTutorial>
-         * cat_list = conService.findAllByTopicCat(local);
-         * 
-         * //To find Topics List<Tutorial> tutorials =
-         * tutService.findAllByconAssignedTutorialAndStatus(cat_list);
-         * 
-         * for(Tutorial t1: tutorials) {
-         * topicName.put(t1.getConAssignedTutorial().getTopicCatId().getTopic().
-         * getTopicId(),t1.getConAssignedTutorial().getTopicCatId().getTopic().
-         * getTopicName()); }
-         * 
-         */
-        // alok code ends
 
         model.addAttribute("topics", topicName);
         model.addAttribute("langauges", langauges);
@@ -9147,12 +7122,7 @@ public class HomeController {
         } else {
             model.addAttribute("status", "already_unpublished");
         }
-        User usr = new User();
 
-        if (principal != null) {
-
-            usr = userService.findByUsername(principal.getName());
-        }
         model.addAttribute("userInfo", usr);
 
         return "unpublishTopic";
