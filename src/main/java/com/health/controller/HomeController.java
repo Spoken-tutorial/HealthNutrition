@@ -1696,7 +1696,7 @@ public class HomeController {
     @GetMapping("/addCarousel")
     public String addCarouselGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);
-        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI(), req.getQueryString());
         model.addAttribute("userInfo", usr);
 
         List<Carousel> cara = caroService.findAll();
@@ -1712,7 +1712,7 @@ public class HomeController {
             @RequestParam(name = "eventDesc") String desc) {
 
         User usr = getUser(principal);
-        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI(), req.getQueryString());
 
         model.addAttribute("userInfo", usr);
 

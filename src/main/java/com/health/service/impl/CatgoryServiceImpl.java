@@ -106,7 +106,7 @@ public class CatgoryServiceImpl implements CategoryService {
 
         try {
             Optional<Category> var = categoryRepo.findById(id);
-            logger.info("Fetching Category from db by id {} ", id);
+
             return var.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block

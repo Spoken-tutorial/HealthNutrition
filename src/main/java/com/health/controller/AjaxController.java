@@ -1403,7 +1403,7 @@ public class AjaxController {
         User usr = getUser(principal);
 
         Category cat = catService.findBycategoryname(catName);
-        logger.info("Variables of getTopicByCategoryOnContributorRole cat: {}", cat);
+        logger.info("Variables of getTopicByCategoryOnContributorRole usr:{} cat: {}", usr.getUsername(), cat);
 
         List<TopicCategoryMapping> localTopicCat = topicCatService.findAllByCategory(cat);
 
@@ -1446,8 +1446,8 @@ public class AjaxController {
         Topic topic = topicService.findById(topicId);
         TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
 
-        logger.info("Variables of getLanguageByContributorRole cat : {} topic : {} localTopicCat : {}", cat, topic,
-                localTopicCat);
+        logger.info("Variables of getLanguageByContributorRole usr: {}cat : {} topic : {} localTopicCat : {}",
+                usr.getUsername(), cat, topic, localTopicCat);
 
         List<ContributorAssignedMultiUserTutorial> conTutorialByUser = conMultiService.getAllByuser(usr);
 
@@ -1502,27 +1502,30 @@ public class AjaxController {
 
         HashMap<String, String> temp = new HashMap<>();
 
-        logger.info("Variables of addOutline tutorialId : {} topicId : {} catName : {} langName {}", tutorialId,
-                topicId, catName, lang);
         Category cat = catService.findBycategoryname(catName);
 
         Topic topic = topicService.findById(topicId);
         TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat, topic);
         Language language = langService.getByLanName(lang);
         ContributorAssignedTutorial cnn = conService.findByTopicCatAndLanViewPart(tcm, language);
-        List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(cnn);
-
         User usr = getUser(principal);
         Tutorial local = null;
 
-        int tutId1 = 0;
-        if (tut.size() > 0) {
-            Tutorial tut1 = tut.get(0);
-            tutId1 = tut1.getTutorialId();
-        }
+        /*
+         * List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(cnn);
+         * 
+         * 
+         * logger.
+         * info("Variables of addOutline usr: {} tutorialId : {} topicId : {} catName : {} langName {}"
+         * , usr.getUsername(), tutorialId, topicId, catName, lang); Tutorial local =
+         * null;
+         * 
+         * int tutId1 = 0; if (tut.size() > 0) { Tutorial tut1 = tut.get(0); tutId1 =
+         * tut1.getTutorialId(); }
+         */
 
-        if (tutId1 != 0) {
-            Tutorial tut2 = tutService.getById(tutId1);
+        if (tutorialId != 0) {
+            Tutorial tut2 = tutService.getById(tutorialId);
             temp = addOutlineComp(tut2, outlineData, usr);
             return temp;
         }
@@ -1705,7 +1708,7 @@ public class AjaxController {
         Tutorial local = null;
         if (tutorialId != 0) {
             Tutorial tut = tutService.getById(tutorialId);
-            logger.info("Variable of addKeyWord tut: {}", tut);
+            logger.info("Variable of addKeyWord usr:{} tut: {}", usr.getUsername(), tut);
             temp = addVideoComp(tut, videoFile, usr);
         } else {
             local = createTutorial(catName, topicId, lanId, usr);
@@ -1752,11 +1755,11 @@ public class AjaxController {
         Tutorial local = null;
         if (tutorialId != 0) {
             Tutorial tut = tutService.getById(tutorialId);
-            logger.info("Variable of  addSlide tutorialId : {}", tutorialId);
+            logger.info("Variable of  addSlide usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
             temp = addSlideComp(tut, videoFile, usr);
         } else {
             local = createTutorial(catName, topicId, lanId, usr);
-            logger.info("Variable of  addSlide tutorial : {}", local);
+            logger.info("Variable of  addSlide usr:{} tutorial : {}", usr.getUsername(), local);
             if (local != null) {
                 temp = addSlideComp(local, videoFile, usr);
             } else {
@@ -1789,11 +1792,11 @@ public class AjaxController {
 
         if (tutorialId != 0) {
             Tutorial tut = tutService.getById(tutorialId);
-            logger.info("Variable of  addScript tutorialId : {}", tutorialId);
+            logger.info("Variable of  addScript usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
             temp = addScriptComp(tut, usr);
         } else {
             Tutorial tut = createTutorial(catName, topicId, lang, usr);
-            logger.info("Variable of  addScript tutorial : {}", tut);
+            logger.info("Variable of  addScript usr:{} tutorial : {}", usr.getUsername(), tut);
             temp = addScriptComp(tut, usr);
         }
         return temp;
@@ -1836,7 +1839,7 @@ public class AjaxController {
 
         HashMap<String, String> temp = new HashMap<String, String>();
         User usr = getUser(principal);
-        logger.info("Variable of acceptDomainOutline tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptDomainOutline usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
                 CommonData.OUTLINE, CommonData.QUALITY_STATUS, tutorial.getOutlineStatus(),
@@ -1866,7 +1869,7 @@ public class AjaxController {
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
         User usr = getUser(principal);
-        logger.info("Variable of acceptDomainScript tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptDomainScript usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT,
                 CommonData.QUALITY_STATUS, tutorial.getScriptStatus(), CommonData.domainReviewerRole, usr, tutorial);
@@ -1893,7 +1896,7 @@ public class AjaxController {
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
         User usr = getUser(principal);
-        logger.info("Variable of acceptDomainVideo tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptDomainVideo usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO,
                 CommonData.QUALITY_STATUS, tutorial.getVideoStatus(), CommonData.domainReviewerRole, usr, tutorial);
@@ -1920,7 +1923,7 @@ public class AjaxController {
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
         User usr = getUser(principal);
-        logger.info("Variable of acceptDomainSlide tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptDomainSlide usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE,
                 CommonData.QUALITY_STATUS, tutorial.getSlideStatus(), CommonData.domainReviewerRole, usr, tutorial);
@@ -1946,7 +1949,7 @@ public class AjaxController {
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
         User usr = getUser(principal);
-        logger.info("Variable of acceptDomainKeywords tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptDomainKeywords usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
                 CommonData.KEYWORD, CommonData.QUALITY_STATUS, tutorial.getKeywordStatus(),
@@ -1972,7 +1975,7 @@ public class AjaxController {
             Principal principal) {
         HashMap<String, String> temp = new HashMap<String, String>();
         User usr = getUser(principal);
-        logger.info("Variable of acceptDomainPreRequistic tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptDomainPreRequistic usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
                 CommonData.PRE_REQUISTIC, CommonData.QUALITY_STATUS, tutorial.getPreRequisticStatus(),
@@ -2006,7 +2009,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptQualityOutline(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         User usr = getUser(principal);
-        logger.info("Variable of acceptQualityOutline tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptQualityOutline usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
                 CommonData.OUTLINE, CommonData.WAITING_PUBLISH_STATUS, tutorial.getOutlineStatus(),
@@ -2029,7 +2032,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptQualityScript(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         User usr = getUser(principal);
-        logger.info("Variable of acceptQualityScript tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptQualityScript usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SCRIPT,
                 CommonData.WAITING_PUBLISH_STATUS, tutorial.getScriptStatus(), CommonData.qualityReviewerRole, usr,
@@ -2052,7 +2055,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptQualityVideo(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         User usr = getUser(principal);
-        logger.info("Variable of acceptQualityVideo tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptQualityVideo usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.VIDEO,
                 CommonData.WAITING_PUBLISH_STATUS, tutorial.getVideoStatus(), CommonData.qualityReviewerRole, usr,
@@ -2075,7 +2078,7 @@ public class AjaxController {
     public @ResponseBody HashMap<String, String> acceptQualitySlide(@RequestParam(value = "id") int tutorialId,
             Principal principal) {
         User usr = getUser(principal);
-        logger.info("Variable of acceptQualitySlide tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptQualitySlide usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(), CommonData.SLIDE,
                 CommonData.WAITING_PUBLISH_STATUS, tutorial.getSlideStatus(), CommonData.qualityReviewerRole, usr,
@@ -2099,7 +2102,7 @@ public class AjaxController {
             Principal principal) {
 
         User usr = getUser(principal);
-        logger.info("Variable of acceptQualityKeywords tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptQualityKeywords usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         Tutorial tutorial = tutService.getById(tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
                 CommonData.KEYWORD, CommonData.WAITING_PUBLISH_STATUS, tutorial.getKeywordStatus(),
@@ -2125,7 +2128,7 @@ public class AjaxController {
 
         User usr = getUser(principal);
         Tutorial tutorial = tutService.getById(tutorialId);
-        logger.info("Variable of acceptQualityPreRequistic tutorialId : {}", tutorialId);
+        logger.info("Variable of acceptQualityPreRequistic usr:{} tutorialId : {}", usr.getUsername(), tutorialId);
         LogManegement log = new LogManegement(logService.getNewId(), ServiceUtility.getCurrentTime(),
                 CommonData.PRE_REQUISTIC, CommonData.WAITING_PUBLISH_STATUS, tutorial.getPreRequisticStatus(),
                 CommonData.qualityReviewerRole, usr, tutorial);
@@ -2637,7 +2640,8 @@ public class AjaxController {
             @RequestParam int language, @RequestParam String components, Principal principal) {
         HashMap<String, String> res = new HashMap<String, String>();
         User user = getUser(principal);
-        logger.info("Variables of unpublishTutorial category : {} topic : {} language : {}", category, topic, language);
+        logger.info("Variables of unpublishTutorial usr:{} category : {} topic : {} language : {}", user.getUsername(),
+                category, topic, language);
         Category cat_ = catService.findByid(category);
         Topic topic_ = topicService.findById(topic);
         Language lang = langService.getById(language);
@@ -2674,19 +2678,6 @@ public class AjaxController {
         HashMap<Integer, String> languages = new HashMap<Integer, String>();
         Category cat = catService.findByid(category);
         Topic topic_ = topicService.findById(topic);
-        /*
-         * if(category==0) {
-         * 
-         * List<TopicCategoryMapping> local = topicCatService.findAllByTopic(topic_) ;
-         * List<ContributorAssignedTutorial> top_list =
-         * conService.findAllByTopicCat(local);
-         * 
-         * //To find Languages for(ContributorAssignedTutorial c : top_list) {
-         * if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
-         * languages.put(c.getLan().getLanId(), c.getLan().getLangName()); } }
-         * 
-         * }
-         */
 
         TopicCategoryMapping localTopicCat = topicCatService.findAllByCategoryAndTopic(cat, topic_);
         List<TopicCategoryMapping> tcm = new ArrayList<TopicCategoryMapping>();
@@ -2702,50 +2693,6 @@ public class AjaxController {
 
         return languages;
     }
-
-    /*
-     * //author alok func start
-     * 
-     * @RequestMapping("/loadLanguageByCategory") public @ResponseBody
-     * HashMap<Integer, String>
-     * getLanguageByContributorRoleCategory(@RequestParam(value = "category") int
-     * category) {
-     * 
-     * HashMap<Integer,String> languages=new HashMap<Integer,String>(); Category cat
-     * = catService.findByid(category); List<TopicCategoryMapping> tcm =
-     * topicCatService.findAllByCategory(cat); List<ContributorAssignedTutorial>
-     * catAssgnTut = conService.findAllByTopicCat(tcm);
-     * for(ContributorAssignedTutorial c : catAssgnTut) {
-     * if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
-     * 
-     * languages.put(c.getLan().getLanId(), c.getLan().getLangName()); }
-     * 
-     * } return languages; }
-     * 
-     * //func end
-     * 
-     * 
-     * //author alok func start
-     * 
-     * @RequestMapping("/loadLanguageByTopic") public @ResponseBody HashMap<Integer,
-     * String> getLanguageByContributorRole1(@RequestParam(value = "topic") int
-     * topic) {
-     * 
-     * HashMap<Integer,String> languages=new HashMap<Integer,String>(); Topic top =
-     * topicService.findById(topic); List<TopicCategoryMapping> tcm =
-     * topicCatService.findAllByTopic(top); List<ContributorAssignedTutorial>
-     * catAssgnTut = conService.findAllByTopicCat(tcm);
-     * for(ContributorAssignedTutorial c : catAssgnTut) {
-     * if(!tutService.findAllByContributorAssignedTutorial(c).isEmpty()) {
-     * 
-     * languages.put(c.getLan().getLanId(), c.getLan().getLangName()); }
-     * 
-     * } return languages; }
-     * 
-     * 
-     * //func end
-     * 
-     */
 
     @RequestMapping("/loadPublishedTopicsByCategory")
     public @ResponseBody HashMap<Integer, String> loadPublishedTopicsByCategory(@RequestParam(value = "id") int id) {

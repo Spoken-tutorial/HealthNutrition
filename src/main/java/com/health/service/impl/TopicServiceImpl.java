@@ -72,7 +72,7 @@ public class TopicServiceImpl implements TopicService {
         // TODO Auto-generated method stub
         try {
             Optional<Topic> local = topicRepo.findById(id);
-            logger.info("Fetching Topic from db by id {}", id);
+
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block

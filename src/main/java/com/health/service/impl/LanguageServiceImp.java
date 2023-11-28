@@ -91,7 +91,7 @@ public class LanguageServiceImp implements LanguageService {
         // TODO Auto-generated method stub
         try {
             Optional<Language> local = languageRepo.findById(lanId);
-            logger.info("Fetching Language from db by id {}", lanId);
+
             return local.get();
         } catch (Exception e) {
             // TODO Auto-generated catch block
