@@ -395,50 +395,35 @@ public class HomeController {
 
     private boolean checkRole(User usr, Category cat, Language lan) {
 
-        boolean flag = false;
-
         if (usr == null) {
-            return flag;
+            return false;
         }
 
-        UserRole usrRole = new UserRole();
-        List<UserRole> usrRoles = new ArrayList<>();
+        Role role = null;
+        List<UserRole> usrRoles = null;
 
-        List<Role> roles = new ArrayList<>();
-        roles.add(roleService.findByname(CommonData.superUserRole));
-        roles.add(roleService.findByname(CommonData.contributorRole));
-        roles.add(roleService.findByname(CommonData.qualityReviewerRole));
-        roles.add(roleService.findByname(CommonData.domainReviewerRole));
-        roles.add(roleService.findByname(CommonData.domainReviewerRole));
-
-        for (int i = 0; i < roles.size(); i++) {
-
-            if (i == 0) {
-                usrRoles = usrRoleService.findByRoleUser(usr, roles.get(i));
-                if (usrRoles != null && usrRoles.size() > 0) {
-                    flag = true;
-                    break;
-                }
-
-            } else if (i == 1) {
-                usrRoles = usrRoleService.findByLanUser(lan, usr, roles.get(i));
-                if (usrRoles != null && usrRoles.size() > 0) {
-                    flag = true;
-                    break;
-                }
-
-            } else {
-                usrRole = usrRoleService.findByLanCatUser(lan, cat, usr, roles.get(i));
-                if (usrRole != null) {
-                    flag = true;
-                    break;
-
-                }
-            }
+        role = roleService.findByname(CommonData.contributorRole);
+        usrRoles = usrRoleService.findByLanUser(lan, usr, role);
+        if (usrRoles != null && usrRoles.size() > 0) {
+            return true;
 
         }
 
-        return flag;
+        role = roleService.findByname(CommonData.domainReviewerRole);
+        UserRole usrRole = null;
+        usrRole = usrRoleService.findByLanCatUser(lan, cat, usr, role);
+        if (usrRole != null) {
+            return true;
+
+        }
+        role = roleService.findByname(CommonData.qualityReviewerRole);
+        usrRole = null;
+        usrRole = usrRoleService.findByLanCatUser(lan, cat, usr, role);
+        if (usrRole != null) {
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -1026,7 +1011,6 @@ public class HomeController {
 
         if (principal != null) {
 
-            usr = userService.findByUsername(principal.getName());
             boolean flag = checkRole(usr, category, lanName);
             if (flag) {
                 StringBuilder sb1 = new StringBuilder(sb);
@@ -1208,6 +1192,99 @@ public class HomeController {
         mv.addObject("resetToken", usr.getToken());
         mv.setViewName("resetPassword");
         return mv;
+
+    }
+
+    @GetMapping("/TimeScript/{id}")
+    public String getTimeScript(HttpServletRequest req, @PathVariable int id, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        Tutorial tut = tutService.getById(id);
+
+        try {
+            tut.setResourceVisit(tut.getResourceVisit() + 1);
+            tutService.save(tut);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Error in  count Resource Visit of TimeScript: {}", tut, e);
+
+        }
+        String res = tut.getTimeScript();
+        return "redirect:/files/" + res;
+
+    }
+
+    @GetMapping("/OriginalScript/{id}")
+    public ModelAndView getScript(HttpServletRequest req, @PathVariable int id, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        Tutorial tut = tutService.getById(id);
+        String sm_url = "";
+
+        try {
+
+            List<Integer> scriptVerList = getApiVersion(scriptmanager_api,
+                    tut.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId(), tut.getTutorialId(),
+                    tut.getConAssignedTutorial().getLan().getLanId());
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(scriptmanager_url);
+            sb.append(scriptmanager_path);
+            sb.append(String.valueOf(tut.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId()));
+            sb.append("/");
+            sb.append(String.valueOf(tut.getTutorialId()));
+            sb.append("/");
+            sb.append(String.valueOf(tut.getConAssignedTutorial().getLan().getLanId()));
+            sb.append("/");
+            sb.append(String.valueOf(tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+            sb.append("/");
+            if (scriptVerList != null && scriptVerList.size() > 0) {
+                System.out.println(scriptVerList);
+                StringBuilder sb2 = new StringBuilder(sb);
+                sb2.append(scriptVerList.get(0));
+                sm_url = sb2.toString();
+            }
+            tut.setResourceVisit(tut.getResourceVisit() + 1);
+            tutService.save(tut);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Error in  count Resource Visit of Slide: {}", tut, e);
+
+        }
+        return new ModelAndView("redirect:" + sm_url);
+
+    }
+
+    @GetMapping("/Slide/{id}")
+    public String getSlide(HttpServletRequest req, @PathVariable int id, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        Tutorial tut = tutService.getById(id);
+
+        try {
+            tut.setResourceVisit(tut.getResourceVisit() + 1);
+            tutService.save(tut);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Error in  count Resource Visit of Slide: {}", tut, e);
+
+        }
+        String res = "";
+
+        if (!tut.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
+            res = tut.getRelatedVideo().getSlide();
+        } else {
+            res = tut.getSlide();
+        }
+
+        return "redirect:/files/" + res;
 
     }
 

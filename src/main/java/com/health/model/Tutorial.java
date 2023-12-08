@@ -15,6 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnDefault;
+
 /**
  * Tutorial object
  * 
@@ -40,6 +42,10 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
      */
     @Column(name = "userVisit")
     private int UserVisit = 0;
+
+    @Column(name = "resourceVisit")
+    @ColumnDefault("0")
+    private int resourceVisit = 0;
 
     /**
      * relative path of script
@@ -228,6 +234,14 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     @OneToMany(mappedBy = "tutorialInfos", cascade = CascadeType.ALL)
     private Set<LogManegement> logs = new HashSet<LogManegement>();
+
+    public int getResourceVisit() {
+        return resourceVisit;
+    }
+
+    public void setResourceVisit(int resourceVisit) {
+        this.resourceVisit = resourceVisit;
+    }
 
     public int getTutorialId() {
         return tutorialId;
