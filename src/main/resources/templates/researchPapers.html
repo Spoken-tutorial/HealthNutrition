@@ -53,8 +53,8 @@ border-right: 2px solid #014F7A;
      								 <img th:unless="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${res.getResearchPaperPath()}}"
 										style="height: 100px" />
 									<br>
-								  <a th:href="@{/files/}+@{${res.getResearchPaperPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
-								  <a th:if="${res.getResearchPaperPath()!=null and res.getResearchPaperPath()!=''}" th:href="@{/files/}+@{${res.getResearchPaperPath()}}" download >Download</a>
+								  <a th:href="${'/ResearchPaper/' + res.getId()}" target="_blank"> View</a> &nbsp;&nbsp;
+								  <a th:if="${res.getResearchPaperPath()!=null and res.getResearchPaperPath()!=''}" th:href="${'/ResearchPaper/' + res.getId()}" download >Download</a>
 			
 								</td>
 								 <td><span th:text = "${res.getDescription()}"></span></td>

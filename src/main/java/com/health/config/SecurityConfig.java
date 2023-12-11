@@ -49,7 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/showLanguages/**", "/unpublishTutorial/**", "/loadTopicByCategory/**", "/loadLanguageByCategoryTopic/**",
             "/loadTopicAndLanguageByCategory/**", "/loadCategoryAndLanguageByTopic/**",
             "/loadCategoryAndTopicByLanguage/**", "/tutorialsSearch/**", "/tutorialsSearch1/**", "/checkTutorial/**",
-            "/Slide/**", "/TimeScript/**", "/OriginalScript/**", };
+            "/Slide/**", "/TimeScript/**", "/OriginalScript/**", "/Brochure-English/**", "/Brochure/**",
+            "/ResearchPaper/**", };
 
     /**
      * url matcher for SUPERADMIN

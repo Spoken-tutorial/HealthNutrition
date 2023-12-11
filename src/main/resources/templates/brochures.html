@@ -138,9 +138,9 @@ border-right: 2px solid #014F7A;
       									<img th:unless="${filesBro.getWebPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${filesBro.getWebPath()}}"
 											style=" height: 100px" />
 										<br>
-										<a th:href="@{/files/}+@{${filesBro.getWebPath()}}" target="_blank"> View</a> &nbsp;&nbsp;
+										<a th:href="${'/Brochure/' + filesBro.getBroFileId()}" target="_blank"> View</a> &nbsp;&nbsp;
 										
-										<a th:href="@{/files/}+@{${filesBro.getWebPath()}}" download >Download</a>
+										<a th:href="${'/Brochure/' + filesBro.getBroFileId()}" download >Download</a>
 					                </td>
 					                 <td th:text="${filesBro.getVersion().getBrouchure().getTitle()}"></td>
 					                <td > 

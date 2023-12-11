@@ -508,7 +508,7 @@ the globe.
      								 <img th:unless="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${res.getResearchPaperPath()}}"
 										style="height: 100px" />
 									
-								  <a th:href="@{/files/}+@{${res.getResearchPaperPath()}}" target="_blank" class="pdfclass"> View</a>
+								  <a th:href="${'/ResearchPaper/' + res.getId()}" target="_blank" class="pdfclass"> View</a>
 	    		</div>
 	    		<hr style="border: 1px solid orange; width: 50%;">
 	    		<p class="mb-1"><span th:text="${res.getTitle()}"></span></p>
@@ -537,9 +537,9 @@ the globe.
    		
    	 
    	  <img style=" height: 100px" th:if="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.findWebThumbnailofEnglish()}}"></img>
-       <a class="venobox  pdfclass" data-gall="myGallery"  th:if="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.findWebFileofEnglish()}}"
+       <a class="pdfclass" data-gall="myGallery"  th:if="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:href="${'/Brochure-English/' + ver.getVerId()}"
 													target="_blank" >View</a>
-      <a class="venobox pdfclass" data-gall="myGallery" th:unless="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.findWebFileofEnglish()}}"
+      <a class="pdfclass" data-gall="myGallery" th:unless="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:href="${'/Brochure-English/' + ver.getVerId()}"
 													target="_blank">
       <img  th:unless="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.findWebFileofEnglish()}}"
 			style=" height: 100px" /></a>

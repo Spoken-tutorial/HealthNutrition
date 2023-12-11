@@ -5,12 +5,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.ColumnDefault;
 
 /**
  * Brochure Object to store brochure related data on database
@@ -32,6 +35,18 @@ public class Brouchure implements Serializable {
     private int id;
 
     private String title;
+
+    @Column(name = "brochureVisit")
+    @ColumnDefault("0")
+    private int brochureVisit = 0;
+
+    public int getBrochureVisit() {
+        return brochureVisit;
+    }
+
+    public void setBrochureVisit(int brochureVisit) {
+        this.brochureVisit = brochureVisit;
+    }
 
     public String getTitle() {
         return title;

@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.ColumnDefault;
+
 @Entity
 public class ResearchPaper {
 
@@ -23,6 +25,10 @@ public class ResearchPaper {
     @Column(name = "thumbnail_path")
     private String thumbnailPath;
 
+    @Column(name = "researchPaperVisit")
+    @ColumnDefault("0")
+    private int researchPaperVisit = 0;
+
     /**
      * Location to store brochure
      */
@@ -32,6 +38,14 @@ public class ResearchPaper {
      * Boolean value to show on Homepage or not
      */
     private boolean showOnHomepage = false;
+
+    public int getResearchPaperVisit() {
+        return researchPaperVisit;
+    }
+
+    public void setResearchPaperVisit(int researchPaperVisit) {
+        this.researchPaperVisit = researchPaperVisit;
+    }
 
     public String getThumbnailPath() {
         return thumbnailPath;

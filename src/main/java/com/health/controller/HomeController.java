@@ -1195,6 +1195,74 @@ public class HomeController {
 
     }
 
+    @GetMapping("/Brochure/{filePathId}")
+    public String getBrochure(HttpServletRequest req, @PathVariable int filePathId, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        FilesofBrouchure fileBro = filesofbrouchureService.findById(filePathId);
+
+        Brouchure bro = fileBro.getVersion().getBrouchure();
+
+        try {
+            bro.setBrochureVisit(bro.getBrochureVisit() + 1);
+            broService.save(bro);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Error in  count Resource Visit of TimeScript: {}", bro, e);
+
+        }
+        String res = fileBro.getWebPath();
+        return "redirect:/files/" + res;
+
+    }
+
+    @GetMapping("/Brochure-English/{verId}")
+    public String getBrochureEnglish(HttpServletRequest req, @PathVariable int verId, Principal principal,
+            Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        Version ver = verService.findById(verId);
+
+        Brouchure bro = ver.getBrouchure();
+
+        try {
+            bro.setBrochureVisit(bro.getBrochureVisit() + 1);
+            broService.save(bro);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Error in  count Resource Visit of TimeScript: {}", bro, e);
+
+        }
+        String res = ver.findWebFileofEnglish();
+        return "redirect:/files/" + res;
+
+    }
+
+    @GetMapping("/ResearchPaper/{id}")
+    public String getResearchPaper(HttpServletRequest req, @PathVariable int id, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        ResearchPaper researchPaper = researchPaperService.findById(id);
+
+        try {
+            researchPaper.setResearchPaperVisit(researchPaper.getResearchPaperVisit() + 1);
+            researchPaperService.save(researchPaper);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Error in  count Resource Visit of TimeScript: {}", researchPaper, e);
+
+        }
+        String res = researchPaper.getResearchPaperPath();
+        return "redirect:/files/" + res;
+
+    }
+
     @GetMapping("/TimeScript/{id}")
     public String getTimeScript(HttpServletRequest req, @PathVariable int id, Principal principal, Model model) {
         User usr = getUser(principal);
