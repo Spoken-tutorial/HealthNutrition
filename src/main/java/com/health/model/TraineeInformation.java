@@ -1,7 +1,6 @@
 
 package com.health.model;
 
-
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -12,152 +11,169 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
- * TraineeInfromation object 
+ * TraineeInfromation object
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class TraineeInformation implements  Serializable{
+public class TraineeInformation implements Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	@Column(name = "TraineeId")
-	private int TraineeId;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * name of person
-	 */
-	private String name;
+    /**
+     * unique id of object
+     */
+    @Id
+    @Column(name = "TraineeId")
+    private int TraineeId;
 
-	/**
-	 * email
-	 */
-	private String email;
+    /**
+     * name of person
+     */
+    private String name;
 
-	/**
-	 * contact number
-	 */
-	private long phone;
+    /**
+     * email
+     */
+    private String email;
 
-	/**
-	 * age
-	 */
-	private int age;
+    /**
+     * contact number
+     */
+    private long phone;
 
-	/**
-	 * aadhar number
-	 */
-	private long aadhar;
+    /**
+     * age
+     */
+    private int age;
 
-	/**
-	 * gender of trainee
-	 */
-	private String gender;
+    /**
+     * aadhar number
+     */
+    private long aadhar;
 
-	/**
-	 * name of organization
-	 */
-	private String organization;
+    /**
+     * gender of trainee
+     */
+    private String gender;
 
-	/**
-	 * training for trainee is being added
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="Training_id")
-	private TrainingInformation traineeInfos;
+    /**
+     * name of organization
+     */
+    private String organization;
 
-	public int getTrainingId() {
-		return TraineeId;
-	}
+    /**
+     * training for trainee is being added
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "Training_id")
+    private TrainingInformation traineeInfos;
 
-	public void setTrainingId(int trainingId) {
-		TraineeId = trainingId;
-	}
+    public int getTrainingId() {
+        return TraineeId;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setTrainingId(int trainingId) {
+        TraineeId = trainingId;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public long getPhone() {
-		return phone;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setPhone(long phone) {
-		this.phone = phone;
-	}
+    public long getPhone() {
+        return phone;
+    }
 
-	public int getAge() {
-		return age;
-	}
+    public void setPhone(long phone) {
+        this.phone = phone;
+    }
 
-	public void setAge(int age) {
-		this.age = age;
-	}
+    public int getAge() {
+        return age;
+    }
 
-	public long getAadhar() {
-		return aadhar;
-	}
+    public void setAge(int age) {
+        this.age = age;
+    }
 
-	public void setAadhar(long aadhar) {
-		this.aadhar = aadhar;
-	}
+    public long getAadhar() {
+        return aadhar;
+    }
 
-	public String getGender() {
-		return gender;
-	}
+    public void setAadhar(long aadhar) {
+        this.aadhar = aadhar;
+    }
 
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
+    public String getGender() {
+        return gender;
+    }
 
-	public String getOrganization() {
-		return organization;
-	}
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 
-	public void setOrganization(String organization) {
-		this.organization = organization;
-	}
+    public String getOrganization() {
+        return organization;
+    }
 
-	public TrainingInformation getTraineeInfos() {
-		return traineeInfos;
-	}
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
 
-	public void setTraineeInfos(TrainingInformation traineeInfos) {
-		this.traineeInfos = traineeInfos;
-	}
+    public TrainingInformation getTraineeInfos() {
+        return traineeInfos;
+    }
 
-	public TraineeInformation(int trainingId, String name, String email, long phone, int age, long aadhar,
-			String gender, String organization, TrainingInformation traineeInfos) {
-		super();
-		TraineeId = trainingId;
-		this.name = name;
-		this.email = email;
-		this.phone = phone;
-		this.age = age;
-		this.aadhar = aadhar;
-		this.gender = gender;
-		this.organization = organization;
-		this.traineeInfos = traineeInfos;
-	}
+    public void setTraineeInfos(TrainingInformation traineeInfos) {
+        this.traineeInfos = traineeInfos;
+    }
 
-	public TraineeInformation() {
+    public TraineeInformation(int trainingId, String name, String email, long phone, int age, long aadhar,
+            String gender, String organization, TrainingInformation traineeInfos) {
+        super();
+        TraineeId = trainingId;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.age = age;
+        this.aadhar = aadhar;
+        this.gender = gender;
+        this.organization = organization;
+        this.traineeInfos = traineeInfos;
+    }
 
-	}
+    public TraineeInformation() {
 
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("TraineeInformation [TraineeId=").append(TraineeId);
+        sb.append(", name=").append(name);
+        sb.append(", email=").append(email);
+        sb.append(", phone=").append(phone);
+        sb.append(", age=").append(age);
+        sb.append(", aadhar=").append(aadhar);
+        sb.append(", gender=").append(gender);
+        sb.append(", organization=").append(organization);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

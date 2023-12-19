@@ -71,12 +71,23 @@
             <artifactId>google-http-client-jackson2</artifactId>
             <version>${project.http.version}</version>
         </dependency>
+		
+		<dependency>
+			<groupId>jakarta.json</groupId>
+			<artifactId>jakarta.json-api</artifactId>
+			<version>2.1.0</version>
+		</dependency>
 
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
             <version>${project.oauth.version}</version>
         </dependency>
+       
+        <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+		</dependency>
 
         <dependency>
             <groupId>com.google.collections</groupId>
@@ -133,11 +144,6 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-devtools</artifactId>
-		</dependency>
-	
 		<!-- These dependencies are used for caching-->
 	  	<dependency>
       		<groupId>org.springframework.boot</groupId>
@@ -175,21 +181,10 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
+			<!--runtime -->
+			<scope>provided</scope>
 		</dependency>
 		
-		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5.2</version>
-		</dependency>
-				
-		<dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jquery</artifactId>
-            <version>2.2.4</version>
-        </dependency>
-
       	<dependency>
 	    	<groupId>org.apache.pdfbox</groupId>
     		<artifactId>pdfbox</artifactId>

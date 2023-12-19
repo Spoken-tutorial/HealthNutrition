@@ -1,4 +1,5 @@
 package com.health.service.impl;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,116 +22,114 @@ import com.health.repository.TutorialRepository;
 import com.health.service.LanguageService;
 
 /**
- * Default implementation of the {@link com.health.service.LanguageService} interface.  
+ * Default implementation of the {@link com.health.service.LanguageService}
+ * interface.
+ * 
  * @author om prakash soni
  * @version 1.0
  */
 @Service
-public class LanguageServiceImp implements LanguageService
-{
+public class LanguageServiceImp implements LanguageService {
 
-	private static final Logger logger = LoggerFactory.getLogger(LanguageServiceImp.class);
-	
-	@Autowired
-	private LangaugeRepository languageRepo;
-	
-	@Autowired 
-	private TutorialRepository  tutRepo;
+    private static final Logger logger = LoggerFactory.getLogger(LanguageServiceImp.class);
 
-	/**
-	 * @see com.health.service.LanguageService#getAllLanguages()
-	 */
-	@Override
-	public List<Language> getAllLanguages() {
-		// TODO Auto-generated method stub
-		List<Language> lans= languageRepo.findAll();
-		Collections.sort(lans);
-		return lans;
-		
-	}
+    @Autowired
+    private LangaugeRepository languageRepo;
 
-	/**
-	 * @see com.health.service.LanguageService#getnewLanId()
-	 */
-	@Override
-	public int getnewLanId() {
-		// TODO Auto-generated method stub
-		try {
-			return languageRepo.getNewId()+1;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return 1;
-		}
-	}
+    @Autowired
+    private TutorialRepository tutRepo;
 
-	/**
-	 * @see com.health.service.LanguageService#getByLanName(String)
-	 */
-	@Override
-	public Language getByLanName(String langName) {
-		// TODO Auto-generated method stub
-		try {
-			return languageRepo.findBylangName(langName);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		
-	}
+    /**
+     * @see com.health.service.LanguageService#getAllLanguages()
+     */
+    @Override
+    public List<Language> getAllLanguages() {
+        // TODO Auto-generated method stub
+        List<Language> lans = languageRepo.findAll();
+        Collections.sort(lans);
+        return lans;
 
-	/**
-	 * @see com.health.service.LanguageService#getById(int)
-	 */
-	@Override
-	
-	public Language getById(int lanId) {
-		// TODO Auto-generated method stub
-		try {
-			Optional<Language> local=languageRepo.findById(lanId);
-			logger.info("Fetching Language from db by id {}", lanId);
-			return local.get();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
+    }
 
-	/**
-	 * @see com.health.service.LanguageService#save(Language)
-	 */
-	@Override
-	@CachePut(cacheNames = "languages", key="#lan.lanId")
-	public void save(Language lan) {
-		// TODO Auto-generated method stub
-		languageRepo.save(lan);
-		
-	}
-	
-	@Override
-	@Cacheable(cacheNames ="languages" )
-	public List<Language> getLanguagesForCache() {
-		System.out.println("Language_check");
-		List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
-		//List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
-		
-		Set<Language> langTemp = new HashSet<Language>();
-		for(Tutorial temp :tutorials) {
-			Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
-			if(c.isStatus()) {
-				langTemp.add(temp.getConAssignedTutorial().getLan());
-			}
-			
-		}
-		List<Language> lanTempSorted =new ArrayList<Language>(langTemp);
-		Collections.sort(lanTempSorted);
-		System.out.println("Language_check_end");
-		
-		return lanTempSorted;
-	}
-	
-	
-	
+    /**
+     * @see com.health.service.LanguageService#getnewLanId()
+     */
+    @Override
+    public int getnewLanId() {
+        // TODO Auto-generated method stub
+        try {
+            return languageRepo.getNewId() + 1;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error(" New Id error in  Language  Service Impl: {}", languageRepo.getNewId(), e);
+            return 1;
+        }
+    }
+
+    /**
+     * @see com.health.service.LanguageService#getByLanName(String)
+     */
+    @Override
+    public Language getByLanName(String langName) {
+        // TODO Auto-generated method stub
+        try {
+            return languageRepo.findBylangName(langName);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error(" Name error in Language Service Impl: {}", langName, e);
+            return null;
+        }
+
+    }
+
+    /**
+     * @see com.health.service.LanguageService#getById(int)
+     */
+    @Override
+
+    public Language getById(int lanId) {
+        // TODO Auto-generated method stub
+        try {
+            Optional<Language> local = languageRepo.findById(lanId);
+
+            return local.get();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error(" Id error in Language Service Impl: {}", lanId, e);
+            return null;
+        }
+    }
+
+    /**
+     * @see com.health.service.LanguageService#save(Language)
+     */
+    @Override
+    @CachePut(cacheNames = "languages", key = "#lan.lanId")
+    public void save(Language lan) {
+        // TODO Auto-generated method stub
+        languageRepo.save(lan);
+
+    }
+
+    @Override
+    @Cacheable(cacheNames = "languages")
+    public List<Language> getLanguagesForCache() {
+
+        List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
+        // List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
+
+        Set<Language> langTemp = new HashSet<Language>();
+        for (Tutorial temp : tutorials) {
+            Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+            if (c.isStatus()) {
+                langTemp.add(temp.getConAssignedTutorial().getLan());
+            }
+
+        }
+        List<Language> lanTempSorted = new ArrayList<Language>(langTemp);
+        Collections.sort(lanTempSorted);
+
+        return lanTempSorted;
+    }
+
 }

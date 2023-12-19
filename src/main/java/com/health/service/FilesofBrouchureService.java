@@ -3,44 +3,36 @@ package com.health.service;
 import java.util.List;
 
 import com.health.model.FilesofBrouchure;
-import com.health.model.Version;
 import com.health.model.Language;
-
+import com.health.model.Version;
 
 public interface FilesofBrouchureService {
-	
-	/**
-	 * Find the next unique id for brochure object
-	 * @return primitive integer value
-	 */
-	int getNewId();
 
-	
-	void save( FilesofBrouchure filesofBrouchure);
+    /**
+     * Find the next unique id for brochure object
+     * 
+     * @return primitive integer value
+     */
+    int getNewId();
 
-	
-	List<FilesofBrouchure> findAll();
+    void save(FilesofBrouchure filesofBrouchure);
 
-	
-	void delete(FilesofBrouchure temp);
+    List<FilesofBrouchure> findAll();
 
-	
-	FilesofBrouchure findById(int id);
+    void delete(FilesofBrouchure temp);
 
-	
-	List<FilesofBrouchure> findByVersion(Version ver);
-	
-	List<FilesofBrouchure> findByLanguage(Language lan);
-	
-	FilesofBrouchure findByLanguageandVersion(Language lan, Version ver);
-	
-	List<String> findAlllangNames(Version ver);
-	
-	String GetWebFileofFirstLan(Version ver);
-	
-	String GetPrintFileofFirstLan(Version ver);
-	
-	void  saveAll(List<FilesofBrouchure> filesofbrouchure);
-	
+    FilesofBrouchure findById(int id);
+
+    List<FilesofBrouchure> findByVersion(Version ver);
+
+    List<FilesofBrouchure> findByLanguage(Language lan);
+
+    FilesofBrouchure findByLanguageandVersion(Language lan, Version ver);
+
+    List<String> findAlllangNames(Version ver);
+
+    String GetWebFileofFirstLan(Version ver);
+
+    void saveAll(List<FilesofBrouchure> filesofbrouchure);
 
 }

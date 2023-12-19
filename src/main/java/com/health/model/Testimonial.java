@@ -6,154 +6,175 @@ import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
  * this modal records information of testimonial object into database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class Testimonial implements  Serializable  {
-	
-	/**
-	 * unique id of object
-	 */
-	@Id
-	@Column(name = "testi_id",updatable = false,nullable = false)
-	private int testimonialId;
-	
-	/**
-	 * name of person
-	 */
-	@Column(name = "name", nullable = false)
-	private String name ;
-	
-	/**
-	 * description
-	 */
-	@Column(name = "description", nullable = false,length = 2000)
-	private String description;
-	
-	/**
-	 * relative path of video or file
-	 */
-	@Column(name = "filePath", nullable = false)
-	private String filePath;
-	
-	/**
-	 * timestamp when object is created
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
-	
-	/**
-	 * boolean to accept/reject
-	 */
-	@Column(name ="approved", nullable = false)
-	private boolean approved=true;
-	
-	/**
-	 * relative path of consent letter
-	 */
-	@Column(name = "consent")
-	String consentLetter = null;
-	
-	/**
-	 * user who adds
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	/**
-	 * testimonial added for training
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="Training_id")
-	private TrainingInformation traineeInfos;
+public class Testimonial implements Serializable {
 
-	public int getTestimonialId() {
-		return testimonialId;
-	}
+    private static final long serialVersionUID = 1L;
 
-	public void setTestimonialId(int testimonialId) {
-		this.testimonialId = testimonialId;
-	}
+    /**
+     * unique id of object
+     */
+    @Id
+    @Column(name = "testi_id", updatable = false, nullable = false)
+    private int testimonialId;
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * name of person
+     */
+    @Column(name = "name", nullable = false)
+    private String name;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * description
+     */
+    @Column(name = "description", nullable = false, length = 2000)
+    private String description;
 
-	public String getDescription() {
-		return description;
-	}
+    /**
+     * relative path of video or file
+     */
+    @Column(name = "filePath", nullable = false)
+    private String filePath;
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /**
+     * timestamp when object is created
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	public String getFilePath() {
-		return filePath;
-	}
+    /**
+     * boolean to accept/reject
+     */
+    @Column(name = "approved", nullable = false)
+    private boolean approved = true;
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
+    /**
+     * relative path of consent letter
+     */
+    @Column(name = "consent")
+    String consentLetter = null;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    @Column(name = "thumbnailPath")
+    private String thumbnailPath;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    /**
+     * user who adds
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public User getUser() {
-		return user;
-	}
+    /**
+     * testimonial added for training
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "Training_id")
+    private TrainingInformation traineeInfos;
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public int getTestimonialId() {
+        return testimonialId;
+    }
 
-	public boolean isApproved() {
-		return approved;
-	}
+    public String getThumbnailPath() {
+        return thumbnailPath;
+    }
 
-	public void setApproved(boolean approved) {
-		this.approved = approved;
-	}
+    public void setThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
+    }
 
-	public TrainingInformation getTraineeInfos() {
-		return traineeInfos;
-	}
+    public void setTestimonialId(int testimonialId) {
+        this.testimonialId = testimonialId;
+    }
 
-	public void setTraineeInfos(TrainingInformation traineeInfos) {
-		this.traineeInfos = traineeInfos;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getConsentLetter() {
-		return consentLetter;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setConsentLetter(String consentLetter) {
-		this.consentLetter = consentLetter;
-	}
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
+    public String getFilePath() {
+        return filePath;
+    }
 
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    public TrainingInformation getTraineeInfos() {
+        return traineeInfos;
+    }
+
+    public void setTraineeInfos(TrainingInformation traineeInfos) {
+        this.traineeInfos = traineeInfos;
+    }
+
+    public String getConsentLetter() {
+        return consentLetter;
+    }
+
+    public void setConsentLetter(String consentLetter) {
+        this.consentLetter = consentLetter;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Testimonial [testimonialId=").append(testimonialId);
+        sb.append(", name=").append(name);
+        sb.append(", description=").append(description);
+        sb.append(", filePath=").append(filePath);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", approved=").append(approved);
+        sb.append(", consentLetter=").append(consentLetter);
+        sb.append(", thumbnailPath=").append(thumbnailPath);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }
-
-

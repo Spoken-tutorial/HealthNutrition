@@ -19,154 +19,168 @@ import com.health.domain.security.UserRole;
 
 /**
  * category Object to store category related data on database
+ * 
  * @author om prakash soni
  * @version 1.0
  */
 @Entity
 @Table(name = "category")
-public class Category implements Comparable<Category>,  Serializable{
+public class Category implements Comparable<Category>, Serializable {
 
-	/**
-	 * unique id to identify object
-	 */
-	@Id
-	@Column(name = "category_id", nullable = false, updatable = false)
-	private int categoryId;
-	
-	/**
-	 * category name
-	 */
-	@Column(name = "category_name", nullable = false)
-	private String catName;
-	
-	/**
-	 * Timestamp on added 
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
-	
-	/**
-	 * boolean value to mark visible/invisible in application
-	 */
-	@Column(name = "status", nullable = false)
-	private boolean status=true;
-	
-	/**
-	 * relative path of image stored
-	 */
-	@Column(name = "Image_path", nullable = false)
-	private String posterPath;
-	
-	/**
-	 * description of category
-	 */
-	@Column(name = "Description", nullable = false,length = 2000)
-	private String description;
-	
-	/**
-	 * user who created it
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	@OneToMany(mappedBy = "cat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<TopicCategoryMapping> topicCategoryMap=new HashSet<TopicCategoryMapping>();
-	
-	@OneToMany(mappedBy = "cat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<UserRole> userRoles=new HashSet<UserRole>();
-	
-	@OneToMany(mappedBy = "catId", cascade = CascadeType.ALL)
-	private Set<Brouchure> brochures=new HashSet<Brouchure>();
-	
+    private static final long serialVersionUID = 1L;
 
-	public Set<Brouchure> getBrochures() {
-		return brochures;
-	}
+    /**
+     * unique id to identify object
+     */
+    @Id
+    @Column(name = "category_id", nullable = false, updatable = false)
+    private int categoryId;
 
-	public void setBrochures(Set<Brouchure> brochures) {
-		this.brochures = brochures;
-	}
+    /**
+     * category name
+     */
+    @Column(name = "category_name", nullable = false)
+    private String catName;
 
-	public int getCategoryId() {
-		return categoryId;
-	}
+    /**
+     * Timestamp on added
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	public void setCategoryId(int categoryId) {
-		this.categoryId = categoryId;
-	}
+    /**
+     * boolean value to mark visible/invisible in application
+     */
+    @Column(name = "status", nullable = false)
+    private boolean status = true;
 
-	public String getCatName() {
-		return catName;
-	}
+    /**
+     * relative path of image stored
+     */
+    @Column(name = "Image_path", nullable = false)
+    private String posterPath;
 
-	public void setCatName(String catName) {
-		this.catName = catName;
-	}
+    /**
+     * description of category
+     */
+    @Column(name = "Description", nullable = false, length = 2000)
+    private String description;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    /**
+     * user who created it
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    @OneToMany(mappedBy = "cat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<TopicCategoryMapping> topicCategoryMap = new HashSet<TopicCategoryMapping>();
 
-	public boolean isStatus() {
-		return status;
-	}
+    @OneToMany(mappedBy = "cat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserRole> userRoles = new HashSet<UserRole>();
 
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
+    @OneToMany(mappedBy = "catId", cascade = CascadeType.ALL)
+    private Set<Brouchure> brochures = new HashSet<Brouchure>();
 
-	public String getPosterPath() {
-		return posterPath;
-	}
+    public Set<Brouchure> getBrochures() {
+        return brochures;
+    }
 
-	public void setPosterPath(String posterPath) {
-		this.posterPath = posterPath;
-	}
+    public void setBrochures(Set<Brouchure> brochures) {
+        this.brochures = brochures;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public int getCategoryId() {
+        return categoryId;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public String getCatName() {
+        return catName;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setCatName(String catName) {
+        this.catName = catName;
+    }
 
-	public Set<TopicCategoryMapping> getTopicCategoryMap() {
-		return topicCategoryMap;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public void setTopicCategoryMap(Set<TopicCategoryMapping> topicCategoryMap) {
-		this.topicCategoryMap = topicCategoryMap;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public Set<UserRole> getUserRoles() {
-		return userRoles;
-	}
+    public boolean isStatus() {
+        return status;
+    }
 
-	public void setUserRoles(Set<UserRole> userRoles) {
-		this.userRoles = userRoles;
-	}
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
-	@Override
-	public int compareTo(Category o) {
-		// TODO Auto-generated method stub
-		System.out.println(o.getCatName());
-		return this.getCatName().compareTo(o.getCatName());
-		
-	}
+    public String getPosterPath() {
+        return posterPath;
+    }
 
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Set<TopicCategoryMapping> getTopicCategoryMap() {
+        return topicCategoryMap;
+    }
+
+    public void setTopicCategoryMap(Set<TopicCategoryMapping> topicCategoryMap) {
+        this.topicCategoryMap = topicCategoryMap;
+    }
+
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Set<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
+
+    @Override
+    public int compareTo(Category o) {
+        // TODO Auto-generated method stub
+
+        return this.getCatName().compareTo(o.getCatName());
+
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Category [categoryId=").append(categoryId);
+        sb.append(", catName=").append(catName);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", status=").append(status);
+        sb.append(", posterPath=").append(posterPath);
+        sb.append(", description=").append(description);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

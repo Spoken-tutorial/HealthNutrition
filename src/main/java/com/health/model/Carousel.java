@@ -7,79 +7,94 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
- * Carousel Object to store carousel related data on database 
+ * Carousel Object to store carousel related data on database
+ * 
  * @author Om Prakash Soni
  * @version 1.0
  */
 @Entity
-public class Carousel implements  Serializable  {
+public class Carousel implements Serializable {
 
-	/**
-	 * unique id to identify object
-	 */
-	@Id
-	private int id;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * relative path of image stored specific to object
-	 */
-	private String posterPath;
+    /**
+     * unique id to identify object
+     */
+    @Id
+    private int id;
 
-	/**
-	 * Boolean value to show on Homepage or not
-	 */
-	private boolean showOnHomepage=false;
-	
-	/**
-	 * name of event
-	 */
-	@Column(length = 1000)
-	private String eventName;
+    /**
+     * relative path of image stored specific to object
+     */
+    private String posterPath;
 
-	/**
-	 * description of event
-	 */
-	@Column(length = 2000)
-	private String description;
+    /**
+     * Boolean value to show on Homepage or not
+     */
+    private boolean showOnHomepage = false;
 
-	public int getId() {
-		return id;
-	}
+    /**
+     * name of event
+     */
+    @Column(length = 1000)
+    private String eventName;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * description of event
+     */
+    @Column(length = 2000)
+    private String description;
 
-	public String getPosterPath() {
-		return posterPath;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setPosterPath(String posterPath) {
-		this.posterPath = posterPath;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public boolean isShowOnHomepage() {
-		return showOnHomepage;
-	}
+    public String getPosterPath() {
+        return posterPath;
+    }
 
-	public void setShowOnHomepage(boolean showOnHomepage) {
-		this.showOnHomepage = showOnHomepage;
-	}
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
 
-	public String getEventName() {
-		return eventName;
-	}
+    public boolean isShowOnHomepage() {
+        return showOnHomepage;
+    }
 
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
+    public void setShowOnHomepage(boolean showOnHomepage) {
+        this.showOnHomepage = showOnHomepage;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getEventName() {
+        return eventName;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Carousel [id=").append(id);
+        sb.append(", posterPath=").append(posterPath);
+        sb.append(", showOnHomepage=").append(showOnHomepage);
+        sb.append(", eventName=").append(eventName);
+        sb.append(", description=").append(description);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

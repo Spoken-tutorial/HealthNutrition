@@ -16,176 +16,186 @@ import javax.persistence.OneToMany;
 
 /**
  * This modal add Training information to database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class TrainingInformation implements  Serializable{
+public class TrainingInformation implements Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int trainingId;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * number of participant
-	 */
-	@Column(name = "totalParticipant")
-	private int totalParticipant;
+    /**
+     * unique id of object
+     */
+    @Id
+    private int trainingId;
 
-	/**
-	 * relative path of photos of training
-	 */
-	@Column(name= "PosterPath")
-	private String posterPath;
+    /**
+     * number of participant
+     */
+    @Column(name = "totalParticipant")
+    private int totalParticipant;
 
-	/**
-	 * language
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="state_id")
-	private Language lan;
+    /**
+     * relative path of photos of training
+     */
+    @Column(name = "PosterPath")
+    private String posterPath;
 
-	/**
-	 * event name
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="event_id")
-	private Event event;
+    /**
+     * language
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "state_id")
+    private Language lan;
 
-	/**
-	 * user who added this
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="user_id")
-	private User user;
+    /**
+     * event name
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_id")
+    private Event event;
 
-	/**
-	 * Timestaamp when object created
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
+    /**
+     * user who added this
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	/**
-	 * address
-	 */
-	@Column(name = "address" ,length = 10000)
-	private String address;
+    /**
+     * Timestaamp when object created
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	@OneToMany(mappedBy = "traineeInfos" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<TraineeInformation> traineeInfos= new HashSet<TraineeInformation>();
+    /**
+     * address
+     */
+    @Column(name = "address", length = 10000)
+    private String address;
 
-	@OneToMany(mappedBy = "traineeInfos" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<TrainingTopic> trainingTopicId = new HashSet<TrainingTopic>();
+    @OneToMany(mappedBy = "traineeInfos", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<TraineeInformation> traineeInfos = new HashSet<TraineeInformation>();
 
-	@OneToMany(mappedBy = "traineeInfos" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<FeedbackMasterTrainer> masterTrainerFeedback = new HashSet<FeedbackMasterTrainer>();
+    @OneToMany(mappedBy = "traineeInfos", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<TrainingTopic> trainingTopicId = new HashSet<TrainingTopic>();
 
-	@OneToMany(mappedBy = "traineeInfos" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<PostQuestionaire> postQuestions = new HashSet<PostQuestionaire>();
+    @OneToMany(mappedBy = "traineeInfos", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<FeedbackMasterTrainer> masterTrainerFeedback = new HashSet<FeedbackMasterTrainer>();
 
-	@OneToMany(mappedBy = "traineeInfos" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<Testimonial> testimonials = new HashSet<Testimonial>();
+    @OneToMany(mappedBy = "traineeInfos", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<PostQuestionaire> postQuestions = new HashSet<PostQuestionaire>();
 
-	public int getTrainingId() {
-		return trainingId;
-	}
+    @OneToMany(mappedBy = "traineeInfos", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Testimonial> testimonials = new HashSet<Testimonial>();
 
-	public void setTrainingId(int trainingId) {
-		this.trainingId = trainingId;
-	}
+    public int getTrainingId() {
+        return trainingId;
+    }
 
-	public int getTotalParticipant() {
-		return totalParticipant;
-	}
+    public void setTrainingId(int trainingId) {
+        this.trainingId = trainingId;
+    }
 
-	public void setTotalParticipant(int totalParticipant) {
-		this.totalParticipant = totalParticipant;
-	}
+    public int getTotalParticipant() {
+        return totalParticipant;
+    }
 
-	public String getPosterPath() {
-		return posterPath;
-	}
+    public void setTotalParticipant(int totalParticipant) {
+        this.totalParticipant = totalParticipant;
+    }
 
-	public void setPosterPath(String posterPath) {
-		this.posterPath = posterPath;
-	}
+    public String getPosterPath() {
+        return posterPath;
+    }
 
-	public Set<TrainingTopic> getTrainingTopicId() {
-		return trainingTopicId;
-	}
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
 
-	public void setTrainingTopicId(Set<TrainingTopic> trainingTopicId) {
-		this.trainingTopicId = trainingTopicId;
-	}
+    public Set<TrainingTopic> getTrainingTopicId() {
+        return trainingTopicId;
+    }
 
-	public Language getLan() {
-		return lan;
-	}
+    public void setTrainingTopicId(Set<TrainingTopic> trainingTopicId) {
+        this.trainingTopicId = trainingTopicId;
+    }
 
-	public void setLan(Language lan) {
-		this.lan = lan;
-	}
+    public Language getLan() {
+        return lan;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setLan(Language lan) {
+        this.lan = lan;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public Set<TraineeInformation> getTraineeInfos() {
-		return traineeInfos;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public void setTraineeInfos(Set<TraineeInformation> traineeInfos) {
-		this.traineeInfos = traineeInfos;
-	}
+    public Set<TraineeInformation> getTraineeInfos() {
+        return traineeInfos;
+    }
 
-	public Event getEvent() {
-		return event;
-	}
+    public void setTraineeInfos(Set<TraineeInformation> traineeInfos) {
+        this.traineeInfos = traineeInfos;
+    }
 
-	public void setEvent(Event event) {
-		this.event = event;
-	}
+    public Event getEvent() {
+        return event;
+    }
 
-	public Set<FeedbackMasterTrainer> getMasterTrainerFeedback() {
-		return masterTrainerFeedback;
-	}
+    public void setEvent(Event event) {
+        this.event = event;
+    }
 
-	public void setMasterTrainerFeedback(Set<FeedbackMasterTrainer> masterTrainerFeedback) {
-		this.masterTrainerFeedback = masterTrainerFeedback;
-	}
+    public Set<FeedbackMasterTrainer> getMasterTrainerFeedback() {
+        return masterTrainerFeedback;
+    }
 
-	public Set<PostQuestionaire> getPostQuestions() {
-		return postQuestions;
-	}
+    public void setMasterTrainerFeedback(Set<FeedbackMasterTrainer> masterTrainerFeedback) {
+        this.masterTrainerFeedback = masterTrainerFeedback;
+    }
 
-	public void setPostQuestions(Set<PostQuestionaire> postQuestions) {
-		this.postQuestions = postQuestions;
-	}
+    public Set<PostQuestionaire> getPostQuestions() {
+        return postQuestions;
+    }
 
+    public void setPostQuestions(Set<PostQuestionaire> postQuestions) {
+        this.postQuestions = postQuestions;
+    }
 
-
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("TrainingInformation [trainingId=").append(trainingId);
+        sb.append(", totalParticipant=").append(totalParticipant);
+        sb.append(", posterPath=").append(posterPath);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

@@ -2,119 +2,123 @@ package com.health.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 /**
  * This modal class to record the question
+ * 
  * @author om prakash soni
  * @version 1.0
  */
 @Entity
-public class Question implements  Serializable{
-	
-	/**
-	 * unique id of object
-	 */
-	@Id
-	@Column(name = "question_id",updatable = false,nullable = false)
-	private int questionId;
-	
-	/**
-	 * relative path of question
-	 */
-	@Column(name = "question_path",nullable = false)
-	private String questionPath;
-	
-	/**
-	 * timestamp of object created
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
-	
-	/**
-	 * user who added question
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	/**
-	 * language for question
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lan_id")
-	private Language lan;
-	
-	/**
-	 * category and topic of question
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "topic_cat_id")
-	private TopicCategoryMapping topicCatId;
-	
-	public int getQuestionId() {
-		return questionId;
-	}
+public class Question implements Serializable {
 
-	public void setQuestionId(int questionId) {
-		this.questionId = questionId;
-	}
+    private static final long serialVersionUID = 1L;
 
-	public String getQuestionPath() {
-		return questionPath;
-	}
+    /**
+     * unique id of object
+     */
+    @Id
+    @Column(name = "question_id", updatable = false, nullable = false)
+    private int questionId;
 
-	public void setQuestionPath(String questionPath) {
-		this.questionPath = questionPath;
-	}
+    /**
+     * relative path of question
+     */
+    @Column(name = "question_path", nullable = false)
+    private String questionPath;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    /**
+     * timestamp of object created
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    /**
+     * user who added question
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public User getUser() {
-		return user;
-	}
+    /**
+     * language for question
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lan_id")
+    private Language lan;
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    /**
+     * category and topic of question
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_cat_id")
+    private TopicCategoryMapping topicCatId;
 
-	public Language getLan() {
-		return lan;
-	}
+    public int getQuestionId() {
+        return questionId;
+    }
 
-	public void setLan(Language lan) {
-		this.lan = lan;
-	}
+    public void setQuestionId(int questionId) {
+        this.questionId = questionId;
+    }
 
-	public TopicCategoryMapping getTopicCatId() {
-		return topicCatId;
-	}
+    public String getQuestionPath() {
+        return questionPath;
+    }
 
-	public void setTopicCatId(TopicCategoryMapping topicCatId) {
-		this.topicCatId = topicCatId;
-	}
+    public void setQuestionPath(String questionPath) {
+        this.questionPath = questionPath;
+    }
 
-	
-	
-	
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Language getLan() {
+        return lan;
+    }
+
+    public void setLan(Language lan) {
+        this.lan = lan;
+    }
+
+    public TopicCategoryMapping getTopicCatId() {
+        return topicCatId;
+    }
+
+    public void setTopicCatId(TopicCategoryMapping topicCatId) {
+        this.topicCatId = topicCatId;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Question [questionId=").append(questionId);
+        sb.append(", questionPath=").append(questionPath);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
+    }
+
 //	@Id
 //	@GeneratedValue(strategy=GenerationType.AUTO) 
 //	
@@ -223,5 +227,5 @@ public class Question implements  Serializable{
 //	 * { this.category_Tutorials = category_Tutorials; }
 //	 * 
 //	 */
-	
+
 }

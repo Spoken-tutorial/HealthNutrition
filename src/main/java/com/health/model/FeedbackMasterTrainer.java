@@ -12,112 +12,126 @@ import javax.persistence.ManyToOne;
 
 /**
  * feedbackMasterTrainer object to store data in database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class FeedbackMasterTrainer implements  Serializable {
+public class FeedbackMasterTrainer implements Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int TrainerFeedId;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * description
-	 */
-	@Column(length = 2000)
-	private String description;
+    /**
+     * unique id of object
+     */
+    @Id
+    private int TrainerFeedId;
 
-	/**
-	 * timestamp feedback given
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
+    /**
+     * description
+     */
 
-	/**
-	 * relative path where feedback is given
-	 */
-	private String path;
+    @Column(length = 2000)
+    private String description;
 
-	/**
-	 * feedback given for training
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="Training_id")
-	private TrainingInformation traineeInfos;
+    /**
+     * timestamp feedback given
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	/**
-	 * user who given feedback
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="user_id")
-	private User user;
+    /**
+     * relative path where feedback is given
+     */
+    private String path;
 
-	public int getId() {
-		return TrainerFeedId;
-	}
+    /**
+     * feedback given for training
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Training_id")
+    private TrainingInformation traineeInfos;
 
-	public void setId(int id) {
-		this.TrainerFeedId = id;
-	}
+    /**
+     * user who given feedback
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public String getDescription() {
-		return description;
-	}
+    public int getId() {
+        return TrainerFeedId;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setId(int id) {
+        this.TrainerFeedId = id;
+    }
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public String getPath() {
-		return path;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public void setPath(String path) {
-		this.path = path;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public TrainingInformation getTraineeInfos() {
-		return traineeInfos;
-	}
+    public String getPath() {
+        return path;
+    }
 
-	public void setTraineeInfos(TrainingInformation traineeInfos) {
-		this.traineeInfos = traineeInfos;
-	}
+    public void setPath(String path) {
+        this.path = path;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public TrainingInformation getTraineeInfos() {
+        return traineeInfos;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setTraineeInfos(TrainingInformation traineeInfos) {
+        this.traineeInfos = traineeInfos;
+    }
 
-	public FeedbackMasterTrainer(int trainerFeedId, String description, Timestamp dateAdded,
-			String path, TrainingInformation traineeInfos, User user) {
-		super();
-		TrainerFeedId = trainerFeedId;
-		this.description = description;
-		this.dateAdded = dateAdded;
-		this.path = path;
-		this.traineeInfos = traineeInfos;
-		this.user = user;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public FeedbackMasterTrainer() {
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	}
+    public FeedbackMasterTrainer(int trainerFeedId, String description, Timestamp dateAdded, String path,
+            TrainingInformation traineeInfos, User user) {
+        super();
+        TrainerFeedId = trainerFeedId;
+        this.description = description;
+        this.dateAdded = dateAdded;
+        this.path = path;
+        this.traineeInfos = traineeInfos;
+        this.user = user;
+    }
 
+    public FeedbackMasterTrainer() {
+
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("FeedbackMasterTrainer [TrainerFeedId=").append(TrainerFeedId);
+        sb.append(", description=").append(description);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", path=").append(path);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

@@ -5,7 +5,8 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Spoken Tutorials</title>
+    <link rel="icon" th:href="@{/image/favicon.ico}" />
+   <title>Health And Nutrition</title>
     <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
     
   <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css" />
@@ -73,19 +74,19 @@
 	</div>
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
 	<div><p class="d-inline-block"><span class="top-banner">
-		<a sec:authorize="isAnonymous()" th:href="@{/login}">Login | New
+		<a sec:authorize="isAnonymous()" th:href="@{/login}" target="_blank">Login | New
 		User</a> <a sec:authorize="isAuthenticated()"
 		th:href="@{/dashBoard}">My Account</a> 
 		</span></p>
-	    <p class="d-inline-block"><span class="top-banner"><a sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a></span></p></div>
+	  <p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p></div>
 	</div>
 	</div>
 	</div>
 	</section>
   <nav class="navbar navbar-expand-lg navbar-light bg-light " th:fragment="navbar">
-  <a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
-								<span style="color: rgba(0,0,0,0.9);font-size: 1.5rem;" class="ml-3">Spoken <span style="color: orange;font-size:1.5rem;">Tutorial</span> <span style="border-bottom:2px solid orange;">Health
-& Nutrition Project</span><span style="color: orange;font-size: 2rem;"></span> </span>
+ <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">Spoken <span style="color: orange;font-size:1.8rem;">Tutorial</span>  </span> </span> <span style="color: rgba(0,0,0,0.9);font-size: 1.5rem;" class="ml-3"><span style="border-bottom:2px solid orange;">Health
+& Nutrition </span><span style="color: orange;font-size: 2rem;"></span></span>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -102,6 +103,8 @@
     <a class="dropdown-item" th:href="@{/#events}">Events</a>
     <a class="dropdown-item" th:href="@{/#promoVideo}">Promo Videos</a>
     <a class="dropdown-item" th:href="@{/#testimonial}">Testimonials</a>
+    <a class="dropdown-item" th:href="@{/#researchPaper}">Research Papers</a>
+    <a class="dropdown-item" th:href="@{/#brochure}">Brochures</a>
   </div>
 </div>
       <a class="nav-item nav-link " th:href="@{/#contact}" tabindex="-1">Contact Us</a>
@@ -229,7 +232,7 @@ the globe.
 		</div> -->
 		</div>
 		<br>
-		<div class="w-100 text-center"><a th:href="@{/statistics}" target="_blank" class="button catBtn mb-5">View Statistics</a></div>
+		<div class="w-100 text-center"><a th:href="@{/statistics}" class="button catBtn mb-5">View Statistics</a></div>
 	</div>
   </section>
     
@@ -252,7 +255,7 @@ the globe.
 	    	</div>
    		 </div>
    		 <br>
-   		 <div class="w-100 text-center"><a th:href="@{/categories}" target="_blank" class="button catBtn mb-5">View all Categories</a></div> 
+   		 <div class="w-100 text-center"><a th:href="@{/categories}"  class="button catBtn mb-5">View all Categories</a></div> 
     </div>  
   </section>
   <!-- modal for displaying full category description -->
@@ -276,6 +279,31 @@ the globe.
 </div>
 </div>
 <!-- modal for displaying full category description ends-->
+
+
+  <!-- modal for displaying full Research Paper description -->
+  
+  <div th:if="${listOfResearchPapers}">
+<div class="modal fade" th:each="res1 : ${listOfResearchPapers}" th:attrappend="id=${'detailRes'+'_'+res1.getId()}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1"><span th:text="${res1.getTitle()}"></span></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<small class="text-justify"><span th:text="${res1.getDescription()}"></span></small>
+      </div>
+      
+    </div>
+  </div>
+</div>
+</div>
+  
+  <!-- modal for displaying full Research Papeer description ends-->
+  
     
     <section id="consultants" class="py-4" th:if="${listOfConsultant}">
     <h1 class="text-center spk-title" style="color:#fff!important;">Consultants</h1>
@@ -295,7 +323,7 @@ the globe.
     		</div>
     	</div>
     	<br>
-    	<div class="text-center"><a th:href="@{/showConsultant}" target="_blank" class="button is-link is-outlined is-fullwidth consBtn mb-5">View all consultants</a></div>
+    	<div class="text-center"><a th:href="@{/showConsultant}"  class="button is-link is-outlined is-fullwidth consBtn mb-5">View all consultants</a></div>
     </div>
     </section>
     
@@ -357,7 +385,7 @@ the globe.
     		</div>
     	</div>	
     	<br>
-    <div class=" text-center"><a th:href="@{/showEvent}" target="_blank" class="button catBtn mb-5 ">View all Events</a></div>
+    <div class=" text-center"><a th:href="@{/showEvent}"  class="button catBtn mb-5 ">View all Events</a></div>
     </div>
     
      
@@ -464,22 +492,56 @@ the globe.
     </div>
     </div>
     <br>
-    <div class=" text-center"><a th:href="@{/testimonialList}" target="_blank" class="button catBtn mb-5 ">View all Testimonials</a></div>
+    <div class=" text-center"><a th:href="@{/testimonialList}"  class="button catBtn mb-5 ">View all Testimonials</a></div>
     </div>
     </section>
-    <section th:if="${not #lists.isEmpty(listofVesrsions)}">
-    <h1 class="text-center spk-title">Brochures</h1>
+    
+    
+     <section  id=researchPaper th:if="${listOfResearchPapers}">
+	<h1 class="text-center spk-title">Research Papers</h1>
+    <div class="container-lg">
+    	<div class="row"  >
+	    	<div class="col-md-4 col-lg-3 br-right br-bottom py-3" th:each="res : ${listOfResearchPapers}">
+	    	<div class="d-flex flex-column align-items-center ">
+	    		<div>
+	    		<img style=" height: 100px" th:if="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${res.getThumbnailPath()}}"></img>
+     								 <img th:unless="${res.getResearchPaperPath().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${res.getResearchPaperPath()}}"
+										style="height: 100px" />
+									
+								  <a th:href="${'/ResearchPaper/' + res.getId()}" target="_blank" class="pdfclass"> View</a>
+	    		</div>
+	    		<hr style="border: 1px solid orange; width: 50%;">
+	    		<p class="mb-1"><span th:text="${res.getTitle()}"></span></p>
+	    		<small><p th:text="${#strings.abbreviate(res.getDescription(),150)} "></small>
+	    		<p><button type="button" class="btn btn-light" data-toggle="modal" th:attr="data-target='#detailRes_'+${res.getId() }" >
+  Details
+</button></p></p>
+	    		</div>
+	    	</div>
+   		 </div>
+   		 <br>
+   		 <div class="w-100 text-center"><a th:href="@{/researchPapers}"  class="button catBtn mb-5">View all Research Papers</a></div> 
+    </div>  
+  </section>
+    
+    
+    
+    
+    
+    
+    <section id= brochure th:if="${not #lists.isEmpty(listofVesrsions)}">
+    <h1 class="text-center spk-title">Promotional-Materials</h1>
     <div class="container-lg">
     <div class="row">
    	<div th:each="ver : ${listofVesrsions}" class="col-md-3" style="border-top: 1px solid #014F7A;">
-   		<!-- a  class="venobox " data-gall="myGallery" th:href="@{/files/}+@{${ver.getVersionPosterPath()}}"><img style="width:50%; height:50%;" th:src="@{/files/}+@{${ver.getVersionPosterPath()}}" /></a-->
+   		
    	 
    	  <img style=" height: 100px" th:if="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:src="@{/files/}+@{${ver.findWebThumbnailofEnglish()}}"></img>
-       <a th:if="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:href="@{/files/}+@{${ver.findWebFileofEnglish()}}"
-													target="_blank" class="pdfclass">View</a>
-      <a th:href="@{/files/}+@{${ver.findWebFileofEnglish()}}"
-													target="_blank" class="pdfclass">
-      <img th:unless="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.findWebFileofEnglish()}}"
+       <a class="pdfclass" data-gall="myGallery"  th:if="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:href="${'/Brochure-English/' + ver.getVerId()}"
+													target="_blank" >View</a>
+      <a class="pdfclass" data-gall="myGallery" th:unless="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" th:href="${'/Brochure-English/' + ver.getVerId()}"
+													target="_blank">
+      <img  th:unless="${ver.findWebFileofEnglish().toLowerCase().endsWith('.pdf')}" id="imagesource" th:src="@{/files/}+@{${ver.findWebFileofEnglish()}}"
 			style=" height: 100px" /></a>
    		<p class="mb-1"   th:text="${ver.getBrouchure().getTitle()}" style="color: #1C7871;border-bottom: 1px solid #015686!important;"></p>
    		<p class="mb-1"  th:if="${ver.getBrouchure().getCatId()!= null}" th:text="${ver.getBrouchure().getCatId().getCatName()}" style="color: #1C7871;border-bottom: 1px solid #015686!important;"></p>
@@ -489,7 +551,7 @@ the globe.
     </div>
     <br>
     <br>
-    <div class=" text-center"><a th:href="@{/brochure}" target="_blank" class="button catBtn mb-5 ">View all Brochures</a></div>
+    <div class=" text-center"><a th:href="@{/brochures}" class="button catBtn mb-5 ">View all Promotional-Materials</a></div>
     </div>
     </section>
     

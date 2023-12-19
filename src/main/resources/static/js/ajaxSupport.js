@@ -144,6 +144,11 @@ $(document).ready(function() {
 			    
 			    
 /**********************************end***********************************************************/
+
+
+/*******************************ResourceCount Start******************************************* */
+
+/********************************ResourceCount End**********************************************/
 			
 			
 /******************* Changes made by om prakash *************************************/
@@ -299,6 +304,87 @@ $(document).ready(function() {
 			});
 			
 		
+		
+		
+		
+		
+		
+		
+		$('.enableResearchPaper').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableResearchPaper",
+					data : {
+						"id" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				$('#'+test_id).addClass('fas fa-times-circle');
+			   				$('#'+test_id).removeClass('fas fa-check-circle');
+			   				$('#'+test_id).css({"color": "red"});
+			   				$('#Success').css({"display": "block"});
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+			
+			$('.disableResearchPaper').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableResearchPaper",
+					data : {
+						"id" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				
+			   				$('#'+test_id).addClass('fas fa-check-circle');
+			   				$('#'+test_id).removeClass('fas fa-times-circle');
+			   				$('#'+test_id).css({"color": "green"});
+			   				$('#Success').css({"display": "block"});
+			   				
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+		
+			
+
 			
 			
 			$('.enableTest').click(function() {
@@ -1878,12 +1964,7 @@ $("#languageId1").change(function() {
 		/*
 		Funtion to reset search input
 		*/	
-		$(".btnClear").click(function(){
-       		 $("#myForm").trigger("reset");
-       		 $("#query").setVal("");
-       
-        	return false;
-        });
+		
         	
         	
         	
@@ -1978,7 +2059,7 @@ $("#languageId1").change(function() {
      
     	 */
     	 
-    	 function loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid){
+    	 function loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid){
 			
 			$.ajax({
 					type : "GET",
@@ -2027,7 +2108,7 @@ $("#languageId1").change(function() {
 				var languageid = $(this).val();
 				var catgoryid = $("#categoryname").val();
 				var topicid=$("#inputTopicName").val();
-				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
 				
 				
 			});
@@ -2039,25 +2120,49 @@ $("#languageId1").change(function() {
 				var topicid = $("#inputTopicName").val();
 				var catgoryid=$("#categoryname").val();
 				//loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
-				loadCategoryAndTopicByLanguage(languageid, catgoryid, topicid);
+				loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
 				
 				return false;
 				
 			});
 			
-			$("#btnClear").click(function(){
-   			 $(".btnClear").click(function(){
-       		 $("#searchForm").trigger("reset");
-    		});
-			});
-			
-			$("#reset2").click(function(){
- 			 $(":reset").css("background-color", "red");
+			$( "#btnClearForm" ).click(function() {
+				
+				$("#query").val("");
+				var languageid = 0;
+				$("#inputLanguage").val("0");
+				var topicid =0; 
+				$("#inputTopicName").val("0");
+				var catgoryid=0;
+				$("#categoryname").val("0");
+				//loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				loadCategoryAndTopicByLanguage(catgoryid, topicid, languageid);
+				loadTopicAndLanguageByCategory(catgoryid, topicid, languageid);
+				loadCategoryAndLanguageByTopic(catgoryid, topicid, languageid);
+				
+				return false;
+				
 			});
 			
 			
 			
 
+			$("#reset2").click(function(){
+ 			 $(":reset").css("background-color", "red");
+			});
+			
+			
+  		 /* $("#submitBotton").click(function(e){
+          		if ($("#query").val() === "") {
+               		 $("form[name=selectOption]").submit();
+               	
+         		} else {
+               		 $("form[name=searchOption]").submit();
+               		 
+         		 }
+  		  });
+			
+	*/
 
 		/*	$('#inputTopicName').change(function() {
 				var topic = $(this).val();
@@ -2765,12 +2870,9 @@ $("#languageId1").change(function() {
 						let [tutorialId,category,topicid,lang] = setTutorialData();
 						var outline = editor.getData();
 						$.ajax({
-							type : "GET",
+							type : "POST",
 							url : projectPath+"addOutline",
-							headers: {          
-    Accept: "application/json; charset=utf-8",         
-    "Content-Type": "application/json; charset=utf-8"   
-  }  ,
+						
 							data : {
 								"saveOutline" : outline,
 								"id" : tutorialId,
@@ -4062,7 +4164,7 @@ $("#select-language").change(function(){
 	}
 });
 
-document.getElementById("btn_unpublish").addEventListener("click", function(event){
+$("#btn_unpublish").on("click", function(event){
   event.preventDefault();
 					let category = document.getElementById("select-category").value;
 				let topic = document.getElementById("select-topic").value;

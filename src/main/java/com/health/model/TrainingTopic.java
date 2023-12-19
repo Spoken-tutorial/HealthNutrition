@@ -10,95 +10,109 @@ import javax.persistence.ManyToOne;
 
 /**
  * Training topic information object saved in database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class TrainingTopic implements  Serializable {
+public class TrainingTopic implements Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int trainingTopicId;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * topic category mapping
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="topicCat_id")
-	private TopicCategoryMapping topicCatId;
+    /**
+     * unique id of object
+     */
+    @Id
+    private int trainingTopicId;
 
-	/**
-	 * training object
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="Training_id")
-	private TrainingInformation traineeInfos;
+    /**
+     * topic category mapping
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "topicCat_id")
+    private TopicCategoryMapping topicCatId;
 
-	/**
-	 * event object
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="Event_id")
-	private Event event;
+    /**
+     * training object
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "Training_id")
+    private TrainingInformation traineeInfos;
 
-	public int getTrainingTopicId() {
-		return trainingTopicId;
-	}
+    /**
+     * event object
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "Event_id")
+    private Event event;
 
-	public void setTrainingTopicId(int trainingTopicId) {
-		this.trainingTopicId = trainingTopicId;
-	}
+    public int getTrainingTopicId() {
+        return trainingTopicId;
+    }
 
-	public TopicCategoryMapping getTopicCatId() {
-		return topicCatId;
-	}
+    public void setTrainingTopicId(int trainingTopicId) {
+        this.trainingTopicId = trainingTopicId;
+    }
 
-	public void setTopicCatId(TopicCategoryMapping topicCatId) {
-		this.topicCatId = topicCatId;
-	}
+    public TopicCategoryMapping getTopicCatId() {
+        return topicCatId;
+    }
 
-	public TrainingInformation getTraineeInfos() {
-		return traineeInfos;
-	}
+    public void setTopicCatId(TopicCategoryMapping topicCatId) {
+        this.topicCatId = topicCatId;
+    }
 
-	public void setTraineeInfos(TrainingInformation traineeInfos) {
-		this.traineeInfos = traineeInfos;
-	}
+    public TrainingInformation getTraineeInfos() {
+        return traineeInfos;
+    }
 
+    public void setTraineeInfos(TrainingInformation traineeInfos) {
+        this.traineeInfos = traineeInfos;
+    }
 
-	public Event getEvent() {
-		return event;
-	}
+    public Event getEvent() {
+        return event;
+    }
 
-	public void setEvent(Event event) {
-		this.event = event;
-	}
+    public void setEvent(Event event) {
+        this.event = event;
+    }
 
-	public TrainingTopic(int trainingTopicId, TopicCategoryMapping topicCatId, TrainingInformation traineeInfos, Event event) {
-		super();
-		this.trainingTopicId = trainingTopicId;
-		this.topicCatId = topicCatId;
-		this.traineeInfos = traineeInfos;
-		this.event = event;
-	}
-	public TrainingTopic(int trainingTopicId, TopicCategoryMapping topicCatId, TrainingInformation traineeInfos) {
-		super();
-		this.trainingTopicId = trainingTopicId;
-		this.topicCatId = topicCatId;
-		this.traineeInfos = traineeInfos;
+    public TrainingTopic(int trainingTopicId, TopicCategoryMapping topicCatId, TrainingInformation traineeInfos,
+            Event event) {
+        super();
+        this.trainingTopicId = trainingTopicId;
+        this.topicCatId = topicCatId;
+        this.traineeInfos = traineeInfos;
+        this.event = event;
+    }
 
-	}
-	public TrainingTopic(int trainingTopicId, TopicCategoryMapping topicCatId, Event event) {
-		super();
-		this.trainingTopicId = trainingTopicId;
-		this.topicCatId = topicCatId;
-		this.event = event;
-	}
+    public TrainingTopic(int trainingTopicId, TopicCategoryMapping topicCatId, TrainingInformation traineeInfos) {
+        super();
+        this.trainingTopicId = trainingTopicId;
+        this.topicCatId = topicCatId;
+        this.traineeInfos = traineeInfos;
 
-	public TrainingTopic() {
+    }
 
-	}
+    public TrainingTopic(int trainingTopicId, TopicCategoryMapping topicCatId, Event event) {
+        super();
+        this.trainingTopicId = trainingTopicId;
+        this.topicCatId = topicCatId;
+        this.event = event;
+    }
+
+    public TrainingTopic() {
+
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("TrainingTopic [trainingTopicId=").append(trainingTopicId);
+        sb.append("]");
+        return sb.toString();
+    }
+
 }

@@ -1,129 +1,132 @@
 
 package com.health.model;
+
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set; 
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity; 
-import javax.persistence.FetchType; 
-import javax.persistence.GeneratedValue; 
-import javax.persistence.GenerationType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.io.Serializable;
 
-	/**
-	 * This modal add topic object into database  
-	 * @author om prakash soni
-	 * @version 1.0
-	 *
-	 */
+/**
+ * This modal add topic object into database
+ * 
+ * @author om prakash soni
+ * @version 1.0
+ *
+ */
 @Entity
-@Table(name="topic")
-public class Topic implements Comparable<Topic>, Serializable{
-	
-	/**
-	 * unique id
-	 */
-	@Id
-	@Column(name="topic_id",nullable = false, updatable = false)
-	private int topicId;
-	
-	/**
-	 * topic name
-	 */
-	@Column(name="topic_name",nullable = false)
-	private String topicName;
-	
-	/**
-	 * timestamp of object created
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
-	
-	/**
-	 * boolean value to show/disable on application
-	 */
-	@Column(name = "status", nullable = false)
-	private boolean status=true;
-	
-	/**
-	 * user who add this
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	@OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<TopicCategoryMapping> topicCategoryMap=new HashSet<TopicCategoryMapping>();
-	
+@Table(name = "topic")
+public class Topic implements Comparable<Topic>, Serializable {
 
-	public int getTopicId() {
-		return topicId;
-	}
+    private static final long serialVersionUID = 1L;
 
-	public void setTopicId(int topicId) {
-		this.topicId = topicId;
-	}
+    /**
+     * unique id
+     */
+    @Id
+    @Column(name = "topic_id", nullable = false, updatable = false)
+    private int topicId;
 
-	public String getTopicName() {
-		return topicName;
-	}
+    /**
+     * topic name
+     */
+    @Column(name = "topic_name", nullable = false)
+    private String topicName;
 
-	public void setTopicName(String topicName) {
-		this.topicName = topicName;
-	}
+    /**
+     * timestamp of object created
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    /**
+     * boolean value to show/disable on application
+     */
+    @Column(name = "status", nullable = false)
+    private boolean status = true;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    /**
+     * user who add this
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public boolean isStatus() {
-		return status;
-	}
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<TopicCategoryMapping> topicCategoryMap = new HashSet<TopicCategoryMapping>();
 
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
+    public int getTopicId() {
+        return topicId;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setTopicId(int topicId) {
+        this.topicId = topicId;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public String getTopicName() {
+        return topicName;
+    }
 
-	public Set<TopicCategoryMapping> getTopicCategoryMap() {
-		return topicCategoryMap;
-	}
+    public void setTopicName(String topicName) {
+        this.topicName = topicName;
+    }
 
-	public void setTopicCategoryMap(Set<TopicCategoryMapping> topicCategoryMap) {
-		this.topicCategoryMap = topicCategoryMap;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	@Override
-	public int compareTo(Topic o) {
-		// TODO Auto-generated method stub
-		return this.getTopicName().compareTo(o.getTopicName());
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	  
-	  
+    public boolean isStatus() {
+        return status;
+    }
 
-			
-		  
-		  
-		  
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Set<TopicCategoryMapping> getTopicCategoryMap() {
+        return topicCategoryMap;
+    }
+
+    public void setTopicCategoryMap(Set<TopicCategoryMapping> topicCategoryMap) {
+        this.topicCategoryMap = topicCategoryMap;
+    }
+
+    @Override
+    public int compareTo(Topic o) {
+        // TODO Auto-generated method stub
+        return this.getTopicName().compareTo(o.getTopicName());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Topic [topicId=").append(topicId);
+        sb.append(", topicName=").append(topicName);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", status=").append(status);
+        sb.append("]");
+        return sb.toString();
+    }
+
 }
- 

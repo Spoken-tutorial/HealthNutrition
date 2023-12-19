@@ -253,9 +253,16 @@ a:hover {
             </a>
           </li>
           
-          <li class="nav-item border-lt nav-master-promoVideo">
+           <li class="nav-item border-lt nav-researchPaper">
+            <a class="nav-link" th:href="@{/addResearchPaper}">
+              <span data-feather="bar-chart-2"></span>
+              Research Paper
+            </a>
+          </li>
+          
+          <li class="nav-item border-lt nav-promoVideo">
             <a class="nav-link" th:href="@{/addPromoVideo}">
-              <i class="far fa-comment-alt sidebar-icon-sm"></i>
+              <span data-feather="bar-chart-2"></span>
               PromoVideo
             </a>
           </li>
@@ -418,10 +425,15 @@ a:hover {
               Testimonials
             </a>
           </li>
-          
-           <li class="nav-item border-lt nav-master-promoVideo">
+           <li class="nav-item border-lt nav-researchPaper">
+            <a class="nav-link" th:href="@{/addResearchPaper}">
+               <span data-feather="bar-chart-2"></span>
+              Research Paper
+            </a>
+          </li>
+           <li class="nav-item border-lt nav-promoVideo">
             <a class="nav-link" th:href="@{/addPromoVideo}">
-              <i class="far fa-comment-alt sidebar-icon-sm"></i>
+              <span data-feather="bar-chart-2"></span>
               PromoVideo
             </a>
           </li>
@@ -492,9 +504,16 @@ a:hover {
             </a>
           </li>
           
-          <li class="nav-item border-lt nav-master-promoVideo">
+           <li class="nav-item border-lt nav-researchPaper">
+            <a class="nav-link" th:href="@{/addResearchPaper}">
+               <span data-feather="bar-chart-2"></span>
+              Research Paper
+            </a>
+          </li>
+          
+          <li class="nav-item border-lt nav-promoVideo">
             <a class="nav-link" th:href="@{/addPromoVideo}">
-              <i class="far fa-comment-alt sidebar-icon-sm"></i>
+              <span data-feather="bar-chart-2"></span>
               PromoVideo
             </a>
           </li>
@@ -576,12 +595,6 @@ a:hover {
             <span class="nav-link revoke_role" href="#View">
               <i class="fas fa-user-minus sidebar-icon"></i>Remove Role
             </span>
-          </li>
-           <li class="nav-item border-lt nav-super-revoke-admin" th:if="${#authorization.expression('hasAuthority(''ADMIN_REVIEWER'')')}">
-            <a class="nav-link revoke_role" th:href="@{/}">
-              
-               Admin Reviewer
-            </a>
           </li>
           <li class="nav-item border-lt nav-super-revoke-contri" th:if="${#authorization.expression('hasAuthority(''CONTRIBUTOR'')')}">
             <a class="nav-link revoke_role" th:href="@{/revokeRoleContributor}">

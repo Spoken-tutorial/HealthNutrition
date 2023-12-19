@@ -16,89 +16,100 @@ import javax.persistence.OneToMany;
 
 /**
  * District object to store info on database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class District implements Comparable<District> , Serializable{
+public class District implements Comparable<District>, Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	@Column(name = "district_id", nullable = false)
-	int id;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * name of district
-	 */
-	private String districtName;
+    /**
+     * unique id of object
+     */
+    @Id
+    @Column(name = "district_id", nullable = false)
+    int id;
 
-	/**
-	 * timestamp on which created
-	 */
-	private Timestamp dateAdded;
+    /**
+     * name of district
+     */
+    private String districtName;
 
-	/**
-	 * state under which district comes
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="state_id")
-	private State state;
+    /**
+     * timestamp on which created
+     */
+    private Timestamp dateAdded;
 
-	@OneToMany(mappedBy = "district",cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	Set<City> cities=new HashSet<City>();
+    /**
+     * state under which district comes
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "state_id")
+    private State state;
 
-	@OneToMany(mappedBy = "district",cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	Set<Event> events=new HashSet<Event>();
+    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    Set<City> cities = new HashSet<City>();
 
-	public int getId() {
-		return id;
-	}
+    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    Set<Event> events = new HashSet<Event>();
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getDistrictName() {
-		return districtName;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setDistrictName(String districtName) {
-		this.districtName = districtName;
-	}
+    public String getDistrictName() {
+        return districtName;
+    }
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    public void setDistrictName(String districtName) {
+        this.districtName = districtName;
+    }
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public State getState() {
-		return state;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public void setState(State state) {
-		this.state = state;
-	}
+    public State getState() {
+        return state;
+    }
 
-	public Set<City> getCities() {
-		return cities;
-	}
+    public void setState(State state) {
+        this.state = state;
+    }
 
-	public void setCities(Set<City> cities) {
-		this.cities = cities;
-	}
+    public Set<City> getCities() {
+        return cities;
+    }
 
-	@Override
-	public int compareTo(District o) {
-		// TODO Auto-generated method stub
-		return this.getDistrictName().compareTo(o.getDistrictName());
-	}
+    public void setCities(Set<City> cities) {
+        this.cities = cities;
+    }
 
+    @Override
+    public int compareTo(District o) {
+        // TODO Auto-generated method stub
+        return this.getDistrictName().compareTo(o.getDistrictName());
+    }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("District [id=").append(id);
+        sb.append(", districtName=").append(districtName);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

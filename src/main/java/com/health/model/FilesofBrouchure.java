@@ -1,143 +1,134 @@
 package com.health.model;
+
 import java.sql.Timestamp;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class FilesofBrouchure {
-	
-	@Id
-	int broFileId;
-	
-	@Column(name = "date_added")
-	private Timestamp dateAdded;
-	
-	@Column(name = "Web_path")
-	private String webPath;
-	
-	@Column(name = "Print_path")
-	private String printPath;
-	
-	@Column(name = "thumbnail_path")
-	private String thumbnailPath;
-	
-	@ManyToOne
-	@JoinColumn(name = "ver_id")
-	private Version version;
-	
-	@ManyToOne
-	@JoinColumn(name = "lan_id")
-	private Language lan;
 
-	
-	public FilesofBrouchure() {
-	super();
-	
-}
-	
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version,
-			Language lan) {
-		super();
-		this.broFileId = broFileId;
-		this.dateAdded = dateAdded;
-		this.webPath = webPath;
-		this.printPath = printPath;
-		this.version = version;
-		this.lan = lan;
-	}
-	 
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath) {
-		super();
-		this.broFileId = broFileId;
-		this.dateAdded = dateAdded;
-		this.webPath = webPath;
-		this.printPath = printPath;
-		
-	}
-	 
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Language lan) {
-		super();
-		this.broFileId = broFileId;
-		this.dateAdded = dateAdded;
-		this.webPath = webPath;
-		this.printPath = printPath;
-		this.lan = lan;
-	} 
-	
-	public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String printPath, Version version) {
-		super();
-		this.broFileId = broFileId;
-		this.dateAdded = dateAdded;
-		this.webPath = webPath;
-		this.printPath = printPath;
-		this.version = version;
-		
-	}
-	
+    @Id
+    int broFileId;
 
-	public String getThumbnailPath() {
-		return thumbnailPath;
-	}
+    @Column(name = "date_added")
+    private Timestamp dateAdded;
 
-	public void setThumbnailPath(String thumbnailPath) {
-		this.thumbnailPath = thumbnailPath;
-	}
+    @Column(name = "Web_path")
+    private String webPath;
 
-	public int getBroFileId() {
-		return broFileId;
-	}
+    @Column(name = "thumbnail_path")
+    private String thumbnailPath;
 
-	public void setBroFileId(int broFileId) {
-		this.broFileId = broFileId;
-	}
+    @ManyToOne
+    @JoinColumn(name = "ver_id")
+    private Version version;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    @ManyToOne
+    @JoinColumn(name = "lan_id")
+    private Language lan;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    public FilesofBrouchure() {
+        super();
 
-	public String getWebPath() {
-		return webPath;
-	}
+    }
 
-	public void setWebPath(String webPath) {
-		this.webPath = webPath;
-	}
+    public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, String thumbnailPath, Version version,
+            Language lan) {
+        super();
+        this.broFileId = broFileId;
+        this.dateAdded = dateAdded;
+        this.webPath = webPath;
+        this.thumbnailPath = thumbnailPath;
+        this.version = version;
+        this.lan = lan;
+    }
 
-	public String getPrintPath() {
-		return printPath;
-	}
+    public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath) {
+        super();
+        this.broFileId = broFileId;
+        this.dateAdded = dateAdded;
+        this.webPath = webPath;
 
-	public void setPrintPath(String printPath) {
-		this.printPath = printPath;
-	}
+    }
 
-	public Version getVersion() {
-		return version;
-	}
+    public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, Language lan) {
+        super();
+        this.broFileId = broFileId;
+        this.dateAdded = dateAdded;
+        this.webPath = webPath;
+        this.lan = lan;
+    }
 
-	public void setVersion(Version version) {
-		this.version = version;
-	}
+    public FilesofBrouchure(int broFileId, Timestamp dateAdded, String webPath, Version version) {
+        super();
+        this.broFileId = broFileId;
+        this.dateAdded = dateAdded;
+        this.webPath = webPath;
+        this.version = version;
 
-	public Language getLan() {
-		return lan;
-	}
+    }
 
-	public void setLan(Language lan) {
-		this.lan = lan;
-	}
+    public String getThumbnailPath() {
+        return thumbnailPath;
+    }
 
-	@Override
-	public String toString() {
-		return "FilesofBrouchure [broFileId=" + broFileId + ", version=" + version + ", lan=" + lan + "]";
-	}
-	
-	
-	
-	
-	
+    public void setThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
+    }
+
+    public int getBroFileId() {
+        return broFileId;
+    }
+
+    public void setBroFileId(int broFileId) {
+        this.broFileId = broFileId;
+    }
+
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public String getWebPath() {
+        return webPath;
+    }
+
+    public void setWebPath(String webPath) {
+        this.webPath = webPath;
+    }
+
+    public Version getVersion() {
+        return version;
+    }
+
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
+    public Language getLan() {
+        return lan;
+    }
+
+    public void setLan(Language lan) {
+        this.lan = lan;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("FilesofBrouchure [broFileId=").append(broFileId);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", webPath=").append(webPath);
+        sb.append(", thumbnailPath=").append(thumbnailPath);
+        sb.append("]");
+        return sb.toString();
+    }
+
 }

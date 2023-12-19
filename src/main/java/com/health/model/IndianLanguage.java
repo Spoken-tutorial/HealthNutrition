@@ -12,49 +12,60 @@ import javax.persistence.OneToMany;
 
 /**
  * langauge object for master trainer to store in database
+ * 
  * @author om prakash soni
  * @version 1.0
  */
 @Entity
-public class IndianLanguage implements  Serializable {
+public class IndianLanguage implements Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int id;
-	
-	/**
-	 * language name
-	 */
-	private String lanName;
-	
-	@OneToMany(mappedBy = "indianlan", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-	private Set<UserIndianLanguageMapping> userLans = new HashSet<UserIndianLanguageMapping>();
+    private static final long serialVersionUID = 1L;
 
-	public int getId() {
-		return id;
-	}
+    /**
+     * unique id of object
+     */
+    @Id
+    private int id;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * language name
+     */
+    private String lanName;
 
-	public String getLanName() {
-		return lanName;
-	}
+    @OneToMany(mappedBy = "indianlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserIndianLanguageMapping> userLans = new HashSet<UserIndianLanguageMapping>();
 
-	public void setLanName(String lanName) {
-		this.lanName = lanName;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public Set<UserIndianLanguageMapping> getUserLans() {
-		return userLans;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setUserLans(Set<UserIndianLanguageMapping> userLans) {
-		this.userLans = userLans;
-	}
-	
-	
+    public String getLanName() {
+        return lanName;
+    }
+
+    public void setLanName(String lanName) {
+        this.lanName = lanName;
+    }
+
+    public Set<UserIndianLanguageMapping> getUserLans() {
+        return userLans;
+    }
+
+    public void setUserLans(Set<UserIndianLanguageMapping> userLans) {
+        this.userLans = userLans;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("IndianLanguage [id=").append(id);
+        sb.append(", lanName=").append(lanName);
+        sb.append("]");
+        return sb.toString();
+    }
+
 }

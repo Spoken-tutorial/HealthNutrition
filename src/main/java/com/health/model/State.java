@@ -1,6 +1,5 @@
 package com.health.model;
 
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -15,6 +14,7 @@ import javax.persistence.OneToMany;
 
 /**
  * this modal object records state object in database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
@@ -22,66 +22,77 @@ import javax.persistence.OneToMany;
 @Entity
 public class State implements Comparable<State>, Serializable {
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	@Column(name = "state_id", nullable = false)
-	private int id;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * name of state
-	 */
-	private String stateName;
+    /**
+     * unique id of object
+     */
+    @Id
+    @Column(name = "state_id", nullable = false)
+    private int id;
 
-	/**
-	 * timestamp of object created
-	 */
-	private Timestamp dateAdded;
+    /**
+     * name of state
+     */
+    private String stateName;
 
-	@OneToMany(mappedBy = "state", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	private Set<District>  Districts=new HashSet<District>();
+    /**
+     * timestamp of object created
+     */
+    private Timestamp dateAdded;
 
-	@OneToMany(mappedBy = "state", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	private Set<Event>  events=new HashSet<Event>();
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<District> Districts = new HashSet<District>();
 
-	public int getId() {
-		return id;
-	}
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Event> events = new HashSet<Event>();
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getStateName() {
-		return stateName;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setStateName(String stateName) {
-		this.stateName = stateName;
-	}
+    public String getStateName() {
+        return stateName;
+    }
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public Set<District> getDistricts() {
-		return Districts;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public void setDistricts(Set<District> districts) {
-		Districts = districts;
-	}
+    public Set<District> getDistricts() {
+        return Districts;
+    }
 
-	@Override
-	public int compareTo(State o) {
-		// TODO Auto-generated method stub
-		return this.getStateName().compareTo(o.getStateName());
-	}
+    public void setDistricts(Set<District> districts) {
+        Districts = districts;
+    }
 
+    @Override
+    public int compareTo(State o) {
+        // TODO Auto-generated method stub
+        return this.getStateName().compareTo(o.getStateName());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("State [id=").append(id);
+        sb.append(", stateName=").append(stateName);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

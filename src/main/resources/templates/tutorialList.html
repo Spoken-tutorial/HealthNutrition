@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
-<head th:replace="common/trail :: common-trail">
+<head th:replace="common/trail :: common-trail (pageTitle='Tutorials - Health And Nutrition')">
 </head>
 <body>
  <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
   <section th:replace="index.html :: header-bar"></section>
   <nav class="navbar navbar-expand-lg navbar-light bg-light ">
-  <a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
-								<span style="color: black;font-size: 2rem;" class="ml-3">Spoken <span style="color: orange;font-size: 2rem;">Tutorial </span><span style="border-bottom:2px solid orange;">Health & Nutrition Project</span> </span>
+  <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Spoken Tutorial" height="50" width="50"> </img></a>
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">Spoken <span style="color: orange;font-size:1.8rem;">Tutorial</span>  </span> </span> <span style="color: rgba(0,0,0,0.9);font-size: 1.5rem;" class="ml-3"><span style="border-bottom:2px solid orange;">Health
+& Nutrition </span><span style="color: orange;font-size: 2rem;"></span></span>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -24,6 +25,8 @@
     <a class="dropdown-item" th:href="@{/#events}">Events</a>
     <a class="dropdown-item" th:href="@{/#promoVideo}">Promo Videos</a>
     <a class="dropdown-item" th:href="@{/#testimonial}">Testimonials</a>
+    <a class="dropdown-item" th:href="@{/#researchPaper}">Research Papers</a>
+    <a class="dropdown-item" th:href="@{/#brochure}">Brochures</a>
   </div>
 </div>
       <a class="nav-item nav-link " href="#contact" tabindex="-1">Contact Us</a>
@@ -34,7 +37,7 @@
 <div th:replace="common/commonElements :: search_bar"></div>
 </div>
 <main id="tutorial_list">
-	<div th:each="tutorial : ${tutorials}" class="row t-wrapper mt-3">
+	<div th:if="${tutorials.size()>0}" th:each="tutorial : ${tutorials}" class="row t-wrapper mt-3">
 		<div class="col-md-6" >
 		<div style="width: 100%; margin: auto;">
 			<video th:id="${'storedVideoId' + tutorial.getTutorialId()}" 
@@ -44,7 +47,19 @@
 			</div>
 		</div>
 		<div class="col-md-6">
-		<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" style="color: black;text-decoration: none;">
+		<a th:if="${!query.isEmpty()}" th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} +'/' + ${query} +'/'}" style="color: black;text-decoration: none;">
+			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
+			<h6 style="color: #014F7A;font-size: 1rem;">
+			<span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span>
+			<span>(</span><i th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}" class=""></i><span>)</span>
+			
+			</h6>
+				<!-- <p th:utext="${tutorial.getOutline()}" class="mx-0"> </p> -->
+				<p th:utext="${#strings.abbreviate(tutorial.getOutline(),600)}" class="mx-0"></p>
+				
+			
+		</a>
+		<a  th:unless="${!query.isEmpty()}"th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} +'/' + 'q' +'/'}" style="color: black;text-decoration: none;">
 			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
 			<h6 style="color: #014F7A;font-size: 1rem;">
 			<span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span>
@@ -59,23 +74,30 @@
 		</div>
 	</div>
 	
+	<div th:unless="${tutorials.size()>0}" ><h4>No tutorial found for the query: <span th:text="${query}"></span></h4>
+	<br><h5 th:if="${catforQuery!=null}"><b>Category:</b> <span th:text="${catforQuery.getCatName()}"></span></h5>
+	<h5 th:if="${topicforQuery!=null}"><b>Topic:</b> <span th:text="${topicforQuery.getTopicName()}"></span></h5>
+	<h5 th:if="${lanforQuery!=null}"><b>Language:</b> <span th:text="${lanforQuery.getLangName()}"></span></h5> <br><br></div>
+	
 	
 </main>
 
-	<nav aria-label="Page navigation example" class="navbar fixed-bottom navbar-brand" style="left: auto; right: 5px">
+	<nav th:if="${tutorials.size()>0}"  aria-label="Page navigation example" class="navbar fixed-bottom navbar-brand" style="left: auto; right: 5px">
 		  <ul class="pagination pagination-sm ">
 		  
 		  
-		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${0}}"> &laquo</a></li>
-		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage -1}}"> &lt</a></li>
-		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
-		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${currentPage +1 }}">&gt</a></li>
-		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language}+'&page='+${totalPages-1}}"> &raquo</a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${0}}"> &laquo</a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query}+'&page='+${currentPage -1}}"> &lt</a></li>
+		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${currentPage +1 }}">&gt</a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${totalPages-1}}"> &raquo</a></li>
 		  </ul>
 		</nav>
-
+		
+	
 		
 <div th:replace="common/trail :: body-bottom-scripts"></div>
+
 <style>
   :root {
   --plyr-color-main: #ff9033;
@@ -85,19 +107,58 @@
     margin-bottom: 25px;
     padding-bottom:25px;
   }
+  
 </style>
+
+<!-- 
+<script  th:inline="javascript"> 
+/*<![CDATA[*/
+var localCat = /*[[${localCat}]]*/ 0;
+var localTopic = /*[[${localTopic}]]*/ 0;
+var localLan = /*[[${localLan}]]*/ 0;
+
+/*]]>*/
+if(localCat!=0){
+	loadTopicAndLanguageByCategory(localCat, localTopic, localLan);
+}
+if(localTopic!=0){
+	
+	loadCategoryAndLanguageByTopic(localCat, localTopic, localLan);
+}
+if(localLan!=0){
+	loadCategoryAndTopicByLanguage(localCat, localTopic, localLan);
+}
+	
+</script>
+ -->
+
 
 
 <script>
 		var projectPath='[(@{/})]';
+		
+		
+  		
 		 
 var isPlaying = [];
 		
 		var videos = document.querySelectorAll('video');
+		
+		document.addEventListener('DOMContentLoaded', function() {
+		      // Get the first video element
+		      const firstVideo = document.querySelector('video');
+
+		      // Mute the first video
+		      firstVideo.muted = true;
+		      firstVideo.play();
+		    });
+		
 		for(var i=0; i<videos.length; i++){
 			if(i==0){
-				videos[i].play();
-				videos[i].muted=true;
+				//videos[i].muted=true;
+				//videos[i].play();
+				//videos[i].muted=true;
+				
 			}
 			
 		  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
@@ -118,6 +179,7 @@ var isPlaying = [];
 			 	
 			 	if(flagCheck==0){
 			 		if (!isPlaying[index]) {
+			 			videos[index].muted=true;
 				        videos[index].play();
 				        videos[index].muted=true;
 				        isPlaying[index] = true;

@@ -10,100 +10,95 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class PathofPromoVideo {
-	
-	@Id
-	int pathPromoId;
-	
-	@Column(name = "date_added")
-	private Timestamp dateAdded;
-	
-	@Column(name = "video_path")
-	private String videoPath;
-	
-	@ManyToOne
-	@JoinColumn(name = "promo_id")
-	private PromoVideo promoVideo;
-	
-	@ManyToOne
-	@JoinColumn(name = "lan_id")
-	private Language lan;
-	
-	
-	
 
-	public PathofPromoVideo() {
-		
-	}
+    @Id
+    int pathPromoId;
 
+    @Column(name = "date_added")
+    private Timestamp dateAdded;
 
+    @Column(name = "video_path")
+    private String videoPath;
 
-	public PathofPromoVideo(int pathPromoId, Timestamp dateAdded, String videoPath, PromoVideo promoVideo, Language lan) {
-		super();
-		this.pathPromoId =pathPromoId;
-		this.dateAdded = dateAdded;
-		this.videoPath = videoPath;
-		this.promoVideo = promoVideo;
-		this.lan = lan;
-	}
-	
-	
+    @ManyToOne
+    @JoinColumn(name = "promo_id")
+    private PromoVideo promoVideo;
 
-	public PathofPromoVideo(Timestamp dateAdded, String videoPath, PromoVideo promoVideo, Language lan) {
-		super();
-		this.dateAdded = dateAdded;
-		this.videoPath = videoPath;
-		this.promoVideo = promoVideo;
-		this.lan = lan;
-	}
+    @ManyToOne
+    @JoinColumn(name = "lan_id")
+    private Language lan;
 
+    public PathofPromoVideo() {
 
+    }
 
-	public int getBroFileId() {
-		return pathPromoId;
-	}
+    public PathofPromoVideo(int pathPromoId, Timestamp dateAdded, String videoPath, PromoVideo promoVideo,
+            Language lan) {
+        super();
+        this.pathPromoId = pathPromoId;
+        this.dateAdded = dateAdded;
+        this.videoPath = videoPath;
+        this.promoVideo = promoVideo;
+        this.lan = lan;
+    }
 
-	public void setBroFileId(int pathPromoId) {
-		this.pathPromoId = pathPromoId;
-	}
+    public PathofPromoVideo(Timestamp dateAdded, String videoPath, PromoVideo promoVideo, Language lan) {
+        super();
+        this.dateAdded = dateAdded;
+        this.videoPath = videoPath;
+        this.promoVideo = promoVideo;
+        this.lan = lan;
+    }
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    public int getBroFileId() {
+        return pathPromoId;
+    }
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    public void setBroFileId(int pathPromoId) {
+        this.pathPromoId = pathPromoId;
+    }
 
-	public String getVideoPath() {
-		return videoPath;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public void setVideoPath(String videoPath) {
-		this.videoPath = videoPath;
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public PromoVideo getPromoVideo() {
-		return promoVideo;
-	}
+    public String getVideoPath() {
+        return videoPath;
+    }
 
-	public void setPromoVideo(PromoVideo promoVideo) {
-		this.promoVideo = promoVideo;
-	}
+    public void setVideoPath(String videoPath) {
+        this.videoPath = videoPath;
+    }
 
-	public Language getLan() {
-		return lan;
-	}
+    public PromoVideo getPromoVideo() {
+        return promoVideo;
+    }
 
-	public void setLan(Language lan) {
-		this.lan = lan;
-	}
+    public void setPromoVideo(PromoVideo promoVideo) {
+        this.promoVideo = promoVideo;
+    }
 
-	@Override
-	public String toString() {
-		return "PathofPromoVideo [pathPromoId=" + pathPromoId + ", dateAdded=" + dateAdded + ", videoPath=" + videoPath
-				+ ", promoVideo=" + promoVideo + ", lan=" + lan + "]";
-	}
-	
-	
+    public Language getLan() {
+        return lan;
+    }
+
+    public void setLan(Language lan) {
+        this.lan = lan;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("PathofPromoVideo [pathPromoId=").append(pathPromoId);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append(", videoPath=").append(videoPath);
+
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

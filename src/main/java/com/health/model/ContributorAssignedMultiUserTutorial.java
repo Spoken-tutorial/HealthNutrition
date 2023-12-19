@@ -13,7 +13,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * userAssignedTutorial Object to store userAssignedTutorial related data on database
+ * userAssignedTutorial Object to store userAssignedTutorial related data on
+ * database
+ * 
  * @author om prakash soni
  * @version 1.0
  *
@@ -21,80 +23,87 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "UserOnTutorialAssigned")
 public class ContributorAssignedMultiUserTutorial implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
 
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int id;
-	
-	/**
-	 * timestamp of object created
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
-	
-	/**
-	 * user assigned for tutorial
-	 */
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name="user_assigned")
-	private User user;
-	
-	/**
-	 * tutorial info
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "conAssignedTutorial")
-	private ContributorAssignedTutorial conAssignedTutorial;
+    private static final long serialVersionUID = 1L;
 
-	public int getId() {
-		return id;
-	}
+    /**
+     * unique id of object
+     */
+    @Id
+    private int id;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * timestamp of object created
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    /**
+     * user assigned for tutorial
+     */
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_assigned")
+    private User user;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    /**
+     * tutorial info
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conAssignedTutorial")
+    private ContributorAssignedTutorial conAssignedTutorial;
 
-	public User getUser() {
-		return user;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public ContributorAssignedTutorial getConAssignedTutorial() {
-		return conAssignedTutorial;
-	}
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
 
-	public void setConAssignedTutorial(ContributorAssignedTutorial conAssignedTutorial) {
-		this.conAssignedTutorial = conAssignedTutorial;
-	}
-	
-	public ContributorAssignedMultiUserTutorial() {
-		
-	}
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
-	public ContributorAssignedMultiUserTutorial(int id, Timestamp dateAdded, User user,
-			ContributorAssignedTutorial conAssignedTutorial) {
-		super();
-		this.id = id;
-		this.dateAdded = dateAdded;
-		this.user = user;
-		this.conAssignedTutorial = conAssignedTutorial;
-	}
-	
-	
-	
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public ContributorAssignedTutorial getConAssignedTutorial() {
+        return conAssignedTutorial;
+    }
+
+    public void setConAssignedTutorial(ContributorAssignedTutorial conAssignedTutorial) {
+        this.conAssignedTutorial = conAssignedTutorial;
+    }
+
+    public ContributorAssignedMultiUserTutorial() {
+
+    }
+
+    public ContributorAssignedMultiUserTutorial(int id, Timestamp dateAdded, User user,
+            ContributorAssignedTutorial conAssignedTutorial) {
+        super();
+        this.id = id;
+        this.dateAdded = dateAdded;
+        this.user = user;
+        this.conAssignedTutorial = conAssignedTutorial;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("ContributorAssignedMultiUserTutorial [id=").append(id);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
+    }
+
 }

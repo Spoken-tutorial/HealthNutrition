@@ -7,8 +7,6 @@ import java.util.Comparator;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -16,209 +14,210 @@ import javax.persistence.Table;
 
 import com.health.model.Category;
 import com.health.model.Language;
-import com.health.model.Tutorial;
 import com.health.model.User;
 
 /**
  * Mapping object between user and role object
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-@Table(name="user_role")
-public class UserRole implements Comparable <UserRole>, Serializable 
-{	
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private  Long userRoleId;
-	
-	/**
-	 * timestamp when object is created
-	 */
-	private Timestamp created;
-	
-	/**
-	 * user object
-	 */
-	@ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-	@JoinColumn(name="user_id")
-	private User user;
+@Table(name = "user_role")
+public class UserRole implements Comparable<UserRole>, Serializable {
 
-	/**
-	 * role object
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="role_id")
-	private Role role;
-	
-	/**
-	 * language objevct
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="lan_id")
-	private Language lan;
-	
-	/**
-	 * category object
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="cat_id")
-	private Category cat;
-	
-	/**
-	 * status value
-	 */
-	private boolean status=false;
-	
-	/**
-	 * revoke status
-	 */
-	private boolean revoked = false;
-	
-	/**
-	 * rejected flag
-	 */
-	private boolean rejected = false;
+    private static final long serialVersionUID = 1L;
 
-	public Category getCategory() {
-		return cat;
-	}
+    /**
+     * unique id of object
+     */
+    @Id
+    private Long userRoleId;
 
-	public void setCategory(Category category) {
-		this.cat = category;
-	}
+    /**
+     * timestamp when object is created
+     */
+    private Timestamp created;
 
+    /**
+     * user object
+     */
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public Timestamp getCreated() {
-		return created;
-	}
+    /**
+     * role object
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
-	public void setCreated(Timestamp created) {
-		this.created = created;
-	}
+    /**
+     * language objevct
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "lan_id")
+    private Language lan;
 
+    /**
+     * category object
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cat_id")
+    private Category cat;
 
-	public UserRole(){		
+    /**
+     * status value
+     */
+    private boolean status = false;
 
-	}
-	
-	public UserRole(User user, Role role) {
-		this.user = user;
-		this.role = role;
-	}
-	
-	public UserRole(User user,boolean status) {
-		this.user = user;
-		this.status = status;
-	}
-	public Long getUserRoleId() {
-		return userRoleId;
-	}
+    /**
+     * revoke status
+     */
+    private boolean revoked = false;
 
-	public void setUserRoleId(Long userRoleId) {
-		this.userRoleId = userRoleId;
-	}
+    /**
+     * rejected flag
+     */
+    private boolean rejected = false;
 
-	public User getUser() {
-		return user;
-	}
+    public Category getCategory() {
+        return cat;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setCategory(Category category) {
+        this.cat = category;
+    }
 
-	public Role getRole() {
-		return role;
-	}
+    public Timestamp getCreated() {
+        return created;
+    }
 
-	public boolean getStatus() {
-		return status;
-	}
+    public void setCreated(Timestamp created) {
+        this.created = created;
+    }
 
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
+    public UserRole() {
 
-	public void setRole(Role role) {
-		this.role = role;
-	}
-	
-	public Language getLanguage() {
-		return lan;
-	}
+    }
 
-	public void setLanguage(Language language) {
-		this.lan = language;
-	}
+    public UserRole(User user, Role role) {
+        this.user = user;
+        this.role = role;
+    }
 
-	public Language getLan() {
-		return lan;
-	}
+    public UserRole(User user, boolean status) {
+        this.user = user;
+        this.status = status;
+    }
 
-	public void setLan(Language lan) {
-		this.lan = lan;
-	}
+    public Long getUserRoleId() {
+        return userRoleId;
+    }
 
-	public Category getCat() {
-		return cat;
-	}
+    public void setUserRoleId(Long userRoleId) {
+        this.userRoleId = userRoleId;
+    }
 
-	public void setCat(Category cat) {
-		this.cat = cat;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public boolean isRevoked() {
-		return revoked;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public void setRevoked(boolean revoked) {
-		this.revoked = revoked;
-	}
+    public Role getRole() {
+        return role;
+    }
 
-	public boolean isRejected() {
-		return rejected;
-	}
+    public boolean getStatus() {
+        return status;
+    }
 
-	public void setRejected(boolean rejected) {
-		this.rejected = rejected;
-	}
-	
-	 public static Comparator<UserRole> RoleNameComp = new Comparator<UserRole>() {
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
-	        public int compare(UserRole ur1, UserRole ur2) {
-	        	
-	        	
-	        	if(   ur1.getCategory()!=null && ur2.getCategory()!=null && ur1.getLanguage()!=null && ur2.getLanguage()!=null &&
-	        			ur1.getRole().getName()==ur2.getRole().getName() &&  ur1.getCategory().getCatName()==ur2.getCategory().getCatName()) {
-	        		
-	        		return ur1.getLanguage().getLangName().compareTo(ur2.getLanguage().getLangName());
-	        		
-	        	}
-	        	
-	        	else if( ur1.getCategory()!=null && ur2.getCategory()!=null && ur1.getRole().getName()==ur2.getRole().getName()){
-	        		
-	        		return ur1.getCategory().getCatName().compareTo(ur2.getCategory().getCatName());
-	        	}
-	        	
-	        	else {
-	        		
-	        		return ur1.getRole().getName().compareTo(ur2.getRole().getName());	
-	        	}
-	        		
-	            
-	        }
-	    };
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
-	@Override
-	public int compareTo(UserRole o) {
-		// TODO Auto-generated method stub
-		this.getUser().getFirstName();
-		return this.getUser().getFirstName().compareToIgnoreCase(o.getUser().getFirstName());
-		
-	}
-	
-	
+    public Language getLanguage() {
+        return lan;
+    }
+
+    public void setLanguage(Language language) {
+        this.lan = language;
+    }
+
+    public Language getLan() {
+        return lan;
+    }
+
+    public void setLan(Language lan) {
+        this.lan = lan;
+    }
+
+    public Category getCat() {
+        return cat;
+    }
+
+    public void setCat(Category cat) {
+        this.cat = cat;
+    }
+
+    public boolean isRevoked() {
+        return revoked;
+    }
+
+    public void setRevoked(boolean revoked) {
+        this.revoked = revoked;
+    }
+
+    public boolean isRejected() {
+        return rejected;
+    }
+
+    public void setRejected(boolean rejected) {
+        this.rejected = rejected;
+    }
+
+    public static Comparator<UserRole> RoleNameComp = new Comparator<UserRole>() {
+
+        @Override
+        public int compare(UserRole ur1, UserRole ur2) {
+
+            if (ur1.getCategory() != null && ur2.getCategory() != null && ur1.getLanguage() != null
+                    && ur2.getLanguage() != null && ur1.getRole().getName() == ur2.getRole().getName()
+                    && ur1.getCategory().getCatName() == ur2.getCategory().getCatName()) {
+
+                return ur1.getLanguage().getLangName().compareTo(ur2.getLanguage().getLangName());
+
+            }
+
+            else if (ur1.getCategory() != null && ur2.getCategory() != null
+                    && ur1.getRole().getName() == ur2.getRole().getName()) {
+
+                return ur1.getCategory().getCatName().compareTo(ur2.getCategory().getCatName());
+            }
+
+            else {
+
+                return ur1.getRole().getName().compareTo(ur2.getRole().getName());
+            }
+
+        }
+    };
+
+    @Override
+    public int compareTo(UserRole o) {
+        // TODO Auto-generated method stub
+        this.getUser().getFirstName();
+        return this.getUser().getFirstName().compareToIgnoreCase(o.getUser().getFirstName());
+
+    }
+
 }

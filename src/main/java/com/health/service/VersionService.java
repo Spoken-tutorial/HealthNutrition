@@ -6,24 +6,19 @@ import com.health.model.Brouchure;
 import com.health.model.Version;
 
 public interface VersionService {
-	
-	int getNewId();
 
-	void save(Version ver);
+    int getNewId();
 
-	List<Version> findAll();
+    void save(Version ver);
 
-	
-	void delete(Version ver);
+    List<Version> findAll();
 
-	
-	Version findById(int id);
+    void delete(Version ver);
 
-	Version findByBrouchureAndPrimaryVersion(Brouchure brochure, int primaryVersion);
-	
-	List<Version> findByCategory(Brouchure bro);
-	
-	
+    Version findById(int id);
 
+    Version findByBrouchureAndPrimaryVersion(Brouchure brochure, int primaryVersion);
+
+    List<Version> findByCategory(Brouchure bro);
 
 }

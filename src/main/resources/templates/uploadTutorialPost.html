@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
-<head th:replace="common/trail :: common-trail"></head>
+<head th:replace="common/trail :: common-trail (pageTitle='Tutorial - Admin - Health And Nutrition')"></head>
 <style>
 .fa-user-circle, .fa-clock, .fa-comment-alt {
 	color: #014F7A;
 }
 
 #sm_url:hover, #sliedPdf:hover {
+	background: none !important;
+}
+#sm_url_Ver2:hover, #sliedPdf:hover {
 	background: none !important;
 }
 </style>
@@ -368,12 +371,29 @@
 							<div class="alert d-none w-100" role="alert" id="alert-script"></div>
 
 							<div class="alert alert-info" role="alert">
-								<i th:if="${sm_url}" class="fas fa-external-link-alt"></i> <a th:if="${sm_url}" th:href="${sm_url}"
+								<div th:if="${sm_url}">
+									<div th:if="${!sm_url.isEmpty()}">
+									<i th:if="${sm_url}" class="fas fa-external-link-alt"></i> <a th:if="${sm_url}" th:href="${sm_url}"
 									class="alert-link" style="text-decoration: underline;"
-									target="_blank" id="sm_url">Click here to proceed to Script
-									Manager</a>
+									target="_blank" id="sm_url">Click here to view Existing Script
+									</a>
 									<a th:unless="${sm_url}" class="alert-link" style="text-decoration: underline;"
 									target="_blank" id="sm_url">Please upload component or video first. Please refresh if already added.</a>
+								
+								</div>
+								</div>
+								
+								
+									<div>
+									<i th:if="${sm_url_Ver2}" class="fas fa-external-link-alt"></i> <a th:if="${sm_url_Ver2}" th:href="${sm_url_Ver2}"
+									class="alert-link" style="text-decoration: underline;"
+									target="_blank" id="sm_url_Ver2">Create a New Original Script (Requires login on scriptmanager)
+									</a>
+									<a th:unless="${sm_url_Ver2}" class="alert-link" style="text-decoration: underline;"
+									target="_blank" id="sm_url_Ver2">Please upload component or video first. Please refresh if already added.</a>	
+									</div>
+									
+
 							</div>
 						</div>
 						<div class="col-12">

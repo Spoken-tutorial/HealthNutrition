@@ -1,0 +1,105 @@
+
+<!-- Author: Alok Kumar -->
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Research Paper - Admin - Health And Nutrition')"></head>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Update Research Paper</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form class="form-horizontal" th:action="@{/updateResearchPaper}"
+											method="post" enctype="multipart/form-data">
+											<div class="form-group">
+
+												<label for="researchPaper">Title</label> <input type="text"
+													class="form-control" id="rerserachPaper" name="title"
+													required="required" th:value="${researchPaper.getTitle()}" />
+											</div>
+									
+											
+											
+											 
+  											<input type="hidden"  name="researchPaperId"  th:value="${researchPaper.getId()}"/>
+
+											
+
+
+											<div class="form-group">
+												<label for="Description" style="padding-top: 40px">
+													Description</label>
+												<textarea class="form-control" rows="5"
+													id="Description" name="description"
+													required="required" th:text="${researchPaper.getDescription()}"></textarea>
+											</div>
+											
+											  <div class="form-group">
+
+											    <label for="researchFile">Upload Research Paper *</label><small>(.pdf format only)</small>
+											    <input type="file" class="form-control-file" id="" name="researchFile"  accept=".pdf" onchange="validate_file_size(this,524288000)">
+											    <small>Max file size : 500 MB </small>
+
+											  </div>
+  
+											<button type="submit" class="btn a-btn">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+			
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+</html>
+
+ 
+
+ 

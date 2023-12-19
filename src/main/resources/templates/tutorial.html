@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
 <html>
-<head th:replace="common/trail :: common-trail">  
+<head th:replace="common/trail :: common-trail (pageTitle='Tutorial - Health And Nutrition')"> 
+
+<title>tutorials - Health And Nutrition</title> 
 
 </head>
 <body>
@@ -29,10 +31,7 @@
 									Account</a>
 							</span>
 						</p>
-						<p class="d-inline-block">
-							<span class="top-banner"><a
-								sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a></span>
-						</p>
+						<p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p>
 					</div>
 				</div>
 			</div>
@@ -103,7 +102,7 @@
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
 			
 			
-					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
+					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} + '/' + 'q' +'/'} " class="col-12">
 						
 							
 							
@@ -122,7 +121,7 @@
 				</div>
 			</div>
 		</section>
-		<section th:if="${tutorial.getPreRequistic() != null}"><p>Watch pre-requisite : <a th:href="@{'/tutorialView/'+ ${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getPreRequistic().getConAssignedTutorial().getLan().getLangName()}}">
+		<section th:if="${tutorial.getPreRequistic() != null}"><p>Watch pre-requisite : <a th:href="@{'/tutorialView/'+ ${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getPreRequistic().getConAssignedTutorial().getLan().getLangName()}+ '/' +${query} +'/'}">
 		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span> :
 		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span>
 		</a></p></section>
@@ -138,7 +137,7 @@
 					<li class="nav-item link-style"><a class="nav-link"
 						id="pills-script-tab" data-toggle="pill" href="#pills-script"
 						role="tab" aria-controls="pills-script" aria-selected="false"><i
-							class="far fa-file-alt mr-2 t-icon"></i> Resources</a></li>
+							class="far fa-file-alt mr-2 t-icon"></i>Scripts &amp; Other Resources</a></li>
 					
 				</ul>
 				<div class="tab-content px-0 py-3" id="pills-tabContent-tutorial"
@@ -150,11 +149,15 @@
 					<div class="tab-pane fade px-5" id="pills-script" role="tabpanel"
 						aria-labelledby="pills-script-tab">
 						<ul class="pl-10">
-							<li class="mb-3"><i class="fas fa-file-download mr-3"></i> 
+							<li th:if="${!sm_url.isEmpty()}" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
 							
-							<a
-								th:href="@{${sm_url}}" name="ScriptPdf"
+							<a class="originalScriptClass" 
+								th:value="${tutorial.getTutorialId()}"
+								th:href="${'/OriginalScript/' + tutorial.getTutorialId()}" name="ScriptPdf"
 								target="_blank" id="ScriptPdf">Original Script</a>
+								
+								
+								
 								
 								<!-- th:if="${tutorial.getScript()}" -->
 								<!-- <a
@@ -165,18 +168,26 @@
 							<a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
 								
-								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a
+								<li  th:if="${!sm_url2.isEmpty()}" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
+								<a 
+								th:href="@{${sm_url2}}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Create a New Original Script (Requires login on scriptmanager)</a>
+								<a
+								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
+								
+								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a 
 								th:if="${tutorial.getScriptStatus() != 0}"
-								th:href="@{/files/}+@{${tutorial.getTimeScript()}}" name="ScriptPdf"
-								target="_blank" id="ScriptPdf" download>Timed Script</a> <a
+								th:href="${'/TimeScript/' + tutorial.getTutorialId()}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Timed Script</a> <a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
 								
 							<li class="mb-3" th:unless="${relatedContent}"><i class="fas fa-file-download mr-3"></i> 
-							<a name="sliedPdf" th:if="${tutorial.getSlideStatus() != 0}" target="_blank" th:href="@{/files/}+@{${tutorial.getSlide()}}"
+							<a  name="sliedPdf" th:if="${tutorial.getSlideStatus() != 0}" target="_blank" th:href="${'/Slide/' + tutorial.getTutorialId()}"
 																	id="sliedPdf"> Slide</a>
 							</li>
 							<li class="mb-3" th:if="${relatedContent}"><i class="fas fa-file-download mr-3"> </i> 
-							<a name="sliedPdf" target="_blank" th:href="@{/files/}+@{${relatedContent.getSlide()}}"
+							<a name="sliedPdf" target="_blank" th:href="${'/Slide/' + tutorial.getTutorialId()}"
 																	id="sliedPdf"> Slide</a>
 							</li>
 						</ul>
@@ -198,7 +209,7 @@
 				<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
-					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}}" class="col-12">
+					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}  +'/' + 'q' +'/'}" class="col-12">
 						
 							
 							<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >

@@ -12,89 +12,101 @@ import javax.persistence.ManyToOne;
 
 /**
  * Modal class to record post questionnaire for training conducted
+ * 
  * @author om prakash soni
  * @version 1.0
  *
  */
 @Entity
-public class PostQuestionaire implements  Serializable{
-	
-	/**
-	 * unique id of object
-	 */
-	@Id
-	private int id;
-	
-	/**
-	 * relative path of questionnaire
-	 */
-	private String questionPath;
-	
-	/**
-	 * timestamp of object created
-	 */
-	@Column(name = "date_added", nullable = false)
-	private Timestamp dateAdded;
-	
-	/**
-	 * training for object created
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="Training_id")
-	private TrainingInformation traineeInfos;
-	
-	/**
-	 * trainer who added this info.
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+public class PostQuestionaire implements Serializable {
 
-	public int getId() {
-		return id;
-	}
+    private static final long serialVersionUID = 1L;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * unique id of object
+     */
+    @Id
+    private int id;
 
-	public String getQuestionPath() {
-		return questionPath;
-	}
+    /**
+     * relative path of questionnaire
+     */
+    private String questionPath;
 
-	public void setQuestionPath(String questionPath) {
-		this.questionPath = questionPath;
-	}
+    /**
+     * timestamp of object created
+     */
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
 
-	public Timestamp getDateAdded() {
-		return dateAdded;
-	}
+    /**
+     * training for object created
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Training_id")
+    private TrainingInformation traineeInfos;
 
-	public void setDateAdded(Timestamp dateAdded) {
-		this.dateAdded = dateAdded;
-	}
+    /**
+     * trainer who added this info.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	public TrainingInformation getTraineeInfos() {
-		return traineeInfos;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setTraineeInfos(TrainingInformation traineeInfos) {
-		this.traineeInfos = traineeInfos;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public PostQuestionaire(int id, String questionPath, Timestamp dateAdded, TrainingInformation traineeInfos,
-			User user) {
-		super();
-		this.id = id;
-		this.questionPath = questionPath;
-		this.dateAdded = dateAdded;
-		this.traineeInfos = traineeInfos;
-		this.user = user;
-	}
-	
-	public PostQuestionaire() {
-		
-	}
-	
-	
+    public String getQuestionPath() {
+        return questionPath;
+    }
+
+    public void setQuestionPath(String questionPath) {
+        this.questionPath = questionPath;
+    }
+
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public TrainingInformation getTraineeInfos() {
+        return traineeInfos;
+    }
+
+    public void setTraineeInfos(TrainingInformation traineeInfos) {
+        this.traineeInfos = traineeInfos;
+    }
+
+    public PostQuestionaire(int id, String questionPath, Timestamp dateAdded, TrainingInformation traineeInfos,
+            User user) {
+        super();
+        this.id = id;
+        this.questionPath = questionPath;
+        this.dateAdded = dateAdded;
+        this.traineeInfos = traineeInfos;
+        this.user = user;
+    }
+
+    public PostQuestionaire() {
+
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("PostQuestionaire [id=").append(id);
+        sb.append(", questionPath=").append(questionPath);
+        sb.append(", dateAdded=").append(dateAdded);
+        sb.append("]");
+        return sb.toString();
+    }
+
 }
