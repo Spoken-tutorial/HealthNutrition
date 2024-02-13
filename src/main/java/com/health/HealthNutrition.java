@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
+import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 
 @ServletComponentScan
@@ -29,6 +30,9 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Autowired
     private Environment env;
 
+    @Autowired
+    private TaskProcessingService taskProcessingService;
+
     @Value("${git.commit.id}")
     private String gitCommitId;
 
@@ -39,12 +43,18 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 
     public static void main(String[] args) {
         SpringApplication.run(HealthNutrition.class, args);
+
     }
 
     @Override
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
-
+        try {
+            taskProcessingService.queueProcessor();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Exception: ", e);
+        }
         String baseDir = env.getProperty("spring.applicationexternalPath.name");
         new File(baseDir + CommonData.uploadDirectoryCategory).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryQuestion).mkdirs();
