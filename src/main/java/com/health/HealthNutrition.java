@@ -50,9 +50,10 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
         try {
+            taskProcessingService.intializeQueue();
             taskProcessingService.queueProcessor();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("Exception: ", e);
         }
         String baseDir = env.getProperty("spring.applicationexternalPath.name");

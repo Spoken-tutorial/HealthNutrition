@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.repository.QueueManagementRepository;
+import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 
 @Entity
@@ -37,6 +38,10 @@ public class QueueManagement implements Runnable {
     @Autowired
     @Transient
     private QueueManagementRepository queueRepo;
+
+    @Autowired
+    @Transient
+    private TaskProcessingService taskProcessingService;
 
     @Autowired
     @Transient
@@ -411,124 +416,171 @@ public class QueueManagement implements Runnable {
 
         try {
 
+            setStartTime(System.currentTimeMillis());
+            setStatus(CommonData.STATUS_PROCESSING);
+
             CloseableHttpClient httpClient = HttpClients.createDefault();
 
-            HttpPost httpPost_addDocument = new HttpPost(api_url_addDocument);
+            if (getRequestType().equals(CommonData.ADD_DOCUMENT)) {
 
-            List<NameValuePair> paramsforAddDocument = new ArrayList<>();
-            paramsforAddDocument.add(new BasicNameValuePair("documentPath", "Media\\TestHtml.html"));
-            paramsforAddDocument.add(new BasicNameValuePair("documentUrl", "TestDocumentUrl"));
-            paramsforAddDocument.add(new BasicNameValuePair("view_url", "TestViewUrl"));
-            httpPost_addDocument.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
+                HttpPost httpPost_addDocument = new HttpPost(api_url_addDocument);
 
-            HttpResponse response_addDocument = httpClient.execute(httpPost_addDocument);
+                List<NameValuePair> paramsforAddDocument = new ArrayList<>();
+                paramsforAddDocument.add(new BasicNameValuePair("documentPath", getDocumentPath()));
+                paramsforAddDocument.add(new BasicNameValuePair("documentUrl", getDocumentUrl()));
+                paramsforAddDocument.add(new BasicNameValuePair("view_url", getViewUrl()));
+                paramsforAddDocument.add(new BasicNameValuePair("categoryId", Integer.toString(getCategoryId())));
+                paramsforAddDocument.add(new BasicNameValuePair("category", getCategory()));
+                paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(getTopicId())));
+                paramsforAddDocument.add(new BasicNameValuePair("topic", getTopic()));
+                if (getOutlinePath() != null && !getOutlinePath().isEmpty()) {
+                    paramsforAddDocument.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
 
-            int statusCode__addDocument = response_addDocument.getStatusLine().getStatusCode();
-
-            if (statusCode__addDocument == 200 || statusCode__addDocument == 201) {
-                String jsonResponse = EntityUtils.toString(response_addDocument.getEntity());
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                System.out.println("jsonNode" + jsonNode);
-
-                JsonNode publishedArray = jsonNode.get("queueId");
-                if (publishedArray != null) {
-                    System.out.println("publishedArray: " + publishedArray.asLong());
-                    setResponseId(publishedArray.asLong());
-                    queueRepo.save(this);
                 }
 
-            } else {
-                System.out.println(
-                        "API request failed with status code: " + statusCode__addDocument + " for AddDocument");
+                httpPost_addDocument.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
+
+                HttpResponse response_addDocument = httpClient.execute(httpPost_addDocument);
+
+                int statusCode__addDocument = response_addDocument.getStatusLine().getStatusCode();
+
+                if (statusCode__addDocument == 200 || statusCode__addDocument == 201) {
+                    String jsonResponse = EntityUtils.toString(response_addDocument.getEntity());
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                    System.out.println("jsonNode" + jsonNode);
+
+                    JsonNode publishedArray = jsonNode.get("queueId");
+                    if (publishedArray != null) {
+                        System.out.println("publishedArray: " + publishedArray.asLong());
+                        setResponseId(publishedArray.asLong());
+                        setStatus(CommonData.STATUS_DONE);
+
+                    }
+
+                } else {
+                    System.out.println(
+                            "API request failed with status code: " + statusCode__addDocument + " for AddDocument");
+
+                }
 
             }
 
-            HttpPost httpPost_updateDocument = new HttpPost(api_url_updateDocument);
-            List<NameValuePair> paramsforUpdate = new ArrayList<>();
-            paramsforUpdate.add(new BasicNameValuePair("documentPath", "Media\\TestHtml.html"));
-            paramsforUpdate.add(new BasicNameValuePair("documentUrl", "TestDocumentUrl"));
-            paramsforUpdate.add(new BasicNameValuePair("view_url", "TestViewUrl"));
-            httpPost_updateDocument.setEntity(new UrlEncodedFormEntity(paramsforUpdate, "UTF-8"));
-
-            HttpResponse response_updateDocument = httpClient.execute(httpPost_updateDocument);
-
-            int statusCode__updateDocument = response_updateDocument.getStatusLine().getStatusCode();
-
-            if (statusCode__updateDocument == 200 || statusCode__updateDocument == 201) {
-                String jsonResponse = EntityUtils.toString(response_updateDocument.getEntity());
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                System.out.println("jsonNode" + jsonNode);
-
-                JsonNode publishedArray = jsonNode.get("queueId");
-                if (publishedArray != null) {
-                    System.out.println("publishedArray" + publishedArray.asLong());
-                    setResponseId(publishedArray.asLong());
-                    queueRepo.save(this);
+            else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
+                HttpPost httpPost_updateDocument = new HttpPost(api_url_updateDocument);
+                List<NameValuePair> paramsforUpdate = new ArrayList<>();
+                paramsforUpdate.add(new BasicNameValuePair("documentPath", getDocumentPath()));
+                paramsforUpdate.add(new BasicNameValuePair("documentUrl", getDocumentUrl()));
+                paramsforUpdate.add(new BasicNameValuePair("view_url", getViewUrl()));
+                paramsforUpdate.add(new BasicNameValuePair("categoryId", Integer.toString(getCategoryId())));
+                paramsforUpdate.add(new BasicNameValuePair("category", getCategory()));
+                paramsforUpdate.add(new BasicNameValuePair("topicId", Integer.toString(getTopicId())));
+                paramsforUpdate.add(new BasicNameValuePair("topic", getTopic()));
+                if (getOutlinePath() != null && !getOutlinePath().isEmpty()) {
+                    paramsforUpdate.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
                 }
 
-            } else {
-                System.out.println(
-                        "API request failed with status code: " + statusCode__updateDocument + " for updateDocument");
+                httpPost_updateDocument.setEntity(new UrlEncodedFormEntity(paramsforUpdate, "UTF-8"));
+
+                HttpResponse response_updateDocument = httpClient.execute(httpPost_updateDocument);
+
+                int statusCode__updateDocument = response_updateDocument.getStatusLine().getStatusCode();
+
+                if (statusCode__updateDocument == 200 || statusCode__updateDocument == 201) {
+                    String jsonResponse = EntityUtils.toString(response_updateDocument.getEntity());
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                    System.out.println("jsonNode" + jsonNode);
+
+                    JsonNode publishedArray = jsonNode.get("queueId");
+                    if (publishedArray != null) {
+                        System.out.println("publishedArray" + publishedArray.asLong());
+                        setResponseId(publishedArray.asLong());
+                        setStatus(CommonData.STATUS_DONE);
+
+                    }
+
+                } else {
+                    System.out.println("API request failed with status code: " + statusCode__updateDocument
+                            + " for updateDocument");
+
+                }
 
             }
 
-            HttpGet httpGet_updateDocumentRank = new HttpGet(api_url_updateDocumentRank);
+            else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)) {
+                HttpGet httpGet_updateDocumentRank = new HttpGet(api_url_updateDocumentRank);
 
-            HttpResponse response_updateDocumentRank = httpClient.execute(httpGet_updateDocumentRank);
+                HttpResponse response_updateDocumentRank = httpClient.execute(httpGet_updateDocumentRank);
 
-            int statusCode__updateDocumentRank = response_updateDocumentRank.getStatusLine().getStatusCode();
+                int statusCode__updateDocumentRank = response_updateDocumentRank.getStatusLine().getStatusCode();
 
-            if (statusCode__updateDocumentRank == 200 || statusCode__updateDocumentRank == 201) {
-                String jsonResponse = EntityUtils.toString(response_updateDocumentRank.getEntity());
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                System.out.println("jsonNode" + jsonNode);
+                if (statusCode__updateDocumentRank == 200 || statusCode__updateDocumentRank == 201) {
+                    String jsonResponse = EntityUtils.toString(response_updateDocumentRank.getEntity());
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                    System.out.println("jsonNode" + jsonNode);
 
-                JsonNode publishedArray = jsonNode.get("queueId");
-                if (publishedArray != null) {
-                    System.out.println("publishedArray" + publishedArray.asLong());
-                    setResponseId(publishedArray.asLong());
-                    queueRepo.save(this);
+                    JsonNode publishedArray = jsonNode.get("queueId");
+                    if (publishedArray != null) {
+                        System.out.println("publishedArray" + publishedArray.asLong());
+                        setResponseId(publishedArray.asLong());
+                        setStatus(CommonData.STATUS_DONE);
+
+                    }
+
+                } else {
+                    System.out.println("API request failed with status code: " + statusCode__updateDocumentRank
+                            + " for updateDocumentRank");
+
                 }
-
-            } else {
-                System.out.println("API request failed with status code: " + statusCode__updateDocumentRank
-                        + " for updateDocumentRank");
 
             }
 
-//            HttpGet httpGet_deleteDocument = new HttpGet(api_url_deleteDocument);
-//
-//            HttpResponse response_deleteDocument = httpClient.execute(httpGet_deleteDocument);
-//
-//            int statusCode__deleteDocument = response_deleteDocument.getStatusLine().getStatusCode();
-//
-//            if (statusCode__deleteDocument == 200 || statusCode__deleteDocument == 201) {
-//                String jsonResponse = EntityUtils.toString(response_deleteDocument.getEntity());
-//                ObjectMapper objectMapper = new ObjectMapper();
-//                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-//                System.out.println("jsonNode" + jsonNode);
-//
-//                JsonNode publishedArray = jsonNode.get("queueId");
-//                if (publishedArray != null) {
-//                    System.out.println("publishedArray" + publishedArray.asLong());
-//                    setResponseId(publishedArray.asLong());
-//                    queueRepo.save(this);
-//                }
-//
-//            } else {
-//                System.out.println(
-//                        "API request failed with status code: " + statusCode__deleteDocument + " for deleteDocument");
-//
-//            }
+            else if (getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
+                HttpGet httpGet_deleteDocument = new HttpGet(api_url_deleteDocument);
+
+                HttpResponse response_deleteDocument = httpClient.execute(httpGet_deleteDocument);
+
+                int statusCode__deleteDocument = response_deleteDocument.getStatusLine().getStatusCode();
+
+                if (statusCode__deleteDocument == 200 || statusCode__deleteDocument == 201) {
+                    String jsonResponse = EntityUtils.toString(response_deleteDocument.getEntity());
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                    System.out.println("jsonNode" + jsonNode);
+
+                    JsonNode publishedArray = jsonNode.get("queueId");
+                    if (publishedArray != null) {
+                        System.out.println("publishedArray" + publishedArray.asLong());
+                        setResponseId(publishedArray.asLong());
+                        setStatus(CommonData.STATUS_DONE);
+
+                    }
+
+                } else {
+                    System.out.println("API request failed with status code: " + statusCode__deleteDocument
+                            + " for deleteDocument");
+
+                }
+
+            }
 
             httpClient.close();
 
         } catch (Exception e) {
             e.printStackTrace();
 
+        }
+
+        finally {
+
+            setEndTime(System.currentTimeMillis());
+            setProcesingTime(endTime - startTime);
+            logger.info("Done :{}", this);
+
+            queueRepo.save(this);
+            taskProcessingService.getRunningDocuments().remove(documentId);
         }
 
     }
