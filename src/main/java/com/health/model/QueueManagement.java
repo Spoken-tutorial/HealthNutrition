@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -349,82 +350,100 @@ public class QueueManagement implements Runnable {
     @Override
     public void run() {
 
-        StringBuilder addDocumentsb = new StringBuilder();
-        addDocumentsb.append(commonData.elasticSearch_url);
-        addDocumentsb.append("/");
-        addDocumentsb.append("addDocument");
-        addDocumentsb.append("/");
-        addDocumentsb.append(documentId);
-        addDocumentsb.append("/");
-        addDocumentsb.append(documentType);
-        addDocumentsb.append("/");
-        addDocumentsb.append(languageId);
-        addDocumentsb.append("/");
-        addDocumentsb.append(language);
-        addDocumentsb.append("/");
-        addDocumentsb.append(rank);
-        String api_url_addDocument = addDocumentsb.toString();
+        StringBuilder documentSb = new StringBuilder();
+        String api_url = "";
 
-        StringBuilder updateDocumentsb = new StringBuilder();
-        updateDocumentsb.append(commonData.elasticSearch_url);
-        updateDocumentsb.append("/");
-        updateDocumentsb.append("updateDocument");
-        updateDocumentsb.append("/");
-        updateDocumentsb.append(documentId);
-        updateDocumentsb.append("/");
-        updateDocumentsb.append(documentType);
-        updateDocumentsb.append("/");
-        updateDocumentsb.append(languageId);
-        updateDocumentsb.append("/");
-        updateDocumentsb.append(language);
-        updateDocumentsb.append("/");
-        updateDocumentsb.append(rank);
-        String api_url_updateDocument = updateDocumentsb.toString();
+        setStartTime(System.currentTimeMillis());
+        setStatus(CommonData.STATUS_PROCESSING);
 
-        StringBuilder updateDocumentRanksb = new StringBuilder();
-        updateDocumentRanksb.append(commonData.elasticSearch_url);
-        updateDocumentRanksb.append("/");
-        updateDocumentRanksb.append("updateDocumentRank");
-        updateDocumentRanksb.append("/");
-        updateDocumentRanksb.append(documentId);
-        updateDocumentRanksb.append("/");
-        updateDocumentRanksb.append(documentType);
-        updateDocumentRanksb.append("/");
-        updateDocumentRanksb.append(languageId);
-        updateDocumentRanksb.append("/");
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpRequest request = null;
+            HttpPost httpPost = null;
+            HttpGet httpGet = null;
+            HttpResponse response = null;
 
-        updateDocumentRanksb.append(rank);
-        String api_url_updateDocumentRank = updateDocumentRanksb.toString();
+            if (getRequestType().equals(CommonData.ADD_DOCUMENT)
+                    || getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
 
-        StringBuilder deleteDocumentsb = new StringBuilder();
-        deleteDocumentsb.append(commonData.elasticSearch_url);
-        deleteDocumentsb.append("/");
-        deleteDocumentsb.append("deleteDocument");
-        deleteDocumentsb.append("/");
-        deleteDocumentsb.append(documentId);
-        deleteDocumentsb.append("/");
-        deleteDocumentsb.append(documentType);
-        deleteDocumentsb.append("/");
-        deleteDocumentsb.append(languageId);
+                if (getRequestType().equals(CommonData.ADD_DOCUMENT)) {
+                    documentSb.append(commonData.elasticSearch_url);
+                    documentSb.append("/");
+                    documentSb.append("addDocument");
+                    documentSb.append("/");
+                    documentSb.append(documentId);
+                    documentSb.append("/");
+                    documentSb.append(documentType);
+                    documentSb.append("/");
+                    documentSb.append(languageId);
+                    documentSb.append("/");
+                    documentSb.append(language);
+                    documentSb.append("/");
+                    documentSb.append(rank);
 
-        String api_url_deleteDocument = deleteDocumentsb.toString();
+                }
 
-        System.out.println(api_url_addDocument);
-        System.out.println(api_url_updateDocument);
-        System.out.println(api_url_updateDocumentRank);
-        System.out.println(api_url_deleteDocument);
+                else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
+                    documentSb.append(commonData.elasticSearch_url);
+                    documentSb.append("/");
+                    documentSb.append("updateDocument");
+                    documentSb.append("/");
+                    documentSb.append(documentId);
+                    documentSb.append("/");
+                    documentSb.append(documentType);
+                    documentSb.append("/");
+                    documentSb.append(languageId);
+                    documentSb.append("/");
+                    documentSb.append(language);
+                    documentSb.append("/");
+                    documentSb.append(rank);
 
-        try {
+                }
+                api_url = documentSb.toString();
+                logger.info("API_URL:{}", api_url);
 
-            setStartTime(System.currentTimeMillis());
-            setStatus(CommonData.STATUS_PROCESSING);
+                request = new HttpPost(api_url);
 
-            CloseableHttpClient httpClient = HttpClients.createDefault();
+            }
 
-            if (getRequestType().equals(CommonData.ADD_DOCUMENT)) {
+            else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)
+                    || getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
+                if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)) {
+                    documentSb.append(commonData.elasticSearch_url);
+                    documentSb.append("/");
+                    documentSb.append("updateDocumentRank");
+                    documentSb.append("/");
+                    documentSb.append(documentId);
+                    documentSb.append("/");
+                    documentSb.append(documentType);
+                    documentSb.append("/");
+                    documentSb.append(languageId);
+                    documentSb.append("/");
 
-                HttpPost httpPost_addDocument = new HttpPost(api_url_addDocument);
+                    documentSb.append(rank);
 
+                }
+
+                else if (getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
+                    documentSb.append(commonData.elasticSearch_url);
+                    documentSb.append("/");
+                    documentSb.append("deleteDocument");
+                    documentSb.append("/");
+                    documentSb.append(documentId);
+                    documentSb.append("/");
+                    documentSb.append(documentType);
+                    documentSb.append("/");
+                    documentSb.append(languageId);
+
+                }
+
+                api_url = documentSb.toString();
+                logger.info("API_URL:{}", api_url);
+
+                request = new HttpGet(api_url);
+
+            }
+
+            if (request instanceof HttpPost) {
                 List<NameValuePair> paramsforAddDocument = new ArrayList<>();
                 paramsforAddDocument.add(new BasicNameValuePair("documentPath", getDocumentPath()));
                 paramsforAddDocument.add(new BasicNameValuePair("documentUrl", getDocumentUrl()));
@@ -437,139 +456,42 @@ public class QueueManagement implements Runnable {
                     paramsforAddDocument.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
 
                 }
+                httpPost = (HttpPost) request;
+                httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
 
-                httpPost_addDocument.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
-
-                HttpResponse response_addDocument = httpClient.execute(httpPost_addDocument);
-
-                int statusCode__addDocument = response_addDocument.getStatusLine().getStatusCode();
-
-                if (statusCode__addDocument == 200 || statusCode__addDocument == 201) {
-                    String jsonResponse = EntityUtils.toString(response_addDocument.getEntity());
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                    System.out.println("jsonNode" + jsonNode);
-
-                    JsonNode publishedArray = jsonNode.get("queueId");
-                    if (publishedArray != null) {
-                        System.out.println("publishedArray: " + publishedArray.asLong());
-                        setResponseId(publishedArray.asLong());
-                        setStatus(CommonData.STATUS_DONE);
-
-                    }
-
-                } else {
-                    System.out.println(
-                            "API request failed with status code: " + statusCode__addDocument + " for AddDocument");
-
-                }
-
+                response = httpClient.execute(httpPost);
             }
 
-            else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
-                HttpPost httpPost_updateDocument = new HttpPost(api_url_updateDocument);
-                List<NameValuePair> paramsforUpdate = new ArrayList<>();
-                paramsforUpdate.add(new BasicNameValuePair("documentPath", getDocumentPath()));
-                paramsforUpdate.add(new BasicNameValuePair("documentUrl", getDocumentUrl()));
-                paramsforUpdate.add(new BasicNameValuePair("view_url", getViewUrl()));
-                paramsforUpdate.add(new BasicNameValuePair("categoryId", Integer.toString(getCategoryId())));
-                paramsforUpdate.add(new BasicNameValuePair("category", getCategory()));
-                paramsforUpdate.add(new BasicNameValuePair("topicId", Integer.toString(getTopicId())));
-                paramsforUpdate.add(new BasicNameValuePair("topic", getTopic()));
-                if (getOutlinePath() != null && !getOutlinePath().isEmpty()) {
-                    paramsforUpdate.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
-                }
-
-                httpPost_updateDocument.setEntity(new UrlEncodedFormEntity(paramsforUpdate, "UTF-8"));
-
-                HttpResponse response_updateDocument = httpClient.execute(httpPost_updateDocument);
-
-                int statusCode__updateDocument = response_updateDocument.getStatusLine().getStatusCode();
-
-                if (statusCode__updateDocument == 200 || statusCode__updateDocument == 201) {
-                    String jsonResponse = EntityUtils.toString(response_updateDocument.getEntity());
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                    System.out.println("jsonNode" + jsonNode);
-
-                    JsonNode publishedArray = jsonNode.get("queueId");
-                    if (publishedArray != null) {
-                        System.out.println("publishedArray" + publishedArray.asLong());
-                        setResponseId(publishedArray.asLong());
-                        setStatus(CommonData.STATUS_DONE);
-
-                    }
-
-                } else {
-                    System.out.println("API request failed with status code: " + statusCode__updateDocument
-                            + " for updateDocument");
-
-                }
-
+            else if (request instanceof HttpGet) {
+                httpGet = (HttpGet) request;
+                response = httpClient.execute(httpGet);
             }
 
-            else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)) {
-                HttpGet httpGet_updateDocumentRank = new HttpGet(api_url_updateDocumentRank);
+            int statusCode = response.getStatusLine().getStatusCode();
 
-                HttpResponse response_updateDocumentRank = httpClient.execute(httpGet_updateDocumentRank);
+            if (statusCode == 200 || statusCode == 201) {
+                String jsonResponse = EntityUtils.toString(response.getEntity());
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                System.out.println("jsonNode" + jsonNode);
 
-                int statusCode__updateDocumentRank = response_updateDocumentRank.getStatusLine().getStatusCode();
-
-                if (statusCode__updateDocumentRank == 200 || statusCode__updateDocumentRank == 201) {
-                    String jsonResponse = EntityUtils.toString(response_updateDocumentRank.getEntity());
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                    System.out.println("jsonNode" + jsonNode);
-
-                    JsonNode publishedArray = jsonNode.get("queueId");
-                    if (publishedArray != null) {
-                        System.out.println("publishedArray" + publishedArray.asLong());
-                        setResponseId(publishedArray.asLong());
-                        setStatus(CommonData.STATUS_DONE);
-
-                    }
-
-                } else {
-                    System.out.println("API request failed with status code: " + statusCode__updateDocumentRank
-                            + " for updateDocumentRank");
+                JsonNode publishedArray = jsonNode.get("queueId");
+                if (publishedArray != null) {
+                    System.out.println("publishedArray: " + publishedArray.asLong());
+                    setResponseId(publishedArray.asLong());
+                    setStatus(CommonData.STATUS_DONE);
 
                 }
 
-            }
-
-            else if (getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
-                HttpGet httpGet_deleteDocument = new HttpGet(api_url_deleteDocument);
-
-                HttpResponse response_deleteDocument = httpClient.execute(httpGet_deleteDocument);
-
-                int statusCode__deleteDocument = response_deleteDocument.getStatusLine().getStatusCode();
-
-                if (statusCode__deleteDocument == 200 || statusCode__deleteDocument == 201) {
-                    String jsonResponse = EntityUtils.toString(response_deleteDocument.getEntity());
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                    System.out.println("jsonNode" + jsonNode);
-
-                    JsonNode publishedArray = jsonNode.get("queueId");
-                    if (publishedArray != null) {
-                        System.out.println("publishedArray" + publishedArray.asLong());
-                        setResponseId(publishedArray.asLong());
-                        setStatus(CommonData.STATUS_DONE);
-
-                    }
-
-                } else {
-                    System.out.println("API request failed with status code: " + statusCode__deleteDocument
-                            + " for deleteDocument");
-
-                }
+            } else {
+                logger.info("Status Code:{} API URl", statusCode, api_url);
 
             }
 
             httpClient.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error", e);
 
         }
 
