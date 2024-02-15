@@ -1,8 +1,8 @@
-package com.bookstore;
+package com.health;
 
 import org.junit.Test;
 
-public class BookstoreApplicationTests {
+public class HealthNutritionApplicationTests {
 
     @Test
     public void contextLoads() {
