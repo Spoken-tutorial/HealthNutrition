@@ -11,12 +11,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -367,10 +367,7 @@ public class QueueManagement implements Runnable {
         setStatus(CommonData.STATUS_PROCESSING);
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpRequest request = null;
-            HttpPost httpPost = null;
-            HttpGet httpGet = null;
-            HttpResponse response = null;
+            HttpUriRequest request = null;
 
             if (getRequestType().equals(CommonData.ADD_DOCUMENT)
                     || getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
@@ -417,16 +414,12 @@ public class QueueManagement implements Runnable {
                     paramsforAddDocument.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
 
                 }
-                httpPost = (HttpPost) request;
+                HttpPost httpPost = (HttpPost) request;
                 httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
 
-                response = httpClient.execute(httpPost);
             }
 
-            else if (request instanceof HttpGet) {
-                httpGet = (HttpGet) request;
-                response = httpClient.execute(httpGet);
-            }
+            HttpResponse response = httpClient.execute(request);
 
             int statusCode = response.getStatusLine().getStatusCode();
 
