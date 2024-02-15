@@ -470,12 +470,14 @@ public class HomeController {
 
             if (statusCode == 200) {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
-                System.out.println("Alok" + jsonResponse);
+                System.out.println("JsonResponse" + jsonResponse);
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                System.out.println("jsonNode" + jsonNode);
 
                 JsonNode publishedArray = jsonNode.get("published");
+                System.out.println("publishedArray" + publishedArray);
 
                 for (int i = 0; i < publishedArray.size(); i++) {
                     listofScriptVersions.add(publishedArray.get(i).asInt());
