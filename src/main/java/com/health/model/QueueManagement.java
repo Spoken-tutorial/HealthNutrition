@@ -351,6 +351,16 @@ public class QueueManagement implements Runnable {
     public void run() {
 
         StringBuilder documentSb = new StringBuilder();
+        documentSb.append(commonData.elasticSearch_url);
+        documentSb.append("/");
+        documentSb.append(getRequestType());
+        documentSb.append("/");
+        documentSb.append(documentId);
+        documentSb.append("/");
+        documentSb.append(documentType);
+        documentSb.append("/");
+        documentSb.append(languageId);
+
         String api_url = "";
 
         setStartTime(System.currentTimeMillis());
@@ -365,39 +375,10 @@ public class QueueManagement implements Runnable {
             if (getRequestType().equals(CommonData.ADD_DOCUMENT)
                     || getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
 
-                if (getRequestType().equals(CommonData.ADD_DOCUMENT)) {
-                    documentSb.append(commonData.elasticSearch_url);
-                    documentSb.append("/");
-                    documentSb.append("addDocument");
-                    documentSb.append("/");
-                    documentSb.append(documentId);
-                    documentSb.append("/");
-                    documentSb.append(documentType);
-                    documentSb.append("/");
-                    documentSb.append(languageId);
-                    documentSb.append("/");
-                    documentSb.append(language);
-                    documentSb.append("/");
-                    documentSb.append(rank);
-
-                }
-
-                else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
-                    documentSb.append(commonData.elasticSearch_url);
-                    documentSb.append("/");
-                    documentSb.append("updateDocument");
-                    documentSb.append("/");
-                    documentSb.append(documentId);
-                    documentSb.append("/");
-                    documentSb.append(documentType);
-                    documentSb.append("/");
-                    documentSb.append(languageId);
-                    documentSb.append("/");
-                    documentSb.append(language);
-                    documentSb.append("/");
-                    documentSb.append(rank);
-
-                }
+                documentSb.append("/");
+                documentSb.append(language);
+                documentSb.append("/");
+                documentSb.append(rank);
                 api_url = documentSb.toString();
                 logger.info("API_URL:{}", api_url);
 
@@ -407,32 +388,12 @@ public class QueueManagement implements Runnable {
 
             else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)
                     || getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
+
                 if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)) {
-                    documentSb.append(commonData.elasticSearch_url);
-                    documentSb.append("/");
-                    documentSb.append("updateDocumentRank");
-                    documentSb.append("/");
-                    documentSb.append(documentId);
-                    documentSb.append("/");
-                    documentSb.append(documentType);
-                    documentSb.append("/");
-                    documentSb.append(languageId);
+
                     documentSb.append("/");
 
                     documentSb.append(rank);
-
-                }
-
-                else if (getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
-                    documentSb.append(commonData.elasticSearch_url);
-                    documentSb.append("/");
-                    documentSb.append("deleteDocument");
-                    documentSb.append("/");
-                    documentSb.append(documentId);
-                    documentSb.append("/");
-                    documentSb.append(documentType);
-                    documentSb.append("/");
-                    documentSb.append(languageId);
 
                 }
 
@@ -487,8 +448,6 @@ public class QueueManagement implements Runnable {
                 logger.info("Status Code:{} API URl", statusCode, api_url);
 
             }
-
-            httpClient.close();
 
         } catch (Exception e) {
             logger.error("Error", e);
