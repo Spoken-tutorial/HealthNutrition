@@ -1,10 +1,17 @@
 package com.health.threadpool;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +20,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.QueueManagement;
 import com.health.repository.QueueManagementRepository;
 import com.health.utility.CommonData;
@@ -27,6 +36,8 @@ public class TaskProcessingService {
 
     @Autowired
     private QueueManagementRepository queueRepo;
+    @Autowired
+    private CommonData commonData;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -48,6 +59,86 @@ public class TaskProcessingService {
             qmnt.setStatus(CommonData.STATUS_PENDING);
             qmnt.setQueueTime(0);
             queueRepo.save(qmnt);
+        }
+
+    }
+
+    @Async
+    public void deleteQueueByApiStatus() {
+        logger.info("starting deleteQueueByApiStatus thread");
+
+        while (true) {
+            if (Thread.interrupted()) {
+                logger.info("Interrupted");
+                break;
+            }
+
+            List<QueueManagement> queueList = queueRepo.findAll();
+            StringBuilder documentSb = new StringBuilder();
+            documentSb.append(commonData.elasticSearch_url);
+            documentSb.append("/");
+            documentSb.append("queueStatus");
+            documentSb.append("/");
+            String tempUrl = documentSb.toString();
+            String api_url = "";
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+                HttpUriRequest request = null;
+                Long respondId = null;
+                HttpResponse response = null;
+                int statusCode = 0;
+                int count = 0;
+
+                for (QueueManagement queue : queueList) {
+
+                    respondId = queue.getResponseId();
+                    if (respondId != null && respondId != 0) {
+
+                        api_url = tempUrl + respondId;
+                        logger.info("API_URL:{}", api_url);
+
+                        request = new HttpGet(api_url);
+                        response = httpClient.execute(request);
+
+                        statusCode = response.getStatusLine().getStatusCode();
+                        count += 1;
+
+                        if (statusCode == 200 || statusCode == 201) {
+                            String jsonResponse = EntityUtils.toString(response.getEntity());
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                            System.out.println("jsonNode" + jsonNode);
+
+                            JsonNode publishedArray = jsonNode.get("status");
+                            if (publishedArray != null && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
+                                queueRepo.delete(queue);
+                                System.out.println(
+                                        "respondId: " + respondId + " publishedArray: " + publishedArray.asText());
+
+                            }
+
+                        } else {
+                            logger.info("Status Code:{} API URl:{}", statusCode, api_url);
+
+                        }
+
+                    }
+                }
+
+                long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    logger.info("Interrupted");
+                    break;
+                }
+
+            }
+
+            catch (IOException e) {
+
+                logger.error("Exception: ", e);
+            }
         }
 
     }

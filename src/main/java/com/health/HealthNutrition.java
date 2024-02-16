@@ -14,6 +14,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
@@ -22,6 +23,7 @@ import com.health.utility.CommonData;
 @SpringBootApplication
 @EnableCaching
 @PropertySource("classpath:git.properties")
+@EnableAsync
 public class HealthNutrition extends org.springframework.boot.web.servlet.support.SpringBootServletInitializer
         implements CommandLineRunner {
 
@@ -50,8 +52,11 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
         try {
+
             taskProcessingService.intializeQueue();
             taskProcessingService.queueProcessor();
+            taskProcessingService.deleteQueueByApiStatus();
+
         } catch (Exception e) {
 
             logger.error("Exception: ", e);
