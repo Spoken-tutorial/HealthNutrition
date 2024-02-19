@@ -73,34 +73,30 @@ public class TaskProcessingService {
                 break;
             }
 
-            List<QueueManagement> queueList = queueRepo.findAll();
+            List<QueueManagement> queueList = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_DONE);
             StringBuilder documentSb = new StringBuilder();
             documentSb.append(commonData.elasticSearch_url);
             documentSb.append("/");
             documentSb.append("queueStatus");
             documentSb.append("/");
             String tempUrl = documentSb.toString();
-            String api_url = "";
+
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-                HttpUriRequest request = null;
-                Long respondId = null;
-                HttpResponse response = null;
-                int statusCode = 0;
                 int count = 0;
 
                 for (QueueManagement queue : queueList) {
 
-                    respondId = queue.getResponseId();
+                    Long respondId = queue.getResponseId();
                     if (respondId != null && respondId != 0) {
 
-                        api_url = tempUrl + respondId;
+                        String api_url = tempUrl + respondId;
                         logger.info("API_URL:{}", api_url);
 
-                        request = new HttpGet(api_url);
-                        response = httpClient.execute(request);
+                        HttpUriRequest request = new HttpGet(api_url);
+                        HttpResponse response = httpClient.execute(request);
 
-                        statusCode = response.getStatusLine().getStatusCode();
+                        int statusCode = response.getStatusLine().getStatusCode();
                         count += 1;
 
                         if (statusCode == 200 || statusCode == 201) {
@@ -125,7 +121,8 @@ public class TaskProcessingService {
                     }
                 }
 
-                long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
+                long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME_FOR_DELETE
+                        : CommonData.NO_TASK_SLEEP_TIME_FOR_DELETE;
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
