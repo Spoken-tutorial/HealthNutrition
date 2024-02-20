@@ -467,6 +467,36 @@ public class ServiceUtility {
         }
     }
 
+    /* Creation of txt file " */
+
+    public static String createTextFile(String directoryPath, Environment env, String fileName, String content)
+            throws IOException {
+        directoryPath = env.getProperty("spring.applicationexternalPath.name") + directoryPath;
+
+        Path directory = Paths.get(directoryPath);
+        if (!Files.exists(directory)) {
+
+            createFolder(directoryPath);
+
+        }
+
+        String path = null;
+
+        Path filePath = Paths.get(directoryPath, fileName);
+        if (content != null)
+            Files.write(filePath, content.getBytes());
+        logger.info("File Name Path1: {} ", filePath.toString());
+        path = filePath.toString();
+
+        int indexToStart = path.indexOf("Media");
+
+        String document = path.substring(indexToStart, path.length());
+        return document;
+
+    }
+
+    /*************** End *************************/
+
     /**
      * 
      * @param emailVerificationCode

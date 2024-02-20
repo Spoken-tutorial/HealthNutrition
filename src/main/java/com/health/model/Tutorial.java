@@ -200,6 +200,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @Column(name = "video", length = 1000)
     private String video;
 
+    @Column(name = "outlinePath", length = 1000)
+    private String outlinePath;
+
     /**
      * video status
      */
@@ -257,6 +260,14 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    public String getOutlinePath() {
+        return outlinePath;
+    }
+
+    public void setOutlinePath(String outlinePath) {
+        this.outlinePath = outlinePath;
     }
 
     public int getScriptStatus() {

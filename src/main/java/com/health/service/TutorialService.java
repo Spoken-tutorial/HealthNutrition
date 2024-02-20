@@ -61,6 +61,8 @@ public interface TutorialService {
      */
     int getNewId();
 
+    Tutorial findByTutorialId(int tutorialId);
+
     /**
      * List of Tutorial Object given ContributorAssignedTutorial object
      * 

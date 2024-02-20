@@ -87,6 +87,11 @@ public class TutorialServiceImpl implements TutorialService {
         return tutorialRepo.findAllByconAssignedTutorial(con);
     }
 
+    @Override
+    public Tutorial findByTutorialId(int tutorialId) {
+        return tutorialRepo.findByTutorialId(tutorialId);
+    }
+
     // New Function By Alok
     @Override
     public List<Tutorial> findAllByContributorAssignedTutorialEnabled(ContributorAssignedTutorial con) {
