@@ -31,6 +31,10 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer>, Jp
     @Query("select max(tutorialId) from Tutorial")
     int getNewId();
 
+    Tutorial findByTutorialId(int tutorialId);
+
+    List<Tutorial> findByOutlinePathNull();
+
     /**
      * List of Tutorial Object given ContributorAssignedTutorial object
      * 

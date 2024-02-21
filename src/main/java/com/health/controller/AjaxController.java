@@ -1,5 +1,6 @@
 package com.health.controller;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -264,6 +265,12 @@ public class AjaxController {
                 CommonData.OUTLINE, CommonData.DOMAIN_STATUS, tut.getOutlineStatus(), CommonData.contributorRole, usr,
                 tut);
         tut.setOutline(outline);
+        try {
+            tut.saveOutline(env.getProperty("spring.applicationexternalPath.name"), outline);
+        } catch (IOException e) {
+
+            logger.error("Exception: ", e);
+        }
         tut.setOutlineStatus(CommonData.DOMAIN_STATUS);
         tut.setOutlineUser(usr);
         try {
@@ -300,8 +307,13 @@ public class AjaxController {
     }
 
     private String getDocument(Tutorial tut, MultipartFile mediaFile, String comp) {
-        ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")
-                + CommonData.uploadDirectoryTutorial + tut.getTutorialId() + "/" + comp);
+        try {
+            ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")
+                    + CommonData.uploadDirectoryTutorial + tut.getTutorialId() + "/" + comp);
+        } catch (IOException e) {
+
+            logger.error("Exception: ", e);
+        }
         String document = "";
         try {
 

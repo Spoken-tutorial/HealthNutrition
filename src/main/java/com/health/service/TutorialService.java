@@ -61,6 +61,8 @@ public interface TutorialService {
      */
     int getNewId();
 
+    Tutorial findByTutorialId(int tutorialId);
+
     /**
      * List of Tutorial Object given ContributorAssignedTutorial object
      * 
@@ -131,5 +133,7 @@ public interface TutorialService {
             String query, Pageable page);
 
     Page<Tutorial> findPaginationWithEnabledCategoryandTrueTutorial(List<Tutorial> tutList, Pageable page);
+
+    List<Tutorial> findByOutlinePathNull();
 
 }

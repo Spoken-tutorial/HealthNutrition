@@ -1,9 +1,14 @@
 package com.health.model;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,6 +21,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnDefault;
+
+import com.health.utility.CommonData;
 
 /**
  * Tutorial object
@@ -200,6 +207,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @Column(name = "video", length = 1000)
     private String video;
 
+    @Column(name = "outlinePath", length = 1000)
+    private String outlinePath;
+
     /**
      * video status
      */
@@ -257,6 +267,44 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    public String getOutlinePath() {
+        return outlinePath;
+    }
+
+    public void setOutlinePath(String outlinePath) {
+        this.outlinePath = outlinePath;
+    }
+
+    public String loadOutline(String mediaRoot) throws IOException {
+        Path path = Paths.get(mediaRoot + CommonData.uploadDirectoryOutline + getTutorialId() + ".txt");
+
+        List<String> lines = Files.readAllLines(path);
+        String outline = "";
+        for (String line : lines) {
+            outline += line;
+        }
+        return outline;
+
+    }
+
+    public void saveOutline(String mediaRoot, String outline) throws IOException {
+        Path path = Paths.get(mediaRoot, CommonData.uploadDirectoryOutline);
+
+        Files.createDirectories(path);
+
+        Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryOutline, getTutorialId() + ".txt");
+        if (outline != null)
+            Files.writeString(filePath, outline);
+
+        String temp = filePath.toString();
+
+        int indexToStart = temp.indexOf("Media");
+
+        String document = temp.substring(indexToStart, temp.length());
+        setOutlinePath(document);
+
     }
 
     public int getScriptStatus() {

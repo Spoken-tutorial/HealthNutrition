@@ -13,8 +13,9 @@ import com.health.service.TutorialService;
 
 @RestController
 public class RestControllerClass {
+
     @Autowired
-    TutorialService tutService;
+    private TutorialService tutService;
 
     @GetMapping("/checkTutorial/{id}")
     public Map<String, Boolean> checkTutorial1(@PathVariable int id) {

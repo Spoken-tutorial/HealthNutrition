@@ -82,11 +82,13 @@ public class ServiceUtility {
      * 
      * @param path relative path
      * @return
+     * @throws IOException
      */
-    public static boolean createFolder(String path) { // check for existence of path
+    public static boolean createFolder(String file) throws IOException { // check for existence of path
         boolean status = false;
-        if (!new File(path).exists()) {
-            status = new File(path).mkdirs();
+        Path path = Paths.get(file);
+        if (Files.createDirectories(path) != null) {
+            status = true;
         }
         return status;
 
