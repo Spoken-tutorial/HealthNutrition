@@ -134,4 +134,6 @@ public interface TutorialService {
 
     Page<Tutorial> findPaginationWithEnabledCategoryandTrueTutorial(List<Tutorial> tutList, Pageable page);
 
+    List<Tutorial> findByOutlinePathNull();
+
 }

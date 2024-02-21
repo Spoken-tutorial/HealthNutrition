@@ -33,6 +33,8 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer>, Jp
 
     Tutorial findByTutorialId(int tutorialId);
 
+    List<Tutorial> findByOutlinePathNull();
+
     /**
      * List of Tutorial Object given ContributorAssignedTutorial object
      * 

@@ -82,11 +82,13 @@ public class ServiceUtility {
      * 
      * @param path relative path
      * @return
+     * @throws IOException
      */
-    public static boolean createFolder(String path) { // check for existence of path
+    public static boolean createFolder(String file) throws IOException { // check for existence of path
         boolean status = false;
-        if (!new File(path).exists()) {
-            status = new File(path).mkdirs();
+        Path path = Paths.get(file);
+        if (Files.createDirectories(path) != null) {
+            status = true;
         }
         return status;
 
@@ -466,36 +468,6 @@ public class ServiceUtility {
             throw new RuntimeException("Error sending mail notification", ex);
         }
     }
-
-    /* Creation of txt file " */
-
-    public static String createTextFile(String directoryPath, Environment env, String fileName, String content)
-            throws IOException {
-        directoryPath = env.getProperty("spring.applicationexternalPath.name") + directoryPath;
-
-        Path directory = Paths.get(directoryPath);
-        if (!Files.exists(directory)) {
-
-            createFolder(directoryPath);
-
-        }
-
-        String path = null;
-
-        Path filePath = Paths.get(directoryPath, fileName);
-        if (content != null)
-            Files.write(filePath, content.getBytes());
-        logger.info("File Name Path1: {} ", filePath.toString());
-        path = filePath.toString();
-
-        int indexToStart = path.indexOf("Media");
-
-        String document = path.substring(indexToStart, path.length());
-        return document;
-
-    }
-
-    /*************** End *************************/
 
     /**
      * 

@@ -1,6 +1,7 @@
 package com.health.threadpool;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,10 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.QueueManagement;
+import com.health.model.Tutorial;
 import com.health.repository.QueueManagementRepository;
+import com.health.repository.TutorialRepository;
+import com.health.service.TutorialService;
 import com.health.utility.CommonData;
 
 @Service
@@ -43,6 +48,37 @@ public class TaskProcessingService {
     private ApplicationContext applicationContext;
 
     private final Map<String, Long> runningDocuments = new ConcurrentHashMap<>();
+    @Autowired
+    private TutorialService tutService;
+
+    @Autowired
+    private Environment env;
+    @Autowired
+    private TutorialRepository tutRepo;
+
+    public void createOutlineFile() {
+
+        List<Tutorial> tutList = tutService.findByOutlinePathNull();
+        List<Tutorial> newtutList = new ArrayList<>();
+        if (tutList != null) {
+            for (Tutorial tut : tutList) {
+
+                String outline = tut.getOutline();
+                try {
+                    tut.saveOutline(env.getProperty("spring.applicationexternalPath.name"), outline);
+                    newtutList.add(tut);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    logger.error("Exception: ", e);
+                }
+
+            }
+            logger.info("Tutorial List Size :{}", tutList.size());
+            logger.info(" New Tutorial List Size :{}", newtutList.size());
+            tutRepo.saveAll(newtutList);
+        }
+
+    }
 
     public void intializeQueue() {
         List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_QUEUED);

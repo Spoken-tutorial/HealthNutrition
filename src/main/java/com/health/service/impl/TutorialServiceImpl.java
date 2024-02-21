@@ -92,6 +92,12 @@ public class TutorialServiceImpl implements TutorialService {
         return tutorialRepo.findByTutorialId(tutorialId);
     }
 
+    @Override
+    public List<Tutorial> findByOutlinePathNull() {
+
+        return tutorialRepo.findByOutlinePathNull();
+    }
+
     // New Function By Alok
     @Override
     public List<Tutorial> findAllByContributorAssignedTutorialEnabled(ContributorAssignedTutorial con) {

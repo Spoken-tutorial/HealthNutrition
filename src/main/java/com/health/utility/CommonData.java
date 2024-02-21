@@ -138,6 +138,8 @@ public class CommonData {
 
     public static String uploadDirectoryTutorial = "Media/Content/Tutorial/";
 
+    public static String uploadDirectoryOutline = "Media/Content/Tutorial/Outline/";
+
     public static String uploadDirectoryTestimonial = "Media/Content/Testimonial/";
 
     public static String uploadDirectoryConsultant = "Media/Content/Consultant/";
