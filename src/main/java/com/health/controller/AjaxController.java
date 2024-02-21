@@ -311,7 +311,7 @@ public class AjaxController {
             ServiceUtility.createFolder(env.getProperty("spring.applicationexternalPath.name")
                     + CommonData.uploadDirectoryTutorial + tut.getTutorialId() + "/" + comp);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+
             logger.error("Exception: ", e);
         }
         String document = "";

@@ -68,7 +68,7 @@ public class TaskProcessingService {
                     tut.saveOutline(env.getProperty("spring.applicationexternalPath.name"), outline);
                     newtutList.add(tut);
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
+
                     logger.error("Exception: ", e);
                 }
 
