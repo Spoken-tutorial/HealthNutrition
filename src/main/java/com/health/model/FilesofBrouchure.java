@@ -23,6 +23,9 @@ public class FilesofBrouchure {
     @Column(name = "thumbnail_path")
     private String thumbnailPath;
 
+    @Column(name = "added_queue", nullable = false)
+    private boolean addedQueue = false;
+
     @ManyToOne
     @JoinColumn(name = "ver_id")
     private Version version;
@@ -70,6 +73,14 @@ public class FilesofBrouchure {
         this.webPath = webPath;
         this.version = version;
 
+    }
+
+    public boolean isAddedQueue() {
+        return addedQueue;
+    }
+
+    public void setAddedQueue(boolean addedQueue) {
+        this.addedQueue = addedQueue;
     }
 
     public String getThumbnailPath() {

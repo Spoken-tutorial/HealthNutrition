@@ -25,6 +25,9 @@ public class ResearchPaper {
     @Column(name = "thumbnail_path")
     private String thumbnailPath;
 
+    @Column(name = "added_queue", nullable = false)
+    private boolean addedQueue = false;
+
     @Column(name = "researchPaperVisit")
     @ColumnDefault("0")
     private int researchPaperVisit = 0;
@@ -57,6 +60,14 @@ public class ResearchPaper {
 
     public int getId() {
         return id;
+    }
+
+    public boolean isAddedQueue() {
+        return addedQueue;
+    }
+
+    public void setAddedQueue(boolean addedQueue) {
+        this.addedQueue = addedQueue;
     }
 
     public void setId(int id) {
