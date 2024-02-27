@@ -41,6 +41,7 @@ import com.health.service.FilesofBrouchureService;
 import com.health.service.ResearchPaperService;
 import com.health.service.TutorialService;
 import com.health.utility.CommonData;
+import com.health.utility.ServiceUtility;
 
 @Service
 public class TaskProcessingService {
@@ -150,45 +151,56 @@ public class TaskProcessingService {
 
     }
 
-    public void addAllTuttorialsToQueue() {
-        List<Tutorial> tutorials = tutRepo.findByTimeScriptNotNull();
-        for (Tutorial tutorial : tutorials) {
+    public void addUpdateDeleteTutorial(Tutorial tutorial, String requestType) {
 
-            if (!tutorial.isAddedQueue()) {
-                String documentId = CommonData.DOCUMENT_TYPE_TUTORIAL + tutorial.getTutorialId();
-                String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
-                String documentPath = tutorial.getTimeScript();
-                String documentUrl = "";
-                if (tutorial.getConAssignedTutorial().getLan().getLanId() == 22)
-                    documentUrl = "/TimeScript/" + tutorial.getTutorialId();
-                else
-                    documentUrl = "/OriginalScript/" + tutorial.getTutorialId();
+        String documentId = CommonData.DOCUMENT_TYPE_TUTORIAL + tutorial.getTutorialId();
+        String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
+        String documentPath = tutorial.getTimeScript();
+        String documentUrl = "";
+        if (tutorial.getConAssignedTutorial().getLan().getLanId() == 22)
+            documentUrl = "/TimeScript/" + tutorial.getTutorialId();
+        else
+            documentUrl = "/OriginalScript/" + tutorial.getTutorialId();
 
-                int rank = tutorial.getUserVisit() + 3 * tutorial.getResourceVisit();
-                String view_url = null;
-                int languageId = tutorial.getConAssignedTutorial().getLan().getLanId();
-                String languag = tutorial.getConAssignedTutorial().getLan().getLangName();
-                Optional<Integer> categoryId = Optional
-                        .of(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
-                Optional<String> category = Optional
-                        .of(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-                Optional<Integer> topicId = Optional
-                        .of(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId());
-                Optional<String> topic = Optional
-                        .of(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-                Optional<String> outlinePath = Optional.of(tutorial.getOutlinePath());
-                String requestType = CommonData.ADD_DOCUMENT;
+        int rank = tutorial.getUserVisit() + 3 * tutorial.getResourceVisit();
+        String view_url = null;
+        int languageId = tutorial.getConAssignedTutorial().getLan().getLanId();
+        String languag = tutorial.getConAssignedTutorial().getLan().getLangName();
+        Optional<Integer> categoryId = Optional
+                .of(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
+        Optional<String> category = Optional
+                .of(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
+        Optional<Integer> topicId = Optional
+                .of(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId());
+        Optional<String> topic = Optional
+                .of(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+        Optional<String> outlinePath = Optional.of(tutorial.getOutlinePath());
 
+        if (requestType.equals(CommonData.ADD_DOCUMENT) && !tutorial.isAddedQueue()) {
+
+            Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
+                    view_url, languageId, languag, categoryId, category, topicId, topic, outlinePath, requestType);
+            if (resultMap.containsValue(CommonData.SUCCESS))
+                tutorial.setAddedQueue(true);
+
+        }
+
+        else if (tutorial.isAddedQueue()) {
+            if (requestType.equals(CommonData.UPDATE_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
+                    || requestType.equals(CommonData.DELETE_DOCUMENT)) {
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
                         view_url, languageId, languag, categoryId, category, topicId, topic, outlinePath, requestType);
-                if (resultMap.containsValue(CommonData.SUCCESS))
-                    tutorial.setAddedQueue(true);
 
-                tutService.save(tutorial);
+                if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
+                    if (resultMap.containsValue(CommonData.SUCCESS))
+                        tutorial.setAddedQueue(false);
 
+                }
             }
 
         }
+
+        tutService.save(tutorial);
     }
 
     public void addUpdateDeleteResearchPaper(ResearchPaper researchPaper, String requestType) {
@@ -229,79 +241,97 @@ public class TaskProcessingService {
         researchPaperService.save(researchPaper);
     }
 
-    public void addAllResearchPapertoQueue() {
-        List<ResearchPaper> researchPapers = researchPaperService.findAll();
-        for (ResearchPaper researchPaper : researchPapers) {
-            if (!researchPaper.isAddedQueue()) {
-                String documentId = CommonData.DOCUMENT_TYPE_RESEARCHPAPER + researchPaper.getId();
-                String documentType = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
-                String documentPath = researchPaper.getResearchPaperPath();
-                String documentUrl = "/ResearchPaper/ " + researchPaper.getId();
-                int rank = 5 * researchPaper.getResearchPaperVisit();
-                String view_url = "test";
-                int languageId = 22;
-                String languag = "English";
+    public void addUpdateDeleteBrochure(Brouchure brochure, String requestType) {
 
-                String requestType = CommonData.ADD_DOCUMENT;
+        Version version = verRepository.findByBrouchureAndBroVersion(brochure, brochure.getPrimaryVersion());
+        List<FilesofBrouchure> filesOfBroList = filesofBroService.findByVersion(version);
+
+        int rank = 5 * brochure.getBrochureVisit();
+        String view_url = null;
+        int languageId = brochure.getLan().getLanId();
+        String languag = brochure.getLan().getLangName();
+        Optional<Integer> catId = Optional.empty();
+        Optional<String> category = Optional.empty();
+        Optional<Integer> topicId1 = Optional.empty();
+        Optional<String> topicName = Optional.empty();
+        if (brochure.getTopicCatId() != null) {
+            catId = Optional.of(brochure.getTopicCatId().getCat().getCategoryId());
+            category = Optional.of(brochure.getTopicCatId().getCat().getCatName());
+            topicId1 = Optional.of(brochure.getTopicCatId().getTopic().getTopicId());
+            topicName = Optional.of(brochure.getTopicCatId().getTopic().getTopicName());
+
+        }
+        String documentType = CommonData.DOCUMENT_TYPE_BROCHURE;
+        String documentUrl = "/Brochure/" + brochure.getId();
+
+        for (FilesofBrouchure fileofBro : filesOfBroList) {
+
+            String documentId = CommonData.DOCUMENT_TYPE_BROCHURE + brochure.getId() + CommonData.DOCUMENT_TYPE_VERSION
+                    + version.getVerId() + CommonData.DOCUMENT_TYPE_FILES_OF_BROCHURE + fileofBro.getBroFileId();
+
+            String documentPath = fileofBro.getWebPath();
+
+            if (requestType.equals(CommonData.ADD_DOCUMENT) && !fileofBro.isAddedQueue()) {
+
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                        view_url, languageId, languag, null, null, null, null, null, requestType);
+                        view_url, languageId, languag, catId, category, topicId1, topicName, null, requestType);
                 if (resultMap.containsValue(CommonData.SUCCESS))
-                    researchPaper.setAddedQueue(true);
+                    fileofBro.setAddedQueue(true);
 
             }
 
-            researchPaperService.save(researchPaper);
+            else if (fileofBro.isAddedQueue()) {
+                if (requestType.equals(CommonData.UPDATE_DOCUMENT)
+                        || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
+                        || requestType.equals(CommonData.DELETE_DOCUMENT)) {
+                    Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl,
+                            rank, view_url, languageId, languag, catId, category, topicId1, topicName, null,
+                            requestType);
+
+                    if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
+                        if (resultMap.containsValue(CommonData.SUCCESS))
+                            fileofBro.setAddedQueue(false);
+
+                    }
+                }
+
+            }
+
+            filesofBroService.save(fileofBro);
+
+        }
+
+    }
+
+    public void addAllTuttorialsToQueue() {
+        List<Tutorial> tutorials = tutRepo.findByTimeScriptNotNull();
+        for (Tutorial tutorial : tutorials) {
+
+            addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
+        }
+    }
+
+    public void addAllResearchPapertoQueue() {
+        List<ResearchPaper> researchPapers = researchPaperService.findAllByShowOnHomePage();
+        for (ResearchPaper researchPaper : researchPapers) {
+            addUpdateDeleteResearchPaper(researchPaper, CommonData.ADD_DOCUMENT);
         }
 
     }
 
     public void addAllBrochureToQueue() {
-        List<Brouchure> broList = broService.findAll();
+        List<Brouchure> broList = broService.findAllBrouchuresForCache();
         for (Brouchure brochure : broList) {
-            Version version = verRepository.findByBrouchureAndBroVersion(brochure, brochure.getPrimaryVersion());
-
-            List<FilesofBrouchure> filesOfBroList = filesofBroService.findByVersion(version);
-            for (FilesofBrouchure fileofBro : filesOfBroList) {
-
-                if (!fileofBro.isAddedQueue()) {
-                    String documentId = CommonData.DOCUMENT_TYPE_BROCHURE + brochure.getId() + "Version"
-                            + version.getVerId() + "FilesId" + fileofBro.getBroFileId();
-                    String documentType = CommonData.DOCUMENT_TYPE_BROCHURE;
-                    String documentPath = fileofBro.getWebPath();
-                    String documentUrl = "";
-
-                    documentUrl = "/Brochure/" + brochure.getId();
-
-                    int rank = 5 * brochure.getBrochureVisit();
-                    String view_url = null;
-                    int languageId = brochure.getLan().getLanId();
-                    String languag = brochure.getLan().getLangName();
-                    Optional<Integer> catId = Optional.empty();
-                    Optional<String> category = Optional.empty();
-                    Optional<Integer> topicId1 = Optional.empty();
-                    Optional<String> topicName = Optional.empty();
-                    if (brochure.getTopicCatId() != null) {
-                        catId = Optional.of(brochure.getTopicCatId().getCat().getCategoryId());
-                        category = Optional.of(brochure.getTopicCatId().getCat().getCatName());
-                        topicId1 = Optional.of(brochure.getTopicCatId().getTopic().getTopicId());
-                        topicName = Optional.of(brochure.getTopicCatId().getTopic().getTopicName());
-
-                    }
-
-                    String requestType = CommonData.ADD_DOCUMENT;
-
-                    Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl,
-                            rank, view_url, languageId, languag, catId, category, topicId1, topicName, null,
-                            requestType);
-                    if (resultMap.containsValue(CommonData.SUCCESS))
-                        fileofBro.setAddedQueue(true);
-                    filesofBroService.save(fileofBro);
-
-                }
-
-            }
+            addUpdateDeleteBrochure(brochure, CommonData.ADD_DOCUMENT);
 
         }
+    }
+
+    public void createHtmlFileForTesting() {
+        Tutorial tut = tutRepo.findByTutorialId(1);
+        String url = "https://scriptmanager.spoken-tutorial.org/view/healthnutrition/1/1/22/Cross%20cradle%20hold%20for%20breastfeeding/1";
+        ServiceUtility.createHtmlWithoutImagesAndVideos(tut, env.getProperty("spring.applicationexternalPath.name"),
+                url);
     }
 
     public void checkoutlinedata() {

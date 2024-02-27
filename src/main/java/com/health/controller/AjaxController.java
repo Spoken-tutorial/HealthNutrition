@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -509,11 +508,13 @@ public class AjaxController {
         try {
             if (bro.isShowOnHomepage()) {
                 bro.setShowOnHomepage(false);
+                taskProcessingService.addUpdateDeleteBrochure(bro, CommonData.DELETE_DOCUMENT);
                 broService.save(bro);
                 return true;
 
             } else {
                 bro.setShowOnHomepage(true);
+                taskProcessingService.addUpdateDeleteBrochure(bro, CommonData.ADD_DOCUMENT);
                 broService.save(bro);
                 return true;
             }
@@ -2471,37 +2472,8 @@ public class AjaxController {
                 String document = ServiceUtility.uploadMediaFile(File, env, folder);
 
                 tut.setTimeScript(document);
-                String documentId = CommonData.DOCUMENT_TYPE_TUTORIAL + tut.getTutorialId();
-                String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
-                String documentPath = document;
-                String documentUrl = "/TimeScript/" + tut.getTutorialId();
-                int rank = tut.getUserVisit() + 3 * tut.getResourceVisit();
-                String view_url = null;
-                int languageId = tut.getConAssignedTutorial().getLan().getLanId();
-                String languag = tut.getConAssignedTutorial().getLan().getLangName();
-                Optional<Integer> categoryId = Optional
-                        .of(tut.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
-                Optional<String> category = Optional
-                        .of(tut.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-                Optional<Integer> topicId = Optional
-                        .of(tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId());
-                Optional<String> topic = Optional
-                        .of(tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-                Optional<String> outlinePath = Optional.of(tut.getOutlinePath());
-                String requestType = "";
-
-                if (!tut.isAddedQueue()) {
-                    requestType = CommonData.ADD_DOCUMENT;
-
-                } else {
-                    requestType = CommonData.UPDATE_DOCUMENT;
-                }
-                Map<String, String> resultMap = taskProcessingService.addDocument(documentId, documentType,
-                        documentPath, documentUrl, rank, view_url, languageId, languag, categoryId, category, topicId,
-                        topic, outlinePath, requestType);
-                if (resultMap.containsValue(CommonData.SUCCESS))
-                    tut.setAddedQueue(true);
-
+                if (tut.isStatus() && tut.isAddedQueue())
+                    taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.UPDATE_DOCUMENT);
                 tutService.save(tut);
 
                 return CommonData.Script_SAVE_SUCCESS_MSG;
@@ -2706,6 +2678,7 @@ public class AjaxController {
         if (tutorial != null) {
             tutorial = changeComponentStatus(components, tutorial, user);
             tutorial.setStatus(false);
+            taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.DELETE_DOCUMENT);
             tutService.save(tutorial);
             res.put("response", "1");
             res.put(CommonData.OUTLINE, CommonData.tutorialStatus[tutorial.getOutlineStatus()]);

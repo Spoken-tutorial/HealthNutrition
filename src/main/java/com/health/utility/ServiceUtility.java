@@ -21,6 +21,10 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.repository.UserRepository;
 
@@ -377,6 +382,50 @@ public class ServiceUtility {
             return false;
         }
         return true;
+    }
+
+    /************************
+     * Create HTml file from Url for testing
+     ******************/
+    public static void createHtmlWithoutImagesAndVideos(Tutorial tut, String mediaRoot, String url) {
+        try {
+
+            Document doc = Jsoup.connect(url).get();
+
+            Elements imgTags = doc.select("img");
+            for (Element img : imgTags) {
+                img.remove();
+            }
+
+            Elements videoTags = doc.select("video");
+            for (Element video : videoTags) {
+                video.remove();
+            }
+
+            Elements sourceTags = doc.select("source");
+            for (Element source : sourceTags) {
+                source.remove();
+            }
+
+            Path path = Paths.get(mediaRoot, CommonData.uploadDirectoryScriptHtmlFile);
+
+            Files.createDirectories(path);
+
+            Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryScriptHtmlFile,
+                    tut.getTutorialId() + ".html");
+
+            Files.writeString(filePath, doc.outerHtml());
+
+            String temp = filePath.toString();
+
+            int indexToStart = temp.indexOf("Media");
+
+            String document = temp.substring(indexToStart, temp.length());
+            System.out.println(document);
+
+        } catch (IOException e) {
+            logger.error("Exception Error", e);
+        }
     }
 
     /**

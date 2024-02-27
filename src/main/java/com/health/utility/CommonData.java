@@ -139,6 +139,7 @@ public class CommonData {
     public static String uploadDirectoryTutorial = "Media/Content/Tutorial/";
 
     public static String uploadDirectoryOutline = "Media/Content/Tutorial/Outline/";
+    public static String uploadDirectoryScriptHtmlFile = "Media/Content/Tutorial/ScriptHtmlFile/";
 
     public static String uploadDirectoryTestimonial = "Media/Content/Testimonial/";
 
@@ -270,6 +271,8 @@ public class CommonData {
     public static final String DOCUMENT_TYPE = "documentType";
     public static final String DOCUMENT_TYPE_TUTORIAL = "Tutorial";
     public static final String DOCUMENT_TYPE_BROCHURE = "Brochure";
+    public static final String DOCUMENT_TYPE_VERSION = "Version";
+    public static final String DOCUMENT_TYPE_FILES_OF_BROCHURE = "Files_Of_Brochure";
     public static final String DOCUMENT_TYPE_RESEARCHPAPER = "ResearchPaper";
     public static final String LANGUAGE = "language";
     public static final String RANK = "rank";
