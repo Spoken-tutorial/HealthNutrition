@@ -554,12 +554,15 @@ public class AjaxController {
 
         try {
             if (res.isShowOnHomepage()) {
+
                 res.setShowOnHomepage(false);
+                taskProcessingService.addUpdateDeleteResearchPaper(res, CommonData.DELETE_DOCUMENT);
                 researchPaperService.save(res);
                 return true;
 
             } else {
                 res.setShowOnHomepage(true);
+                taskProcessingService.addUpdateDeleteResearchPaper(res, CommonData.ADD_DOCUMENT);
                 researchPaperService.save(res);
                 return true;
             }

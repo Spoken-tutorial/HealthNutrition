@@ -191,6 +191,44 @@ public class TaskProcessingService {
         }
     }
 
+    public void addUpdateDeleteResearchPaper(ResearchPaper researchPaper, String requestType) {
+
+        String documentId = CommonData.DOCUMENT_TYPE_RESEARCHPAPER + researchPaper.getId();
+        String documentType = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
+        String documentPath = researchPaper.getResearchPaperPath();
+        String documentUrl = "/ResearchPaper/ " + researchPaper.getId();
+        int rank = 5 * researchPaper.getResearchPaperVisit();
+        String view_url = "test";
+        int languageId = 22;
+        String languag = "English";
+
+        if (requestType.equals(CommonData.ADD_DOCUMENT) && !researchPaper.isAddedQueue()) {
+
+            Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
+                    view_url, languageId, languag, null, null, null, null, null, requestType);
+            if (resultMap.containsValue(CommonData.SUCCESS))
+                researchPaper.setAddedQueue(true);
+
+        }
+
+        else if (researchPaper.isAddedQueue()) {
+            if (requestType.equals(CommonData.UPDATE_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
+                    || requestType.equals(CommonData.DELETE_DOCUMENT)) {
+                Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
+                        view_url, languageId, languag, null, null, null, null, null, requestType);
+
+                if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
+                    if (resultMap.containsValue(CommonData.SUCCESS))
+                        researchPaper.setAddedQueue(false);
+
+                }
+            }
+
+        }
+
+        researchPaperService.save(researchPaper);
+    }
+
     public void addAllResearchPapertoQueue() {
         List<ResearchPaper> researchPapers = researchPaperService.findAll();
         for (ResearchPaper researchPaper : researchPapers) {

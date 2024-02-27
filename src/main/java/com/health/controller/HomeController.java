@@ -1976,25 +1976,6 @@ public class HomeController {
             researchPaperTemp.setDescription(researchPaperDesc);
             researchPaperTemp.setTitle(title);
 
-            if (!researchPaperTemp.isAddedQueue()) {
-                String documentId = CommonData.DOCUMENT_TYPE_RESEARCHPAPER + researchPaperTemp.getId();
-                String documentType = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
-                String documentPath = documents.get(0);
-                String documentUrl = "/ResearchPaper/ " + researchPaperTemp.getId();
-                int rank = 5 * researchPaperTemp.getResearchPaperVisit();
-                String view_url = null;
-                int languageId = 22;
-                String languag = "English";
-
-                String requestType = CommonData.ADD_DOCUMENT;
-                Map<String, String> resultMap = taskProcessingService.addDocument(documentId, documentType,
-                        documentPath, documentUrl, rank, view_url, languageId, languag, null, null, null, null, null,
-                        requestType);
-                if (resultMap.containsValue(CommonData.SUCCESS))
-                    researchPaperTemp.setAddedQueue(true);
-
-            }
-
             researchPaperService.save(researchPaperTemp);
 
         } catch (Exception e) {
@@ -4464,25 +4445,6 @@ public class HomeController {
                 List<String> documents = ServiceUtility.UploadMediaFileAndCreateThumbnail(researchFile, env, folder);
                 researchPaper.setResearchPaperPath(documents.get(0));
                 researchPaper.setThumbnailPath(documents.get(1));
-
-                if (researchPaper.isAddedQueue()) {
-                    String documentId = CommonData.DOCUMENT_TYPE_RESEARCHPAPER + researchPaper.getId();
-                    String documentType = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
-                    String documentPath = documents.get(0);
-                    String documentUrl = "/ResearchPaper/ " + researchPaper.getId();
-                    int rank = 5 * researchPaper.getResearchPaperVisit();
-                    String view_url = null;
-                    int languageId = 22;
-                    String languag = "English";
-
-                    String requestType = CommonData.UPDATE_DOCUMENT;
-                    Map<String, String> resultMap = taskProcessingService.addDocument(documentId, documentType,
-                            documentPath, documentUrl, rank, view_url, languageId, languag, null, null, null, null,
-                            null, requestType);
-                    if (resultMap.containsValue(CommonData.SUCCESS))
-                        researchPaper.setAddedQueue(true);
-
-                }
 
             }
 
