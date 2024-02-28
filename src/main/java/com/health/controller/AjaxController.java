@@ -2472,8 +2472,13 @@ public class AjaxController {
                 String document = ServiceUtility.uploadMediaFile(File, env, folder);
 
                 tut.setTimeScript(document);
-                if (tut.isStatus() && tut.isAddedQueue())
+                if (tut.isStatus() && tut.isAddedQueue()) {
                     taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.UPDATE_DOCUMENT);
+                }
+
+                else if (tut.isStatus()) {
+                    taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
+                }
                 tutService.save(tut);
 
                 return CommonData.Script_SAVE_SUCCESS_MSG;

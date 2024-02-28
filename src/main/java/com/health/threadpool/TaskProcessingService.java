@@ -1,6 +1,9 @@
 package com.health.threadpool;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +22,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
@@ -28,9 +32,11 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.Brouchure;
+import com.health.model.ContributorAssignedTutorial;
 import com.health.model.FilesofBrouchure;
 import com.health.model.QueueManagement;
 import com.health.model.ResearchPaper;
+import com.health.model.TopicCategoryMapping;
 import com.health.model.Tutorial;
 import com.health.model.Version;
 import com.health.repository.QueueManagementRepository;
@@ -45,6 +51,15 @@ import com.health.utility.ServiceUtility;
 
 @Service
 public class TaskProcessingService {
+
+    @Value("${scriptmanager_api}")
+    private String scriptmanager_api;
+
+    @Value("${scriptmanager_url}")
+    private String scriptmanager_url;
+
+    @Value("${scriptmanager_path}")
+    private String scriptmanager_path;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskProcessingService.class);
 
@@ -90,6 +105,45 @@ public class TaskProcessingService {
         return st;
     }
 
+    private String ScriptUrl(Tutorial tutorial) {
+        int catId = tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
+        int lanId = tutorial.getConAssignedTutorial().getLan().getLanId();
+        List<Integer> scriptVerList = ServiceUtility.getApiVersion(scriptmanager_api, catId, tutorial.getTutorialId(),
+                lanId);
+        String sm_url = "";
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(scriptmanager_url);
+        sb.append(scriptmanager_path);
+        sb.append(String.valueOf(catId));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getTutorialId()));
+        sb.append("/");
+        sb.append(String.valueOf(lanId));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+        sb.append("/");
+        if (scriptVerList != null && scriptVerList.size() > 0) {
+            System.out.println(scriptVerList);
+            StringBuilder sb2 = new StringBuilder(sb);
+            sb2.append(scriptVerList.get(0));
+            sm_url = sb2.toString();
+        }
+        return sm_url;
+
+    }
+
+    private boolean doesFileExist(String filePath) {
+        if (filePath.contains("..")
+                || !filePath.startsWith(env.getProperty("spring.applicationexternalPath.baseName"))) {
+            return false;
+        }
+        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
+
+        return Files.exists(path);
+    }
+
     public Map<String, String> addDocument(String documentId, String documentType, String documentPath,
             String documentUrl, int rank, String view_url, int languageId, String language,
             Optional<Integer> categoryId, Optional<String> category, Optional<Integer> topicId, Optional<String> topic,
@@ -101,15 +155,25 @@ public class TaskProcessingService {
                 "RequestType:{} Language:{} View_URL: {} documentId:{} documentPath:{} documentType:{} outlinePath:{}",
                 requestType, language, view_url, documentId, documentPath, documentType, outlinePath);
 
-        if (documentPath == null) {
+        if (documentPath == null
+                && (requestType.equals(CommonData.ADD_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT))) {
+
+            resultMap.put(CommonData.STATUS, CommonData.STATUS_FAILED);
+            resultMap.put(CommonData.REASON, "documentPath is null");
+
+            return resultMap;
+
+        } else if (documentPath != null && !doesFileExist(documentPath)) {
 
             resultMap.put(CommonData.STATUS, CommonData.STATUS_FAILED);
             resultMap.put(CommonData.REASON, "documentPath file does not exist");
+            logger.info("documentPath file does not exist");
+
             return resultMap;
 
         }
 
-        if (outlinePath != null && !outlinePath.isPresent()) {
+        if (outlinePath != null && outlinePath.isPresent() && !doesFileExist(outlinePath.get())) {
 
             resultMap.put(CommonData.STATUS, CommonData.STATUS_FAILED);
             resultMap.put(CommonData.REASON, "outline file does not exist");
@@ -130,7 +194,7 @@ public class TaskProcessingService {
         queuemnt.setRank(rank);
         queuemnt.setViewUrl(view_url);
         queuemnt.setLanguageId(languageId);
-        queuemnt.setStatus("pending");
+        queuemnt.setStatus(CommonData.STATUS_PENDING);
         if (language != null)
             queuemnt.setLanguage(language);
         if (category != null && category.isPresent())
@@ -153,49 +217,91 @@ public class TaskProcessingService {
 
     public void addUpdateDeleteTutorial(Tutorial tutorial, String requestType) {
 
-        String documentId = CommonData.DOCUMENT_TYPE_TUTORIAL + tutorial.getTutorialId();
         String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
         String documentPath = tutorial.getTimeScript();
-        String documentUrl = "";
-        if (tutorial.getConAssignedTutorial().getLan().getLanId() == 22)
-            documentUrl = "/TimeScript/" + tutorial.getTutorialId();
-        else
-            documentUrl = "/OriginalScript/" + tutorial.getTutorialId();
+        String documentUrlforTimeScript = "";
+        String documentIdforTimeScript = "";
+
+        ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
+
+        if (conAssignedTutorial.getLan().getLanId() == 22) {
+            documentUrlforTimeScript = "/TimeScript/" + tutorial.getTutorialId();
+            documentIdforTimeScript = CommonData.DOCUMENT_ID_TUTORIAL_TIMESCRIPT + tutorial.getTutorialId();
+        }
+
+        String documentUrlforOriginalScript = ScriptUrl(tutorial);
+        String documentIdforOriginalScript = CommonData.DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT + tutorial.getTutorialId();
 
         int rank = tutorial.getUserVisit() + 3 * tutorial.getResourceVisit();
         String view_url = null;
-        int languageId = tutorial.getConAssignedTutorial().getLan().getLanId();
-        String languag = tutorial.getConAssignedTutorial().getLan().getLangName();
-        Optional<Integer> categoryId = Optional
-                .of(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
-        Optional<String> category = Optional
-                .of(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
-        Optional<Integer> topicId = Optional
-                .of(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId());
-        Optional<String> topic = Optional
-                .of(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+        int languageId = conAssignedTutorial.getLan().getLanId();
+        String language = conAssignedTutorial.getLan().getLangName();
+        TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
+        Optional<Integer> categoryId = Optional.of(topicCat.getCat().getCategoryId());
+        Optional<String> category = Optional.of(topicCat.getCat().getCatName());
+        Optional<Integer> topicId = Optional.of(topicCat.getTopic().getTopicId());
+        Optional<String> topic = Optional.of(topicCat.getTopic().getTopicName());
         Optional<String> outlinePath = Optional.of(tutorial.getOutlinePath());
 
         if (requestType.equals(CommonData.ADD_DOCUMENT) && !tutorial.isAddedQueue()) {
 
-            Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                    view_url, languageId, languag, categoryId, category, topicId, topic, outlinePath, requestType);
-            if (resultMap.containsValue(CommonData.SUCCESS))
-                tutorial.setAddedQueue(true);
+            if (languageId == 22) {
+
+                Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType, documentPath,
+                        documentUrlforTimeScript, rank, view_url, languageId, language, categoryId, category, topicId,
+                        topic, outlinePath, requestType);
+
+                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType, documentPath,
+                        documentUrlforOriginalScript, rank, view_url, languageId, language, categoryId, category,
+                        topicId, topic, outlinePath, requestType);
+
+                if (resultMap1.containsValue(CommonData.SUCCESS) && resultMap2.containsValue(CommonData.SUCCESS))
+                    tutorial.setAddedQueue(true);
+            } else {
+
+                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType, documentPath,
+                        documentUrlforOriginalScript, rank, view_url, languageId, language, categoryId, category,
+                        topicId, topic, outlinePath, requestType);
+
+                if (resultMap2.containsValue(CommonData.SUCCESS))
+                    tutorial.setAddedQueue(true);
+            }
 
         }
 
         else if (tutorial.isAddedQueue()) {
             if (requestType.equals(CommonData.UPDATE_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
                     || requestType.equals(CommonData.DELETE_DOCUMENT)) {
-                Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                        view_url, languageId, languag, categoryId, category, topicId, topic, outlinePath, requestType);
 
-                if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
-                    if (resultMap.containsValue(CommonData.SUCCESS))
-                        tutorial.setAddedQueue(false);
+                if (languageId == 22) {
 
+                    Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType, documentPath,
+                            documentUrlforTimeScript, rank, view_url, languageId, language, categoryId, category,
+                            topicId, topic, outlinePath, requestType);
+
+                    Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
+                            documentPath, documentUrlforOriginalScript, rank, view_url, languageId, language,
+                            categoryId, category, topicId, topic, outlinePath, requestType);
+
+                    if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
+                        if (resultMap1.containsValue(CommonData.SUCCESS)
+                                && resultMap2.containsValue(CommonData.SUCCESS))
+                            tutorial.setAddedQueue(false);
+                    }
+
+                } else {
+
+                    Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
+                            documentPath, documentUrlforOriginalScript, rank, view_url, languageId, language,
+                            categoryId, category, topicId, topic, outlinePath, requestType);
+
+                    if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
+                        if (resultMap2.containsValue(CommonData.SUCCESS))
+                            tutorial.setAddedQueue(false);
+
+                    }
                 }
+
             }
 
         }
@@ -205,19 +311,19 @@ public class TaskProcessingService {
 
     public void addUpdateDeleteResearchPaper(ResearchPaper researchPaper, String requestType) {
 
-        String documentId = CommonData.DOCUMENT_TYPE_RESEARCHPAPER + researchPaper.getId();
+        String documentId = CommonData.DOCUMENT_ID_RESEARCHPAPER + researchPaper.getId();
         String documentType = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
         String documentPath = researchPaper.getResearchPaperPath();
         String documentUrl = "/ResearchPaper/ " + researchPaper.getId();
         int rank = 5 * researchPaper.getResearchPaperVisit();
-        String view_url = "test";
+        String view_url = "";
         int languageId = 22;
-        String languag = "English";
+        String language = "English";
 
         if (requestType.equals(CommonData.ADD_DOCUMENT) && !researchPaper.isAddedQueue()) {
 
             Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                    view_url, languageId, languag, null, null, null, null, null, requestType);
+                    view_url, languageId, language, null, null, null, null, null, requestType);
             if (resultMap.containsValue(CommonData.SUCCESS))
                 researchPaper.setAddedQueue(true);
 
@@ -227,7 +333,7 @@ public class TaskProcessingService {
             if (requestType.equals(CommonData.UPDATE_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
                     || requestType.equals(CommonData.DELETE_DOCUMENT)) {
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                        view_url, languageId, languag, null, null, null, null, null, requestType);
+                        view_url, languageId, language, null, null, null, null, null, requestType);
 
                 if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                     if (resultMap.containsValue(CommonData.SUCCESS))
@@ -247,18 +353,19 @@ public class TaskProcessingService {
         List<FilesofBrouchure> filesOfBroList = filesofBroService.findByVersion(version);
 
         int rank = 5 * brochure.getBrochureVisit();
-        String view_url = null;
+
         int languageId = brochure.getLan().getLanId();
-        String languag = brochure.getLan().getLangName();
+        String language = brochure.getLan().getLangName();
         Optional<Integer> catId = Optional.empty();
         Optional<String> category = Optional.empty();
         Optional<Integer> topicId1 = Optional.empty();
         Optional<String> topicName = Optional.empty();
-        if (brochure.getTopicCatId() != null) {
-            catId = Optional.of(brochure.getTopicCatId().getCat().getCategoryId());
-            category = Optional.of(brochure.getTopicCatId().getCat().getCatName());
-            topicId1 = Optional.of(brochure.getTopicCatId().getTopic().getTopicId());
-            topicName = Optional.of(brochure.getTopicCatId().getTopic().getTopicName());
+        TopicCategoryMapping topicCat = brochure.getTopicCatId();
+        if (topicCat != null) {
+            catId = Optional.of(topicCat.getCat().getCategoryId());
+            category = Optional.of(topicCat.getCat().getCatName());
+            topicId1 = Optional.of(topicCat.getTopic().getTopicId());
+            topicName = Optional.of(topicCat.getTopic().getTopicName());
 
         }
         String documentType = CommonData.DOCUMENT_TYPE_BROCHURE;
@@ -266,15 +373,17 @@ public class TaskProcessingService {
 
         for (FilesofBrouchure fileofBro : filesOfBroList) {
 
-            String documentId = CommonData.DOCUMENT_TYPE_BROCHURE + brochure.getId() + CommonData.DOCUMENT_TYPE_VERSION
-                    + version.getVerId() + CommonData.DOCUMENT_TYPE_FILES_OF_BROCHURE + fileofBro.getBroFileId();
+            String documentId = CommonData.DOCUMENT_ID_BROCHURE + brochure.getId() + "."
+                    + CommonData.DOCUMENT_ID_VERSION + version.getVerId() + "."
+                    + CommonData.DOCUMENT_ID_FILES_OF_BROCHURE + fileofBro.getBroFileId();
 
             String documentPath = fileofBro.getWebPath();
+            String view_url = fileofBro.getWebPath();
 
             if (requestType.equals(CommonData.ADD_DOCUMENT) && !fileofBro.isAddedQueue()) {
 
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                        view_url, languageId, languag, catId, category, topicId1, topicName, null, requestType);
+                        view_url, languageId, language, catId, category, topicId1, topicName, null, requestType);
                 if (resultMap.containsValue(CommonData.SUCCESS))
                     fileofBro.setAddedQueue(true);
 
@@ -285,7 +394,7 @@ public class TaskProcessingService {
                         || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
                         || requestType.equals(CommonData.DELETE_DOCUMENT)) {
                     Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl,
-                            rank, view_url, languageId, languag, catId, category, topicId1, topicName, null,
+                            rank, view_url, languageId, language, catId, category, topicId1, topicName, null,
                             requestType);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
@@ -304,7 +413,7 @@ public class TaskProcessingService {
     }
 
     public void addAllTuttorialsToQueue() {
-        List<Tutorial> tutorials = tutRepo.findByTimeScriptNotNull();
+        List<Tutorial> tutorials = tutRepo.findTutorialsWithNonNullTimeScriptAndStatusAndAddedQueueFalse();
         for (Tutorial tutorial : tutorials) {
 
             addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
@@ -312,7 +421,7 @@ public class TaskProcessingService {
     }
 
     public void addAllResearchPapertoQueue() {
-        List<ResearchPaper> researchPapers = researchPaperService.findAllByShowOnHomePage();
+        List<ResearchPaper> researchPapers = researchPaperService.findByShowOnHomepageIsTrueAndAddedQueueIsFalse();
         for (ResearchPaper researchPaper : researchPapers) {
             addUpdateDeleteResearchPaper(researchPaper, CommonData.ADD_DOCUMENT);
         }
@@ -320,6 +429,7 @@ public class TaskProcessingService {
     }
 
     public void addAllBrochureToQueue() {
+
         List<Brouchure> broList = broService.findAllBrouchuresForCache();
         for (Brouchure brochure : broList) {
             addUpdateDeleteBrochure(brochure, CommonData.ADD_DOCUMENT);
@@ -329,7 +439,7 @@ public class TaskProcessingService {
 
     public void createHtmlFileForTesting() {
         Tutorial tut = tutRepo.findByTutorialId(1);
-        String url = "https://scriptmanager.spoken-tutorial.org/view/healthnutrition/1/1/22/Cross%20cradle%20hold%20for%20breastfeeding/1";
+        String url = "https://www.w3schools.com/java/java_intro.asp";
         ServiceUtility.createHtmlWithoutImagesAndVideos(tut, env.getProperty("spring.applicationexternalPath.name"),
                 url);
     }

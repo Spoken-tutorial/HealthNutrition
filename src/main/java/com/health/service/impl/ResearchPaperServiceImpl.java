@@ -64,6 +64,11 @@ public class ResearchPaperServiceImpl implements ResearchPaperService {
     }
 
     @Override
+    public List<ResearchPaper> findByShowOnHomepageIsTrueAndAddedQueueIsFalse() {
+        return repo.findByShowOnHomepageIsTrueAndAddedQueueIsFalse();
+    }
+
+    @Override
     public ResearchPaper findById(int id) {
         // TODO Auto-generated method stub
         try {

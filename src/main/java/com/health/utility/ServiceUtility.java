@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,6 +20,11 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.jsoup.Jsoup;
@@ -28,11 +34,14 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.repository.UserRepository;
@@ -532,6 +541,70 @@ public class ServiceUtility {
         } else {
             UserRepository.enable(user.getId());
             return true;
+        }
+
+    }
+
+    @Cacheable(cacheNames = "scriptapi")
+    public static List<Integer> getApiVersion(String scripmanager_api, int catId, int TutorialId, int lanId) {
+
+        int x = 1;
+        List<Integer> listofScriptVersions = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(scripmanager_api);
+        sb.append("/");
+        sb.append(catId);
+        sb.append("/");
+        sb.append(TutorialId);
+        sb.append("/");
+        sb.append(lanId);
+        sb.append("/");
+        String api_url = sb.toString();
+
+        try {
+
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+
+            HttpGet httpGet = new HttpGet(api_url);
+
+            HttpResponse response = httpClient.execute(httpGet);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if (statusCode == 200) {
+                String jsonResponse = EntityUtils.toString(response.getEntity());
+                System.out.println("JsonResponse" + jsonResponse);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                System.out.println("jsonNode" + jsonNode);
+
+                JsonNode publishedArray = jsonNode.get("published");
+                System.out.println("publishedArray" + publishedArray);
+
+                for (int i = 0; i < publishedArray.size(); i++) {
+                    listofScriptVersions.add(publishedArray.get(i).asInt());
+                }
+
+                httpClient.close();
+                Collections.reverse(listofScriptVersions);
+                System.out.println("Alok List" + listofScriptVersions);
+                return listofScriptVersions;
+            } else {
+                System.out.println("API request failed with status code: " + statusCode);
+
+                listofScriptVersions.add(x);
+                return listofScriptVersions;
+            }
+
+            // Close the HTTP client
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            listofScriptVersions.add(x);
+            return listofScriptVersions;
+
         }
 
     }

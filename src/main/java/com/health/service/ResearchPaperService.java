@@ -52,4 +52,6 @@ public interface ResearchPaperService {
 
     List<ResearchPaper> findAllByShowOnHomePage();
 
+    List<ResearchPaper> findByShowOnHomepageIsTrueAndAddedQueueIsFalse();
+
 }

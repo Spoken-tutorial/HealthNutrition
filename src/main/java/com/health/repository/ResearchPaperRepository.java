@@ -27,4 +27,6 @@ public interface ResearchPaperRepository extends CrudRepository<ResearchPaper, I
      */
     List<ResearchPaper> findAllByshowOnHomepage(boolean value);
 
+    List<ResearchPaper> findByShowOnHomepageIsTrueAndAddedQueueIsFalse();
+
 }
