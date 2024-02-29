@@ -139,6 +139,7 @@ public class CommonData {
     public static String uploadDirectoryTutorial = "Media/Content/Tutorial/";
 
     public static String uploadDirectoryOutline = "Media/Content/Tutorial/Outline/";
+    public static String uploadDirectoryScriptHtmlFile = "Media/Content/Tutorial/ScriptHtmlFile/";
 
     public static String uploadDirectoryTestimonial = "Media/Content/Testimonial/";
 
@@ -250,7 +251,9 @@ public class CommonData {
     public static String FAILURE_STATUS = "0";
 
     public static String SUCCESS_STATUS = "1";
+
     public int HANDLER_DATA = 10000000;
+
     public static final String STATUS = "status";
     public static final String STATUS_QUEUED = "queued";
     public static final String STATUS_PROCESSING = "processing";
@@ -270,7 +273,16 @@ public class CommonData {
     public static final String DOCUMENT_TYPE = "documentType";
     public static final String DOCUMENT_TYPE_TUTORIAL = "Tutorial";
     public static final String DOCUMENT_TYPE_BROCHURE = "Brochure";
+    public static final String DOCUMENT_TYPE_VERSION = "Version";
+    public static final String DOCUMENT_TYPE_FILES_OF_BROCHURE = "Files_Of_Brochure";
     public static final String DOCUMENT_TYPE_RESEARCHPAPER = "ResearchPaper";
+
+    public static final String DOCUMENT_ID_TUTORIAL_TIMESCRIPT = "Tts";
+    public static final String DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT = "Tos";
+    public static final String DOCUMENT_ID_BROCHURE = "Bro";
+    public static final String DOCUMENT_ID_VERSION = "Ver";
+    public static final String DOCUMENT_ID_FILES_OF_BROCHURE = "Files_Of_Bro";
+    public static final String DOCUMENT_ID_RESEARCHPAPER = "Rp";
     public static final String LANGUAGE = "language";
     public static final String RANK = "rank";
     public static final String SUCCESS = "success";

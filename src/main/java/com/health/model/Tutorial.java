@@ -189,6 +189,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @Column(name = "enabled")
     private boolean status;
 
+    @Column(name = "added_queue", nullable = false)
+    private boolean addedQueue = false;
+
     /**
      * relative path of timescript
      */
@@ -249,6 +252,14 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
         return resourceVisit;
     }
 
+    public boolean isAddedQueue() {
+        return addedQueue;
+    }
+
+    public void setAddedQueue(boolean addedQueue) {
+        this.addedQueue = addedQueue;
+    }
+
     public void setResourceVisit(int resourceVisit) {
         this.resourceVisit = resourceVisit;
     }
@@ -282,7 +293,12 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
         List<String> lines = Files.readAllLines(path);
         String outline = "";
+        boolean firstLine = true;
         for (String line : lines) {
+            if (firstLine)
+                firstLine = false;
+            else
+                outline += "\n";
             outline += line;
         }
         return outline;
@@ -295,9 +311,11 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
         Files.createDirectories(path);
 
         Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryOutline, getTutorialId() + ".txt");
-        if (outline != null)
+        if (outline != null) {
             Files.writeString(filePath, outline);
-
+        } else {
+            Files.writeString(filePath, "");
+        }
         String temp = filePath.toString();
 
         int indexToStart = temp.indexOf("Media");

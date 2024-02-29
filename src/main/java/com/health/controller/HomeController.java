@@ -133,6 +133,7 @@ import com.health.service.UserIndianLanguageMappingService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.service.VersionService;
+import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -272,6 +273,9 @@ public class HomeController {
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private TaskProcessingService taskProcessingService;
 
     @Autowired
     private LogMangementService logMangementService;
@@ -1970,6 +1974,7 @@ public class HomeController {
             researchPaperTemp.setThumbnailPath(documents.get(1));
             researchPaperTemp.setDescription(researchPaperDesc);
             researchPaperTemp.setTitle(title);
+
             researchPaperService.save(researchPaperTemp);
 
         } catch (Exception e) {
@@ -5941,6 +5946,7 @@ public class HomeController {
         tutorial.setPreRequisticStatus(CommonData.PUBLISH_STATUS);
         tutorial.setVideoStatus(CommonData.PUBLISH_STATUS);
         tutorial.setStatus(true);
+        taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
         model.addAttribute("success_msg", CommonData.PUBLISHED_SUCCESS);
@@ -6832,9 +6838,11 @@ public class HomeController {
 
         if (tut.isStatus()) {
             tut.setStatus(false);
+            taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.DELETE_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
+            taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }
 

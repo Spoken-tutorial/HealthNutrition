@@ -88,6 +88,7 @@ import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.service.VersionService;
+import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -152,6 +153,9 @@ public class AjaxController {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private TaskProcessingService taskProcessingService;
 
     @Autowired
     private StateService stateService;
@@ -504,11 +508,13 @@ public class AjaxController {
         try {
             if (bro.isShowOnHomepage()) {
                 bro.setShowOnHomepage(false);
+                taskProcessingService.addUpdateDeleteBrochure(bro, CommonData.DELETE_DOCUMENT);
                 broService.save(bro);
                 return true;
 
             } else {
                 bro.setShowOnHomepage(true);
+                taskProcessingService.addUpdateDeleteBrochure(bro, CommonData.ADD_DOCUMENT);
                 broService.save(bro);
                 return true;
             }
@@ -549,12 +555,15 @@ public class AjaxController {
 
         try {
             if (res.isShowOnHomepage()) {
+
                 res.setShowOnHomepage(false);
+                taskProcessingService.addUpdateDeleteResearchPaper(res, CommonData.DELETE_DOCUMENT);
                 researchPaperService.save(res);
                 return true;
 
             } else {
                 res.setShowOnHomepage(true);
+                taskProcessingService.addUpdateDeleteResearchPaper(res, CommonData.ADD_DOCUMENT);
                 researchPaperService.save(res);
                 return true;
             }
@@ -2463,6 +2472,13 @@ public class AjaxController {
                 String document = ServiceUtility.uploadMediaFile(File, env, folder);
 
                 tut.setTimeScript(document);
+                if (tut.isStatus() && tut.isAddedQueue()) {
+                    taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.UPDATE_DOCUMENT);
+                }
+
+                else if (tut.isStatus()) {
+                    taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
+                }
                 tutService.save(tut);
 
                 return CommonData.Script_SAVE_SUCCESS_MSG;
@@ -2667,6 +2683,7 @@ public class AjaxController {
         if (tutorial != null) {
             tutorial = changeComponentStatus(components, tutorial, user);
             tutorial.setStatus(false);
+            taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.DELETE_DOCUMENT);
             tutService.save(tutorial);
             res.put("response", "1");
             res.put(CommonData.OUTLINE, CommonData.tutorialStatus[tutorial.getOutlineStatus()]);
