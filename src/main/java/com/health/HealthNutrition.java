@@ -52,7 +52,8 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
         try {
-            taskProcessingService.addAllTuttorialsToQueue();
+            // taskProcessingService.addAllTuttorialsToQueue();
+            taskProcessingService.createHtmlFileForTesting();
             taskProcessingService.checkoutlinedata();
             taskProcessingService.createOutlineFile();
             taskProcessingService.intializeQueue();

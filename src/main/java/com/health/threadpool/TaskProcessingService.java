@@ -233,7 +233,7 @@ public class TaskProcessingService {
             view_urlforTimeScript = tutorial.getTimeScript();
         }
 
-        String documentUrlforOriginalScript = "/OriginalScript" + tutorial.getTutorialId();
+        String documentUrlforOriginalScript = "/OriginalScript/" + tutorial.getTutorialId();
         String view_urlforOriginalScript = sm_url;
         String documentIdforOriginalScript = CommonData.DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT + tutorial.getTutorialId();
 
@@ -445,7 +445,7 @@ public class TaskProcessingService {
 
     public void createHtmlFileForTesting() {
         Tutorial tut = tutRepo.findByTutorialId(1);
-        String url = "https://www.w3schools.com/java/java_intro.asp";
+        String url = "https://scriptmanager.spoken-tutorial.org/view/healthnutrition/1/1/22/Cross%20cradle%20hold%20for%20breastfeeding/1";
         ServiceUtility.createHtmlWithoutImagesAndVideos(tut, env.getProperty("spring.applicationexternalPath.name"),
                 url);
     }
