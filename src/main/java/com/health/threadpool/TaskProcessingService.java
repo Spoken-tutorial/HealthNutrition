@@ -106,8 +106,10 @@ public class TaskProcessingService {
     }
 
     private String ScriptUrl(Tutorial tutorial) {
-        int catId = tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
-        int lanId = tutorial.getConAssignedTutorial().getLan().getLanId();
+        ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
+        TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
+        int catId = topicCat.getCat().getCategoryId();
+        int lanId = conAssignedTutorial.getLan().getLanId();
         List<Integer> scriptVerList = ServiceUtility.getApiVersion(scriptmanager_api, catId, tutorial.getTutorialId(),
                 lanId);
         String sm_url = "";
@@ -122,7 +124,7 @@ public class TaskProcessingService {
         sb.append("/");
         sb.append(String.valueOf(lanId));
         sb.append("/");
-        sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+        sb.append(String.valueOf(topicCat.getTopic().getTopicName()));
         sb.append("/");
         if (scriptVerList != null && scriptVerList.size() > 0) {
             System.out.println(scriptVerList);
@@ -221,19 +223,22 @@ public class TaskProcessingService {
         String documentPath = tutorial.getTimeScript();
         String documentUrlforTimeScript = "";
         String documentIdforTimeScript = "";
-
+        String view_urlforTimeScript = "";
+        String sm_url = ScriptUrl(tutorial);
         ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
 
         if (conAssignedTutorial.getLan().getLanId() == 22) {
             documentUrlforTimeScript = "/TimeScript/" + tutorial.getTutorialId();
             documentIdforTimeScript = CommonData.DOCUMENT_ID_TUTORIAL_TIMESCRIPT + tutorial.getTutorialId();
+            view_urlforTimeScript = tutorial.getTimeScript();
         }
 
-        String documentUrlforOriginalScript = ScriptUrl(tutorial);
+        String documentUrlforOriginalScript = "/OriginalScript" + tutorial.getTutorialId();
+        String view_urlforOriginalScript = sm_url;
         String documentIdforOriginalScript = CommonData.DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT + tutorial.getTutorialId();
 
         int rank = tutorial.getUserVisit() + 3 * tutorial.getResourceVisit();
-        String view_url = null;
+
         int languageId = conAssignedTutorial.getLan().getLanId();
         String language = conAssignedTutorial.getLan().getLangName();
         TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
@@ -243,25 +248,25 @@ public class TaskProcessingService {
         Optional<String> topic = Optional.of(topicCat.getTopic().getTopicName());
         Optional<String> outlinePath = Optional.of(tutorial.getOutlinePath());
 
-        if (requestType.equals(CommonData.ADD_DOCUMENT) && !tutorial.isAddedQueue()) {
+        if (requestType.equals(CommonData.ADD_DOCUMENT) && !tutorial.isAddedQueue() && !sm_url.isEmpty()) {
 
             if (languageId == 22) {
 
                 Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType, documentPath,
-                        documentUrlforTimeScript, rank, view_url, languageId, language, categoryId, category, topicId,
-                        topic, outlinePath, requestType);
+                        documentUrlforTimeScript, rank, view_urlforTimeScript, languageId, language, categoryId,
+                        category, topicId, topic, outlinePath, requestType);
 
                 Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType, documentPath,
-                        documentUrlforOriginalScript, rank, view_url, languageId, language, categoryId, category,
-                        topicId, topic, outlinePath, requestType);
+                        documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId, language, categoryId,
+                        category, topicId, topic, outlinePath, requestType);
 
                 if (resultMap1.containsValue(CommonData.SUCCESS) && resultMap2.containsValue(CommonData.SUCCESS))
                     tutorial.setAddedQueue(true);
             } else {
 
                 Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType, documentPath,
-                        documentUrlforOriginalScript, rank, view_url, languageId, language, categoryId, category,
-                        topicId, topic, outlinePath, requestType);
+                        documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId, language, categoryId,
+                        category, topicId, topic, outlinePath, requestType);
 
                 if (resultMap2.containsValue(CommonData.SUCCESS))
                     tutorial.setAddedQueue(true);
@@ -276,12 +281,12 @@ public class TaskProcessingService {
                 if (languageId == 22) {
 
                     Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType, documentPath,
-                            documentUrlforTimeScript, rank, view_url, languageId, language, categoryId, category,
-                            topicId, topic, outlinePath, requestType);
+                            documentUrlforTimeScript, rank, view_urlforTimeScript, languageId, language, categoryId,
+                            category, topicId, topic, outlinePath, requestType);
 
                     Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
-                            documentPath, documentUrlforOriginalScript, rank, view_url, languageId, language,
-                            categoryId, category, topicId, topic, outlinePath, requestType);
+                            documentPath, documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId,
+                            language, categoryId, category, topicId, topic, outlinePath, requestType);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap1.containsValue(CommonData.SUCCESS)
@@ -292,8 +297,8 @@ public class TaskProcessingService {
                 } else {
 
                     Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
-                            documentPath, documentUrlforOriginalScript, rank, view_url, languageId, language,
-                            categoryId, category, topicId, topic, outlinePath, requestType);
+                            documentPath, documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId,
+                            language, categoryId, category, topicId, topic, outlinePath, requestType);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap2.containsValue(CommonData.SUCCESS))
@@ -316,7 +321,8 @@ public class TaskProcessingService {
         String documentPath = researchPaper.getResearchPaperPath();
         String documentUrl = "/ResearchPaper/ " + researchPaper.getId();
         int rank = 5 * researchPaper.getResearchPaperVisit();
-        String view_url = "";
+        String view_url = researchPaper.getResearchPaperPath();
+        ;
         int languageId = 22;
         String language = "English";
 
