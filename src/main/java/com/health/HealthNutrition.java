@@ -53,7 +53,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         logger.info("Starting application {}", gitCommitId);
         try {
             // taskProcessingService.addAllTuttorialsToQueue();
-            taskProcessingService.createHtmlFileForTesting();
+            taskProcessingService.addAllTuttorialsToQueue();
             taskProcessingService.checkoutlinedata();
             taskProcessingService.createOutlineFile();
             taskProcessingService.intializeQueue();
