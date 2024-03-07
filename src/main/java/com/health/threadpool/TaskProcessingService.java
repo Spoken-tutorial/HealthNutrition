@@ -25,9 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -460,10 +463,14 @@ public class TaskProcessingService {
 
     public void addAllTuttorialsToQueue() {
         List<Tutorial> tutorials = tutRepo.findTutorialsWithNonNullTimeScriptAndStatusAndAddedQueueFalse();
+        logger.info("tutorial size:{}", tutorials.size());
+        List<Tutorial> newtTutorials = new ArrayList<>();
         for (Tutorial tutorial : tutorials) {
 
             addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
+            newtTutorials.add(tutorial);
         }
+        tutRepo.saveAll(newtTutorials);
     }
 
     public void addAllResearchPapertoQueue() {
@@ -570,78 +577,102 @@ public class TaskProcessingService {
 
     }
 
+    public boolean isURLWorking(String url) {
+        RestTemplate restTemplate = new RestTemplate();
+        boolean flag = false;
+
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (ResourceAccessException e) {
+            logger.error("No Connection with health nutrition elastic Search Server", e);
+        } catch (Exception e) {
+            logger.error("IsUrlWorking function Error: ", e);
+        }
+
+        return flag;
+    }
+
     @Async
     public void deleteQueueByApiStatus() {
-        logger.info("starting deleteQueueByApiStatus thread");
 
-        while (true) {
-            if (Thread.interrupted()) {
-                logger.info("Interrupted");
-                break;
-            }
+        if (isURLWorking(commonData.elasticSearch_url)) {
 
-            List<QueueManagement> queueList = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_DONE);
-            StringBuilder documentSb = new StringBuilder();
-            documentSb.append(commonData.elasticSearch_url);
-            documentSb.append("/");
-            documentSb.append("queueStatus");
-            documentSb.append("/");
-            String tempUrl = documentSb.toString();
+            logger.info("starting deleteQueueByApiStatus thread");
 
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-
-                int count = 0;
-
-                for (QueueManagement queue : queueList) {
-
-                    Long respondId = queue.getResponseId();
-                    if (respondId != null && respondId != 0) {
-
-                        String api_url = tempUrl + respondId;
-                        logger.info("API_URL:{}", api_url);
-
-                        HttpUriRequest request = new HttpGet(api_url);
-                        HttpResponse response = httpClient.execute(request);
-
-                        int statusCode = response.getStatusLine().getStatusCode();
-                        count += 1;
-
-                        if (statusCode == 200 || statusCode == 201) {
-                            String jsonResponse = EntityUtils.toString(response.getEntity());
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                            System.out.println("jsonNode" + jsonNode);
-
-                            JsonNode publishedArray = jsonNode.get("status");
-                            if (publishedArray != null && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
-                                queueRepo.delete(queue);
-                                System.out.println(
-                                        "respondId: " + respondId + " publishedArray: " + publishedArray.asText());
-
-                            }
-
-                        } else {
-                            logger.info("Status Code:{} API URl:{}", statusCode, api_url);
-
-                        }
-
-                    }
-                }
-
-                long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME_FOR_DELETE
-                        : CommonData.NO_TASK_SLEEP_TIME_FOR_DELETE;
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
+            while (true) {
+                if (Thread.interrupted()) {
                     logger.info("Interrupted");
                     break;
                 }
 
-            }
+                List<QueueManagement> queueList = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_DONE);
+                StringBuilder documentSb = new StringBuilder();
+                documentSb.append(commonData.elasticSearch_url);
+                documentSb.append("/");
+                documentSb.append("queueStatus");
+                documentSb.append("/");
+                String tempUrl = documentSb.toString();
 
-            catch (IOException e) {
+                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-                logger.error("Exception: ", e);
+                    int count = 0;
+
+                    for (QueueManagement queue : queueList) {
+
+                        Long respondId = queue.getResponseId();
+                        if (respondId != null && respondId != 0) {
+
+                            String api_url = tempUrl + respondId;
+                            logger.info("API_URL:{}", api_url);
+
+                            HttpUriRequest request = new HttpGet(api_url);
+                            HttpResponse response = httpClient.execute(request);
+
+                            int statusCode = response.getStatusLine().getStatusCode();
+                            count += 1;
+
+                            if (statusCode == 200 || statusCode == 201) {
+                                String jsonResponse = EntityUtils.toString(response.getEntity());
+                                ObjectMapper objectMapper = new ObjectMapper();
+                                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                                logger.info("jsonNode:{}", jsonNode);
+
+                                JsonNode publishedArray = jsonNode.get("status");
+                                if (publishedArray != null && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
+                                    queueRepo.delete(queue);
+                                    logger.info("respondId: {}  publishedArray: {}", respondId,
+                                            publishedArray.asText());
+
+                                }
+
+                            } else {
+                                logger.info("Status Code:{} API URl:{}", statusCode, api_url);
+
+                            }
+
+                        }
+                    }
+
+                    long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        logger.info("Interrupted");
+                        break;
+                    }
+
+                }
+
+                catch (IOException e) {
+
+                    logger.error("Exception: ", e);
+                }
             }
         }
 
@@ -650,53 +681,56 @@ public class TaskProcessingService {
     @Async
     public void queueProcessor() {
 
-        logger.info("starting QueueProcessor thread");
+        if (isURLWorking(commonData.elasticSearch_url)) {
 
-        while (true) {
-            if (Thread.interrupted()) {
-                logger.info("Interrupted");
-                break;
-            }
+            logger.info("starting QueueProcessor thread");
 
-            Map<String, Long> skippedDocuments = new HashMap<>();
-            skippedDocuments.putAll(getRunningDocuments());
-            int count = 0;
+            while (true) {
+                if (Thread.interrupted()) {
+                    logger.info("Interrupted");
+                    break;
+                }
 
-            List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PENDING);
-            if (qmnts == null) {
+                Map<String, Long> skippedDocuments = new HashMap<>();
+                skippedDocuments.putAll(getRunningDocuments());
+                int count = 0;
+
+                List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PENDING);
+                if (qmnts == null) {
+                    try {
+                        Thread.sleep(CommonData.NO_TASK_SLEEP_TIME);
+                        continue;
+
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+
+                for (QueueManagement qmnt : qmnts) {
+                    logger.info("Queueing:{}", qmnt);
+                    if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
+
+                        continue;
+                    }
+
+                    skippedDocuments.put(qmnt.getDocumentId(), System.currentTimeMillis());
+                    getRunningDocuments().put(qmnt.getDocumentId(), System.currentTimeMillis());
+                    qmnt.setStatus(CommonData.STATUS_QUEUED);
+                    qmnt.setQueueTime(System.currentTimeMillis());
+                    queueRepo.save(qmnt);
+
+                    applicationContext.getAutowireCapableBeanFactory().autowireBean(qmnt);
+                    taskExecutor.submit(qmnt);
+                    count = count + 1;
+
+                }
+                long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
                 try {
-                    Thread.sleep(CommonData.NO_TASK_SLEEP_TIME);
-                    continue;
-
+                    Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
-
+                    logger.info("Interrupted");
+                    break;
                 }
-            }
-
-            for (QueueManagement qmnt : qmnts) {
-                logger.info("Queueing:{}", qmnt);
-                if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
-
-                    continue;
-                }
-
-                skippedDocuments.put(qmnt.getDocumentId(), System.currentTimeMillis());
-                getRunningDocuments().put(qmnt.getDocumentId(), System.currentTimeMillis());
-                qmnt.setStatus(CommonData.STATUS_QUEUED);
-                qmnt.setQueueTime(System.currentTimeMillis());
-                queueRepo.save(qmnt);
-
-                applicationContext.getAutowireCapableBeanFactory().autowireBean(qmnt);
-                taskExecutor.submit(qmnt);
-                count = count + 1;
-
-            }
-            long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                logger.info("Interrupted");
-                break;
             }
         }
 
