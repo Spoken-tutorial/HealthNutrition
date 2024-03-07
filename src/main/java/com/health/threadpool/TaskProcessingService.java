@@ -25,9 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,6 +63,9 @@ public class TaskProcessingService {
 
     @Value("${scriptmanager_path}")
     private String scriptmanager_path;
+
+    @Value("${scriptmanager_url_for_json}")
+    private String scriptmanager_url_for_json;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskProcessingService.class);
 
@@ -127,7 +133,7 @@ public class TaskProcessingService {
         sb.append(String.valueOf(topicCat.getTopic().getTopicName()));
         sb.append("/");
         if (scriptVerList != null && scriptVerList.size() > 0) {
-            System.out.println(scriptVerList);
+
             StringBuilder sb2 = new StringBuilder(sb);
             sb2.append(scriptVerList.get(0));
             sm_url = sb2.toString();
@@ -136,7 +142,40 @@ public class TaskProcessingService {
 
     }
 
+    private String CreateJsonSmUrl(Tutorial tutorial) {
+        ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
+        TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
+        int catId = topicCat.getCat().getCategoryId();
+        int lanId = conAssignedTutorial.getLan().getLanId();
+        int tutorialId = tutorial.getTutorialId();
+        int version = 1;
+        List<Integer> scriptVerList = ServiceUtility.getApiVersion(scriptmanager_api, catId, tutorial.getTutorialId(),
+                lanId);
+
+        if (scriptVerList != null && scriptVerList.size() > 0) {
+            version = scriptVerList.get(0);
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(scriptmanager_url_for_json);
+        sb.append(String.valueOf(catId));
+        sb.append("/tutorial/");
+        sb.append(String.valueOf(tutorialId));
+        sb.append("/language/");
+        sb.append(String.valueOf(lanId));
+        sb.append("/scripts/");
+        sb.append(String.valueOf(version));
+        sb.append("/healthnutrition/");
+        String sm_url_json = sb.toString();
+        return sm_url_json;
+
+    }
+
     private boolean doesFileExist(String filePath) {
+        if (filePath.startsWith("https://")) {
+            return true;
+        }
         if (filePath.contains("..")
                 || !filePath.startsWith(env.getProperty("spring.applicationexternalPath.baseName"))) {
             return false;
@@ -220,7 +259,7 @@ public class TaskProcessingService {
     public void addUpdateDeleteTutorial(Tutorial tutorial, String requestType) {
 
         String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
-        String documentPath = tutorial.getTimeScript();
+        String documentPathforTimeScript = "";
         String documentUrlforTimeScript = "";
         String documentIdforTimeScript = "";
         String view_urlforTimeScript = "";
@@ -228,6 +267,7 @@ public class TaskProcessingService {
         ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
 
         if (conAssignedTutorial.getLan().getLanId() == 22) {
+            documentPathforTimeScript = tutorial.getTimeScript();
             documentUrlforTimeScript = "/TimeScript/" + tutorial.getTutorialId();
             documentIdforTimeScript = CommonData.DOCUMENT_ID_TUTORIAL_TIMESCRIPT + tutorial.getTutorialId();
             view_urlforTimeScript = tutorial.getTimeScript();
@@ -236,6 +276,7 @@ public class TaskProcessingService {
         String documentUrlforOriginalScript = "/OriginalScript/" + tutorial.getTutorialId();
         String view_urlforOriginalScript = sm_url;
         String documentIdforOriginalScript = CommonData.DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT + tutorial.getTutorialId();
+        String documentPathforOriginalScript = CreateJsonSmUrl(tutorial);
 
         int rank = tutorial.getUserVisit() + 3 * tutorial.getResourceVisit();
 
@@ -252,21 +293,21 @@ public class TaskProcessingService {
 
             if (languageId == 22) {
 
-                Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType, documentPath,
-                        documentUrlforTimeScript, rank, view_urlforTimeScript, languageId, language, categoryId,
-                        category, topicId, topic, outlinePath, requestType);
+                Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType,
+                        documentPathforTimeScript, documentUrlforTimeScript, rank, view_urlforTimeScript, languageId,
+                        language, categoryId, category, topicId, topic, null, requestType);
 
-                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType, documentPath,
-                        documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId, language, categoryId,
-                        category, topicId, topic, outlinePath, requestType);
+                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
+                        documentPathforOriginalScript, documentUrlforOriginalScript, rank, view_urlforOriginalScript,
+                        languageId, language, categoryId, category, topicId, topic, outlinePath, requestType);
 
                 if (resultMap1.containsValue(CommonData.SUCCESS) && resultMap2.containsValue(CommonData.SUCCESS))
                     tutorial.setAddedQueue(true);
             } else {
 
-                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType, documentPath,
-                        documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId, language, categoryId,
-                        category, topicId, topic, outlinePath, requestType);
+                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
+                        documentPathforOriginalScript, documentUrlforOriginalScript, rank, view_urlforOriginalScript,
+                        languageId, language, categoryId, category, topicId, topic, outlinePath, requestType);
 
                 if (resultMap2.containsValue(CommonData.SUCCESS))
                     tutorial.setAddedQueue(true);
@@ -280,13 +321,14 @@ public class TaskProcessingService {
 
                 if (languageId == 22) {
 
-                    Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType, documentPath,
-                            documentUrlforTimeScript, rank, view_urlforTimeScript, languageId, language, categoryId,
-                            category, topicId, topic, outlinePath, requestType);
+                    Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType,
+                            documentPathforTimeScript, documentUrlforTimeScript, rank, view_urlforTimeScript,
+                            languageId, language, categoryId, category, topicId, topic, null, requestType);
 
                     Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
-                            documentPath, documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId,
-                            language, categoryId, category, topicId, topic, outlinePath, requestType);
+                            documentPathforOriginalScript, documentUrlforOriginalScript, rank,
+                            view_urlforOriginalScript, languageId, language, categoryId, category, topicId, topic,
+                            outlinePath, requestType);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap1.containsValue(CommonData.SUCCESS)
@@ -297,8 +339,9 @@ public class TaskProcessingService {
                 } else {
 
                     Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
-                            documentPath, documentUrlforOriginalScript, rank, view_urlforOriginalScript, languageId,
-                            language, categoryId, category, topicId, topic, outlinePath, requestType);
+                            documentPathforOriginalScript, documentUrlforOriginalScript, rank,
+                            view_urlforOriginalScript, languageId, language, categoryId, category, topicId, topic,
+                            outlinePath, requestType);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap2.containsValue(CommonData.SUCCESS))
@@ -420,10 +463,14 @@ public class TaskProcessingService {
 
     public void addAllTuttorialsToQueue() {
         List<Tutorial> tutorials = tutRepo.findTutorialsWithNonNullTimeScriptAndStatusAndAddedQueueFalse();
+        logger.info("tutorial size:{}", tutorials.size());
+        List<Tutorial> newtTutorials = new ArrayList<>();
         for (Tutorial tutorial : tutorials) {
 
             addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
+            newtTutorials.add(tutorial);
         }
+        tutRepo.saveAll(newtTutorials);
     }
 
     public void addAllResearchPapertoQueue() {
@@ -441,13 +488,6 @@ public class TaskProcessingService {
             addUpdateDeleteBrochure(brochure, CommonData.ADD_DOCUMENT);
 
         }
-    }
-
-    public void createHtmlFileForTesting() {
-        Tutorial tut = tutRepo.findByTutorialId(1);
-        String url = "https://scriptmanager.spoken-tutorial.org/view/healthnutrition/1/1/22/Cross%20cradle%20hold%20for%20breastfeeding/1";
-        ServiceUtility.createHtmlWithoutImagesAndVideos(tut, env.getProperty("spring.applicationexternalPath.name"),
-                url);
     }
 
     public void checkoutlinedata() {
@@ -537,78 +577,102 @@ public class TaskProcessingService {
 
     }
 
+    public boolean isURLWorking(String url) {
+        RestTemplate restTemplate = new RestTemplate();
+        boolean flag = false;
+
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (ResourceAccessException e) {
+            logger.error("No Connection with health nutrition elastic Search Server", e);
+        } catch (Exception e) {
+            logger.error("IsUrlWorking function Error: ", e);
+        }
+
+        return flag;
+    }
+
     @Async
     public void deleteQueueByApiStatus() {
-        logger.info("starting deleteQueueByApiStatus thread");
 
-        while (true) {
-            if (Thread.interrupted()) {
-                logger.info("Interrupted");
-                break;
-            }
+        if (isURLWorking(commonData.elasticSearch_url)) {
 
-            List<QueueManagement> queueList = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_DONE);
-            StringBuilder documentSb = new StringBuilder();
-            documentSb.append(commonData.elasticSearch_url);
-            documentSb.append("/");
-            documentSb.append("queueStatus");
-            documentSb.append("/");
-            String tempUrl = documentSb.toString();
+            logger.info("starting deleteQueueByApiStatus thread");
 
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-
-                int count = 0;
-
-                for (QueueManagement queue : queueList) {
-
-                    Long respondId = queue.getResponseId();
-                    if (respondId != null && respondId != 0) {
-
-                        String api_url = tempUrl + respondId;
-                        logger.info("API_URL:{}", api_url);
-
-                        HttpUriRequest request = new HttpGet(api_url);
-                        HttpResponse response = httpClient.execute(request);
-
-                        int statusCode = response.getStatusLine().getStatusCode();
-                        count += 1;
-
-                        if (statusCode == 200 || statusCode == 201) {
-                            String jsonResponse = EntityUtils.toString(response.getEntity());
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                            System.out.println("jsonNode" + jsonNode);
-
-                            JsonNode publishedArray = jsonNode.get("status");
-                            if (publishedArray != null && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
-                                queueRepo.delete(queue);
-                                System.out.println(
-                                        "respondId: " + respondId + " publishedArray: " + publishedArray.asText());
-
-                            }
-
-                        } else {
-                            logger.info("Status Code:{} API URl:{}", statusCode, api_url);
-
-                        }
-
-                    }
-                }
-
-                long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME_FOR_DELETE
-                        : CommonData.NO_TASK_SLEEP_TIME_FOR_DELETE;
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
+            while (true) {
+                if (Thread.interrupted()) {
                     logger.info("Interrupted");
                     break;
                 }
 
-            }
+                List<QueueManagement> queueList = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_DONE);
+                StringBuilder documentSb = new StringBuilder();
+                documentSb.append(commonData.elasticSearch_url);
+                documentSb.append("/");
+                documentSb.append("queueStatus");
+                documentSb.append("/");
+                String tempUrl = documentSb.toString();
 
-            catch (IOException e) {
+                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-                logger.error("Exception: ", e);
+                    int count = 0;
+
+                    for (QueueManagement queue : queueList) {
+
+                        Long respondId = queue.getResponseId();
+                        if (respondId != null && respondId != 0) {
+
+                            String api_url = tempUrl + respondId;
+                            logger.info("API_URL:{}", api_url);
+
+                            HttpUriRequest request = new HttpGet(api_url);
+                            HttpResponse response = httpClient.execute(request);
+
+                            int statusCode = response.getStatusLine().getStatusCode();
+                            count += 1;
+
+                            if (statusCode == 200 || statusCode == 201) {
+                                String jsonResponse = EntityUtils.toString(response.getEntity());
+                                ObjectMapper objectMapper = new ObjectMapper();
+                                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                                logger.info("jsonNode:{}", jsonNode);
+
+                                JsonNode publishedArray = jsonNode.get("status");
+                                if (publishedArray != null && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
+                                    queueRepo.delete(queue);
+                                    logger.info("respondId: {}  publishedArray: {}", respondId,
+                                            publishedArray.asText());
+
+                                }
+
+                            } else {
+                                logger.info("Status Code:{} API URl:{}", statusCode, api_url);
+
+                            }
+
+                        }
+                    }
+
+                    long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        logger.info("Interrupted");
+                        break;
+                    }
+
+                }
+
+                catch (IOException e) {
+
+                    logger.error("Exception: ", e);
+                }
             }
         }
 
@@ -617,53 +681,56 @@ public class TaskProcessingService {
     @Async
     public void queueProcessor() {
 
-        logger.info("starting QueueProcessor thread");
+        if (isURLWorking(commonData.elasticSearch_url)) {
 
-        while (true) {
-            if (Thread.interrupted()) {
-                logger.info("Interrupted");
-                break;
-            }
+            logger.info("starting QueueProcessor thread");
 
-            Map<String, Long> skippedDocuments = new HashMap<>();
-            skippedDocuments.putAll(getRunningDocuments());
-            int count = 0;
+            while (true) {
+                if (Thread.interrupted()) {
+                    logger.info("Interrupted");
+                    break;
+                }
 
-            List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PENDING);
-            if (qmnts == null) {
+                Map<String, Long> skippedDocuments = new HashMap<>();
+                skippedDocuments.putAll(getRunningDocuments());
+                int count = 0;
+
+                List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PENDING);
+                if (qmnts == null) {
+                    try {
+                        Thread.sleep(CommonData.NO_TASK_SLEEP_TIME);
+                        continue;
+
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+
+                for (QueueManagement qmnt : qmnts) {
+                    logger.info("Queueing:{}", qmnt);
+                    if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
+
+                        continue;
+                    }
+
+                    skippedDocuments.put(qmnt.getDocumentId(), System.currentTimeMillis());
+                    getRunningDocuments().put(qmnt.getDocumentId(), System.currentTimeMillis());
+                    qmnt.setStatus(CommonData.STATUS_QUEUED);
+                    qmnt.setQueueTime(System.currentTimeMillis());
+                    queueRepo.save(qmnt);
+
+                    applicationContext.getAutowireCapableBeanFactory().autowireBean(qmnt);
+                    taskExecutor.submit(qmnt);
+                    count = count + 1;
+
+                }
+                long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
                 try {
-                    Thread.sleep(CommonData.NO_TASK_SLEEP_TIME);
-                    continue;
-
+                    Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
-
+                    logger.info("Interrupted");
+                    break;
                 }
-            }
-
-            for (QueueManagement qmnt : qmnts) {
-                logger.info("Queueing:{}", qmnt);
-                if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
-
-                    continue;
-                }
-
-                skippedDocuments.put(qmnt.getDocumentId(), System.currentTimeMillis());
-                getRunningDocuments().put(qmnt.getDocumentId(), System.currentTimeMillis());
-                qmnt.setStatus(CommonData.STATUS_QUEUED);
-                qmnt.setQueueTime(System.currentTimeMillis());
-                queueRepo.save(qmnt);
-
-                applicationContext.getAutowireCapableBeanFactory().autowireBean(qmnt);
-                taskExecutor.submit(qmnt);
-                count = count + 1;
-
-            }
-            long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                logger.info("Interrupted");
-                break;
             }
         }
 

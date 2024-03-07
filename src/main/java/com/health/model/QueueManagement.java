@@ -350,111 +350,117 @@ public class QueueManagement implements Runnable {
     @Override
     public void run() {
 
-        StringBuilder documentSb = new StringBuilder();
-        documentSb.append(commonData.elasticSearch_url);
-        documentSb.append("/");
-        documentSb.append(getRequestType());
-        documentSb.append("/");
-        documentSb.append(documentId);
-        documentSb.append("/");
-        documentSb.append(documentType);
-        documentSb.append("/");
-        documentSb.append(languageId);
+        if (taskProcessingService.isURLWorking(commonData.elasticSearch_url)) {
 
-        String api_url = "";
+            StringBuilder documentSb = new StringBuilder();
+            documentSb.append(commonData.elasticSearch_url);
+            documentSb.append("/");
+            documentSb.append(getRequestType());
+            documentSb.append("/");
+            documentSb.append(documentId);
+            documentSb.append("/");
+            documentSb.append(documentType);
+            documentSb.append("/");
+            documentSb.append(languageId);
 
-        setStartTime(System.currentTimeMillis());
-        setStatus(CommonData.STATUS_PROCESSING);
+            String api_url = "";
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpUriRequest request = null;
+            setStartTime(System.currentTimeMillis());
+            setStatus(CommonData.STATUS_PROCESSING);
 
-            if (getRequestType().equals(CommonData.ADD_DOCUMENT)
-                    || getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpUriRequest request = null;
 
-                documentSb.append("/");
-                documentSb.append(language);
-                documentSb.append("/");
-                documentSb.append(rank);
-                api_url = documentSb.toString();
-                logger.info("API_URL:{}", api_url);
-
-                request = new HttpPost(api_url);
-
-            }
-
-            else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)
-                    || getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
-
-                if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)) {
+                if (getRequestType().equals(CommonData.ADD_DOCUMENT)
+                        || getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
 
                     documentSb.append("/");
-
+                    documentSb.append(language);
+                    documentSb.append("/");
                     documentSb.append(rank);
+                    api_url = documentSb.toString();
+                    logger.info("API_URL:{}", api_url);
+
+                    request = new HttpPost(api_url);
 
                 }
 
-                api_url = documentSb.toString();
-                logger.info("API_URL:{}", api_url);
+                else if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)
+                        || getRequestType().equals(CommonData.DELETE_DOCUMENT)) {
 
-                request = new HttpGet(api_url);
+                    if (getRequestType().equals(CommonData.UPDATE_DOCUMENT_RANK)) {
 
-            }
+                        documentSb.append("/");
 
-            if (request instanceof HttpPost) {
-                List<NameValuePair> paramsforAddDocument = new ArrayList<>();
-                paramsforAddDocument.add(new BasicNameValuePair("documentPath", getDocumentPath()));
-                paramsforAddDocument.add(new BasicNameValuePair("documentUrl", getDocumentUrl()));
-                paramsforAddDocument.add(new BasicNameValuePair("view_url", getViewUrl()));
-                paramsforAddDocument.add(new BasicNameValuePair("categoryId", Integer.toString(getCategoryId())));
-                paramsforAddDocument.add(new BasicNameValuePair("category", getCategory()));
-                paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(getTopicId())));
-                paramsforAddDocument.add(new BasicNameValuePair("topic", getTopic()));
-                if (getOutlinePath() != null && !getOutlinePath().isEmpty()) {
-                    paramsforAddDocument.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
+                        documentSb.append(rank);
 
-                }
-                HttpPost httpPost = (HttpPost) request;
-                httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
+                    }
 
-            }
+                    api_url = documentSb.toString();
+                    logger.info("API_URL:{}", api_url);
 
-            HttpResponse response = httpClient.execute(request);
-
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            if (statusCode == 200 || statusCode == 201) {
-                String jsonResponse = EntityUtils.toString(response.getEntity());
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                System.out.println("jsonNode" + jsonNode);
-
-                JsonNode publishedArray = jsonNode.get("queueId");
-                if (publishedArray != null) {
-                    System.out.println("publishedArray: " + publishedArray.asLong());
-                    setResponseId(publishedArray.asLong());
-                    setStatus(CommonData.STATUS_DONE);
+                    request = new HttpGet(api_url);
 
                 }
 
-            } else {
-                logger.info("Status Code:{} API URl", statusCode, api_url);
+                if (request instanceof HttpPost) {
+                    List<NameValuePair> paramsforAddDocument = new ArrayList<>();
+                    paramsforAddDocument.add(new BasicNameValuePair("documentPath", getDocumentPath()));
+                    paramsforAddDocument.add(new BasicNameValuePair("documentUrl", getDocumentUrl()));
+                    paramsforAddDocument.add(new BasicNameValuePair("view_url", getViewUrl()));
+                    paramsforAddDocument.add(new BasicNameValuePair("categoryId", Integer.toString(getCategoryId())));
+                    paramsforAddDocument.add(new BasicNameValuePair("category", getCategory()));
+                    paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(getTopicId())));
+                    paramsforAddDocument.add(new BasicNameValuePair("topic", getTopic()));
+                    if (getOutlinePath() != null && !getOutlinePath().isEmpty()) {
+                        paramsforAddDocument.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
+
+                    }
+                    HttpPost httpPost = (HttpPost) request;
+                    httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
+
+                }
+
+                HttpResponse response = httpClient.execute(request);
+
+                int statusCode = response.getStatusLine().getStatusCode();
+
+                if (statusCode == 200 || statusCode == 201) {
+                    String jsonResponse = EntityUtils.toString(response.getEntity());
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+
+                    JsonNode publishedArray = jsonNode.get("queueId");
+                    if (publishedArray != null) {
+
+                        setResponseId(publishedArray.asLong());
+                        setStatus(CommonData.STATUS_DONE);
+
+                    }
+
+                } else {
+                    logger.info("Status Code:{} API URl", statusCode, api_url);
+
+                }
+
+            } catch (Exception e) {
+                logger.error("Error", e);
 
             }
 
-        } catch (Exception e) {
-            logger.error("Error", e);
+            finally {
 
-        }
+                setEndTime(System.currentTimeMillis());
+                setProcesingTime(endTime - startTime);
+                logger.info("Done :{}", this);
 
-        finally {
+                queueRepo.save(this);
+                taskProcessingService.getRunningDocuments().remove(documentId);
+            }
 
-            setEndTime(System.currentTimeMillis());
-            setProcesingTime(endTime - startTime);
-            logger.info("Done :{}", this);
-
+        } else {
+            setStatus(CommonData.STATUS_PENDING);
             queueRepo.save(this);
-            taskProcessingService.getRunningDocuments().remove(documentId);
         }
 
     }
