@@ -440,6 +440,7 @@ public class QueueManagement implements Runnable {
 
                 } else {
                     logger.info("Status Code:{} API URl", statusCode, api_url);
+                    setStatus(CommonData.STATUS_PENDING);
 
                 }
 
@@ -458,9 +459,6 @@ public class QueueManagement implements Runnable {
                 taskProcessingService.getRunningDocuments().remove(documentId);
             }
 
-        } else {
-            setStatus(CommonData.STATUS_PENDING);
-            queueRepo.save(this);
         }
 
     }

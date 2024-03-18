@@ -1,6 +1,8 @@
 package com.health.threadpool;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,12 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -578,24 +577,32 @@ public class TaskProcessingService {
     }
 
     public boolean isURLWorking(String url) {
-        RestTemplate restTemplate = new RestTemplate();
         boolean flag = false;
 
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-            if (response.getStatusCode().is2xxSuccessful()) {
+            URL url1 = new URL(url);
+
+            HttpURLConnection connection = (HttpURLConnection) url1.openConnection();
+
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 flag = true;
+                logger.info("Connection Request successful");
             } else {
-                flag = false;
-            }
-        } catch (ResourceAccessException e) {
-            logger.error("No Connection with health nutrition elastic Search Server", e);
-        } catch (Exception e) {
-            logger.error("IsUrlWorking function Error: ", e);
-        }
 
+                logger.info("Request failed with status code:{} ", responseCode);
+            }
+
+            connection.disconnect();
+
+        } catch (IOException e) {
+
+            logger.error("Request failed due to I/O error: " + e);
+        }
         return flag;
+
     }
 
     @Async
@@ -659,7 +666,8 @@ public class TaskProcessingService {
                         }
                     }
 
-                    long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
+                    long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME_FOR_DELETE
+                            : CommonData.NO_TASK_SLEEP_TIME_FOR_DELETE;
                     try {
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
