@@ -3314,6 +3314,242 @@ $("#languageId1").change(function() {
 			
 /*********************************** end*******************************************************/
 
+/*********************Resource Download**** */
+
+$('#resourceCategoryId').on('change',function() {
+						//var catId = $(this).find("option:selected").val();
+						var catId= $('#resourceCategoryId').val();
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadLanguageAndTopicByCategoryResource",
+							data : {
+								"catId" : catId
+							},
+							contentType : "application/json",
+							success : function(resultlist) {
+								var result=resultlist[0];
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			        html += '<option value=' + key + '>'
+			  			               + value
+			  			               + '</option>';
+			  	  			 		})
+			  	  			 	html += '</option>';
+								$("#languageResourceId").prop('disabled', false);
+								$('#languageResourceId').html(html);
+								
+								
+								var result=resultlist[1];
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			        html += '<option value=' + key + '>'
+			  			               + value
+			  			               + '</option>';
+			  	  			 		})
+			  	  			 	html += '</option>';
+								$("#topicResourceId").prop('disabled', false);
+								$('#topicResourceId').html(html);
+								
+								var result=resultlist[2];
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			        html += '<option value=' + key + '>'
+			  			               + value
+			  			               + '</option>';
+			  	  			 		})
+			  	  			 	html += '</option>';
+								$("#tutorialforCategoryId").prop('disabled', false);
+								$('#tutorialforCategoryId').html(html);
+								
+								var html = '';
+								$("#tutorialforLanguageId").prop('disabled', false);
+								$('#tutorialforLanguageId').html(html);
+
+								var html = '';
+								$("#tutorialforTopicId").prop('disabled', false);
+								$('#tutorialforTopicId').html(html);
+								
+
+
+							},
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+							}
+						});
+
+					});
+
+
+
+$('#languageResourceId').on('change',function() {
+						
+						var catId= $('#resourceCategoryId').val();
+						var lanIds=[];
+						
+						 $("#languageResourceId option:selected").each(function() {
+          				  lanIds.push(parseInt($(this).val()));
+        					});
+        					console.log(catId)
+        					console.log(lanIds)
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTutorialCountByLanguage",
+							data : {
+								"catId" : catId,
+								"lanIds":  lanIds                //JSON.stringify(lanIds)
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			        html += '<option value=' + key + '>'
+			  			               + value
+			  			               + '</option>';
+			  	  			 		})
+			  	  			 	html += '</option>';
+								$("#tutorialforLanguageId").prop('disabled', false);
+								$('#tutorialforLanguageId').html(html);
+
+							},
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+							}
+						});
+
+					});
+					
+	
+	$('#topicResourceId').on('change',function() {
+						
+						var catId= $('#resourceCategoryId').val();
+						var topicIds=[];
+						
+						 $("#topicResourceId option:selected").each(function() {
+          				  topicIds.push(parseInt($(this).val()));
+        					});
+        					console.log(catId)
+        					console.log(topicIds)
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTutorialCountByTopics",
+							data : {
+								"catId" : catId,
+								"topicIds": topicIds                
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			        html += '<option value=' + key + '>'
+			  			               + value
+			  			               + '</option>';
+			  	  			 		})
+			  	  			 	html += '</option>';
+								$("#tutorialforTopicId").prop('disabled', false);
+								$('#tutorialforTopicId').html(html);
+
+							},
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+							}
+						});
+
+					});
+				
+
+/*
+$('#resourceCategoryId').on('change',function() {
+						//var catId = $(this).find("option:selected").val();
+						var catId= $('#resourceCategoryId').val();
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadLanguageByCategoryResource",
+							data : {
+								"catId" : catId
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			        html += '<option value=' + key + '>'
+			  			               + value
+			  			               + '</option>';
+			  	  			 		})
+			  	  			 	html += '</option>';
+								$("#languageResourceId").prop('disabled', false);
+								$('#languageResourceId').html(html);
+								var html = '';
+								$("#topicResourceId").prop('disabled', false);
+								$('#topicResourceId').html(html);
+
+							},
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+							}
+						});
+
+					});
+
+*/
+
+/*$('#languageResourceId').on('change',function() {
+						
+						var catId= $('#resourceCategoryId').val();
+						var lanIds=[];
+						
+						 $("#languageResourceId option:selected").each(function() {
+          				  lanIds.push(parseInt($(this).val()));
+        					});
+        					console.log(catId)
+        					console.log(lanIds)
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryAndLanguageResource",
+							data : {
+								"catId" : catId,
+								"lanIds":  lanIds                //JSON.stringify(lanIds)
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+
+								$.each(result , function( key, value ) {
+			  	  			        html += '<option value=' + key + '>'
+			  			               + value
+			  			               + '</option>';
+			  	  			 		})
+			  	  			 	html += '</option>';
+								$("#topicResourceId").prop('disabled', false);
+								$('#topicResourceId').html(html);
+
+							},
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+							}
+						});
+
+					});
+
+*/
+/**********************End*******************/
+
 
 
 

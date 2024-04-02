@@ -1189,6 +1189,98 @@ public class AjaxController {
 
     }
 
+    @RequestMapping("/loadLanguageAndTopicByCategoryResource")
+    public @ResponseBody ArrayList<HashMap<Integer, String>> getLanguageByCategoryResourse(
+            @RequestParam(value = "catId") int catId) {
+
+        ArrayList<HashMap<Integer, String>> arlist = new ArrayList<>();
+        HashMap<Integer, String> languagesMap = new HashMap<>();
+        HashMap<Integer, String> topicMap = new HashMap<>();
+        HashMap<Integer, String> tutorialCount = new HashMap<>();
+
+        Category cat = catService.findByid(catId);
+        logger.info("Variables of loadLanguageByCategoryResourse cat : {}", cat);
+        if (cat != null) {
+            List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+            List<ContributorAssignedTutorial> conList = conService.findAllByTopicCat(tcm);
+            List<Tutorial> tutList = tutService.findAllByconAssignedTutorialAndStatus(conList);
+
+            for (Tutorial tut : tutList) {
+                Category cat1 = tut.getConAssignedTutorial().getTopicCatId().getCat();
+                if (cat1.isStatus())
+                    languagesMap.put(tut.getConAssignedTutorial().getLan().getLanId(),
+                            tut.getConAssignedTutorial().getLan().getLangName());
+                topicMap.put(tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),
+                        tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+
+            }
+
+            tutorialCount.put(tutList.size(), Integer.toString(tutList.size()));
+            arlist.add(languagesMap);
+            arlist.add(topicMap);
+            arlist.add(tutorialCount);
+        }
+
+        return arlist;
+
+    }
+
+    @RequestMapping("/loadTutorialCountByLanguage")
+    public @ResponseBody HashMap<Integer, String> getTutorialCountByLanguageResourse(
+            @RequestParam(value = "catId") int catId, @RequestParam(value = "lanIds[]") int[] lanIds) {
+
+        HashMap<Integer, String> tutorialCount = new HashMap<>();
+
+        Category cat = catService.findByid(catId);
+        logger.info("Variables of getTopicByCategoryAndLanguageResourse cat : {}", catId);
+        logger.info("Variables of getTopicByCategoryAndLanguageResourse lan : {}", lanIds);
+        if (cat != null) {
+            List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+            List<ContributorAssignedTutorial> conList = new ArrayList<>();
+
+            if (lanIds != null) {
+                for (int i = 0; i < lanIds.length; i++) {
+                    logger.info("language:{}", langService.getById(lanIds[i]).getLangName());
+                    conList.addAll(conService.findAllByTopicCatAndLan(tcm, langService.getById(lanIds[i])));
+                }
+            }
+            List<Tutorial> tutList = tutService.findAllByconAssignedTutorialAndStatus(conList);
+
+            tutorialCount.put(tutList.size(), Integer.toString(tutList.size()));
+        }
+        return tutorialCount;
+
+    }
+
+    @RequestMapping("/loadTutorialCountByTopics")
+    public @ResponseBody HashMap<Integer, String> getTutorialCountByTopic(@RequestParam(value = "catId") int catId,
+            @RequestParam(value = "topicIds[]") int[] topicIds) {
+
+        HashMap<Integer, String> tutorialCount = new HashMap<>();
+
+        Category cat = catService.findByid(catId);
+
+        logger.info("Variables of getTopicByCategoryAndLanguageResourse cat : {}", catId);
+
+        if (cat != null) {
+            List<TopicCategoryMapping> tcm = new ArrayList<>();
+            List<ContributorAssignedTutorial> conList = new ArrayList<>();
+
+            if (topicIds != null) {
+                for (int i = 0; i < topicIds.length; i++) {
+                    tcm.add(topicCatService.findAllByCategoryAndTopic(cat, topicService.findById(topicIds[i])));
+
+                }
+            }
+            conList = conService.findAllByTopicCat(tcm);
+            List<Tutorial> tutList = tutService.findAllByconAssignedTutorialAndStatus(conList);
+
+            tutorialCount.put(tutList.size(), Integer.toString(tutList.size()));
+        }
+        return tutorialCount;
+
+    }
+
     /*
      * A new function by to load topic by Category
      * 

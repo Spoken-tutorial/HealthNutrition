@@ -900,6 +900,14 @@ public class HomeController {
         return "tutorialList";
     }
 
+    @GetMapping("/downloads")
+    public String downloadResources(HttpServletRequest req, Principal principal, Model model) {
+        List<Category> categories = getCategories();
+        model.addAttribute("categories", categories);
+
+        return "downloadResources";
+    }
+
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
