@@ -908,6 +908,72 @@ public class HomeController {
         return "downloadResources";
     }
 
+    @PostMapping("/downloads")
+    public String downloadResourcesPost(HttpServletRequest req, Principal principal, Model model,
+            @RequestParam(name = "resourceCategoryName") String catId,
+            @RequestParam(name = "languageResourceName") String[] langIds,
+            @RequestParam(name = "topicResourceName") String[] topicIds) {
+
+        Category cat = catService.findByid(Integer.parseInt(catId));
+        List<ContributorAssignedTutorial> conList = new ArrayList<>();
+        List<Language> languages = new ArrayList<>();
+        List<Topic> topics = new ArrayList<>();
+        List<Tutorial> tutList = new ArrayList<>();
+        List<TopicCategoryMapping> tcmList = new ArrayList<>();
+
+        if ((topicIds != null && topicIds.length != 0)) {
+            for (String topicId : topicIds) {
+                Topic topic = topicService.findById(Integer.parseInt(topicId));
+                topics.add(topic);
+                tcmList.add(topicCatService.findAllByCategoryAndTopic(cat, topic));
+            }
+        }
+
+        if ((langIds != null && langIds.length != 0)) {
+            for (String lanId : langIds) {
+                languages.add(lanService.getById(Integer.parseInt(lanId)));
+            }
+        }
+
+        if ((langIds != null && langIds.length != 0) && (topicIds != null && topicIds.length != 0)) {
+
+            for (Language lan : languages) {
+
+                List<ContributorAssignedTutorial> conList1 = conRepo.findAllByTopicCatAndLan(tcmList, lan);
+                if (conList1 != null) {
+                    conList.addAll(conList1);
+
+                }
+            }
+
+        } else if ((langIds != null && langIds.length != 0)) {
+            List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+            for (Language lan : languages) {
+
+                List<ContributorAssignedTutorial> conList1 = conRepo.findAllByTopicCatAndLan(tcm, lan);
+                if (conList1 != null) {
+                    conList.addAll(conList1);
+
+                }
+            }
+
+        } else if ((topicIds != null && topicIds.length != 0)) {
+            conList = conRepo.findAllByTopicCat(tcmList);
+
+        } else {
+            List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+            conList = conRepo.findAllByTopicCat(tcm);
+        }
+
+        tutList = tutService.findAllByconAssignedTutorialAndStatus(conList);
+
+        Set<Tutorial> tutorialSet = new LinkedHashSet<>(tutList);
+
+        int countTutorial = tutorialSet.size();
+
+        return "downloadResources";
+    }
+
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,

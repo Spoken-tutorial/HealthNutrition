@@ -3354,26 +3354,11 @@ $('#resourceCategoryId').on('change',function() {
 								$("#topicResourceId").prop('disabled', false);
 								$('#topicResourceId').html(html);
 								
-								var result=resultlist[2];
-								var html = '';
-								var len = result.length;
-
-								$.each(result , function( key, value ) {
-			  	  			        html += '<option value=' + key + '>'
-			  			               + value
-			  			               + '</option>';
-			  	  			 		})
-			  	  			 	html += '</option>';
-								$("#tutorialforCategoryId").prop('disabled', false);
-								$('#tutorialforCategoryId').html(html);
+								
 								
 								var html = '';
-								$("#tutorialforLanguageId").prop('disabled', false);
-								$('#tutorialforLanguageId').html(html);
-
-								var html = '';
-								$("#tutorialforTopicId").prop('disabled', false);
-								$('#tutorialforTopicId').html(html);
+								$("#tutorialCountId").prop('disabled', false);
+								$('#tutorialCountId').html(html);
 								
 
 
@@ -3391,17 +3376,24 @@ $('#languageResourceId').on('change',function() {
 						
 						var catId= $('#resourceCategoryId').val();
 						var lanIds=[];
+						var topicIds=[];
 						
 						 $("#languageResourceId option:selected").each(function() {
           				  lanIds.push(parseInt($(this).val()));
         					});
+        					
+        				$("#topicResourceId option:selected").each(function() {
+          				  topicIds.push(parseInt($(this).val()));
+        					});
+        					
         					console.log(catId)
         					console.log(lanIds)
 						$.ajax({
 							type : "GET",
-							url : projectPath+"loadTutorialCountByLanguage",
+							url : projectPath+"loadTutorialCountByTopicAndLanguage",
 							data : {
 								"catId" : catId,
+								"topicIds": topicIds,
 								"lanIds":  lanIds                //JSON.stringify(lanIds)
 							},
 							contentType : "application/json",
@@ -3409,15 +3401,11 @@ $('#languageResourceId').on('change',function() {
 
 								var html = '';
 								var len = result.length;
-
-								$.each(result , function( key, value ) {
-			  	  			        html += '<option value=' + key + '>'
-			  			               + value
-			  			               + '</option>';
-			  	  			 		})
-			  	  			 	html += '</option>';
-								$("#tutorialforLanguageId").prop('disabled', false);
-								$('#tutorialforLanguageId').html(html);
+								
+			  	  			        html += result;
+			  	  			 		
+								$("#tutorialCountId").prop('disabled', false);
+								$('#tutorialCountId').html(html);
 
 							},
 							error : function(err) {
@@ -3431,34 +3419,34 @@ $('#languageResourceId').on('change',function() {
 	$('#topicResourceId').on('change',function() {
 						
 						var catId= $('#resourceCategoryId').val();
+						var lanIds=[];
 						var topicIds=[];
 						
-						 $("#topicResourceId option:selected").each(function() {
+						 $("#languageResourceId option:selected").each(function() {
+          				  lanIds.push(parseInt($(this).val()));
+        					});
+        					
+        				$("#topicResourceId option:selected").each(function() {
           				  topicIds.push(parseInt($(this).val()));
         					});
         					console.log(catId)
         					console.log(topicIds)
 						$.ajax({
 							type : "GET",
-							url : projectPath+"loadTutorialCountByTopics",
+							url : projectPath+"loadTutorialCountByTopicAndLanguage",
 							data : {
 								"catId" : catId,
-								"topicIds": topicIds                
+								"topicIds": topicIds,
+								"lanIds":  lanIds                 
 							},
 							contentType : "application/json",
 							success : function(result) {
 
 								var html = '';
-								var len = result.length;
-
-								$.each(result , function( key, value ) {
-			  	  			        html += '<option value=' + key + '>'
-			  			               + value
-			  			               + '</option>';
-			  	  			 		})
-			  	  			 	html += '</option>';
-								$("#tutorialforTopicId").prop('disabled', false);
-								$('#tutorialforTopicId').html(html);
+								
+			  	  			 	html += result;
+								$("#tutorialCountId").prop('disabled', false);
+								$('#tutorialCountId').html(html);
 
 							},
 							error : function(err) {
