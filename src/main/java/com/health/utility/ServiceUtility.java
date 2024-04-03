@@ -2,11 +2,15 @@ package com.health.utility;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,6 +19,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
@@ -34,6 +40,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -66,6 +73,9 @@ public class ServiceUtility {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Value("${spring.applicationexternalPath.name}")
+    private String mediaRoot;
 
     public static Timestamp getCurrentTime() { // Current Date
 
@@ -446,6 +456,93 @@ public class ServiceUtility {
         Path currentRelativePath = Paths.get("");
         String currentpath = currentRelativePath.toAbsolutePath().toString();
         return currentpath;
+
+    }
+
+    /**
+     * Craete Zip File
+     * 
+     * @throws IOException
+     **/
+
+    public static String createZipFile(List<String> fileUrls, Environment env) throws IOException {
+        String document = "";
+        Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles);
+
+        Files.createDirectories(zipFilePathDirectory);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        String zipFileName = "scripts-" + sdf.format(new Date()) + ".zip";
+
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles, zipFileName);
+
+        try (OutputStream fos = Files.newOutputStream(zipFilePath); ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+            byte[] buffer = new byte[1024];
+
+            for (String fileUrl : fileUrls) {
+                Path fileUrlPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), fileUrl);
+
+                File file = fileUrlPath.toFile();
+
+                if (!file.exists()) {
+                    logger.info("Sciptfile not found: {}" + file);
+                    continue;
+                }
+
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    zos.putNextEntry(new ZipEntry(file.getName()));
+
+                    int length;
+                    while ((length = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, length);
+                    }
+
+                    zos.closeEntry();
+                }
+            }
+
+            String temp = zipFilePath.toString();
+            int indexToStart = temp.indexOf("Media");
+            document = temp.substring(indexToStart, temp.length());
+
+        } catch (Exception e) {
+            logger.error("Exception Error", e);
+        }
+
+        return document;
+    }
+
+    /**
+     * File Info
+     * 
+     * @throws IOException
+     **/
+
+    public static List<String> FileInfoSizeAndCreationDate(String fileUrl, Environment env) {
+
+        List<String> fileInfo = new ArrayList<>();
+        try {
+
+            Path fileUrlPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), fileUrl);
+
+            BasicFileAttributes attr = Files.readAttributes(fileUrlPath, BasicFileAttributes.class);
+
+            long fileSize = attr.size();
+            FileTime date = attr.lastModifiedTime();
+            attr.lastModifiedTime();
+            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+            String dateCreated = df.format(date.toMillis());
+
+            fileInfo.add(Long.toString(fileSize));
+            fileInfo.add(dateCreated);
+
+        } catch (IOException e) {
+            logger.error("Error reading file attributes: ", e);
+        }
+        return fileInfo;
 
     }
 
