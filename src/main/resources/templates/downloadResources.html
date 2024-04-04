@@ -48,7 +48,7 @@ font-weight:bold!important;
   
   				<div class="card">
 					
-					<div class="card-body">
+					<div th:if="${downloadSection ==false}" class="card-body">
 						<form class="form-horizontal"
 											th:action="@{/downloads}" method="post">
 						<div class="row">
@@ -72,17 +72,17 @@ font-weight:bold!important;
 										
 											
 											<div class="form-group col-md-4 mb-3" style="width:100%; height: 50%;">
-												<label for="languageResourceId">Select Language * <span class="text-muted">(For multiple language selection, press Ctrl key)</span></label> <select
+												<label for="languageResourceId">Select Language  <span class="text-muted">(For multiple language selection, press Ctrl key)</span></label> <select
 													id="languageResourceId" class="form-control select selectpicker"
-													name="languageResourceName" required="required" size="13" multiple="multiple">
+													name="languageResourceName"  size="13" multiple="multiple">
 												</select>
 												
 											</div>
 
 											<div class="form-group col-md-4 mb-3" style="width:100%; height: 100%">
-												<label for="topicResourceId">Select Topic * <span class="text-muted">(For multiple topic selection, press Ctrl key)</span></label> <select
+												<label for="topicResourceId">Select Topic  <span class="text-muted">(For multiple topic selection, press Ctrl key)</span></label> <select
 													id="topicResourceId" class="form-control select selectpicker"
-													name="topicResourceName" required="required" size="13" multiple="multiple">
+													name="topicResourceName"  size="13" multiple="multiple">
 												</select>
 											
 											</div>
@@ -104,9 +104,14 @@ font-weight:bold!important;
 									
 								</form>
 
-							
-						
 
+					</div>
+					
+					<div th:if="${downloadSection !=false}" class="card-body">
+						<div class="mb-3" style="align-content: center; margin-left: 20%; " ><i class="fas fa-file-download mr-3 fa-lg" style="float: left;"> </i> 
+							<a name="scriptzipdownload" target="_blank" th:href="@{/files/}+@{${zipUrl}}"
+																	id="scriptzipdownload" style="font-size: large; position: relative; float: left;"> <h5>Download the Script Resources</h5></a>
+							</div>
 					</div>
 				
   </div>

@@ -59,16 +59,6 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 //            String htmlFileUrl = "Media/Content/Tutorial/ScriptHtmlFile/1.html";
 //            String htmlFileUrl1 = "Media/Content/Tutorial/ScriptHtmlFile/1103.html";
 //            String zipurl = "Media/Content/Tutorial/ScriptZipFiles/scripts-20240403T180705.zip";
-//            List<String> arlist = new ArrayList<>();
-//            arlist.add(htmlFileUrl);
-//            arlist.add(htmlFileUrl1);
-//            String temp = ServiceUtility.createZipFile(arlist, env);
-//
-//            // htmlFileUrl = jsonService.conversionofHtmlFiletoOdtandSave(htmlFileUrl, 1);
-//            System.out.println(temp);
-//            List<String> resultList = ServiceUtility.FileInfoSizeAndCreationDate(zipurl, env);
-//            System.out.println("FileSize: " + resultList.get(0));
-//            System.out.println("FileCreationDate: " + resultList.get(1));
 
             taskProcessingService.createOutlineFile();
             taskProcessingService.addAllResearchPapertoQueue();

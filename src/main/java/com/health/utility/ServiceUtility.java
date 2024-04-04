@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -544,6 +545,30 @@ public class ServiceUtility {
         }
         return fileInfo;
 
+    }
+
+    /*
+     * Delete Files of N old days
+     * 
+     */
+
+    public static void deleteFilesOlderThanNDays(int days, Environment env, String dirPath) throws IOException {
+
+        long cutOff = System.currentTimeMillis() - (days * 24 * 60 * 60 * 1000);
+
+        dirPath = env.getProperty("spring.applicationexternalPath.name") + dirPath;
+
+        Files.list(Paths.get(dirPath)).forEach(path -> {
+
+            try {
+                if (Files.getLastModifiedTime(path).to(TimeUnit.MILLISECONDS) < cutOff) {
+                    Files.delete(path);
+                }
+            } catch (IOException ix) {
+                logger.error("Exception Error", ix);
+            }
+
+        });
     }
 
     /**
