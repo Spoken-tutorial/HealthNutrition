@@ -1021,9 +1021,7 @@ public class HomeController {
             String sdfString = "scripts-" + sdf.format(new java.util.Date());
             Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                     CommonData.uploadDirectoryScriptZipFiles, sdfString);
-//            List<Tutorial> testtutorialList = Arrays.asList(tutService.findByTutorialId(2),
-//                    tutService.findByTutorialId(4), tutService.findByTutorialId(6), tutService.findByTutorialId(8),
-//                    tutService.findByTutorialId(14));
+
             for (Tutorial tut : tutorialSet) {
                 int tutorialId = tut.getTutorialId();
                 ContributorAssignedTutorial con = tut.getConAssignedTutorial();
@@ -1099,36 +1097,7 @@ public class HomeController {
 
             }
 
-            // *************Testing-Start*************************************//
-
-//            List<String> odtfileNameList = new ArrayList<>();
-//            try {
-//                String htmlurl1 = jsonService.saveNarrationAndCuefScriptoHtmlFile(1103);
-//                String htmlurl2 = jsonService.saveNarrationAndCuefScriptoHtmlFile(442);
-//                String odtfile1 = jsonService.convertHtmltoOdt(htmlurl1, 1103);
-//                String odtfile2 = jsonService.convertHtmltoOdt(htmlurl2, 442);
-//                odtfileNameList.add(odtfile1);
-//                odtfileNameList.add(odtfile2);
-//
-//            } catch (ParseException | IOException e) {
-//                // TODO Auto-generated catch block
-//                logger.error("Exception: ", e);
-//            }
-//
-//            String zipUrl = "";
-//
-//            try {
-//                zipUrl = ServiceUtility.createZipFile(odtfileNameList, env);
-//            } catch (IOException e) {
-//                
-//
-//            }
-
         }
-
-        /**********************************
-         * Testing End
-         ************************************************/
 
         model.addAttribute("success_msg",
                 "Record Submitted Successfully ! Click on download link to download resources");

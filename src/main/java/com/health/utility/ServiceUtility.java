@@ -34,14 +34,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -50,7 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.repository.UserRepository;
 
@@ -74,9 +68,6 @@ public class ServiceUtility {
 
     @Autowired
     private JavaMailSender mailSender;
-
-    @Value("${spring.applicationexternalPath.name}")
-    private String mediaRoot;
 
     public static Timestamp getCurrentTime() { // Current Date
 
@@ -404,49 +395,6 @@ public class ServiceUtility {
         return true;
     }
 
-    /************************
-     * Create HTml file from Url for testing
-     ******************/
-    public static void createHtmlWithoutImagesAndVideos(Tutorial tut, String mediaRoot, String url) {
-        try {
-
-            Document doc = Jsoup.connect(url).get();
-
-            Elements imgTags = doc.select("img");
-            for (Element img : imgTags) {
-                img.remove();
-            }
-
-            Elements videoTags = doc.select("video");
-            for (Element video : videoTags) {
-                video.remove();
-            }
-
-            Elements sourceTags = doc.select("source");
-            for (Element source : sourceTags) {
-                source.remove();
-            }
-
-            Path path = Paths.get(mediaRoot, CommonData.uploadDirectoryScriptHtmlFile);
-
-            Files.createDirectories(path);
-
-            Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryScriptHtmlFile,
-                    tut.getTutorialId() + ".html");
-
-            Files.writeString(filePath, doc.outerHtml());
-
-            String temp = filePath.toString();
-
-            int indexToStart = temp.indexOf("Media");
-
-            String document = temp.substring(indexToStart, temp.length());
-
-        } catch (IOException e) {
-            logger.error("Exception Error", e);
-        }
-    }
-
     /**
      * to get present working path
      * 
@@ -565,22 +513,17 @@ public class ServiceUtility {
 
         Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
 
-        try {
-            OutputStream fos = Files.newOutputStream(zipFilePathName);
-            ZipOutputStream zos = new ZipOutputStream(fos);
-
+        try (OutputStream fos = Files.newOutputStream(zipFilePathName);
+                ZipOutputStream zos = new ZipOutputStream(fos)) {
             File filetoZip = new File(sourceDirlName.toString());
             zipFile(filetoZip, filetoZip.getName(), zos);
-
-            zos.close();
-            fos.close();
 
             String temp = zipFilePathName.toString();
             int indexToStart = temp.indexOf("Media");
             document = temp.substring(indexToStart, temp.length());
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Exception Error  ", e);
         }
 
         return document;
