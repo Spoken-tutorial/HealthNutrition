@@ -212,13 +212,7 @@
    			 <artifactId>json</artifactId>
    			 <version>20231013</version>
 		</dependency>
-		
-		<dependency>
-   			<groupId>org.apache.poi</groupId>
-    		<artifactId>poi</artifactId>
-   			<version>5.2.3</version>
-		</dependency>
-		
+
 		 <dependency>
       		  <groupId>org.apache.tika</groupId>
        		  <artifactId>tika-core</artifactId>
@@ -237,13 +231,6 @@
        			 <version>2.9.1</version> 
         </dependency>
        
-      <dependency>
-    		<groupId>org.jodconverter</groupId>
-   			<artifactId>jodconverter-core</artifactId>
-    		<version>4.4.7</version>
-	 </dependency>
-
-		
 	</dependencies>
 
 	<build>

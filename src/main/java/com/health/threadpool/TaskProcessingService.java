@@ -141,7 +141,7 @@ public class TaskProcessingService {
 
     }
 
-    private String CreateJsonSmUrl(Tutorial tutorial) {
+    public String createJsonSmUrl(Tutorial tutorial) {
         ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
         TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
         int catId = topicCat.getCat().getCategoryId();
@@ -275,7 +275,7 @@ public class TaskProcessingService {
         String documentUrlforOriginalScript = "/OriginalScript/" + tutorial.getTutorialId();
         String view_urlforOriginalScript = sm_url;
         String documentIdforOriginalScript = CommonData.DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT + tutorial.getTutorialId();
-        String documentPathforOriginalScript = CreateJsonSmUrl(tutorial);
+        String documentPathforOriginalScript = createJsonSmUrl(tutorial);
 
         int rank = tutorial.getUserVisit() + 3 * tutorial.getResourceVisit();
 

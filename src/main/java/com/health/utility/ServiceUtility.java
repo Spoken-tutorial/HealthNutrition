@@ -441,7 +441,6 @@ public class ServiceUtility {
             int indexToStart = temp.indexOf("Media");
 
             String document = temp.substring(indexToStart, temp.length());
-            System.out.println(document);
 
         } catch (IOException e) {
             logger.error("Exception Error", e);
@@ -481,7 +480,7 @@ public class ServiceUtility {
 
         try (OutputStream fos = Files.newOutputStream(zipFilePath); ZipOutputStream zos = new ZipOutputStream(fos)) {
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[16384];
 
             for (String fileUrl : fileUrls) {
                 Path fileUrlPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), fileUrl);
@@ -511,6 +510,77 @@ public class ServiceUtility {
 
         } catch (Exception e) {
             logger.error("Exception Error", e);
+        }
+
+        return document;
+    }
+
+    /****
+     * Create ZipFileWithSubDirectories
+     * 
+     */
+
+    private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+        if (fileToZip.isHidden()) {
+            return;
+        }
+        if (fileToZip.isDirectory()) {
+            if (fileName.endsWith("/")) {
+                zipOut.putNextEntry(new ZipEntry(fileName));
+                zipOut.closeEntry();
+            } else {
+                zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+                zipOut.closeEntry();
+            }
+            File[] children = fileToZip.listFiles();
+            for (File childFile : children) {
+                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+            }
+            return;
+        }
+        FileInputStream fis = new FileInputStream(fileToZip);
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        byte[] bytes = new byte[16384];
+        int length;
+        while ((length = fis.read(bytes)) >= 0) {
+            zipOut.write(bytes, 0, length);
+        }
+        fis.close();
+    }
+
+    public static String zipFileWithSubDirectories(String sourceDirurl, Environment env) throws IOException {
+
+        String document = "";
+        Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles);
+
+        Files.createDirectories(zipFilePathDirectory);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        String zipFileName = "scripts-" + sdf.format(new Date()) + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles, zipFileName);
+
+        Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
+
+        try {
+            OutputStream fos = Files.newOutputStream(zipFilePathName);
+            ZipOutputStream zos = new ZipOutputStream(fos);
+
+            File filetoZip = new File(sourceDirlName.toString());
+            zipFile(filetoZip, filetoZip.getName(), zos);
+
+            zos.close();
+            fos.close();
+
+            String temp = zipFilePathName.toString();
+            int indexToStart = temp.indexOf("Media");
+            document = temp.substring(indexToStart, temp.length());
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return document;
@@ -696,14 +766,11 @@ public class ServiceUtility {
 
             if (statusCode == 200) {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
-                System.out.println("JsonResponse" + jsonResponse);
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                System.out.println("jsonNode" + jsonNode);
 
                 JsonNode publishedArray = jsonNode.get("published");
-                System.out.println("publishedArray" + publishedArray);
 
                 for (int i = 0; i < publishedArray.size(); i++) {
                     listofScriptVersions.add(publishedArray.get(i).asInt());
@@ -711,10 +778,10 @@ public class ServiceUtility {
 
                 httpClient.close();
                 Collections.reverse(listofScriptVersions);
-                System.out.println("Alok List" + listofScriptVersions);
+
                 return listofScriptVersions;
             } else {
-                System.out.println("API request failed with status code: " + statusCode);
+                logger.info("API request failed with status code:{}  ", statusCode);
 
                 listofScriptVersions.add(x);
                 return listofScriptVersions;

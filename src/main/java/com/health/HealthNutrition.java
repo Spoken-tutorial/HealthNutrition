@@ -16,7 +16,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import com.health.json.service.JsonService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 
@@ -36,9 +35,6 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Autowired
     private TaskProcessingService taskProcessingService;
 
-    @Autowired
-    private JsonService jsonService;
-
     @Value("${git.commit.id}")
     private String gitCommitId;
 
@@ -56,10 +52,6 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
         try {
-//            String htmlFileUrl = "Media/Content/Tutorial/ScriptHtmlFile/1.html";
-//            String htmlFileUrl1 = "Media/Content/Tutorial/ScriptHtmlFile/1103.html";
-//            String zipurl = "Media/Content/Tutorial/ScriptZipFiles/scripts-20240403T180705.zip";
-
             taskProcessingService.createOutlineFile();
             taskProcessingService.addAllResearchPapertoQueue();
             taskProcessingService.intializeQueue();
