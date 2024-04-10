@@ -312,9 +312,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
         Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryOutline, getTutorialId() + ".txt");
         if (outline != null) {
-            Files.writeString(filePath, outline);
+            Files.write(filePath, outline.getBytes());
         } else {
-            Files.writeString(filePath, "");
+            Files.write(filePath, "".getBytes());
         }
         String temp = filePath.toString();
 
