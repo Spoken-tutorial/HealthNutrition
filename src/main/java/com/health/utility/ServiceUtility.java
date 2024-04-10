@@ -497,7 +497,7 @@ public class ServiceUtility {
                 zipOut.write(bytes, 0, length);
             }
         } catch (Exception e) {
-
+            logger.error("Exception Error", e);
         }
 
     }
