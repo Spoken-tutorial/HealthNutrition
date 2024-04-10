@@ -1,5 +1,6 @@
 package com.health.controller;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -17,11 +19,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -474,14 +478,11 @@ public class HomeController {
 
             if (statusCode == 200) {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
-                System.out.println("JsonResponse" + jsonResponse);
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                System.out.println("jsonNode" + jsonNode);
 
                 JsonNode publishedArray = jsonNode.get("published");
-                System.out.println("publishedArray" + publishedArray);
 
                 for (int i = 0; i < publishedArray.size(); i++) {
                     listofScriptVersions.add(publishedArray.get(i).asInt());
@@ -489,10 +490,10 @@ public class HomeController {
 
                 httpClient.close();
                 Collections.reverse(listofScriptVersions);
-                System.out.println("Alok List" + listofScriptVersions);
+
                 return listofScriptVersions;
             } else {
-                System.out.println("API request failed with status code: " + statusCode);
+                logger.info("API request failed with status code:{} ", statusCode);
 
                 listofScriptVersions.add(x);
                 return listofScriptVersions;
@@ -902,8 +903,30 @@ public class HomeController {
 
     @GetMapping("/downloads")
     public String downloadResources(HttpServletRequest req, Principal principal, Model model) {
+
         List<Category> categories = getCategories();
         model.addAttribute("categories", categories);
+        boolean downloadSection = false;
+        model.addAttribute("downloadSection", downloadSection);
+
+        try {
+            ServiceUtility.deleteFilesOlderThanNDays(1, env, CommonData.uploadDirectoryScriptZipFiles);
+
+            Path zipDirectoryPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryScriptZipFiles);
+
+            Long sizeofDirectory = FileUtils.sizeOfDirectory(zipDirectoryPath.toFile());
+            logger.info("Size of Directory:{}", sizeofDirectory);
+
+            if (sizeofDirectory >= CommonData.Zip_DIR_MAX_SIZE_GB) {
+                ServiceUtility.deleteFilesOlderThanNDays(0, env, CommonData.uploadDirectoryScriptZipFiles);
+
+            }
+
+        } catch (IOException e) {
+
+            logger.error("Exception: ", e);
+        }
 
         return "downloadResources";
     }
@@ -911,31 +934,46 @@ public class HomeController {
     @PostMapping("/downloads")
     public String downloadResourcesPost(HttpServletRequest req, Principal principal, Model model,
             @RequestParam(name = "resourceCategoryName") String catId,
-            @RequestParam(name = "languageResourceName") String[] langIds,
-            @RequestParam(name = "topicResourceName") String[] topicIds) {
+            @RequestParam(name = "languageResourceName") Optional<String[]> langIds,
+            @RequestParam(name = "topicResourceName") Optional<String[]> topicIds) {
+
+        List<Category> categories = getCategories();
+        model.addAttribute("categories", categories);
+        boolean downloadSection = false;
+        model.addAttribute("downloadSection", downloadSection);
 
         Category cat = catService.findByid(Integer.parseInt(catId));
+        if (cat == null) { // throw error
+            downloadSection = false;
+            model.addAttribute("downloadSection", downloadSection);
+            model.addAttribute("error_msg", "Please Select Category");
+            return "downloadResources";
+        }
+
         List<ContributorAssignedTutorial> conList = new ArrayList<>();
         List<Language> languages = new ArrayList<>();
         List<Topic> topics = new ArrayList<>();
         List<Tutorial> tutList = new ArrayList<>();
         List<TopicCategoryMapping> tcmList = new ArrayList<>();
 
-        if ((topicIds != null && topicIds.length != 0)) {
-            for (String topicId : topicIds) {
+        if ((topicIds != null && topicIds.isPresent() && topicIds.get().length != 0)) {
+            for (String topicId : topicIds.get()) {
                 Topic topic = topicService.findById(Integer.parseInt(topicId));
+                logger.info("Topic Name: {}", topic.getTopicName());
                 topics.add(topic);
                 tcmList.add(topicCatService.findAllByCategoryAndTopic(cat, topic));
             }
         }
 
-        if ((langIds != null && langIds.length != 0)) {
-            for (String lanId : langIds) {
+        if ((langIds != null && langIds.isPresent() && langIds.get().length != 0)) {
+            for (String lanId : langIds.get()) {
+                logger.info("Language Name: {}", lanService.getById(Integer.parseInt(lanId)).getLangName());
                 languages.add(lanService.getById(Integer.parseInt(lanId)));
             }
         }
 
-        if ((langIds != null && langIds.length != 0) && (topicIds != null && topicIds.length != 0)) {
+        if ((langIds != null && langIds.isPresent() && langIds.get().length != 0)
+                && (topicIds != null && topicIds.isPresent() && topicIds.get().length != 0)) {
 
             for (Language lan : languages) {
 
@@ -946,7 +984,7 @@ public class HomeController {
                 }
             }
 
-        } else if ((langIds != null && langIds.length != 0)) {
+        } else if ((langIds != null && langIds.isPresent() && langIds.get().length != 0)) {
             List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
             for (Language lan : languages) {
 
@@ -957,7 +995,7 @@ public class HomeController {
                 }
             }
 
-        } else if ((topicIds != null && topicIds.length != 0)) {
+        } else if ((topicIds != null && topicIds.isPresent() && topicIds.get().length != 0)) {
             conList = conRepo.findAllByTopicCat(tcmList);
 
         } else {
@@ -970,8 +1008,115 @@ public class HomeController {
         Set<Tutorial> tutorialSet = new LinkedHashSet<>(tutList);
 
         int countTutorial = tutorialSet.size();
+        if (countTutorial == 0) {
+            model.addAttribute("error_msg", "No Tutorials are available for selected category, topic and language");
+            downloadSection = false;
+            model.addAttribute("downloadSection", downloadSection);
+            return "downloadResources";
+        }
+
+        else {
+            String document = "";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+            String sdfString = "scripts-" + sdf.format(new java.util.Date());
+            Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryScriptZipFiles, sdfString);
+
+            for (Tutorial tut : tutorialSet) {
+                int tutorialId = tut.getTutorialId();
+                ContributorAssignedTutorial con = tut.getConAssignedTutorial();
+                String langName = con.getLan().getLangName();
+                String topicName = con.getTopicCatId().getTopic().getTopicName();
+
+                Path destInationDirectoryforTopiccAndLan = Paths.get(destInationDirectory1.toString(), File.separator,
+                        topicName, File.separator, langName, File.separator);
+                try {
+                    Files.createDirectories(destInationDirectoryforTopiccAndLan);
+                    Path filePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                            CommonData.uploadDirectoryScriptOdtFileforDownload, tutorialId + ".odt");
+                    File destainationFile = destInationDirectoryforTopiccAndLan.toFile();
+                    File sourceFile = filePath.toFile();
+                    if (filePath.toFile().exists()) {
+
+                        FileUtils.copyFileToDirectory(sourceFile, destainationFile);
+
+                    }
+
+                } catch (IOException e) {
+
+                    logger.error("Exception: ", e);
+                }
+
+            }
+            String temp = destInationDirectory1.toString();
+            int indexToStart = temp.indexOf("Media");
+            document = temp.substring(indexToStart, temp.length());
+            try {
+                String zipUrl = ServiceUtility.zipFileWithSubDirectories(document, env);
+                logger.info(destInationDirectory1.toString());
+                FileUtils.deleteDirectory(destInationDirectory1.toFile());
+
+                if (zipUrl.isEmpty()) {
+                    downloadSection = false;
+                    model.addAttribute("downloadSection", downloadSection);
+                    model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+                    return "downloadResources";
+
+                } else {
+
+                    List<String> fileInfoList = ServiceUtility.FileInfoSizeAndCreationDate(zipUrl, env);
+
+                    if (fileInfoList != null) {
+                        Long fileSize = Long.parseLong(fileInfoList.get(0));
+                        if (fileSize > CommonData.SCRIPT_MAX_SIZE_MB) {
+                            downloadSection = false;
+                            model.addAttribute("downloadSection", downloadSection);
+                            model.addAttribute("error_msg",
+                                    "The file size is larger than expected please try to select few tutorials");
+                            return "downloadResources";
+
+                        } else {
+                            model.addAttribute("zipUrl", zipUrl);
+                        }
+
+                    } else {
+                        downloadSection = false;
+                        model.addAttribute("downloadSection", downloadSection);
+                        model.addAttribute("error_msg", "Some errors occured please try again");
+                        return "downloadResources";
+                    }
+
+                }
+
+            } catch (IOException e) {
+                logger.error("Exception: ", e);
+                downloadSection = false;
+                model.addAttribute("downloadSection", downloadSection);
+                model.addAttribute("error_msg", "Some Errors Occured; please contact Admin or try again");
+                return "downloadResources";
+
+            }
+
+        }
+
+        model.addAttribute("success_msg",
+                "Record Submitted Successfully ! Click on download link to download resources");
+        downloadSection = true;
+        model.addAttribute("downloadSection", downloadSection);
 
         return "downloadResources";
+    }
+
+    @GetMapping("/downloadResources/{zipFileUrl}")
+    public String downloadScriptFile(HttpServletRequest req, @PathVariable String zipFileUrl, Principal principal,
+            Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        String url = zipFileUrl;
+
+        return "redirect:/files/" + url;
+
     }
 
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
@@ -1083,7 +1228,7 @@ public class HomeController {
         sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
         sb.append("/");
         if (scriptVerList != null && scriptVerList.size() > 0) {
-            System.out.println(scriptVerList);
+
             StringBuilder sb2 = new StringBuilder(sb);
             sb2.append(scriptVerList.get(0));
             sm_url = sb2.toString();
@@ -1391,7 +1536,7 @@ public class HomeController {
             sb.append(String.valueOf(tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
             sb.append("/");
             if (scriptVerList != null && scriptVerList.size() > 0) {
-                System.out.println(scriptVerList);
+
                 StringBuilder sb2 = new StringBuilder(sb);
                 sb2.append(scriptVerList.get(0));
                 sm_url = sb2.toString();

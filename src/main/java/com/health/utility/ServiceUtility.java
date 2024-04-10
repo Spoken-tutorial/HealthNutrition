@@ -2,11 +2,15 @@ package com.health.utility;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,7 +18,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
@@ -27,10 +34,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.repository.UserRepository;
 
@@ -393,50 +395,6 @@ public class ServiceUtility {
         return true;
     }
 
-    /************************
-     * Create HTml file from Url for testing
-     ******************/
-    public static void createHtmlWithoutImagesAndVideos(Tutorial tut, String mediaRoot, String url) {
-        try {
-
-            Document doc = Jsoup.connect(url).get();
-
-            Elements imgTags = doc.select("img");
-            for (Element img : imgTags) {
-                img.remove();
-            }
-
-            Elements videoTags = doc.select("video");
-            for (Element video : videoTags) {
-                video.remove();
-            }
-
-            Elements sourceTags = doc.select("source");
-            for (Element source : sourceTags) {
-                source.remove();
-            }
-
-            Path path = Paths.get(mediaRoot, CommonData.uploadDirectoryScriptHtmlFile);
-
-            Files.createDirectories(path);
-
-            Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryScriptHtmlFile,
-                    tut.getTutorialId() + ".html");
-
-            Files.writeString(filePath, doc.outerHtml());
-
-            String temp = filePath.toString();
-
-            int indexToStart = temp.indexOf("Media");
-
-            String document = temp.substring(indexToStart, temp.length());
-            System.out.println(document);
-
-        } catch (IOException e) {
-            logger.error("Exception Error", e);
-        }
-    }
-
     /**
      * to get present working path
      * 
@@ -447,6 +405,188 @@ public class ServiceUtility {
         String currentpath = currentRelativePath.toAbsolutePath().toString();
         return currentpath;
 
+    }
+
+    /**
+     * Craete Zip File
+     * 
+     * @throws IOException
+     **/
+
+    public static String createZipFile(List<String> fileUrls, Environment env) throws IOException {
+        String document = "";
+        Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles);
+
+        Files.createDirectories(zipFilePathDirectory);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        String zipFileName = "scripts-" + sdf.format(new Date()) + ".zip";
+
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles, zipFileName);
+
+        try (OutputStream fos = Files.newOutputStream(zipFilePath); ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+            byte[] buffer = new byte[16384];
+
+            for (String fileUrl : fileUrls) {
+                Path fileUrlPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), fileUrl);
+
+                File file = fileUrlPath.toFile();
+
+                if (!file.exists()) {
+                    logger.info("Sciptfile not found: {}" + file);
+                    continue;
+                }
+
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    zos.putNextEntry(new ZipEntry(file.getName()));
+
+                    int length;
+                    while ((length = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, length);
+                    }
+
+                    zos.closeEntry();
+                }
+            }
+
+            String temp = zipFilePath.toString();
+            int indexToStart = temp.indexOf("Media");
+            document = temp.substring(indexToStart, temp.length());
+
+        } catch (Exception e) {
+            logger.error("Exception Error", e);
+        }
+
+        return document;
+    }
+
+    /****
+     * Create ZipFileWithSubDirectories
+     * 
+     */
+
+    private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+        if (fileToZip.isHidden()) {
+            return;
+        }
+        if (fileToZip.isDirectory()) {
+            if (fileName.endsWith("/")) {
+                zipOut.putNextEntry(new ZipEntry(fileName));
+
+            } else {
+                zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+
+            }
+            zipOut.closeEntry();
+            File[] children = fileToZip.listFiles();
+            for (File childFile : children) {
+                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+            }
+            return;
+        }
+
+        try (FileInputStream fis = new FileInputStream(fileToZip)) {
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            zipOut.putNextEntry(zipEntry);
+            byte[] bytes = new byte[16384];
+            int length;
+            while ((length = fis.read(bytes)) >= 0) {
+                zipOut.write(bytes, 0, length);
+            }
+        } catch (Exception e) {
+            logger.error("Exception Error", e);
+        }
+
+    }
+
+    public static String zipFileWithSubDirectories(String sourceDirurl, Environment env) throws IOException {
+
+        String document = "";
+        Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles);
+
+        Files.createDirectories(zipFilePathDirectory);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        String zipFileName = "scripts-" + sdf.format(new Date()) + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryScriptZipFiles, zipFileName);
+
+        Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
+
+        try (OutputStream fos = Files.newOutputStream(zipFilePathName);
+                ZipOutputStream zos = new ZipOutputStream(fos)) {
+            File filetoZip = new File(sourceDirlName.toString());
+            zipFile(filetoZip, filetoZip.getName(), zos);
+
+            String temp = zipFilePathName.toString();
+            int indexToStart = temp.indexOf("Media");
+            document = temp.substring(indexToStart, temp.length());
+
+        } catch (IOException e) {
+            logger.error("Exception Error  ", e);
+        }
+
+        return document;
+    }
+
+    /**
+     * File Info
+     * 
+     * @throws IOException
+     **/
+
+    public static List<String> FileInfoSizeAndCreationDate(String fileUrl, Environment env) {
+
+        List<String> fileInfo = new ArrayList<>();
+        try {
+
+            Path fileUrlPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), fileUrl);
+
+            BasicFileAttributes attr = Files.readAttributes(fileUrlPath, BasicFileAttributes.class);
+
+            long fileSize = attr.size();
+            FileTime date = attr.lastModifiedTime();
+            attr.lastModifiedTime();
+            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+            String dateCreated = df.format(date.toMillis());
+
+            fileInfo.add(Long.toString(fileSize));
+            fileInfo.add(dateCreated);
+
+        } catch (IOException e) {
+            logger.error("Error reading file attributes: ", e);
+        }
+        return fileInfo;
+
+    }
+
+    /*
+     * Delete Files of N old days
+     * 
+     */
+
+    public static void deleteFilesOlderThanNDays(int days, Environment env, String dirPath) throws IOException {
+
+        long cutOff = System.currentTimeMillis() - (days * 24 * 60 * 60 * 1000);
+
+        dirPath = env.getProperty("spring.applicationexternalPath.name") + dirPath;
+
+        Files.list(Paths.get(dirPath)).forEach(path -> {
+
+            try {
+                if (Files.getLastModifiedTime(path).to(TimeUnit.MILLISECONDS) < cutOff) {
+                    Files.delete(path);
+                }
+            } catch (IOException ix) {
+                logger.error("Exception Error", ix);
+            }
+
+        });
     }
 
     /**
@@ -574,14 +714,11 @@ public class ServiceUtility {
 
             if (statusCode == 200) {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
-                System.out.println("JsonResponse" + jsonResponse);
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                System.out.println("jsonNode" + jsonNode);
 
                 JsonNode publishedArray = jsonNode.get("published");
-                System.out.println("publishedArray" + publishedArray);
 
                 for (int i = 0; i < publishedArray.size(); i++) {
                     listofScriptVersions.add(publishedArray.get(i).asInt());
@@ -589,10 +726,10 @@ public class ServiceUtility {
 
                 httpClient.close();
                 Collections.reverse(listofScriptVersions);
-                System.out.println("Alok List" + listofScriptVersions);
+
                 return listofScriptVersions;
             } else {
-                System.out.println("API request failed with status code: " + statusCode);
+                logger.info("API request failed with status code:{}  ", statusCode);
 
                 listofScriptVersions.add(x);
                 return listofScriptVersions;

@@ -140,6 +140,10 @@ public class CommonData {
 
     public static String uploadDirectoryOutline = "Media/Content/Tutorial/Outline/";
     public static String uploadDirectoryScriptHtmlFile = "Media/Content/Tutorial/ScriptHtmlFile/";
+    public static String uploadDirectoryScriptHtmlFileforDownload = "Media/Content/Tutorial/ScriptDownloadHtmlFile/";
+    public static String uploadDirectoryScriptOdtFileforDownload = "Media/Content/Tutorial/ScriptDownloadOdtFile/";
+    public static String uploadDirectoryScriptJsonFile = "Media/Content/Tutorial/ScriptJsonFile/";
+    public static String uploadDirectoryScriptZipFiles = "Media/Content/Tutorial/ScriptZipFiles/";
 
     public static String uploadDirectoryTestimonial = "Media/Content/Testimonial/";
 
@@ -226,6 +230,10 @@ public class CommonData {
     public static final long fileSize = 10 * 1024 * 1024;
 
     public static final long categoryFileSizeImageFileSize = 10 * 1024 * 1024;
+
+    public static final int SCRIPT_MAX_COUNT = 100;
+    public static final long SCRIPT_MAX_SIZE_MB = 100 * 1024 * 1024;
+    public static final long Zip_DIR_MAX_SIZE_GB = 5 * 1000 * 1024 * 1024;
 
     public static final String SCRIPT_UPLOAD_ERROR = "Script Not Uploaded";
 
