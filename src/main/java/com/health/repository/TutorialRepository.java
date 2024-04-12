@@ -42,6 +42,9 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer>, Jp
     @Query("SELECT t FROM Tutorial t WHERE t.timeScript IS NOT NULL AND t.status = true AND t.addedQueue = false")
     List<Tutorial> findTutorialsWithNonNullTimeScriptAndStatusAndAddedQueueFalse();
 
+    @Query("SELECT t FROM Tutorial t WHERE  t.status = true AND t.addedQueue = false")
+    List<Tutorial> findTutorialsWithStatusTrueAndAddedQueueFalse();
+
     /**
      * List of Tutorial Object given ContributorAssignedTutorial object
      * 

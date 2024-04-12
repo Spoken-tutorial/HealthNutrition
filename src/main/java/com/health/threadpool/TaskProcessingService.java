@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.Brouchure;
+import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.FilesofBrouchure;
 import com.health.model.QueueManagement;
@@ -461,10 +462,19 @@ public class TaskProcessingService {
     }
 
     public void addAllTuttorialsToQueue() {
-        List<Tutorial> tutorials = tutRepo.findTutorialsWithNonNullTimeScriptAndStatusAndAddedQueueFalse();
-        logger.info("tutorial size:{}", tutorials.size());
+        List<Tutorial> tutorials = tutRepo.findTutorialsWithStatusTrueAndAddedQueueFalse();
+        List<Tutorial> finalTutorials = new ArrayList<>();
+        for (Tutorial temp : tutorials) {
+
+            Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+            if (c.isStatus()) {
+
+                finalTutorials.add(temp);
+            }
+        }
+        logger.info("tutorial size:{}", finalTutorials.size());
         List<Tutorial> newtTutorials = new ArrayList<>();
-        for (Tutorial tutorial : tutorials) {
+        for (Tutorial tutorial : finalTutorials) {
 
             addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
             newtTutorials.add(tutorial);
