@@ -177,6 +177,7 @@ public class TaskProcessingService {
     }
 
     private boolean doesFileExist(String filePath) {
+        logger.info("filePath:{}", filePath);
         if (filePath.startsWith("https://")) {
             return true;
         }
@@ -291,7 +292,10 @@ public class TaskProcessingService {
         Optional<String> category = Optional.of(topicCat.getCat().getCatName());
         Optional<Integer> topicId = Optional.of(topicCat.getTopic().getTopicId());
         Optional<String> topic = Optional.of(topicCat.getTopic().getTopicName());
-        Optional<String> outlinePath = Optional.of(tutorial.getOutlinePath());
+        Optional<String> outlinePath = null;
+        if (tutorial.getOutlinePath() != null) {
+            outlinePath = Optional.of(tutorial.getOutlinePath());
+        }
 
         if (requestType.equals(CommonData.ADD_DOCUMENT) && !tutorial.isAddedQueue() && !sm_url.isEmpty()) {
 
