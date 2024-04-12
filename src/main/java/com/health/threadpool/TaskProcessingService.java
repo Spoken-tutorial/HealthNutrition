@@ -47,6 +47,7 @@ import com.health.repository.TutorialRepository;
 import com.health.repository.VersionRepository;
 import com.health.service.BrouchureService;
 import com.health.service.FilesofBrouchureService;
+import com.health.service.QueueManagementService;
 import com.health.service.ResearchPaperService;
 import com.health.service.TutorialService;
 import com.health.utility.CommonData;
@@ -71,6 +72,9 @@ public class TaskProcessingService {
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
+
+    @Autowired
+    private QueueManagementService queueService;
 
     @Autowired
     private QueueManagementRepository queueRepo;
@@ -574,6 +578,7 @@ public class TaskProcessingService {
             qmnt.setStatus(CommonData.STATUS_PENDING);
             qmnt.setQueueTime(0);
             queueRepo.save(qmnt);
+            logger.info("from queued to  pending status is:{}", qmnt.getStatus());
         }
 
         qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PROCESSING);
@@ -582,6 +587,7 @@ public class TaskProcessingService {
             qmnt.setStatus(CommonData.STATUS_PENDING);
             qmnt.setQueueTime(0);
             queueRepo.save(qmnt);
+            logger.info("from processing to  pending status is:{}", qmnt.getStatus());
         }
 
     }
@@ -713,7 +719,8 @@ public class TaskProcessingService {
                 skippedDocuments.putAll(getRunningDocuments());
                 int count = 0;
 
-                List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PENDING);
+                List<QueueManagement> qmnts = queueService
+                        .findByStatusOrderByRequestTimeAscWithNqueries(CommonData.STATUS_PENDING);
                 if (qmnts == null) {
                     try {
                         Thread.sleep(CommonData.NO_TASK_SLEEP_TIME);
@@ -725,22 +732,29 @@ public class TaskProcessingService {
                 }
 
                 for (QueueManagement qmnt : qmnts) {
-                    logger.info("Queueing:{}", qmnt);
-                    if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
+                    try {
+                        logger.info("Queueing:{}", qmnt);
+                        if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
 
-                        continue;
+                            continue;
+                        }
+
+                        skippedDocuments.put(qmnt.getDocumentId(), System.currentTimeMillis());
+                        getRunningDocuments().put(qmnt.getDocumentId(), System.currentTimeMillis());
+                        qmnt.setStatus(CommonData.STATUS_QUEUED);
+                        qmnt.setQueueTime(System.currentTimeMillis());
+
+                        applicationContext.getAutowireCapableBeanFactory().autowireBean(qmnt);
+                        taskExecutor.submit(qmnt);
+                        queueRepo.save(qmnt);
+                        logger.info("from pending to   queued  status is:{}", qmnt.getStatus());
+
+                        count = count + 1;
+
+                    } catch (Exception e) {
+                        logger.error("Exception Error", e);
+                        break;
                     }
-
-                    skippedDocuments.put(qmnt.getDocumentId(), System.currentTimeMillis());
-                    getRunningDocuments().put(qmnt.getDocumentId(), System.currentTimeMillis());
-                    qmnt.setStatus(CommonData.STATUS_QUEUED);
-                    qmnt.setQueueTime(System.currentTimeMillis());
-                    queueRepo.save(qmnt);
-
-                    applicationContext.getAutowireCapableBeanFactory().autowireBean(qmnt);
-                    taskExecutor.submit(qmnt);
-                    count = count + 1;
-
                 }
                 long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
                 try {
