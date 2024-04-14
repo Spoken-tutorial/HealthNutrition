@@ -116,6 +116,7 @@ public class TaskProcessingService {
     }
 
     private String ScriptUrl(Tutorial tutorial) {
+        logger.debug("ScriptUrl");
         ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
         TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
         int catId = topicCat.getCat().getCategoryId();
@@ -147,6 +148,7 @@ public class TaskProcessingService {
     }
 
     public String createJsonSmUrl(Tutorial tutorial) {
+        logger.debug("createJsonSmUrl{}", tutorial);
         ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
         TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
         int catId = topicCat.getCat().getCategoryId();
@@ -177,6 +179,7 @@ public class TaskProcessingService {
     }
 
     private boolean doesFileExist(String filePath) {
+        logger.debug("filePath:{}", filePath);
         logger.info("filePath:{}", filePath);
         if (filePath.startsWith("https://")) {
             return true;
@@ -194,6 +197,12 @@ public class TaskProcessingService {
             String documentUrl, int rank, String view_url, int languageId, String language,
             Optional<Integer> categoryId, Optional<String> category, Optional<Integer> topicId, Optional<String> topic,
             Optional<String> outlinePath, String requestType) {
+
+        logger.debug(
+                "addDocument documentId: {}, documentType:{}, documentPath:{}, documentUrl:{}, rank:{}, view_url:{}, languageId: {}, language:{}, "
+                        + "categoryId:{}, category:{},topicId:{}, topic:{},outlinePath: {},requestType: {}",
+                documentId, documentType, documentPath, documentUrl, rank, view_url, languageId, language, categoryId,
+                category, topicId, topic, outlinePath, requestType);
 
         Map<String, String> resultMap = new HashMap<>();
 
@@ -262,7 +271,7 @@ public class TaskProcessingService {
     }
 
     public void addUpdateDeleteTutorial(Tutorial tutorial, String requestType) {
-
+        logger.debug("addUpdateDeleteTutorial tutorial:{}, requestType:{}", tutorial, requestType);
         String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
         String documentPathforTimeScript = "";
         String documentUrlforTimeScript = "";
@@ -366,6 +375,7 @@ public class TaskProcessingService {
     }
 
     public void addUpdateDeleteResearchPaper(ResearchPaper researchPaper, String requestType) {
+        logger.debug("addUpdateDeleteResearchPaper researchPaper:{}, requestType:{}", researchPaper, requestType);
 
         String documentId = CommonData.DOCUMENT_ID_RESEARCHPAPER + researchPaper.getId();
         String documentType = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
@@ -405,6 +415,7 @@ public class TaskProcessingService {
     }
 
     public void addUpdateDeleteBrochure(Brouchure brochure, String requestType) {
+        logger.debug("addUpdateDeleteBrochure brochure:{}, requestType:{}", brochure, requestType);
 
         Version version = verRepository.findByBrouchureAndBroVersion(brochure, brochure.getPrimaryVersion());
         List<FilesofBrouchure> filesOfBroList = filesofBroService.findByVersion(version);
@@ -470,6 +481,7 @@ public class TaskProcessingService {
     }
 
     public void addAllTuttorialsToQueue() {
+        logger.debug("addAllTuttorialsToQueue");
         List<Tutorial> tutorials = tutRepo.findTutorialsWithStatusTrueAndAddedQueueFalse();
         List<Tutorial> finalTutorials = new ArrayList<>();
         for (Tutorial temp : tutorials) {
@@ -483,26 +495,41 @@ public class TaskProcessingService {
         logger.info("tutorial size:{}", finalTutorials.size());
         List<Tutorial> newtTutorials = new ArrayList<>();
         for (Tutorial tutorial : finalTutorials) {
+            try {
+                addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
+                newtTutorials.add(tutorial);
+            } catch (Exception e) {
+                logger.error("Exception{}", tutorial, e);
 
-            addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
-            newtTutorials.add(tutorial);
+            }
+
         }
         tutRepo.saveAll(newtTutorials);
     }
 
     public void addAllResearchPapertoQueue() {
+        logger.debug("addAllResearchPapertoQueue");
         List<ResearchPaper> researchPapers = researchPaperService.findByShowOnHomepageIsTrueAndAddedQueueIsFalse();
         for (ResearchPaper researchPaper : researchPapers) {
-            addUpdateDeleteResearchPaper(researchPaper, CommonData.ADD_DOCUMENT);
+            try {
+                addUpdateDeleteResearchPaper(researchPaper, CommonData.ADD_DOCUMENT);
+            } catch (Exception e) {
+                logger.error("Exception:{}", researchPaper, e);
+            }
+
         }
 
     }
 
     public void addAllBrochureToQueue() {
-
+        logger.debug("addAllBrochureToQueue");
         List<Brouchure> broList = broService.findAllBrouchuresForCache();
         for (Brouchure brochure : broList) {
-            addUpdateDeleteBrochure(brochure, CommonData.ADD_DOCUMENT);
+            try {
+                addUpdateDeleteBrochure(brochure, CommonData.ADD_DOCUMENT);
+            } catch (Exception e) {
+                logger.error("Exception:{}", brochure, e);
+            }
 
         }
     }
@@ -552,6 +579,7 @@ public class TaskProcessingService {
     }
 
     public void createOutlineFile() {
+        logger.debug("createOutlineFile");
 
         List<Tutorial> tutList = tutService.findByOutlinePathNull();
         List<Tutorial> newtutList = new ArrayList<>();
@@ -564,39 +592,54 @@ public class TaskProcessingService {
                     newtutList.add(tut);
                 } catch (IOException e) {
 
-                    logger.error("Exception: ", e);
+                    logger.error("Exception: {}", tut, e);
                 }
 
             }
-            logger.info("Tutorial List Size :{}", tutList.size());
-            logger.info(" New Tutorial List Size :{}", newtutList.size());
+            logger.info("Size of tutorials to create outline file :{}", tutList.size());
+            logger.info(" Size of new Tutorials whose outline file are created :{}", newtutList.size());
             tutRepo.saveAll(newtutList);
         }
 
     }
 
     public void intializeQueue() {
+        logger.debug("intializeQueue");
         List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_QUEUED);
         for (QueueManagement qmnt : qmnts) {
-            logger.info("Pending:{}", qmnt);
-            qmnt.setStatus(CommonData.STATUS_PENDING);
-            qmnt.setQueueTime(0);
-            queueRepo.save(qmnt);
-            logger.info("from queued to  pending status is:{}", qmnt.getStatus());
+            try {
+                logger.info("Pending:{}", qmnt);
+                qmnt.setStatus(CommonData.STATUS_PENDING);
+                qmnt.setQueueTime(0);
+                queueRepo.save(qmnt);
+                logger.info("from queued to  pending status is:{}", qmnt.getStatus());
+            } catch (Exception e) {
+
+                logger.error("Exception: {}", qmnt, e);
+            }
+
         }
 
         qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PROCESSING);
         for (QueueManagement qmnt : qmnts) {
-            logger.info("Pending:{}", qmnt);
-            qmnt.setStatus(CommonData.STATUS_PENDING);
-            qmnt.setQueueTime(0);
-            queueRepo.save(qmnt);
-            logger.info("from processing to  pending status is:{}", qmnt.getStatus());
+            try {
+                logger.info("Pending:{}", qmnt);
+                qmnt.setStatus(CommonData.STATUS_PENDING);
+                qmnt.setQueueTime(0);
+                queueRepo.save(qmnt);
+                logger.info("from processing to  pending status is:{}", qmnt.getStatus());
+            } catch (Exception e) {
+                logger.error("Exception: {}", qmnt, e);
+            }
+
         }
 
     }
 
     public boolean isURLWorking(String url) {
+
+        logger.debug("isURLWorking:{}", url);
+
         boolean flag = false;
 
         try {
@@ -627,6 +670,7 @@ public class TaskProcessingService {
 
     @Async
     public void deleteQueueByApiStatus() {
+        logger.debug("deleteQueueByApiStatus");
 
         if (isURLWorking(commonData.elasticSearch_url)) {
 
@@ -652,38 +696,45 @@ public class TaskProcessingService {
 
                     for (QueueManagement queue : queueList) {
 
-                        Long respondId = queue.getResponseId();
-                        if (respondId != null && respondId != 0) {
+                        try {
+                            Long respondId = queue.getResponseId();
+                            if (respondId != null && respondId != 0) {
 
-                            String api_url = tempUrl + respondId;
-                            logger.info("API_URL:{}", api_url);
+                                String api_url = tempUrl + respondId;
+                                logger.info("API_URL:{}", api_url);
 
-                            HttpUriRequest request = new HttpGet(api_url);
-                            HttpResponse response = httpClient.execute(request);
+                                HttpUriRequest request = new HttpGet(api_url);
+                                HttpResponse response = httpClient.execute(request);
 
-                            int statusCode = response.getStatusLine().getStatusCode();
-                            count += 1;
+                                int statusCode = response.getStatusLine().getStatusCode();
+                                count += 1;
 
-                            if (statusCode == 200 || statusCode == 201) {
-                                String jsonResponse = EntityUtils.toString(response.getEntity());
-                                ObjectMapper objectMapper = new ObjectMapper();
-                                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                                logger.info("jsonNode:{}", jsonNode);
+                                if (statusCode == 200 || statusCode == 201) {
+                                    String jsonResponse = EntityUtils.toString(response.getEntity());
+                                    ObjectMapper objectMapper = new ObjectMapper();
+                                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                                    logger.info("jsonNode:{}", jsonNode);
 
-                                JsonNode publishedArray = jsonNode.get("status");
-                                if (publishedArray != null && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
-                                    queueRepo.delete(queue);
-                                    logger.info("respondId: {}  publishedArray: {}", respondId,
-                                            publishedArray.asText());
+                                    JsonNode publishedArray = jsonNode.get("status");
+                                    if (publishedArray != null
+                                            && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
+                                        queueRepo.delete(queue);
+                                        logger.info("respondId: {}  publishedArray: {}", respondId,
+                                                publishedArray.asText());
+
+                                    }
+
+                                } else {
+                                    logger.info("Status Code:{} API URl:{}", statusCode, api_url);
 
                                 }
 
-                            } else {
-                                logger.info("Status Code:{} API URl:{}", statusCode, api_url);
-
                             }
 
+                        } catch (Exception e) {
+                            logger.error("Exception:{}", queue, e);
                         }
+
                     }
 
                     long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME_FOR_DELETE
@@ -708,7 +759,7 @@ public class TaskProcessingService {
 
     @Async
     public void queueProcessor() {
-
+        logger.debug("queueProcessor");
         if (isURLWorking(commonData.elasticSearch_url)) {
 
             logger.info("starting QueueProcessor thread");
@@ -756,7 +807,7 @@ public class TaskProcessingService {
                         count = count + 1;
 
                     } catch (Exception e) {
-                        logger.error("Exception Error", e);
+                        logger.error("Exception Error {}", qmnt, e);
                         break;
                     }
                 }
