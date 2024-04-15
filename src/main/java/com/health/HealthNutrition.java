@@ -16,6 +16,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import com.health.repository.TutorialRepository;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 
@@ -35,6 +36,9 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Autowired
     private TaskProcessingService taskProcessingService;
 
+    @Autowired
+    private TutorialRepository tutRepo;
+
     @Value("${git.commit.id}")
     private String gitCommitId;
 
@@ -52,6 +56,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
         try {
+
             taskProcessingService.createOutlineFile();
             taskProcessingService.addAllTuttorialsToQueue();
             taskProcessingService.intializeQueue();

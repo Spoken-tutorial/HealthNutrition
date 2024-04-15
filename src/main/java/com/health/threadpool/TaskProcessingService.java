@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.Brouchure;
-import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.FilesofBrouchure;
 import com.health.model.QueueManagement;
@@ -180,7 +179,7 @@ public class TaskProcessingService {
 
     private boolean doesFileExist(String filePath) {
         logger.debug("filePath:{}", filePath);
-        logger.info("filePath:{}", filePath);
+
         if (filePath.startsWith("https://")) {
             return true;
         }
@@ -205,10 +204,6 @@ public class TaskProcessingService {
                 category, topicId, topic, outlinePath, requestType);
 
         Map<String, String> resultMap = new HashMap<>();
-
-        logger.info(
-                "RequestType:{} Language:{} View_URL: {} documentId:{} documentPath:{} documentType:{} outlinePath:{}",
-                requestType, language, view_url, documentId, documentPath, documentType, outlinePath);
 
         if (documentPath == null
                 && (requestType.equals(CommonData.ADD_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT))) {
@@ -482,24 +477,17 @@ public class TaskProcessingService {
 
     public void addAllTuttorialsToQueue() {
         logger.debug("addAllTuttorialsToQueue");
-        List<Tutorial> tutorials = tutRepo.findTutorialsWithStatusTrueAndAddedQueueFalse();
-        List<Tutorial> finalTutorials = new ArrayList<>();
-        for (Tutorial temp : tutorials) {
 
-            Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
-            if (c.isStatus()) {
+        List<Tutorial> tutorialList = tutRepo.findTutorialsWithStatusTrueAndAddedQueueFalseAndCatregoryEnabled();
 
-                finalTutorials.add(temp);
-            }
-        }
-        logger.info("tutorial size:{}", finalTutorials.size());
+        logger.info("tutorial size:{}", tutorialList.size());
         List<Tutorial> newtTutorials = new ArrayList<>();
-        for (Tutorial tutorial : finalTutorials) {
+        for (Tutorial tutorial : tutorialList) {
             try {
                 addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
                 newtTutorials.add(tutorial);
             } catch (Exception e) {
-                logger.error("Exception{}", tutorial, e);
+                logger.error("Exception of addAllTuttorialsToQueue: {}", tutorial, e);
 
             }
 
@@ -514,7 +502,7 @@ public class TaskProcessingService {
             try {
                 addUpdateDeleteResearchPaper(researchPaper, CommonData.ADD_DOCUMENT);
             } catch (Exception e) {
-                logger.error("Exception:{}", researchPaper, e);
+                logger.error("Exception of addAllResearchPapertoQueue: {}", researchPaper, e);
             }
 
         }
@@ -528,7 +516,7 @@ public class TaskProcessingService {
             try {
                 addUpdateDeleteBrochure(brochure, CommonData.ADD_DOCUMENT);
             } catch (Exception e) {
-                logger.error("Exception:{}", brochure, e);
+                logger.error("Exception of addAllBrochureToQueue :{}", brochure, e);
             }
 
         }
@@ -615,7 +603,7 @@ public class TaskProcessingService {
                 logger.info("from queued to  pending status is:{}", qmnt.getStatus());
             } catch (Exception e) {
 
-                logger.error("Exception: {}", qmnt, e);
+                logger.error("Exception of intializeQueue1: {}", qmnt, e);
             }
 
         }
@@ -629,7 +617,7 @@ public class TaskProcessingService {
                 queueRepo.save(qmnt);
                 logger.info("from processing to  pending status is:{}", qmnt.getStatus());
             } catch (Exception e) {
-                logger.error("Exception: {}", qmnt, e);
+                logger.error("Exception of intializeQueue2: {}", qmnt, e);
             }
 
         }
@@ -732,7 +720,7 @@ public class TaskProcessingService {
                             }
 
                         } catch (Exception e) {
-                            logger.error("Exception:{}", queue, e);
+                            logger.error("Exception of deleteQueueByApiStatus :{}", queue, e);
                         }
 
                     }
@@ -782,7 +770,7 @@ public class TaskProcessingService {
                         continue;
 
                     } catch (InterruptedException e) {
-
+                        logger.error("InterruptedException of queueProcessor: ", e);
                     }
                 }
 
@@ -807,7 +795,7 @@ public class TaskProcessingService {
                         count = count + 1;
 
                     } catch (Exception e) {
-                        logger.error("Exception Error {}", qmnt, e);
+                        logger.error("Exception of queueProcessor {}", qmnt, e);
                         break;
                     }
                 }
