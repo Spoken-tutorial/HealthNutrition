@@ -23,6 +23,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -775,6 +776,7 @@ public class TaskProcessingService {
                 }
 
                 for (QueueManagement qmnt : qmnts) {
+                    MDC.put("queueId", Long.toString(qmnt.getQueueId()));
                     try {
                         logger.info("Queueing:{}", qmnt);
                         if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
@@ -798,8 +800,11 @@ public class TaskProcessingService {
                         logger.error("Exception of queueProcessor {}", qmnt, e);
                         break;
                     }
+
+                    MDC.remove("queueId");
                 }
                 long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
+                logger.info("Task_SLEEP_TIME: " + CommonData.TASK_SLEEP_TIME);
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
