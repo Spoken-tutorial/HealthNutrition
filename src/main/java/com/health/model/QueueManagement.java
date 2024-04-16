@@ -436,10 +436,13 @@ public class QueueManagement implements Runnable {
                         setResponseId(publishedArray.asLong());
                         setStatus(CommonData.STATUS_DONE);
 
+                    } else {
+                        logger.info("Json Node:{} ", jsonNode);
+                        setStatus(CommonData.STATUS_FAILED);
                     }
 
                 } else {
-                    logger.info("Status Code:{} API URl", statusCode, api_url);
+                    logger.info("Status Code:{} API URl:{}", statusCode, api_url);
                     setStatus(CommonData.STATUS_PENDING);
 
                 }
