@@ -23,6 +23,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -432,9 +433,11 @@ public class QueueManagement implements Runnable {
 
                     JsonNode publishedArray = jsonNode.get("queueId");
                     if (publishedArray != null) {
-
+                        MDC.put("queueId",
+                                '@' + Long.toString(getQueueId()) + '#' + Long.toString(publishedArray.asLong()));
                         setResponseId(publishedArray.asLong());
                         setStatus(CommonData.STATUS_DONE);
+                        MDC.remove("queueId");
 
                     } else {
                         logger.info("Json Node:{} ", jsonNode);

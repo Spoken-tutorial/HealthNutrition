@@ -116,7 +116,7 @@ public class TaskProcessingService {
     }
 
     private String ScriptUrl(Tutorial tutorial) {
-        logger.debug("ScriptUrl");
+
         ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
         TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
         int catId = topicCat.getCat().getCategoryId();
@@ -148,7 +148,7 @@ public class TaskProcessingService {
     }
 
     public String createJsonSmUrl(Tutorial tutorial) {
-        logger.debug("createJsonSmUrl{}", tutorial);
+
         ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
         TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
         int catId = topicCat.getCat().getCategoryId();
@@ -179,7 +179,7 @@ public class TaskProcessingService {
     }
 
     private boolean doesFileExist(String filePath) {
-        logger.debug("filePath:{}", filePath);
+        logger.info("filePath:{}", filePath);
 
         if (filePath.startsWith("https://")) {
             return true;
@@ -198,7 +198,7 @@ public class TaskProcessingService {
             Optional<Integer> categoryId, Optional<String> category, Optional<Integer> topicId, Optional<String> topic,
             Optional<String> outlinePath, String requestType) {
 
-        logger.debug(
+        logger.info(
                 "addDocument documentId: {}, documentType:{}, documentPath:{}, documentUrl:{}, rank:{}, view_url:{}, languageId: {}, language:{}, "
                         + "categoryId:{}, category:{},topicId:{}, topic:{},outlinePath: {},requestType: {}",
                 documentId, documentType, documentPath, documentUrl, rank, view_url, languageId, language, categoryId,
@@ -267,7 +267,7 @@ public class TaskProcessingService {
     }
 
     public void addUpdateDeleteTutorial(Tutorial tutorial, String requestType) {
-        logger.debug("addUpdateDeleteTutorial tutorial:{}, requestType:{}", tutorial, requestType);
+
         String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
         String documentPathforTimeScript = "";
         String documentUrlforTimeScript = "";
@@ -371,7 +371,6 @@ public class TaskProcessingService {
     }
 
     public void addUpdateDeleteResearchPaper(ResearchPaper researchPaper, String requestType) {
-        logger.debug("addUpdateDeleteResearchPaper researchPaper:{}, requestType:{}", researchPaper, requestType);
 
         String documentId = CommonData.DOCUMENT_ID_RESEARCHPAPER + researchPaper.getId();
         String documentType = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
@@ -411,7 +410,6 @@ public class TaskProcessingService {
     }
 
     public void addUpdateDeleteBrochure(Brouchure brochure, String requestType) {
-        logger.debug("addUpdateDeleteBrochure brochure:{}, requestType:{}", brochure, requestType);
 
         Version version = verRepository.findByBrouchureAndBroVersion(brochure, brochure.getPrimaryVersion());
         List<FilesofBrouchure> filesOfBroList = filesofBroService.findByVersion(version);
@@ -477,7 +475,6 @@ public class TaskProcessingService {
     }
 
     public void addAllTuttorialsToQueue() {
-        logger.debug("addAllTuttorialsToQueue");
 
         List<Tutorial> tutorialList = tutRepo.findTutorialsWithStatusTrueAndAddedQueueFalseAndCatregoryEnabled();
 
@@ -497,7 +494,7 @@ public class TaskProcessingService {
     }
 
     public void addAllResearchPapertoQueue() {
-        logger.debug("addAllResearchPapertoQueue");
+
         List<ResearchPaper> researchPapers = researchPaperService.findByShowOnHomepageIsTrueAndAddedQueueIsFalse();
         for (ResearchPaper researchPaper : researchPapers) {
             try {
@@ -511,7 +508,7 @@ public class TaskProcessingService {
     }
 
     public void addAllBrochureToQueue() {
-        logger.debug("addAllBrochureToQueue");
+
         List<Brouchure> broList = broService.findAllBrouchuresForCache();
         for (Brouchure brochure : broList) {
             try {
@@ -568,7 +565,6 @@ public class TaskProcessingService {
     }
 
     public void createOutlineFile() {
-        logger.debug("createOutlineFile");
 
         List<Tutorial> tutList = tutService.findByOutlinePathNull();
         List<Tutorial> newtutList = new ArrayList<>();
@@ -593,7 +589,7 @@ public class TaskProcessingService {
     }
 
     public void intializeQueue() {
-        logger.debug("intializeQueue");
+
         List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_QUEUED);
         for (QueueManagement qmnt : qmnts) {
             try {
@@ -627,8 +623,6 @@ public class TaskProcessingService {
 
     public boolean isURLWorking(String url) {
 
-        logger.debug("isURLWorking:{}", url);
-
         boolean flag = false;
 
         try {
@@ -659,7 +653,6 @@ public class TaskProcessingService {
 
     @Async
     public void deleteQueueByApiStatus() {
-        logger.debug("deleteQueueByApiStatus");
 
         if (isURLWorking(commonData.elasticSearch_url)) {
 
@@ -684,7 +677,8 @@ public class TaskProcessingService {
                     int count = 0;
 
                     for (QueueManagement queue : queueList) {
-
+                        MDC.put("queueId",
+                                '@' + Long.toString(queue.getQueueId()) + '#' + Long.toString(queue.getResponseId()));
                         try {
                             Long respondId = queue.getResponseId();
                             if (respondId != null && respondId != 0) {
@@ -724,6 +718,8 @@ public class TaskProcessingService {
                             logger.error("Exception of deleteQueueByApiStatus :{}", queue, e);
                         }
 
+                        MDC.remove("queueId");
+
                     }
 
                     long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME_FOR_DELETE
@@ -748,7 +744,7 @@ public class TaskProcessingService {
 
     @Async
     public void queueProcessor() {
-        logger.debug("queueProcessor");
+
         if (isURLWorking(commonData.elasticSearch_url)) {
 
             logger.info("starting QueueProcessor thread");
@@ -776,7 +772,7 @@ public class TaskProcessingService {
                 }
 
                 for (QueueManagement qmnt : qmnts) {
-                    MDC.put("queueId", Long.toString(qmnt.getQueueId()));
+                    MDC.put("queueId", '@' + Long.toString(qmnt.getQueueId()));
                     try {
                         logger.info("Queueing:{}", qmnt);
                         if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
@@ -804,7 +800,8 @@ public class TaskProcessingService {
                     MDC.remove("queueId");
                 }
                 long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
-                logger.info("Task_SLEEP_TIME: " + CommonData.TASK_SLEEP_TIME);
+                if (count > 0)
+                    logger.info("Task_SLEEP_TIME: " + CommonData.TASK_SLEEP_TIME);
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
