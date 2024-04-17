@@ -767,7 +767,8 @@ public class TaskProcessingService {
                         continue;
 
                     } catch (InterruptedException e) {
-                        logger.error("InterruptedException of queueProcessor: ", e);
+                        logger.info("Interrupted");
+                        break;
                     }
                 }
 

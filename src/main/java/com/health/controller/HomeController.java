@@ -1019,8 +1019,9 @@ public class HomeController {
             String document = "";
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
             String sdfString = "scripts-" + sdf.format(new java.util.Date());
+            String newCatNamewith_ = cat.getCatName().replace(' ', '_');
             Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                    CommonData.uploadDirectoryScriptZipFiles, sdfString, File.separator, cat.getCatName());
+                    CommonData.uploadDirectoryScriptZipFiles, sdfString, File.separator, newCatNamewith_);
 
             for (Tutorial tut : tutorialSet) {
                 int tutorialId = tut.getTutorialId();
@@ -1028,8 +1029,10 @@ public class HomeController {
                 String langName = con.getLan().getLangName();
                 String topicName = con.getTopicCatId().getTopic().getTopicName();
 
+                topicName = topicName.replace(' ', '_');
+
                 Path destInationDirectoryforTopiccAndLan = Paths.get(destInationDirectory1.toString(), File.separator,
-                        topicName, File.separator, langName, File.separator);
+                        langName, File.separator, topicName, File.separator);
                 try {
                     Files.createDirectories(destInationDirectoryforTopiccAndLan);
                     Path filePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
