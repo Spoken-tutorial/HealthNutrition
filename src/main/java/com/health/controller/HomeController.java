@@ -1020,7 +1020,7 @@ public class HomeController {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
             String sdfString = "scripts-" + sdf.format(new java.util.Date());
             Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                    CommonData.uploadDirectoryScriptZipFiles, sdfString);
+                    CommonData.uploadDirectoryScriptZipFiles, sdfString, File.separator, cat.getCatName());
 
             for (Tutorial tut : tutorialSet) {
                 int tutorialId = tut.getTutorialId();

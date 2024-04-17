@@ -610,9 +610,8 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
         sb.append(", scriptStatus=").append(scriptStatus);
         sb.append(", slide=").append(slide);
         sb.append(", slideStatus=").append(slideStatus);
-        sb.append(", keyword=").append(keyword);
         sb.append(", keywordStatus=").append(keywordStatus);
-        sb.append(", outline=").append(outline);
+        sb.append(", outlinePath=").append(outlinePath);
         sb.append(", outlineStatus=").append(outlineStatus);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", status=").append(status);

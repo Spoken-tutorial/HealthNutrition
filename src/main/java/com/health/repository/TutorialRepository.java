@@ -42,6 +42,15 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer>, Jp
     @Query("SELECT t FROM Tutorial t WHERE t.timeScript IS NOT NULL AND t.status = true AND t.addedQueue = false")
     List<Tutorial> findTutorialsWithNonNullTimeScriptAndStatusAndAddedQueueFalse();
 
+    @Query("SELECT t FROM Tutorial t WHERE  t.status = true AND t.addedQueue = false")
+    List<Tutorial> findTutorialsWithStatusTrueAndAddedQueueFalse();
+
+    @Query(nativeQuery = true, value = "select * from tutorial_resource join  contributor_role on contributor_role.id=tutorial_resource.con_assigned_tutorial inner join topic_category on topic_category.topic_category_id=contributor_role.topic_cat_id inner join  language on language.lan_id=contributor_role.language_id inner join category on category.category_id=topic_category.category_id inner join topic on topic.topic_id=topic_category.topic_id  where category.status =1 and tutorial_resource.enabled =1 And tutorial_resource.added_queue =0")
+    List<Tutorial> findTutorialsWithStatusTrueAndAddedQueueFalseAndCatregoryEnabled();
+
+    @Query(nativeQuery = true, value = "select  * from tutorial_resource join  contributor_role on contributor_role.id=tutorial_resource.con_assigned_tutorial inner join topic_category on topic_category.topic_category_id=contributor_role.topic_cat_id inner join  language on language.lan_id=contributor_role.language_id inner join category on category.category_id=topic_category.category_id inner join topic on topic.topic_id=topic_category.topic_id  where category.status =1 and tutorial_resource.enabled =1")
+    List<Tutorial> findTutorialsWithStatusTrueAndAndCatregoryEnabled();
+
     /**
      * List of Tutorial Object given ContributorAssignedTutorial object
      * 

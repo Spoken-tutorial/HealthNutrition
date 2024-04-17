@@ -23,6 +23,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,6 +62,9 @@ public class QueueManagement implements Runnable {
 
     @Column(name = "status", nullable = true)
     private String status;
+
+    @Column(name = "oldstatus", nullable = true)
+    private String oldStatus;
 
     @Column(name = "responseId", nullable = true)
     private Long responseId;
@@ -275,7 +279,12 @@ public class QueueManagement implements Runnable {
         return status;
     }
 
+    public String getStatusLog() {
+        return "from " + oldStatus + " to new " + status;
+    }
+
     public void setStatus(String status) {
+        this.oldStatus = this.status;
         this.status = status;
     }
 
@@ -349,6 +358,7 @@ public class QueueManagement implements Runnable {
 
     @Override
     public void run() {
+        MDC.put("queueId", '@' + Long.toString(getQueueId()));
 
         if (taskProcessingService.isURLWorking(commonData.elasticSearch_url)) {
 
@@ -432,14 +442,18 @@ public class QueueManagement implements Runnable {
 
                     JsonNode publishedArray = jsonNode.get("queueId");
                     if (publishedArray != null) {
-
+                        MDC.put("queueId",
+                                '@' + Long.toString(getQueueId()) + '#' + Long.toString(publishedArray.asLong()));
                         setResponseId(publishedArray.asLong());
                         setStatus(CommonData.STATUS_DONE);
 
+                    } else {
+                        logger.info("Json Node:{} ", jsonNode);
+                        setStatus(CommonData.STATUS_FAILED);
                     }
 
                 } else {
-                    logger.info("Status Code:{} API URl", statusCode, api_url);
+                    logger.info("Status Code:{} API URl:{}", statusCode, api_url);
                     setStatus(CommonData.STATUS_PENDING);
 
                 }
@@ -457,6 +471,7 @@ public class QueueManagement implements Runnable {
 
                 queueRepo.save(this);
                 taskProcessingService.getRunningDocuments().remove(documentId);
+                MDC.remove("queueId");
             }
 
         }

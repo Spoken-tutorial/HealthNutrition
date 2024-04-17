@@ -177,8 +177,6 @@ public class Category implements Comparable<Category>, Serializable {
         sb.append(", catName=").append(catName);
         sb.append(", dateAdded=").append(dateAdded);
         sb.append(", status=").append(status);
-        sb.append(", posterPath=").append(posterPath);
-        sb.append(", description=").append(description);
         sb.append("]");
         return sb.toString();
     }
