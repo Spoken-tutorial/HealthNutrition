@@ -63,6 +63,9 @@ public class QueueManagement implements Runnable {
     @Column(name = "status", nullable = true)
     private String status;
 
+    @Column(name = "oldstatus", nullable = true)
+    private String oldStatus;
+
     @Column(name = "responseId", nullable = true)
     private Long responseId;
 
@@ -276,7 +279,12 @@ public class QueueManagement implements Runnable {
         return status;
     }
 
+    public String getStatusLog() {
+        return "from " + oldStatus + " to new " + status;
+    }
+
     public void setStatus(String status) {
+        this.oldStatus = this.status;
         this.status = status;
     }
 
@@ -350,6 +358,7 @@ public class QueueManagement implements Runnable {
 
     @Override
     public void run() {
+        MDC.put("queueId", '@' + Long.toString(getQueueId()));
 
         if (taskProcessingService.isURLWorking(commonData.elasticSearch_url)) {
 
@@ -437,7 +446,6 @@ public class QueueManagement implements Runnable {
                                 '@' + Long.toString(getQueueId()) + '#' + Long.toString(publishedArray.asLong()));
                         setResponseId(publishedArray.asLong());
                         setStatus(CommonData.STATUS_DONE);
-                        MDC.remove("queueId");
 
                     } else {
                         logger.info("Json Node:{} ", jsonNode);
@@ -463,6 +471,7 @@ public class QueueManagement implements Runnable {
 
                 queueRepo.save(this);
                 taskProcessingService.getRunningDocuments().remove(documentId);
+                MDC.remove("queueId");
             }
 
         }

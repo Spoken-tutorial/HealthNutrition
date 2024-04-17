@@ -597,7 +597,7 @@ public class TaskProcessingService {
                 qmnt.setStatus(CommonData.STATUS_PENDING);
                 qmnt.setQueueTime(0);
                 queueRepo.save(qmnt);
-                logger.info("from queued to  pending status is:{}", qmnt.getStatus());
+                logger.info("{}", qmnt.getStatusLog());
             } catch (Exception e) {
 
                 logger.error("Exception of intializeQueue1: {}", qmnt, e);
@@ -612,7 +612,7 @@ public class TaskProcessingService {
                 qmnt.setStatus(CommonData.STATUS_PENDING);
                 qmnt.setQueueTime(0);
                 queueRepo.save(qmnt);
-                logger.info("from processing to  pending status is:{}", qmnt.getStatus());
+                logger.info("{}", qmnt.getStatusLog());
             } catch (Exception e) {
                 logger.error("Exception of intializeQueue2: {}", qmnt, e);
             }
@@ -788,7 +788,7 @@ public class TaskProcessingService {
                         applicationContext.getAutowireCapableBeanFactory().autowireBean(qmnt);
                         taskExecutor.submit(qmnt);
                         queueRepo.save(qmnt);
-                        logger.info("from pending to   queued  status is:{}", qmnt.getStatus());
+                        logger.info("{}", qmnt.getStatusLog());
 
                         count = count + 1;
 
