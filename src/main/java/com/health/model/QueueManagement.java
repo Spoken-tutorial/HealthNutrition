@@ -280,7 +280,7 @@ public class QueueManagement implements Runnable {
     }
 
     public String getStatusLog() {
-        return "from " + oldStatus + " to new " + status;
+        return "from " + oldStatus + " to " + status;
     }
 
     public void setStatus(String status) {
@@ -467,7 +467,7 @@ public class QueueManagement implements Runnable {
 
                 setEndTime(System.currentTimeMillis());
                 setProcesingTime(endTime - startTime);
-                logger.info("Done :{}", this);
+                logger.info("{}", getStatusLog());
 
                 queueRepo.save(this);
                 taskProcessingService.getRunningDocuments().remove(documentId);

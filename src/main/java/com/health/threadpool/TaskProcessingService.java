@@ -716,6 +716,8 @@ public class TaskProcessingService {
 
                         } catch (Exception e) {
                             logger.error("Exception of deleteQueueByApiStatus :{}", queue, e);
+                            MDC.remove("queueId");
+                            continue;
                         }
 
                         MDC.remove("queueId");
@@ -777,7 +779,7 @@ public class TaskProcessingService {
                     try {
                         logger.info("Queueing:{}", qmnt);
                         if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
-
+                            MDC.remove("queueId");
                             continue;
                         }
 
@@ -795,7 +797,8 @@ public class TaskProcessingService {
 
                     } catch (Exception e) {
                         logger.error("Exception of queueProcessor {}", qmnt, e);
-                        break;
+                        MDC.remove("queueId");
+                        continue;
                     }
 
                     MDC.remove("queueId");
