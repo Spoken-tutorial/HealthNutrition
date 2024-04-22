@@ -377,6 +377,7 @@ public class QueueManagement implements Runnable {
 
             setStartTime(System.currentTimeMillis());
             setStatus(CommonData.STATUS_PROCESSING);
+            logger.info("{}", getStatusLog());
 
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 HttpUriRequest request = null;
@@ -446,15 +447,18 @@ public class QueueManagement implements Runnable {
                                 '@' + Long.toString(getQueueId()) + '#' + Long.toString(publishedArray.asLong()));
                         setResponseId(publishedArray.asLong());
                         setStatus(CommonData.STATUS_DONE);
+                        logger.info("{}", getStatusLog());
 
                     } else {
                         logger.info("Json Node:{} ", jsonNode);
                         setStatus(CommonData.STATUS_FAILED);
+                        logger.info("{}", getStatusLog());
                     }
 
                 } else {
                     logger.info("Status Code:{} API URl:{}", statusCode, api_url);
                     setStatus(CommonData.STATUS_PENDING);
+                    logger.info("{}", getStatusLog());
 
                 }
 
@@ -471,6 +475,7 @@ public class QueueManagement implements Runnable {
 
                 queueRepo.save(this);
                 taskProcessingService.getRunningDocuments().remove(documentId);
+                logger.info("Removing MDC");
                 MDC.remove("queueId");
             }
 

@@ -593,6 +593,7 @@ public class TaskProcessingService {
         List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_QUEUED);
         for (QueueManagement qmnt : qmnts) {
             try {
+                MDC.put("queueId", '@' + Long.toString(qmnt.getQueueId()));
                 logger.info("Pending:{}", qmnt);
                 qmnt.setStatus(CommonData.STATUS_PENDING);
                 qmnt.setQueueTime(0);
@@ -602,12 +603,16 @@ public class TaskProcessingService {
 
                 logger.error("Exception of intializeQueue1: {}", qmnt, e);
             }
+            logger.info("{}", qmnt.getStatusLog());
+            logger.info("Removing MDC");
+            MDC.remove("queueId");
 
         }
 
         qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PROCESSING);
         for (QueueManagement qmnt : qmnts) {
             try {
+                MDC.put("queueId", '@' + Long.toString(qmnt.getQueueId()));
                 logger.info("Pending:{}", qmnt);
                 qmnt.setStatus(CommonData.STATUS_PENDING);
                 qmnt.setQueueTime(0);
@@ -616,6 +621,9 @@ public class TaskProcessingService {
             } catch (Exception e) {
                 logger.error("Exception of intializeQueue2: {}", qmnt, e);
             }
+            logger.info("{}", qmnt.getStatusLog());
+            logger.info("Removing MDC");
+            MDC.remove("queueId");
 
         }
 
@@ -719,7 +727,7 @@ public class TaskProcessingService {
                             MDC.remove("queueId");
                             continue;
                         }
-
+                        logger.info("Removing MDC");
                         MDC.remove("queueId");
 
                     }
@@ -779,6 +787,8 @@ public class TaskProcessingService {
                     try {
                         logger.info("Queueing:{}", qmnt);
                         if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
+                            logger.info("skipDocument contains the DocumentID: {}", qmnt.getDocumentId());
+                            logger.info("Removing MDC");
                             MDC.remove("queueId");
                             continue;
                         }
@@ -800,7 +810,7 @@ public class TaskProcessingService {
                         MDC.remove("queueId");
                         continue;
                     }
-
+                    logger.info("Removing MDC");
                     MDC.remove("queueId");
                 }
                 long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
