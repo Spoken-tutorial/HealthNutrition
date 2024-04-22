@@ -1032,7 +1032,7 @@ public class HomeController {
                 topicName = topicName.replace(' ', '_');
 
                 Path destInationDirectoryforTopiccAndLan = Paths.get(destInationDirectory1.toString(), File.separator,
-                        langName, File.separator, topicName, File.separator);
+                        langName, File.separator);
                 try {
                     Files.createDirectories(destInationDirectoryforTopiccAndLan);
                     Path filePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
@@ -1042,6 +1042,11 @@ public class HomeController {
                     if (filePath.toFile().exists()) {
 
                         FileUtils.copyFileToDirectory(sourceFile, destainationFile);
+
+                        Path newFilePath = Paths.get(destInationDirectory1.toString(), File.separator, langName,
+                                File.separator, tutorialId + ".odt");
+                        File newsourceFile = newFilePath.toFile();
+                        ServiceUtility.renameFile(newsourceFile.toString(), topicName + ".odt");
 
                     }
 

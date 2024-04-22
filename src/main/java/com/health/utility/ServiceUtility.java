@@ -27,6 +27,7 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -539,6 +540,20 @@ public class ServiceUtility {
      * 
      * @throws IOException
      **/
+
+    public static void renameFile(String filePath, String newFileName) {
+
+        try {
+            File fileToRename = new File(filePath);
+
+            File newFile = new File(fileToRename.getParent(), newFileName);
+
+            FileUtils.moveFile(fileToRename, newFile);
+
+        } catch (IOException e) {
+            logger.error("Failed to rename the file: ", e);
+        }
+    }
 
     public static List<String> FileInfoSizeAndCreationDate(String fileUrl, Environment env) {
 
