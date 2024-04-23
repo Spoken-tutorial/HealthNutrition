@@ -57,6 +57,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         logger.info("Starting application {}", gitCommitId);
         try {
 
+            logger.info("New War file created on 23/04/2024 for 2nd Time");
             taskProcessingService.createOutlineFile();
             taskProcessingService.addAllTuttorialsToQueue();
             taskProcessingService.intializeQueue();

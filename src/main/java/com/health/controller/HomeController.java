@@ -1034,19 +1034,22 @@ public class HomeController {
                 Path destInationDirectoryforTopiccAndLan = Paths.get(destInationDirectory1.toString(), File.separator,
                         langName, File.separator);
                 try {
-                    Files.createDirectories(destInationDirectoryforTopiccAndLan);
+                    ServiceUtility.createFolder(destInationDirectoryforTopiccAndLan);
+                } catch (IOException e) {
+
+                    logger.error("Exception: ", e);
+                }
+
+                try {
+
                     Path filePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                             CommonData.uploadDirectoryScriptOdtFileforDownload, tutorialId + ".odt");
-                    File destainationFile = destInationDirectoryforTopiccAndLan.toFile();
+                    Path destainationPath = destInationDirectoryforTopiccAndLan.resolve(topicName + ".odt");
+
                     File sourceFile = filePath.toFile();
-                    if (filePath.toFile().exists()) {
+                    if (sourceFile.exists()) {
 
-                        FileUtils.copyFileToDirectory(sourceFile, destainationFile);
-
-                        Path newFilePath = Paths.get(destInationDirectory1.toString(), File.separator, langName,
-                                File.separator, tutorialId + ".odt");
-                        File newsourceFile = newFilePath.toFile();
-                        ServiceUtility.renameFile(newsourceFile.toString(), topicName + ".odt");
+                        FileUtils.copyFile(sourceFile, destainationPath.toFile());
 
                     }
 
