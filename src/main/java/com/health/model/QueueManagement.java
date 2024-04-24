@@ -475,7 +475,6 @@ public class QueueManagement implements Runnable {
 
                 queueRepo.save(this);
                 taskProcessingService.getRunningDocuments().remove(documentId);
-                logger.info("Removing MDC");
                 MDC.remove("queueId");
             }
 

@@ -604,7 +604,6 @@ public class TaskProcessingService {
                 logger.error("Exception of intializeQueue1: {}", qmnt, e);
             }
             logger.info("{}", qmnt.getStatusLog());
-            logger.info("Removing MDC");
             MDC.remove("queueId");
 
         }
@@ -622,7 +621,6 @@ public class TaskProcessingService {
                 logger.error("Exception of intializeQueue2: {}", qmnt, e);
             }
             logger.info("{}", qmnt.getStatusLog());
-            logger.info("Removing MDC");
             MDC.remove("queueId");
 
         }
@@ -727,7 +725,7 @@ public class TaskProcessingService {
                             MDC.remove("queueId");
                             continue;
                         }
-                        logger.info("Removing MDC");
+
                         MDC.remove("queueId");
 
                     }
@@ -788,7 +786,6 @@ public class TaskProcessingService {
                         logger.info("Queueing:{}", qmnt);
                         if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
                             logger.info("skipDocument contains the DocumentID: {}", qmnt.getDocumentId());
-                            logger.info("Removing MDC");
                             MDC.remove("queueId");
                             continue;
                         }
@@ -810,7 +807,7 @@ public class TaskProcessingService {
                         MDC.remove("queueId");
                         continue;
                     }
-                    logger.info("Removing MDC");
+
                     MDC.remove("queueId");
                 }
                 long sleepTime = count > 0 ? CommonData.TASK_SLEEP_TIME : CommonData.NO_TASK_SLEEP_TIME;
