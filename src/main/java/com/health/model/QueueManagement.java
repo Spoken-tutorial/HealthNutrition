@@ -280,7 +280,7 @@ public class QueueManagement implements Runnable {
     }
 
     public String getStatusLog() {
-        return "from " + oldStatus + " to new " + status;
+        return "from " + oldStatus + " to " + status;
     }
 
     public void setStatus(String status) {
@@ -377,6 +377,7 @@ public class QueueManagement implements Runnable {
 
             setStartTime(System.currentTimeMillis());
             setStatus(CommonData.STATUS_PROCESSING);
+            logger.info("{}", getStatusLog());
 
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 HttpUriRequest request = null;
@@ -446,15 +447,18 @@ public class QueueManagement implements Runnable {
                                 '@' + Long.toString(getQueueId()) + '#' + Long.toString(publishedArray.asLong()));
                         setResponseId(publishedArray.asLong());
                         setStatus(CommonData.STATUS_DONE);
+                        logger.info("{}", getStatusLog());
 
                     } else {
                         logger.info("Json Node:{} ", jsonNode);
                         setStatus(CommonData.STATUS_FAILED);
+                        logger.info("{}", getStatusLog());
                     }
 
                 } else {
                     logger.info("Status Code:{} API URl:{}", statusCode, api_url);
                     setStatus(CommonData.STATUS_PENDING);
+                    logger.info("{}", getStatusLog());
 
                 }
 
@@ -467,7 +471,7 @@ public class QueueManagement implements Runnable {
 
                 setEndTime(System.currentTimeMillis());
                 setProcesingTime(endTime - startTime);
-                logger.info("Done :{}", this);
+                logger.info("{}", getStatusLog());
 
                 queueRepo.save(this);
                 taskProcessingService.getRunningDocuments().remove(documentId);

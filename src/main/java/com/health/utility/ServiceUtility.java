@@ -110,6 +110,17 @@ public class ServiceUtility {
 
     }
 
+    public static boolean createFolder(Path path) throws IOException { // check for existence of path
+        boolean status = false;
+        if (Files.exists(path))
+            return status;
+        if (Files.createDirectories(path) != null) {
+            status = true;
+        }
+        return status;
+
+    }
+
     /**
      * to upload file in system
      * 

@@ -593,6 +593,7 @@ public class TaskProcessingService {
         List<QueueManagement> qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_QUEUED);
         for (QueueManagement qmnt : qmnts) {
             try {
+                MDC.put("queueId", '@' + Long.toString(qmnt.getQueueId()));
                 logger.info("Pending:{}", qmnt);
                 qmnt.setStatus(CommonData.STATUS_PENDING);
                 qmnt.setQueueTime(0);
@@ -602,12 +603,15 @@ public class TaskProcessingService {
 
                 logger.error("Exception of intializeQueue1: {}", qmnt, e);
             }
+            logger.info("{}", qmnt.getStatusLog());
+            MDC.remove("queueId");
 
         }
 
         qmnts = queueRepo.findByStatusOrderByRequestTimeAsc(CommonData.STATUS_PROCESSING);
         for (QueueManagement qmnt : qmnts) {
             try {
+                MDC.put("queueId", '@' + Long.toString(qmnt.getQueueId()));
                 logger.info("Pending:{}", qmnt);
                 qmnt.setStatus(CommonData.STATUS_PENDING);
                 qmnt.setQueueTime(0);
@@ -616,6 +620,8 @@ public class TaskProcessingService {
             } catch (Exception e) {
                 logger.error("Exception of intializeQueue2: {}", qmnt, e);
             }
+            logger.info("{}", qmnt.getStatusLog());
+            MDC.remove("queueId");
 
         }
 
@@ -716,6 +722,8 @@ public class TaskProcessingService {
 
                         } catch (Exception e) {
                             logger.error("Exception of deleteQueueByApiStatus :{}", queue, e);
+                            MDC.remove("queueId");
+                            continue;
                         }
 
                         MDC.remove("queueId");
@@ -767,7 +775,8 @@ public class TaskProcessingService {
                         continue;
 
                     } catch (InterruptedException e) {
-                        logger.error("InterruptedException of queueProcessor: ", e);
+                        logger.info("Interrupted");
+                        break;
                     }
                 }
 
@@ -776,7 +785,8 @@ public class TaskProcessingService {
                     try {
                         logger.info("Queueing:{}", qmnt);
                         if (skippedDocuments.containsKey(qmnt.getDocumentId())) {
-
+                            logger.info("skipDocument contains the DocumentID: {}", qmnt.getDocumentId());
+                            MDC.remove("queueId");
                             continue;
                         }
 
@@ -794,7 +804,8 @@ public class TaskProcessingService {
 
                     } catch (Exception e) {
                         logger.error("Exception of queueProcessor {}", qmnt, e);
-                        break;
+                        MDC.remove("queueId");
+                        continue;
                     }
 
                     MDC.remove("queueId");

@@ -162,6 +162,9 @@ public class HomeController {
     private VersionRepository verRepository;
 
     @Autowired
+    private RestControllerClass restcontrollerClass;
+
+    @Autowired
     private AjaxController ajaxController;
 
     @Autowired
@@ -1019,8 +1022,9 @@ public class HomeController {
             String document = "";
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
             String sdfString = "scripts-" + sdf.format(new java.util.Date());
+            String newCatNamewith_ = cat.getCatName().replace(' ', '_');
             Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                    CommonData.uploadDirectoryScriptZipFiles, sdfString, File.separator, cat.getCatName());
+                    CommonData.uploadDirectoryScriptZipFiles, sdfString, File.separator, newCatNamewith_);
 
             for (Tutorial tut : tutorialSet) {
                 int tutorialId = tut.getTutorialId();
@@ -1028,17 +1032,27 @@ public class HomeController {
                 String langName = con.getLan().getLangName();
                 String topicName = con.getTopicCatId().getTopic().getTopicName();
 
+                topicName = topicName.replace(' ', '_');
+
                 Path destInationDirectoryforTopiccAndLan = Paths.get(destInationDirectory1.toString(), File.separator,
-                        topicName, File.separator, langName, File.separator);
+                        langName, File.separator);
                 try {
-                    Files.createDirectories(destInationDirectoryforTopiccAndLan);
+                    ServiceUtility.createFolder(destInationDirectoryforTopiccAndLan);
+                } catch (IOException e) {
+
+                    logger.error("Exception: ", e);
+                }
+
+                try {
+
                     Path filePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                             CommonData.uploadDirectoryScriptOdtFileforDownload, tutorialId + ".odt");
-                    File destainationFile = destInationDirectoryforTopiccAndLan.toFile();
-                    File sourceFile = filePath.toFile();
-                    if (filePath.toFile().exists()) {
+                    Path destainationPath = destInationDirectoryforTopiccAndLan.resolve(topicName + ".odt");
 
-                        FileUtils.copyFileToDirectory(sourceFile, destainationFile);
+                    File sourceFile = filePath.toFile();
+                    if (sourceFile.exists()) {
+
+                        FileUtils.copyFile(sourceFile, destainationPath.toFile());
 
                     }
 
@@ -6165,6 +6179,7 @@ public class HomeController {
         tutorial.setPreRequisticStatus(CommonData.PUBLISH_STATUS);
         tutorial.setVideoStatus(CommonData.PUBLISH_STATUS);
         tutorial.setStatus(true);
+        restcontrollerClass.getLatestPublishhedTutorial().put(tutorial.getTutorialId(), "Tutorial");
         taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
@@ -7061,6 +7076,7 @@ public class HomeController {
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
+            restcontrollerClass.getLatestPublishhedTutorial().put(tut.getTutorialId(), "Tutorial");
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }
