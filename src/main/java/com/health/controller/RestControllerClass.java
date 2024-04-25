@@ -1,12 +1,14 @@
 package com.health.controller;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,8 @@ import com.health.model.ContributorAssignedTutorial;
 import com.health.model.TopicCategoryMapping;
 import com.health.model.Tutorial;
 import com.health.service.TutorialService;
+import com.health.threadpool.TaskProcessingService;
+import com.health.utility.CommonData;
 import com.health.utility.ServiceUtility;
 
 @RestController
@@ -26,40 +30,53 @@ public class RestControllerClass {
     @Autowired
     private TutorialService tutService;
 
-    private Map<Integer, String> latestPublishhedTutorial = new HashMap<>();
+    @Autowired
+    private TaskProcessingService taskProcessingService;
 
-    public Map<Integer, String> getLatestPublishhedTutorial() {
-        return latestPublishhedTutorial;
+    @GetMapping("/api/scriptPublished/{tutorialId}/{dateWithTime}")
+    public ResponseEntity<Map<String, String>> isScriptPulished(@PathVariable int tutorialId,
+            @PathVariable Timestamp dateWithTime) {
+        Map<String, String> response = new HashMap<>();
+        Tutorial tutorial = tutService.findByTutorialId(tutorialId);
+
+        if (tutorial != null) {
+            ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
+            TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
+            int catId = topicCat.getCat().getCategoryId();
+            int lanId = conAssignedTutorial.getLan().getLanId();
+            List<Integer> scriptVerList = ServiceUtility.getApiVersion(scriptmanager_api, catId,
+                    tutorial.getTutorialId(), lanId);
+
+            if (scriptVerList != null && scriptVerList.size() > 0) {
+                response.put("status", "okay");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("status", " not published");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } else {
+            response.put("status", "Tutorial not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+        }
     }
 
-    public void setLatestPublishhedTutorial(Map<Integer, String> latestPublishhedTutorial) {
-        this.latestPublishhedTutorial = latestPublishhedTutorial;
-    }
-
-    @GetMapping("/tutorialsToUploadScripts")
-    public Map<Integer, String> getPublishedTutorial() {
-        Map<Integer, String> resultTutorial = new HashMap<>(latestPublishhedTutorial);
-        Iterator<Map.Entry<Integer, String>> iterator = resultTutorial.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Integer, String> entry = iterator.next();
-            int tutorialId = entry.getKey();
-            Tutorial tutorial = tutService.findByTutorialId(tutorialId);
-            if (tutorial != null) {
-                ContributorAssignedTutorial conAssignedTutorial = tutorial.getConAssignedTutorial();
-                TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
-                int catId = topicCat.getCat().getCategoryId();
-                int lanId = conAssignedTutorial.getLan().getLanId();
-                List<Integer> scriptVerList = ServiceUtility.getApiVersion(scriptmanager_api, catId,
-                        tutorial.getTutorialId(), lanId);
-
-                if (scriptVerList != null && scriptVerList.size() > 0) {
-
-                    getLatestPublishhedTutorial().remove(tutorialId);
+    @GetMapping("/isTutorialPublishedandAddedQueue/{tutorialId}")
+    public boolean isTutorialPublishedandAddedQueue(@PathVariable int tutorialId) {
+        Tutorial tutorial = tutService.findByTutorialId(tutorialId);
+        boolean flag = false;
+        if (tutorial != null) {
+            if (tutorial.isStatus()) {
+                if (tutorial.isAddedQueue()) {
+                    taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.UPDATE_DOCUMENT);
+                } else {
+                    taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
                 }
+                flag = true;
+
             }
         }
-
-        return latestPublishhedTutorial;
+        return flag;
     }
 
     @GetMapping("/checkTutorial/{id}")

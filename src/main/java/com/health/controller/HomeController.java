@@ -6179,7 +6179,6 @@ public class HomeController {
         tutorial.setPreRequisticStatus(CommonData.PUBLISH_STATUS);
         tutorial.setVideoStatus(CommonData.PUBLISH_STATUS);
         tutorial.setStatus(true);
-        restcontrollerClass.getLatestPublishhedTutorial().put(tutorial.getTutorialId(), "Tutorial");
         taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
@@ -7076,7 +7075,7 @@ public class HomeController {
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
-            restcontrollerClass.getLatestPublishhedTutorial().put(tut.getTutorialId(), "Tutorial");
+
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }
