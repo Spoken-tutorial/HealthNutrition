@@ -49,6 +49,14 @@ public class RestControllerClass {
 
             if (scriptVerList != null && scriptVerList.size() > 0) {
                 response.put("status", "okay");
+                if (tutorial.isStatus()) {
+                    if (tutorial.isAddedQueue()) {
+                        taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.UPDATE_DOCUMENT);
+                    } else {
+                        taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
+                    }
+
+                }
                 return ResponseEntity.ok(response);
             } else {
                 response.put("status", " not published");
@@ -59,24 +67,6 @@ public class RestControllerClass {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
         }
-    }
-
-    @GetMapping("/isTutorialPublishedandAddedQueue/{tutorialId}")
-    public boolean isTutorialPublishedandAddedQueue(@PathVariable int tutorialId) {
-        Tutorial tutorial = tutService.findByTutorialId(tutorialId);
-        boolean flag = false;
-        if (tutorial != null) {
-            if (tutorial.isStatus()) {
-                if (tutorial.isAddedQueue()) {
-                    taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.UPDATE_DOCUMENT);
-                } else {
-                    taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
-                }
-                flag = true;
-
-            }
-        }
-        return flag;
     }
 
     @GetMapping("/checkTutorial/{id}")
