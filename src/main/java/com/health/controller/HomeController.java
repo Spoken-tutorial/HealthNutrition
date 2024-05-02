@@ -83,6 +83,7 @@ import com.health.model.FeedbackMasterTrainer;
 import com.health.model.FilesofBrouchure;
 import com.health.model.IndianLanguage;
 import com.health.model.Language;
+import com.health.model.LiveTutorial;
 import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
 import com.health.model.PathofPromoVideo;
@@ -101,6 +102,7 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
+import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
 import com.health.service.BrouchureService;
@@ -117,6 +119,7 @@ import com.health.service.FeedBackMasterTrainerService;
 import com.health.service.FilesofBrouchureService;
 import com.health.service.IndianLanguageService;
 import com.health.service.LanguageService;
+import com.health.service.LiveTutorialService;
 import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
 import com.health.service.PathofPromoVideoService;
@@ -142,6 +145,7 @@ import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
+import com.opencsv.exceptions.CsvException;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
@@ -162,7 +166,10 @@ public class HomeController {
     private VersionRepository verRepository;
 
     @Autowired
-    private RestControllerClass restcontrollerClass;
+    private LiveTutorialService liveTutorialService;
+
+    @Autowired
+    private LiveTutorialRepository liveTutorialRepo;
 
     @Autowired
     private AjaxController ajaxController;
@@ -902,6 +909,102 @@ public class HomeController {
         model.addAttribute("totalPages", totalPages);
 
         return "tutorialList";
+    }
+
+    @GetMapping("/addLiveTutorial")
+    public String addLiveTutorial(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        List<Language> languages = lanService.getAllLanguages();
+        Collections.sort(languages);
+        model.addAttribute("languages", languages);
+
+        List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
+        model.addAttribute("liveTutorials", liveTutorials);
+        return "addLiveTutorial";
+    }
+
+    @PostMapping("/addLiveTutorial")
+    public String addLiveTuotorialPost(// @ModelAttribute("liveTutorials") List<LiveTutorial> liveTutorialList,
+            @RequestParam(value = "add_csv_file") MultipartFile csv_file,
+            @RequestParam(value = "add_live_video_name") String name,
+            @RequestParam(value = "add_live_video_title") String title,
+            @RequestParam(value = "add_live_video_lang") String lanId,
+            @RequestParam(value = "add_live_video_link") String url,
+            @RequestParam(value = "csvfilecheckbox", required = false) String csvFileCheckBoxValue,
+            HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        List<Language> languages = lanService.getAllLanguages();
+        Collections.sort(languages);
+        model.addAttribute("languages", languages);
+
+        List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
+
+        if (csvFileCheckBoxValue != null && Integer.parseInt(csvFileCheckBoxValue) == 1) {
+            try {
+                liveTutorialService.saveLiveTutorialsFromCSV(csv_file);
+
+                model.addAttribute("liveTutorials", liveTutorials);
+                model.addAttribute("success_msg", "Record Submitted Successfully !");
+            } catch (IOException e) {
+
+                model.addAttribute("liveTutorials", liveTutorials);
+                model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+                logger.error("Exception: ", e);
+                return "addLiveTutorial";
+            } catch (CsvException e) {
+                model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+                logger.error("Exception: ", e);
+                return "addLiveTutorial";
+            }
+        } else {
+
+            int id = liveTutorialService.getNewId();
+
+            if (name == null || name.isEmpty()) {
+                model.addAttribute("liveTutorials", liveTutorials);
+                model.addAttribute("error_msg", "Please, enter name ");
+                return "addLiveTutorial";
+            }
+
+            if (title == null || title.isEmpty()) {
+                model.addAttribute("liveTutorials", liveTutorials);
+                model.addAttribute("error_msg", "Please, enter title");
+                return "addLiveTutorial";
+            }
+
+            if (lanId == null || lanId.isEmpty() || Integer.parseInt(lanId) == 0) {
+                model.addAttribute("liveTutorials", liveTutorials);
+                model.addAttribute("error_msg", "Please, select language");
+                return "addLiveTutorial";
+            }
+
+            if (url == null || url.isEmpty()) {
+                model.addAttribute("liveTutorials", liveTutorials);
+                model.addAttribute("error_msg", "Please, enter url");
+                return "addLiveTutorial";
+            }
+
+            Language lan = lanService.getById(Integer.parseInt(lanId));
+            LiveTutorial liveTutorial = new LiveTutorial();
+            liveTutorial.setId(id);
+            liveTutorial.setDateAdded(ServiceUtility.getCurrentTime());
+            liveTutorial.setName(name);
+            liveTutorial.setTitle(title);
+            liveTutorial.setLan(lan);
+            liveTutorial.setUrl(url);
+            liveTutorialRepo.save(liveTutorial);
+
+        }
+
+        liveTutorials = liveTutorialService.findAll();
+        model.addAttribute("liveTutorials", liveTutorials);
+        model.addAttribute("success_msg", "Record Submitted Successfully");
+        return "addLiveTutorial";
     }
 
     @GetMapping("/downloads")

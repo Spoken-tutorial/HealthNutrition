@@ -2667,7 +2667,19 @@ $("#languageId1").change(function() {
 	
 			
 		
-		
+		 $('#csvfilecheckbox').on('change', function() {
+       
+		if($("#csvfilecheckbox").is(':checked')){
+			 $('#csv_file_div').show();
+          	 $('#rawData').hide();
+			}
+		else{
+		 	$('#csv_file_div').hide();
+            $('#rawData').show();
+		}
+        
+       
+      });
 			
 					
 					

@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Live Tutorial - Admin - Health And Nutrition')"></head>
+<style>
+.nav-live_tutorial{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-live_tutorial a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">View</a></li>
+
+
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Live Tutorial</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form th:action="@{/addLiveTutorial}" method="post"
+											enctype="multipart/form-data" id="inputForm">
+											<div id="rawData">
+											<div class="form-group">
+											  <label for="add_live_video_name">Name *</label>
+											    <input class="form-control" type="text"  id="add_live_video_name" formmethod="GET" name="add_live_video_name" >
+											    
+											  </div>
+											   <div class="form-group">
+											  <label for="add_live_video_title">Title *</label>
+											    <input class="form-control" type="text"  id="add_live_video_title" formmethod="GET" name="add_live_video_title" >
+											  </div>
+											  
+											 <div class="form-group">
+											<label for="add_live_video_lang">Language *</label> <select
+											id="add_live_video_lang" class="form-control"
+											name="add_live_video_lang" >
+
+											<option value="0">Select any one Language</option>
+											
+												<option 
+												th:each="language: ${languages}"
+												th:value="${language.getLanId()}" th:text="${language.getLangName()}" >
+														</option>
+											</select>
+										
+											</div>
+											 <div class="form-group">
+											<label th:for="add_live_video_link"> Video Link *  </label>
+											 <input class="form-control" type="text"  id="add_live_video_link" formmethod="GET" name="add_live_video_link" >
+											</div>
+											
+											</div>
+											<br>
+											<h6>If you have csv file of data then you can directly upload it without entering name, title, lang and video link. </h6>
+											<div class="form-group">
+
+											<label><input type="checkbox" id="csvfilecheckbox" name="csvfilecheckbox" 
+											  value="1" /> Select checkbox to upload CSV File</label>
+										
+											</div>
+   											 						        
+									         <div class="form-group"  id=csv_file_div style="display:none;">
+											<label th:for="add_csv_file">Upload CSV File *</label>
+											
+											<input type="file" class="form-control" th:id="add_csv_file" name="add_csv_file"  accept=".csv" onchange="validate_file_size(this,50000000)"
+											  / >
+											<small> (Only csv format of max filesize 50 MB)</small > 
+	
+											</div>
+
+											
+											<button type="submit" class="btn  btn-success">Submit</button>
+										</form>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable">
+						
+							</div>
+							<thead>
+								<tr>
+									<th scope="col">Date Added</th>
+									<th scope="col"> Name</th>
+									<th scope="col">Title</th>
+									<th scope="col">Language</th>
+									<th scope="col">Url</th>
+									 <th scope="col">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="tut : ${liveTutorials}">
+								 <td scope="row"><span th:text = "${tut.getDateAdded()}"></span></td>
+							      <td scope="row"><span th:text = "${tut.getName()}"></span></td>
+							      <td><span th:text = "${tut.getTitle()}"></span></td>
+							      <td><span th:text = "${tut.getLan().getLangName()}"></span></td>
+						
+							      <td><span th:text = "${tut.getUrl()}"></span>
+								  </td>
+								    
+								   <td><a th:href="@{${'/liveTutorial/edit/' + tut.getId()}}">Edit</a></td>
+								
+							    </tr>
+
+							</tbody>
+						</table >
+					</div>
+
+
+
+				</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+   
+} );
+</script>
+
+	<script th:inline="javascript">
+	
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>
+
