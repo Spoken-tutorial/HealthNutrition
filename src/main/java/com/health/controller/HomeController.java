@@ -926,8 +926,7 @@ public class HomeController {
     }
 
     @PostMapping("/addLiveTutorial")
-    public String addLiveTuotorialPost(// @ModelAttribute("liveTutorials") List<LiveTutorial> liveTutorialList,
-            @RequestParam(value = "add_csv_file") MultipartFile csv_file,
+    public String addLiveTuotorialPost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
             @RequestParam(value = "add_live_video_name") String name,
             @RequestParam(value = "add_live_video_title") String title,
             @RequestParam(value = "add_live_video_lang") String lanId,
@@ -1005,6 +1004,72 @@ public class HomeController {
         model.addAttribute("liveTutorials", liveTutorials);
         model.addAttribute("success_msg", "Record Submitted Successfully");
         return "addLiveTutorial";
+    }
+
+    @GetMapping("/liveTutorial/edit/{id}")
+    public String editLiveTutorialGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        List<Language> languages = lanService.getAllLanguages();
+        Collections.sort(languages);
+        model.addAttribute("languages", languages);
+
+        LiveTutorial liveTutorial = liveTutorialService.findById(id);
+
+        if (liveTutorial == null) {
+
+            return "redirect:/addLiveTutorial";
+        }
+
+        model.addAttribute("liveTutorial", liveTutorial);
+
+        return "updateLiveTutorial";
+    }
+
+    @PostMapping("/updateLiveTutorial")
+    public String updateLiveTutorialPost(HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+        List<Language> languages = lanService.getAllLanguages();
+        Collections.sort(languages);
+        model.addAttribute("languages", languages);
+
+        String liveTutorialId = req.getParameter("liveTutorialId");
+        String name = req.getParameter("update_live_video_name");
+        String title = req.getParameter("update_live_video_title");
+        String lanId = req.getParameter("update_live_video_lang");
+        String url = req.getParameter("update_live_video_link");
+
+        LiveTutorial liveTutorial = liveTutorialService.findById(Integer.parseInt(liveTutorialId));
+
+        model.addAttribute("liveTutorial", liveTutorial);
+        if (name != null && !name.isEmpty()) {
+            liveTutorial.setName(name);
+        }
+        if (title != null && !title.isEmpty()) {
+            liveTutorial.setTitle(title);
+        }
+        if (lanId != null && !lanId.isEmpty()) {
+            Language language = lanService.getById(Integer.parseInt(lanId));
+            if (language != null)
+                liveTutorial.setLan(language);
+        }
+        if (url != null && !url.isEmpty()) {
+            liveTutorial.setUrl(url);
+        }
+
+        liveTutorial.setDateAdded(ServiceUtility.getCurrentTime());
+        liveTutorialRepo.save(liveTutorial);
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+        model.addAttribute("liveTutorial", liveTutorial);
+
+        return "updateLiveTutorial";
     }
 
     @GetMapping("/downloads")
