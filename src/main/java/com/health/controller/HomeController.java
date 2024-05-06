@@ -943,17 +943,11 @@ public class HomeController {
         String document = temp.substring(indexToStart, temp.length());
         model.addAttribute("sample_csv_file", document);
 
-        List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
-        Collections.sort(liveTutorials, LiveTutorial.SortByUploadTime);
-
         try {
             liveTutorialService.saveLiveTutorialsFromCSV(csv_file, model);
 
-            model.addAttribute("liveTutorials", liveTutorials);
-
         } catch (IOException e) {
 
-            model.addAttribute("liveTutorials", liveTutorials);
             model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
             logger.error("Exception: ", e);
             return "addLiveTutorial";
@@ -963,77 +957,11 @@ public class HomeController {
             return "addLiveTutorial";
         }
 
-        liveTutorials = liveTutorialService.findAll();
+        List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
         Collections.sort(liveTutorials, LiveTutorial.SortByUploadTime);
         model.addAttribute("liveTutorials", liveTutorials);
 
         return "addLiveTutorial";
-    }
-
-    @GetMapping("/liveTutorial/edit/{id}")
-    public String editLiveTutorialGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
-
-        User usr = getUser(principal);
-        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
-        model.addAttribute("userInfo", usr);
-        List<Language> languages = lanService.getAllLanguages();
-        Collections.sort(languages);
-        model.addAttribute("languages", languages);
-
-        LiveTutorial liveTutorial = liveTutorialService.findById(id);
-
-        if (liveTutorial == null) {
-
-            return "redirect:/addLiveTutorial";
-        }
-
-        model.addAttribute("liveTutorial", liveTutorial);
-
-        return "updateLiveTutorial";
-    }
-
-    @PostMapping("/updateLiveTutorial")
-    public String updateLiveTutorialPost(HttpServletRequest req, Model model, Principal principal) {
-
-        User usr = getUser(principal);
-        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
-
-        model.addAttribute("userInfo", usr);
-        List<Language> languages = lanService.getAllLanguages();
-        Collections.sort(languages);
-        model.addAttribute("languages", languages);
-
-        String liveTutorialId = req.getParameter("liveTutorialId");
-        String name = req.getParameter("update_live_video_name");
-        String title = req.getParameter("update_live_video_title");
-        String lanId = req.getParameter("update_live_video_lang");
-        String url = req.getParameter("update_live_video_link");
-
-        LiveTutorial liveTutorial = liveTutorialService.findById(Integer.parseInt(liveTutorialId));
-
-        model.addAttribute("liveTutorial", liveTutorial);
-        if (name != null && !name.isEmpty()) {
-            liveTutorial.setName(name);
-        }
-        if (title != null && !title.isEmpty()) {
-            liveTutorial.setTitle(title);
-        }
-        if (lanId != null && !lanId.isEmpty()) {
-            Language language = lanService.getById(Integer.parseInt(lanId));
-            if (language != null)
-                liveTutorial.setLan(language);
-        }
-        if (url != null && !url.isEmpty()) {
-            liveTutorial.setUrl(url);
-        }
-
-        liveTutorial.setDateAdded(ServiceUtility.getCurrentTime());
-        liveTutorialRepo.save(liveTutorial);
-
-        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
-        model.addAttribute("liveTutorial", liveTutorial);
-
-        return "updateLiveTutorial";
     }
 
     @GetMapping("/downloads")
