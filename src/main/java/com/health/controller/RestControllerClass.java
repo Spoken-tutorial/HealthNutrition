@@ -57,14 +57,15 @@ public class RestControllerClass {
                     }
 
                 }
-                return ResponseEntity.ok(response);
+
             } else {
                 response.put("status", " not published");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
             }
+            return ResponseEntity.ok(response);
         } else {
             response.put("status", "Tutorial not found");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
         }
     }

@@ -2,9 +2,12 @@ package com.health.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Comparator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -15,6 +18,7 @@ public class LiveTutorial implements Comparable<LiveTutorial>, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "live_tutorial_id", nullable = false, updatable = false)
     private int id;
 
@@ -31,7 +35,7 @@ public class LiveTutorial implements Comparable<LiveTutorial>, Serializable {
     private Timestamp dateAdded;
 
     @ManyToOne
-    @JoinColumn(name = "lan_id")
+    @JoinColumn(name = "lan_id", nullable = false)
     private Language lan;
 
     public int getId() {
@@ -107,6 +111,16 @@ public class LiveTutorial implements Comparable<LiveTutorial>, Serializable {
 
         this.lan = lan;
     }
+
+    public static Comparator<LiveTutorial> SortByUploadTime = new Comparator<LiveTutorial>() {
+
+        // Method
+        @Override
+        public int compare(LiveTutorial t1, LiveTutorial t2) {
+            return t2.getDateAdded().compareTo(t1.getDateAdded());
+
+        }
+    };
 
     @Override
     public int compareTo(LiveTutorial o) {

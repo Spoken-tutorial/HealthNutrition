@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.health.model.Language;
@@ -33,20 +34,6 @@ public class LiveTutorialServiceImpl implements LiveTutorialService {
     private LanguageService lanService;
 
     @Override
-    public int getNewId() {
-        try {
-            if (repo.getNewId() == null)
-                return 1;
-            else
-                return repo.getNewId() + 1;
-        } catch (Exception e) {
-
-            logger.error("New Id error in LiveTutorial Service Impl class: {}", repo.getNewId(), e);
-            return 1;
-        }
-    }
-
-    @Override
     public LiveTutorial findById(int id) {
         try {
             Optional<LiveTutorial> local = repo.findById(id);
@@ -64,32 +51,71 @@ public class LiveTutorialServiceImpl implements LiveTutorialService {
     }
 
     @Override
-    public void saveLiveTutorialsFromCSV(MultipartFile file) throws IOException, CsvException {
+    public void saveLiveTutorialsFromCSV(MultipartFile file, Model model) throws IOException, CsvException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
                 CSVReader csvReader = new CSVReader(reader)) {
             List<LiveTutorial> liveTutorialsList = new ArrayList<>();
-            List<String[]> rows = csvReader.readAll();
-            int liveTutorialId = getNewId();
+            String[] header = csvReader.readNext();
+            int namecolumn = -1;
+            int titlecolumn = -1;
+            int languagecolumn = -1;
+            int urlcolumn = -1;
 
-            for (String[] row : rows) {
-                LiveTutorial liveTutorial = new LiveTutorial();
-                liveTutorial.setId(liveTutorialId);
-                logger.info(row[0]);
-                liveTutorial.setName(row[0]);
-                logger.info(row[1]);
-                liveTutorial.setTitle(row[1]);
-                logger.info(row[2]);
-                Language lan = lanService.getByLanName(row[2]);
+            for (int i = 0; i < header.length; i++) {
+
+                switch (header[i]) {
+                case "Name":
+                    namecolumn = i;
+                    break;
+
+                case "Title":
+                    titlecolumn = i;
+                    break;
+
+                case "Language":
+                    languagecolumn = i;
+                    break;
+
+                case "Url":
+                    urlcolumn = i;
+                    break;
+
+                }
+            }
+
+            if (namecolumn == -1 || titlecolumn == -1 || languagecolumn == -1 || urlcolumn == -1) {
+                model.addAttribute("error_msg",
+                        "Some Errors Occured; missing header or name or title or language or url");
+                return;
+            }
+            String[] row;
+            while ((row = csvReader.readNext()) != null) {
+                LiveTutorial liveTutorial = repo.findByName(row[namecolumn]);
+                if (liveTutorial == null) {
+                    liveTutorial = new LiveTutorial();
+                    logger.info(row[namecolumn]);
+                    liveTutorial.setName(row[namecolumn]);
+                }
+
+                logger.info(row[titlecolumn]);
+                liveTutorial.setTitle(row[titlecolumn]);
+                logger.info(row[languagecolumn]);
+                Language lan = lanService.getByLanName(row[languagecolumn]);
+                if (lan == null) {
+                    model.addAttribute("error_msg", "Could not get language from " + row[namecolumn]);
+                    continue;
+                }
                 liveTutorial.setLan(lan);
-                logger.info(row[3]);
-                liveTutorial.setUrl(row[3]);
+                logger.info(row[urlcolumn]);
+                liveTutorial.setUrl(row[urlcolumn]);
                 liveTutorial.setDateAdded(ServiceUtility.getCurrentTime());
                 liveTutorialsList.add(liveTutorial);
-                liveTutorialId += 1;
 
             }
             logger.info("Size of liveTutorialsList: {}", liveTutorialsList.size());
+
             repo.saveAll(liveTutorialsList);
+            model.addAttribute("success_msg", "Saved liveTutorialList:  " + liveTutorialsList.size());
         }
     }
 

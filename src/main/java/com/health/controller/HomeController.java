@@ -916,93 +916,57 @@ public class HomeController {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-        List<Language> languages = lanService.getAllLanguages();
-        Collections.sort(languages);
-        model.addAttribute("languages", languages);
-
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadLiveTutorial, "Sample_CSV_file" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
         List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
+        Collections.sort(liveTutorials, LiveTutorial.SortByUploadTime);
         model.addAttribute("liveTutorials", liveTutorials);
         return "addLiveTutorial";
     }
 
     @PostMapping("/addLiveTutorial")
     public String addLiveTuotorialPost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
-            @RequestParam(value = "add_live_video_name") String name,
-            @RequestParam(value = "add_live_video_title") String title,
-            @RequestParam(value = "add_live_video_lang") String lanId,
-            @RequestParam(value = "add_live_video_link") String url,
-            @RequestParam(value = "csvfilecheckbox", required = false) String csvFileCheckBoxValue,
+
             HttpServletRequest req, Principal principal, Model model) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-        List<Language> languages = lanService.getAllLanguages();
-        Collections.sort(languages);
-        model.addAttribute("languages", languages);
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadLiveTutorial, "Sample_CSV_file" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
 
         List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
+        Collections.sort(liveTutorials, LiveTutorial.SortByUploadTime);
 
-        if (csvFileCheckBoxValue != null && Integer.parseInt(csvFileCheckBoxValue) == 1) {
-            try {
-                liveTutorialService.saveLiveTutorialsFromCSV(csv_file);
+        try {
+            liveTutorialService.saveLiveTutorialsFromCSV(csv_file, model);
 
-                model.addAttribute("liveTutorials", liveTutorials);
-                model.addAttribute("success_msg", "Record Submitted Successfully !");
-            } catch (IOException e) {
+            model.addAttribute("liveTutorials", liveTutorials);
 
-                model.addAttribute("liveTutorials", liveTutorials);
-                model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
-                logger.error("Exception: ", e);
-                return "addLiveTutorial";
-            } catch (CsvException e) {
-                model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
-                logger.error("Exception: ", e);
-                return "addLiveTutorial";
-            }
-        } else {
+        } catch (IOException e) {
 
-            int id = liveTutorialService.getNewId();
-
-            if (name == null || name.isEmpty()) {
-                model.addAttribute("liveTutorials", liveTutorials);
-                model.addAttribute("error_msg", "Please, enter name ");
-                return "addLiveTutorial";
-            }
-
-            if (title == null || title.isEmpty()) {
-                model.addAttribute("liveTutorials", liveTutorials);
-                model.addAttribute("error_msg", "Please, enter title");
-                return "addLiveTutorial";
-            }
-
-            if (lanId == null || lanId.isEmpty() || Integer.parseInt(lanId) == 0) {
-                model.addAttribute("liveTutorials", liveTutorials);
-                model.addAttribute("error_msg", "Please, select language");
-                return "addLiveTutorial";
-            }
-
-            if (url == null || url.isEmpty()) {
-                model.addAttribute("liveTutorials", liveTutorials);
-                model.addAttribute("error_msg", "Please, enter url");
-                return "addLiveTutorial";
-            }
-
-            Language lan = lanService.getById(Integer.parseInt(lanId));
-            LiveTutorial liveTutorial = new LiveTutorial();
-            liveTutorial.setId(id);
-            liveTutorial.setDateAdded(ServiceUtility.getCurrentTime());
-            liveTutorial.setName(name);
-            liveTutorial.setTitle(title);
-            liveTutorial.setLan(lan);
-            liveTutorial.setUrl(url);
-            liveTutorialRepo.save(liveTutorial);
-
+            model.addAttribute("liveTutorials", liveTutorials);
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return "addLiveTutorial";
+        } catch (CsvException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return "addLiveTutorial";
         }
 
         liveTutorials = liveTutorialService.findAll();
+        Collections.sort(liveTutorials, LiveTutorial.SortByUploadTime);
         model.addAttribute("liveTutorials", liveTutorials);
-        model.addAttribute("success_msg", "Record Submitted Successfully");
+
         return "addLiveTutorial";
     }
 

@@ -72,6 +72,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         new File(baseDir + CommonData.uploadDirectoryMasterTrainer).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryEvent).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
+        new File(baseDir + CommonData.uploadLiveTutorial).mkdirs();
     }
 
 }

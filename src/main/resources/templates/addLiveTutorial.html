@@ -58,49 +58,15 @@ font-weight:bold!important;
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-6">
+							
 										<form th:action="@{/addLiveTutorial}" method="post"
 											enctype="multipart/form-data" id="inputForm">
 											<div id="rawData">
-											<div class="form-group">
-											  <label for="add_live_video_name">Name *</label>
-											    <input class="form-control" type="text"  id="add_live_video_name" formmethod="GET" name="add_live_video_name" >
-											    
-											  </div>
-											   <div class="form-group">
-											  <label for="add_live_video_title">Title *</label>
-											    <input class="form-control" type="text"  id="add_live_video_title" formmethod="GET" name="add_live_video_title" >
-											  </div>
-											  
-											 <div class="form-group">
-											<label for="add_live_video_lang">Language *</label> <select
-											id="add_live_video_lang" class="form-control"
-											name="add_live_video_lang" >
-
-											<option value="0">Select any one Language</option>
-											
-												<option 
-												th:each="language: ${languages}"
-												th:value="${language.getLanId()}" th:text="${language.getLangName()}" >
-														</option>
-											</select>
-										
-											</div>
-											 <div class="form-group">
-											<label th:for="add_live_video_link"> Video Link *  </label>
-											 <input class="form-control" type="text"  id="add_live_video_link" formmethod="GET" name="add_live_video_link" >
-											</div>
-											
+												
 											</div>
 											<br>
-											<h6>If you have csv file of data then you can directly upload it without entering name, title, lang and video link. </h6>
-											<div class="form-group">
-
-											<label><input type="checkbox" id="csvfilecheckbox" name="csvfilecheckbox" 
-											  value="1" /> Select checkbox to upload CSV File</label>
-										
-											</div>
-   											 						        
-									         <div class="form-group"  id=csv_file_div style="display:none;">
+																        
+									         <div class="form-group"  id=csv_file_div >
 											<label th:for="add_csv_file">Upload CSV File *</label>
 											
 											<input type="file" class="form-control" th:id="add_csv_file" name="add_csv_file"  accept=".csv" onchange="validate_file_size(this,50000000)"
@@ -112,7 +78,11 @@ font-weight:bold!important;
 											
 											<button type="submit" class="btn  btn-success">Submit</button>
 										</form>
-
+										<br> <br>
+										<div class="mb-3" style="align-content: center; " ><i class="fas fa-file-download mr-3 fa-lg" style="float: left;"> </i> 
+										<a name="samplecsvdownload" target="_blank" th:href="@{/files/}+@{${sample_csv_file}}"
+										id="samplecsvdownload" style="font-size: large; position: relative; float: left;"> <h6>Download Sample CSV File</h6></a>
+							</div>
 									</div>
 								</div>
 
@@ -131,7 +101,7 @@ font-weight:bold!important;
 									<th scope="col">Title</th>
 									<th scope="col">Language</th>
 									<th scope="col">Url</th>
-									 <th scope="col">Action</th>
+									 
 								</tr>
 							</thead>
 							<tbody>
@@ -143,9 +113,7 @@ font-weight:bold!important;
 						
 							      <td><span th:text = "${tut.getUrl()}"></span>
 								  </td>
-								    
-								   <td><a th:href="@{${'/liveTutorial/edit/' + tut.getId()}}">Edit</a></td>
-								
+								  
 							    </tr>
 
 							</tbody>
