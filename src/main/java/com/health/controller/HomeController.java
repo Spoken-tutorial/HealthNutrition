@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -22,14 +23,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +46,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.MailException;
@@ -164,6 +172,9 @@ public class HomeController {
 
     @Autowired
     private VersionRepository verRepository;
+
+    @Autowired
+    private CommonData commonData;
 
     @Autowired
     private LiveTutorialService liveTutorialService;
@@ -777,6 +788,87 @@ public class HomeController {
         return "ClearAllCaches";
     }
 
+    private Page<Tutorial> searchonElasticSearch(Pageable pageable, int cat, int topic, int lan, String query) {
+
+        StringBuilder documentSb = new StringBuilder();
+        documentSb.append(commonData.elasticSearch_url);
+        documentSb.append("/");
+        documentSb.append("search");
+
+        String tempUrl = documentSb.toString();
+        List<Tutorial> tutorialList = new ArrayList<>();
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+            try {
+
+                logger.info("API_URL:{}", tempUrl);
+
+                HttpUriRequest request = new HttpPost(tempUrl);
+                if (request instanceof HttpPost) {
+                    List<NameValuePair> paramsforAddDocument = new ArrayList<>();
+                    paramsforAddDocument.add(new BasicNameValuePair("categoryId", Integer.toString(cat)));
+                    paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(topic)));
+                    paramsforAddDocument.add(new BasicNameValuePair("languageId", Integer.toString(lan)));
+                    paramsforAddDocument.add(new BasicNameValuePair("query", query));
+                    HttpPost httpPost = (HttpPost) request;
+                    httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
+
+                }
+
+                HttpResponse response = httpClient.execute(request);
+
+                int statusCode = response.getStatusLine().getStatusCode();
+
+                if (statusCode == 200 || statusCode == 201) {
+                    String jsonResponse = EntityUtils.toString(response.getEntity());
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+                    logger.info("jsonNode:{}", jsonNode);
+
+                    JsonNode publishedArray = jsonNode.get("documentIds");
+                    if (publishedArray != null && publishedArray.isArray()) {
+
+                        for (JsonNode idNode : publishedArray) {
+
+                            String documentId = idNode.asText();
+                            int tutorialId = Integer.parseInt(documentId.replaceAll("[^0-9]", ""));
+                            tutorialList.add(tutService.findByTutorialId(tutorialId));
+                        }
+
+                    } else {
+                        logger.error("documentIds is not an array or is null");
+                    }
+
+                } else {
+                    logger.info("Status Code:{} API URl:{}", statusCode, tempUrl);
+
+                }
+
+            } catch (Exception e) {
+                logger.error("Exception of serach :{}", query, e);
+
+            }
+
+        } catch (IOException e1) {
+
+            logger.error("Exception: ", e1);
+        }
+
+        List<Tutorial> newTutorialList = tutorialList.stream().distinct().collect(Collectors.toList());
+        if (cat == 0 && topic == 0 && lan == 0 && query.isEmpty()) {
+            newTutorialList = newTutorialList.stream().sorted(Comparator.comparing(Tutorial::getTutorialId))
+                    .collect(Collectors.toList());
+        }
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), newTutorialList.size());
+
+        List<Tutorial> sublist = newTutorialList.subList(start, end);
+
+        return new PageImpl<>(sublist, pageable, newTutorialList.size());
+
+    }
+
     @GetMapping("/tutorials")
     public String viewCoursesAvailable(HttpServletRequest req,
             @RequestParam(name = "categoryName", required = false, defaultValue = "0") int cat,
@@ -825,64 +917,63 @@ public class HomeController {
             model.addAttribute("lanforQuery", localLan);
         }
 
-        if (localCat != null && localTopic != null) {
-            localTopicCat = topicCatService.findAllByCategoryAndTopic(localCat, localTopic);
-            localTopicCatList = new ArrayList<>();
-            localTopicCatList.add(localTopicCat);
-        } else if (localCat != null) {
-            localTopicCatList = topicCatService.findAllByCategory(localCat);
-        } else if (localTopic != null) {
-            localTopicCatList = topicCatService.findAllByTopicwithCategoryTrue(localTopic);
-        }
+        /*
+         * if (localCat != null && localTopic != null) { localTopicCat =
+         * topicCatService.findAllByCategoryAndTopic(localCat, localTopic);
+         * localTopicCatList = new ArrayList<>(); localTopicCatList.add(localTopicCat);
+         * } else if (localCat != null) { localTopicCatList =
+         * topicCatService.findAllByCategory(localCat); } else if (localTopic != null) {
+         * localTopicCatList =
+         * topicCatService.findAllByTopicwithCategoryTrue(localTopic); }
+         * 
+         * if (localTopicCatList != null) {
+         * 
+         * if (localLan != null) { conAssigTutorialList =
+         * conRepo.findAllByTopicCatAndLan(localTopicCatList, localLan); } else {
+         * conAssigTutorialList = conRepo.findAllByTopicCat(localTopicCatList); } } else
+         * { if (localLan != null) { conAssigTutorialList =
+         * conRepo.findAllByLanWithcategoryTrue(localLan); } }
+         * 
+         * if (conAssigTutorialList != null) { tut =
+         * tutService.findAllByconAssignedTutorialListPagination(conAssigTutorialList,
+         * pageable);
+         * 
+         * } else { tut =
+         * tutService.findAllPaginationWithEnabledCategoryandTrueTutorial(pageable);
+         * 
+         * }
+         * 
+         * List<TopicCategoryMapping> localTopicCatListforQuery = new ArrayList<>();
+         * List<ContributorAssignedTutorial> conAssigTutorialListforQuery = null;
+         * List<Category> enabledCatList = getCategories(); for (Category catTemp :
+         * enabledCatList) {
+         * localTopicCatListforQuery.addAll(topicCatService.findAllByCategory(catTemp));
+         * } conAssigTutorialListforQuery =
+         * conRepo.findAllByTopicCat(localTopicCatListforQuery);
+         * 
+         * if (!query.isEmpty()) { if (conAssigTutorialList != null) { tut =
+         * tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(
+         * conAssigTutorialList, query, pageable); }
+         * 
+         * else { tut =
+         * tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(
+         * conAssigTutorialListforQuery, query, pageable);
+         * 
+         * }
+         * 
+         * }
+         * 
+         */
 
-        if (localTopicCatList != null) {
-
-            if (localLan != null) {
-                conAssigTutorialList = conRepo.findAllByTopicCatAndLan(localTopicCatList, localLan);
-            } else {
-                conAssigTutorialList = conRepo.findAllByTopicCat(localTopicCatList);
-            }
-        } else {
-            if (localLan != null) {
-                conAssigTutorialList = conRepo.findAllByLanWithcategoryTrue(localLan);
-            }
-        }
-
-        if (conAssigTutorialList != null) {
-            tut = tutService.findAllByconAssignedTutorialListPagination(conAssigTutorialList, pageable);
-
-        } else {
-            tut = tutService.findAllPaginationWithEnabledCategoryandTrueTutorial(pageable);
-
-        }
-
-        List<TopicCategoryMapping> localTopicCatListforQuery = new ArrayList<>();
-        List<ContributorAssignedTutorial> conAssigTutorialListforQuery = null;
-        List<Category> enabledCatList = getCategories();
-        for (Category catTemp : enabledCatList) {
-            localTopicCatListforQuery.addAll(topicCatService.findAllByCategory(catTemp));
-        }
-        conAssigTutorialListforQuery = conRepo.findAllByTopicCat(localTopicCatListforQuery);
-
-        if (!query.isEmpty()) {
-            if (conAssigTutorialList != null) {
-                tut = tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(conAssigTutorialList, query,
-                        pageable);
-            }
-
-            else {
-                tut = tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(
-                        conAssigTutorialListforQuery, query, pageable);
-
-            }
-
-        }
+        tut = searchonElasticSearch(pageable, cat, topic, lan, query);
 
         for (Tutorial temp : tut) {
             {
                 tutToView1.add(temp);
             }
         }
+
+        logger.info("tutorials size:{}", tutToView1.size());
 
         if (localCat == null) {
             Collections.sort(tutToView1, Tutorial.UserVisitComp);
