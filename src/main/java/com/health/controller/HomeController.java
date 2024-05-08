@@ -83,6 +83,7 @@ import com.health.model.FeedbackMasterTrainer;
 import com.health.model.FilesofBrouchure;
 import com.health.model.IndianLanguage;
 import com.health.model.Language;
+import com.health.model.LiveTutorial;
 import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
 import com.health.model.PathofPromoVideo;
@@ -101,6 +102,7 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
+import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
 import com.health.service.BrouchureService;
@@ -117,6 +119,7 @@ import com.health.service.FeedBackMasterTrainerService;
 import com.health.service.FilesofBrouchureService;
 import com.health.service.IndianLanguageService;
 import com.health.service.LanguageService;
+import com.health.service.LiveTutorialService;
 import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
 import com.health.service.PathofPromoVideoService;
@@ -142,6 +145,7 @@ import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
+import com.opencsv.exceptions.CsvException;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
@@ -162,7 +166,10 @@ public class HomeController {
     private VersionRepository verRepository;
 
     @Autowired
-    private RestControllerClass restcontrollerClass;
+    private LiveTutorialService liveTutorialService;
+
+    @Autowired
+    private LiveTutorialRepository liveTutorialRepo;
 
     @Autowired
     private AjaxController ajaxController;
@@ -902,6 +909,59 @@ public class HomeController {
         model.addAttribute("totalPages", totalPages);
 
         return "tutorialList";
+    }
+
+    @GetMapping("/addLiveTutorial")
+    public String addLiveTutorial(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadLiveTutorial, "Sample_CSV_file" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
+        List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
+        Collections.sort(liveTutorials, LiveTutorial.SortByUploadTime);
+        model.addAttribute("liveTutorials", liveTutorials);
+        return "addLiveTutorial";
+    }
+
+    @PostMapping("/addLiveTutorial")
+    public String addLiveTuotorialPost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
+
+            HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadLiveTutorial, "Sample_CSV_file" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
+
+        try {
+            liveTutorialService.saveLiveTutorialsFromCSV(csv_file, model);
+
+        } catch (IOException e) {
+
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return "addLiveTutorial";
+        } catch (CsvException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return "addLiveTutorial";
+        }
+
+        List<LiveTutorial> liveTutorials = liveTutorialService.findAll();
+        Collections.sort(liveTutorials, LiveTutorial.SortByUploadTime);
+        model.addAttribute("liveTutorials", liveTutorials);
+
+        return "addLiveTutorial";
     }
 
     @GetMapping("/downloads")
@@ -6179,7 +6239,6 @@ public class HomeController {
         tutorial.setPreRequisticStatus(CommonData.PUBLISH_STATUS);
         tutorial.setVideoStatus(CommonData.PUBLISH_STATUS);
         tutorial.setStatus(true);
-        restcontrollerClass.getLatestPublishhedTutorial().put(tutorial.getTutorialId(), "Tutorial");
         taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
@@ -7076,7 +7135,7 @@ public class HomeController {
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
-            restcontrollerClass.getLatestPublishhedTutorial().put(tut.getTutorialId(), "Tutorial");
+
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }

@@ -2668,7 +2668,6 @@ $("#languageId1").change(function() {
 			
 		
 		
-			
 					
 					
 		 $('#topicId').on('change', function() {
