@@ -837,8 +837,7 @@ public class HomeController {
                                 docSearch.setId((String) jsonObjet.get("id"));
                                 docSearch.setOutlineContent((String) jsonObjet.get("outlineContent"));
                                 docSearch.setDocumentType((String) jsonObjet.get("documentType"));
-                                docSearch
-                                        .setDocumentId(((String) jsonObjet.get("documentId")).replaceAll("[^0-9]", ""));
+                                docSearch.setDocumentId((String) jsonObjet.get("documentId"));
                                 docSearch.setLanguage((String) jsonObjet.get("language"));
                                 docSearch.setLanguageId((int) jsonObjet.get("languageId"));
                                 docSearch.setCategory((String) jsonObjet.get("category"));

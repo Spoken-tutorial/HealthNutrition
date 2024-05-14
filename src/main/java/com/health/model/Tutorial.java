@@ -2,6 +2,7 @@ package com.health.model;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -311,11 +312,11 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
         Files.createDirectories(path);
 
         Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryOutline, getTutorialId() + ".txt");
-        if (outline != null) {
-            Files.write(filePath, outline.getBytes());
-        } else {
-            Files.write(filePath, "".getBytes());
+        if (outline == null) {
+            outline = "";
+
         }
+        Files.write(filePath, outline.getBytes(StandardCharsets.UTF_8));
         String temp = filePath.toString();
 
         int indexToStart = temp.indexOf("Media");
