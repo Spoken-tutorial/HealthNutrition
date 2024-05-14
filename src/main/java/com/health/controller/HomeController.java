@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -33,11 +32,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +86,7 @@ import com.health.model.Comment;
 import com.health.model.Consultant;
 import com.health.model.ContributorAssignedMultiUserTutorial;
 import com.health.model.ContributorAssignedTutorial;
+import com.health.model.DocumentSearch;
 import com.health.model.Event;
 import com.health.model.FeedbackMasterTrainer;
 import com.health.model.FilesofBrouchure;
@@ -788,7 +789,7 @@ public class HomeController {
         return "ClearAllCaches";
     }
 
-    private Page<Tutorial> searchonElasticSearch(Pageable pageable, int cat, int topic, int lan, String query) {
+    private Page<DocumentSearch> searchonElasticSearch(Pageable pageable, int cat, int topic, int lan, String query) {
 
         StringBuilder documentSb = new StringBuilder();
         documentSb.append(commonData.elasticSearch_url);
@@ -796,7 +797,8 @@ public class HomeController {
         documentSb.append("search");
 
         String tempUrl = documentSb.toString();
-        List<Tutorial> tutorialList = new ArrayList<>();
+
+        List<DocumentSearch> documentSearchList = new ArrayList<>();
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
@@ -804,17 +806,15 @@ public class HomeController {
 
                 logger.info("API_URL:{}", tempUrl);
 
-                HttpUriRequest request = new HttpPost(tempUrl);
-                if (request instanceof HttpPost) {
-                    List<NameValuePair> paramsforAddDocument = new ArrayList<>();
-                    paramsforAddDocument.add(new BasicNameValuePair("categoryId", Integer.toString(cat)));
-                    paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(topic)));
-                    paramsforAddDocument.add(new BasicNameValuePair("languageId", Integer.toString(lan)));
-                    paramsforAddDocument.add(new BasicNameValuePair("query", query));
-                    HttpPost httpPost = (HttpPost) request;
-                    httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
+                HttpPost request = new HttpPost(tempUrl);
 
-                }
+                List<NameValuePair> paramsforAddDocument = new ArrayList<>();
+                paramsforAddDocument.add(new BasicNameValuePair("categoryId", Integer.toString(cat)));
+                paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(topic)));
+                paramsforAddDocument.add(new BasicNameValuePair("languageId", Integer.toString(lan)));
+                paramsforAddDocument.add(new BasicNameValuePair("query", query));
+
+                request.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
 
                 HttpResponse response = httpClient.execute(request);
 
@@ -822,18 +822,36 @@ public class HomeController {
 
                 if (statusCode == 200 || statusCode == 201) {
                     String jsonResponse = EntityUtils.toString(response.getEntity());
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-                    logger.info("jsonNode:{}", jsonNode);
+                    JSONObject mainJsonObject = new JSONObject(jsonResponse);
+                    JSONArray jsonArray = (JSONArray) mainJsonObject.get("documentSearchList");
 
-                    JsonNode publishedArray = jsonNode.get("documentIds");
-                    if (publishedArray != null && publishedArray.isArray()) {
+                    logger.info("jsonArray:{}", jsonArray);
 
-                        for (JsonNode idNode : publishedArray) {
+                    if (jsonArray != null) {
 
-                            String documentId = idNode.asText();
-                            int tutorialId = Integer.parseInt(documentId.replaceAll("[^0-9]", ""));
-                            tutorialList.add(tutService.findByTutorialId(tutorialId));
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            DocumentSearch docSearch = new DocumentSearch();
+                            JSONObject jsonObjet = (JSONObject) jsonArray.get(i);
+                            if (((String) jsonObjet.get("documentType")).equals(CommonData.DOCUMENT_TYPE_TUTORIAL)) {
+
+                                docSearch.setId((String) jsonObjet.get("id"));
+                                docSearch.setOutlineContent((String) jsonObjet.get("outlineContent"));
+                                docSearch.setDocumentType((String) jsonObjet.get("documentType"));
+                                docSearch
+                                        .setDocumentId(((String) jsonObjet.get("documentId")).replaceAll("[^0-9]", ""));
+                                docSearch.setLanguage((String) jsonObjet.get("language"));
+                                docSearch.setLanguageId((int) jsonObjet.get("languageId"));
+                                docSearch.setCategory((String) jsonObjet.get("category"));
+                                docSearch.setCategoryId((int) jsonObjet.get("categoryId"));
+                                docSearch.setTopic((String) jsonObjet.get("topic"));
+                                docSearch.setTopicId((int) jsonObjet.get("topicId"));
+                                docSearch.setRank((int) jsonObjet.get("rank"));
+                                docSearch.setVideoPath((String) jsonObjet.get("videoPath"));
+                                docSearch.setViewUrl((String) jsonObjet.get("viewUrl"));
+                                docSearch.setCreationTime((Long) jsonObjet.get("creationTime"));
+                                documentSearchList.add(docSearch);
+                            }
+
                         }
 
                     } else {
@@ -855,17 +873,18 @@ public class HomeController {
             logger.error("Exception: ", e1);
         }
 
-        List<Tutorial> newTutorialList = tutorialList.stream().distinct().collect(Collectors.toList());
-        if (cat == 0 && topic == 0 && lan == 0 && query.isEmpty()) {
-            newTutorialList = newTutorialList.stream().sorted(Comparator.comparing(Tutorial::getTutorialId))
-                    .collect(Collectors.toList());
-        }
+        List<DocumentSearch> newDocumentSearchList = documentSearchList.stream().distinct()
+                .collect(Collectors.toList());
+//        if (cat == 0 && topic == 0 && lan == 0 && query.isEmpty()) {
+//            newDocumentSearchList = newDocumentSearchList.stream().sorted(Comparator.comparing(Tutorial::getTutorialId))
+//                    .collect(Collectors.toList());
+//        }
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), newTutorialList.size());
+        int end = Math.min((start + pageable.getPageSize()), newDocumentSearchList.size());
 
-        List<Tutorial> sublist = newTutorialList.subList(start, end);
+        List<DocumentSearch> sublist = newDocumentSearchList.subList(start, end);
 
-        return new PageImpl<>(sublist, pageable, newTutorialList.size());
+        return new PageImpl<>(sublist, pageable, newDocumentSearchList.size());
 
     }
 
@@ -891,13 +910,10 @@ public class HomeController {
         Category localCat = null;
         Language localLan = null;
         Topic localTopic = null;
-        TopicCategoryMapping localTopicCat = null;
-        List<TopicCategoryMapping> localTopicCatList = null;
-        List<ContributorAssignedTutorial> conAssigTutorialList = null;
 
-        Page<Tutorial> tut = null;
+        Page<DocumentSearch> docSearch = null;
 
-        List<Tutorial> tutToView1 = new ArrayList<Tutorial>();
+        List<DocumentSearch> docSearchToView1 = new ArrayList<DocumentSearch>();
 
         model.addAttribute("userInfo", usr);
 
@@ -917,75 +933,27 @@ public class HomeController {
             model.addAttribute("lanforQuery", localLan);
         }
 
-        /*
-         * if (localCat != null && localTopic != null) { localTopicCat =
-         * topicCatService.findAllByCategoryAndTopic(localCat, localTopic);
-         * localTopicCatList = new ArrayList<>(); localTopicCatList.add(localTopicCat);
-         * } else if (localCat != null) { localTopicCatList =
-         * topicCatService.findAllByCategory(localCat); } else if (localTopic != null) {
-         * localTopicCatList =
-         * topicCatService.findAllByTopicwithCategoryTrue(localTopic); }
-         * 
-         * if (localTopicCatList != null) {
-         * 
-         * if (localLan != null) { conAssigTutorialList =
-         * conRepo.findAllByTopicCatAndLan(localTopicCatList, localLan); } else {
-         * conAssigTutorialList = conRepo.findAllByTopicCat(localTopicCatList); } } else
-         * { if (localLan != null) { conAssigTutorialList =
-         * conRepo.findAllByLanWithcategoryTrue(localLan); } }
-         * 
-         * if (conAssigTutorialList != null) { tut =
-         * tutService.findAllByconAssignedTutorialListPagination(conAssigTutorialList,
-         * pageable);
-         * 
-         * } else { tut =
-         * tutService.findAllPaginationWithEnabledCategoryandTrueTutorial(pageable);
-         * 
-         * }
-         * 
-         * List<TopicCategoryMapping> localTopicCatListforQuery = new ArrayList<>();
-         * List<ContributorAssignedTutorial> conAssigTutorialListforQuery = null;
-         * List<Category> enabledCatList = getCategories(); for (Category catTemp :
-         * enabledCatList) {
-         * localTopicCatListforQuery.addAll(topicCatService.findAllByCategory(catTemp));
-         * } conAssigTutorialListforQuery =
-         * conRepo.findAllByTopicCat(localTopicCatListforQuery);
-         * 
-         * if (!query.isEmpty()) { if (conAssigTutorialList != null) { tut =
-         * tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(
-         * conAssigTutorialList, query, pageable); }
-         * 
-         * else { tut =
-         * tutService.SearchOutlineByCombinationOfWordsWithConAssisgendTutorials(
-         * conAssigTutorialListforQuery, query, pageable);
-         * 
-         * }
-         * 
-         * }
-         * 
-         */
+        docSearch = searchonElasticSearch(pageable, cat, topic, lan, query);
 
-        tut = searchonElasticSearch(pageable, cat, topic, lan, query);
-
-        for (Tutorial temp : tut) {
+        for (DocumentSearch temp : docSearch) {
             {
-                tutToView1.add(temp);
+                docSearchToView1.add(temp);
             }
         }
 
-        logger.info("tutorials size:{}", tutToView1.size());
+        logger.info("DocumentSearch size:{}", docSearchToView1.size());
 
-        if (localCat == null) {
-            Collections.sort(tutToView1, Tutorial.UserVisitComp);
-        } else {
-            Collections.sort(tutToView1, Tutorial.SortByOrderValue);
-        }
+//        if (localCat == null) {
+//            Collections.sort(tutToView1, Tutorial.UserVisitComp);
+//        } else {
+//            Collections.sort(tutToView1, Tutorial.SortByOrderValue);
+//        }
 
         // sorting based on order value
         int totalPages = 0;
 
-        if (tut != null) {
-            totalPages = tut.getTotalPages();
+        if (docSearch != null) {
+            totalPages = docSearch.getTotalPages();
         } else {
             totalPages = 1;
         }
@@ -993,7 +961,7 @@ public class HomeController {
         int firstPage = page + 1 > 2 ? page + 1 - 2 : 1;
         int lastPage = page + 1 < totalPages - 5 ? page + 1 + 5 : totalPages;
 
-        model.addAttribute("tutorials", tutToView1);
+        model.addAttribute("docSearchList", docSearchToView1);
         model.addAttribute("currentPage", page);
         model.addAttribute("firstPage", firstPage);
         model.addAttribute("lastPage", lastPage);

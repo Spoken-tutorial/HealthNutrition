@@ -120,6 +120,9 @@ public class QueueManagement implements Runnable {
     @Column(name = "topicId", nullable = true)
     private int topicId;
 
+    @Column(name = "videoPath", nullable = true)
+    private String videoPath;
+
     @Column(name = "outlinePath", nullable = true)
     private String outlinePath;
 
@@ -129,6 +132,14 @@ public class QueueManagement implements Runnable {
 
     public void setQueueTime(long queueTime) {
         this.queueTime = queueTime;
+    }
+
+    public String getVideoPath() {
+        return videoPath;
+    }
+
+    public void setVideoPath(String videoPath) {
+        this.videoPath = videoPath;
     }
 
     public Long getResponseId() {
@@ -330,6 +341,20 @@ public class QueueManagement implements Runnable {
 
     }
 
+    public QueueManagement(long queueId, Timestamp request, String requestType, String status, long startTime,
+            long endTime, long procesingTime, String videoPath) {
+        super();
+        this.queueId = queueId;
+        this.requestTime = request;
+        this.requestType = requestType;
+        this.status = status;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.procesingTime = procesingTime;
+        this.videoPath = videoPath;
+
+    }
+
     public QueueManagement(long queueId, Timestamp requestTime, String requestType) {
         super();
         this.queueId = queueId;
@@ -425,6 +450,11 @@ public class QueueManagement implements Runnable {
                     paramsforAddDocument.add(new BasicNameValuePair("topic", getTopic()));
                     if (getOutlinePath() != null && !getOutlinePath().isEmpty()) {
                         paramsforAddDocument.add(new BasicNameValuePair("outlinePath", getOutlinePath()));
+
+                    }
+
+                    if (getVideoPath() != null && !getVideoPath().isEmpty()) {
+                        paramsforAddDocument.add(new BasicNameValuePair("videoPath", getVideoPath()));
 
                     }
                     HttpPost httpPost = (HttpPost) request;
