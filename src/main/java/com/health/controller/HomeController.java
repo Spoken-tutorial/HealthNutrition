@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -871,9 +872,14 @@ public class HomeController {
 
             logger.error("Exception: ", e1);
         }
-
-        List<DocumentSearch> newDocumentSearchList = documentSearchList.stream().distinct()
-                .collect(Collectors.toList());
+//
+//        List<DocumentSearch> newDocumentSearchList = documentSearchList.stream().distinct()
+//                .collect(Collectors.toList());
+        List<DocumentSearch> newDocumentSearchList = documentSearchList.stream()
+                .collect(Collectors.toMap(DocumentSearch::getVideoPath, Function.identity(),
+                        (existing, replacement) -> existing, LinkedHashMap::new)) // Use LinkedHashMap to preserve
+                                                                                  // insertion order
+                .values().stream().collect(Collectors.toList());
 //        if (cat == 0 && topic == 0 && lan == 0 && query.isEmpty()) {
 //            newDocumentSearchList = newDocumentSearchList.stream().sorted(Comparator.comparing(Tutorial::getTutorialId))
 //                    .collect(Collectors.toList());
