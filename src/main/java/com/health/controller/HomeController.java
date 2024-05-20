@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -790,17 +789,21 @@ public class HomeController {
         return "ClearAllCaches";
     }
 
-    private Page<DocumentSearch> searchonElasticSearch(Pageable pageable, int cat, int topic, int lan, String query) {
+    private Page<DocumentSearch> searchonElasticSearch(Pageable pageable, int cat, int topic, int lan, String query,
+    		String typeTutorial, String typeTimeScript,  String typeBrochure, String typeResearchPaper) {
 
         StringBuilder documentSb = new StringBuilder();
         documentSb.append(commonData.elasticSearch_url);
         documentSb.append("/");
         documentSb.append("search");
+        
+        logger.info("typeTutorial :{}, typeTimeScript:{}, typeBrochure:{}, typeResearchPaper:{}, query:{}",
+        		typeTutorial, typeTimeScript, typeBrochure, typeResearchPaper, query);
 
         String tempUrl = documentSb.toString();
 
-        List<DocumentSearch> documentSearchList = new ArrayList<>();
-
+        List<DocumentSearch> documentSearchTutorialList = new ArrayList<>();
+        
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
             try {
@@ -814,6 +817,10 @@ public class HomeController {
                 paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(topic)));
                 paramsforAddDocument.add(new BasicNameValuePair("languageId", Integer.toString(lan)));
                 paramsforAddDocument.add(new BasicNameValuePair("query", query));
+                paramsforAddDocument.add(new BasicNameValuePair("typeTutorial", typeTutorial));
+                paramsforAddDocument.add(new BasicNameValuePair("typeTimeScript", typeTimeScript));
+                paramsforAddDocument.add(new BasicNameValuePair("typeBrochure", typeBrochure));
+                paramsforAddDocument.add(new BasicNameValuePair("typeResearchPaper", typeResearchPaper));
 
                 request.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
 
@@ -833,25 +840,43 @@ public class HomeController {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             DocumentSearch docSearch = new DocumentSearch();
                             JSONObject jsonObjet = (JSONObject) jsonArray.get(i);
-                            if (((String) jsonObjet.get("documentType")).equals(CommonData.DOCUMENT_TYPE_TUTORIAL)) {
 
-                                docSearch.setId((String) jsonObjet.get("id"));
-                                docSearch.setOutlineContent((String) jsonObjet.get("outlineContent"));
-                                docSearch.setDocumentType((String) jsonObjet.get("documentType"));
-                                docSearch.setDocumentId((String) jsonObjet.get("documentId"));
-                                docSearch.setLanguage((String) jsonObjet.get("language"));
-                                docSearch.setLanguageId((int) jsonObjet.get("languageId"));
-                                docSearch.setCategory((String) jsonObjet.get("category"));
-                                docSearch.setCategoryId((int) jsonObjet.get("categoryId"));
-                                docSearch.setTopic((String) jsonObjet.get("topic"));
-                                docSearch.setTopicId((int) jsonObjet.get("topicId"));
-                                docSearch.setRank((int) jsonObjet.get("rank"));
-                                docSearch.setVideoPath((String) jsonObjet.get("videoPath"));
-                                docSearch.setViewUrl((String) jsonObjet.get("viewUrl"));
-                                docSearch.setCreationTime((Long) jsonObjet.get("creationTime"));
-                                documentSearchList.add(docSearch);
+                            docSearch.setId((String) jsonObjet.get("id"));
+                            
+                            docSearch.setDocumentType((String) jsonObjet.get("documentType"));
+                            docSearch.setDocumentId((String) jsonObjet.get("documentId"));
+                            docSearch.setLanguage((String) jsonObjet.get("language"));
+                            docSearch.setLanguageId((int) jsonObjet.get("languageId"));
+                            docSearch.setCategory((String) jsonObjet.get("category"));
+                            docSearch.setCategoryId((int) jsonObjet.get("categoryId"));
+                            docSearch.setTopic((String) jsonObjet.get("topic"));
+                            docSearch.setTopicId((int) jsonObjet.get("topicId"));
+                            docSearch.setRank((int) jsonObjet.get("rank"));
+                            docSearch.setVideoPath((String) jsonObjet.get("videoPath"));
+                            docSearch.setViewUrl((String) jsonObjet.get("viewUrl"));
+                            docSearch.setCreationTime((Long) jsonObjet.get("creationTime"));
+                            
+                           
+                            docSearch.setDocumentUrl((String) jsonObjet.get("documentUrl"));
+
+                            if (((String) jsonObjet.get("documentType"))
+                                    .equals(CommonData.DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT) || ((String) jsonObjet.get("documentType"))
+                                    .equals(CommonData.DOCUMENT_TYPE_TUTORIAL_TIME_SCRIPT)) {
+                            	docSearch.setOutlineContent((String) jsonObjet.get("outlineContent")); 
                             }
-
+                            
+                            if (((String) jsonObjet.get("documentType"))
+                                    .equals(CommonData.DOCUMENT_TYPE_BROCHURE) || ((String) jsonObjet.get("documentType"))
+                                    .equals(CommonData.DOCUMENT_TYPE_RESEARCHPAPER)) {
+                            	docSearch.setTitle((String) jsonObjet.get("title")); 
+                            }
+                            
+                            if(((String) jsonObjet.get("documentType"))
+                                    .equals(CommonData.DOCUMENT_TYPE_RESEARCHPAPER)) {
+                            	 docSearch.setDescription((String) jsonObjet.get("description"));
+                            }
+                            
+                            documentSearchTutorialList.add(docSearch);
                         }
 
                     } else {
@@ -872,24 +897,28 @@ public class HomeController {
 
             logger.error("Exception: ", e1);
         }
-//
-//        List<DocumentSearch> newDocumentSearchList = documentSearchList.stream().distinct()
-//                .collect(Collectors.toList());
-        List<DocumentSearch> newDocumentSearchList = documentSearchList.stream()
-                .collect(Collectors.toMap(DocumentSearch::getVideoPath, Function.identity(),
-                        (existing, replacement) -> existing, LinkedHashMap::new)) // Use LinkedHashMap to preserve
-                                                                                  // insertion order
-                .values().stream().collect(Collectors.toList());
+
+        List<DocumentSearch> newDocumentSearchTutorialList = documentSearchTutorialList.stream().distinct()
+                .collect(Collectors.toList());
+        /*
+         * List<DocumentSearch> newDocumentSearchList = documentSearchList.stream()
+         * .collect(Collectors.toMap(DocumentSearch::getVideoPath, Function.identity(),
+         * (existing, replacement) -> existing, LinkedHashMap::new)) // Use
+         * LinkedHashMap to preserve // insertion order
+         * .values().stream().collect(Collectors.toList());
+         * 
+         */
+
 //        if (cat == 0 && topic == 0 && lan == 0 && query.isEmpty()) {
 //            newDocumentSearchList = newDocumentSearchList.stream().sorted(Comparator.comparing(Tutorial::getTutorialId))
 //                    .collect(Collectors.toList());
 //        }
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), newDocumentSearchList.size());
+        int end = Math.min((start + pageable.getPageSize()), newDocumentSearchTutorialList.size());
 
-        List<DocumentSearch> sublist = newDocumentSearchList.subList(start, end);
+        List<DocumentSearch> sublist = newDocumentSearchTutorialList.subList(start, end);
 
-        return new PageImpl<>(sublist, pageable, newDocumentSearchList.size());
+        return new PageImpl<>(sublist, pageable, newDocumentSearchTutorialList.size());
 
     }
 
@@ -899,6 +928,10 @@ public class HomeController {
             @RequestParam(name = "topic", required = false, defaultValue = "0") int topic,
             @RequestParam(name = "lan", required = false, defaultValue = "0") int lan,
             @RequestParam(name = "query", required = false, defaultValue = "") String query,
+            @RequestParam(name = "typeTutorial", required = false, defaultValue = "") String typeTutorial,
+            @RequestParam(name = "typeTimeScript", required = false, defaultValue = "") String typeTimeScript,
+            @RequestParam(name = "typeBrochure", required = false, defaultValue = "") String typeBrochure,
+            @RequestParam(name = "typeResearchPaper", required = false, defaultValue = "") String typeResearchPaper,
             @RequestParam(name = "page", defaultValue = "0") int page, Principal principal, Model model) {
 
         User usr = getUser(principal);
@@ -907,16 +940,42 @@ public class HomeController {
         model.addAttribute("category", cat);
         model.addAttribute("language", lan);
         model.addAttribute("topic", topic);
+        
+        if(typeTutorial!=null && !typeTutorial.isEmpty() && typeTutorial.equals("typeTutorial")) {
+        	typeTutorial=CommonData.DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT;
+        }else {
+			typeTutorial="";
+		}
+        
+        if(typeTimeScript!=null && !typeTimeScript.isEmpty() && typeTimeScript.equals("typeTimeScript")) {
+        	typeTimeScript=CommonData.DOCUMENT_TYPE_TUTORIAL_TIME_SCRIPT;
+        }else {
+        	typeTimeScript="";
+		}
+        
+        if(typeBrochure!=null && !typeBrochure.isEmpty() && typeBrochure.equals("typeBrochure")) {
+        	typeBrochure=CommonData.DOCUMENT_TYPE_BROCHURE;
+        }else {
+        	typeBrochure="";
+		}
+        
+        if(typeResearchPaper!=null && !typeResearchPaper.isEmpty() && typeResearchPaper.equals("typeResearchPaper")) {
+        	typeResearchPaper=CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
+        }else {
+        	typeResearchPaper="";
+		}
+        
+        
 
         if (query.equals("q")) {
             query = "";
         }
-
+       
         Category localCat = null;
         Language localLan = null;
         Topic localTopic = null;
 
-        Page<DocumentSearch> docSearch = null;
+        Page<DocumentSearch> docSearchPage = null;
 
         List<DocumentSearch> docSearchToView1 = new ArrayList<DocumentSearch>();
 
@@ -938,9 +997,12 @@ public class HomeController {
             model.addAttribute("lanforQuery", localLan);
         }
 
-        docSearch = searchonElasticSearch(pageable, cat, topic, lan, query);
 
-        for (DocumentSearch temp : docSearch) {
+       
+        docSearchPage = searchonElasticSearch( pageable,  cat,  topic,  lan,  query,
+        		typeTutorial,  typeTimeScript,   typeBrochure,  typeResearchPaper);
+
+        for (DocumentSearch temp : docSearchPage) {
             {
                 docSearchToView1.add(temp);
             }
@@ -955,10 +1017,11 @@ public class HomeController {
 //        }
 
         // sorting based on order value
+
         int totalPages = 0;
 
-        if (docSearch != null) {
-            totalPages = docSearch.getTotalPages();
+        if (docSearchPage != null) {
+            totalPages = docSearchPage.getTotalPages();
         } else {
             totalPages = 1;
         }

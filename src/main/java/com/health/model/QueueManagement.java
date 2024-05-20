@@ -117,6 +117,12 @@ public class QueueManagement implements Runnable {
     @Column(name = "topic", nullable = true)
     private String topic;
 
+    @Column(name = "title", nullable = true)
+    private String title;
+
+    @Column(name = "description", nullable = true)
+    private String description;
+
     @Column(name = "topicId", nullable = true)
     private int topicId;
 
@@ -204,6 +210,22 @@ public class QueueManagement implements Runnable {
 
     public void setRank(int rank) {
         this.rank = rank;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getViewUrl() {
@@ -435,6 +457,8 @@ public class QueueManagement implements Runnable {
                     api_url = documentSb.toString();
                     logger.info("API_URL:{}", api_url);
 
+                   
+             
                     request = new HttpGet(api_url);
 
                 }
@@ -453,10 +477,18 @@ public class QueueManagement implements Runnable {
 
                     }
 
-                    if (getVideoPath() != null && !getVideoPath().isEmpty()) {
+                    
                         paramsforAddDocument.add(new BasicNameValuePair("videoPath", getVideoPath()));
 
-                    }
+                    
+                    
+                        paramsforAddDocument.add(new BasicNameValuePair("title", getTitle()));
+
+                    
+                   
+                        paramsforAddDocument.add(new BasicNameValuePair("description", getDescription()));
+
+                    
                     HttpPost httpPost = (HttpPost) request;
                     httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
 

@@ -33,6 +33,12 @@ public class DocumentSearch {
 
     private String viewUrl;
 
+    private String documentUrl;
+
+    private String title;
+
+    private String description;
+
     private Long creationTime;
 
     private Long modificationTime;
@@ -53,6 +59,30 @@ public class DocumentSearch {
 
     public String getVideoPath() {
         return videoPath;
+    }
+
+    public String getDocumentUrl() {
+        return documentUrl;
+    }
+
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setVideoPath(String videoPath) {
