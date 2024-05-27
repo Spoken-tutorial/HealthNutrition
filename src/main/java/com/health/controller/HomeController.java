@@ -860,8 +860,7 @@ public class HomeController {
                             docSearch.setDocumentUrl((String) jsonObjet.get("documentUrl"));
 
                             if (((String) jsonObjet.get("documentType"))
-                                    .equals(CommonData.DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT) || ((String) jsonObjet.get("documentType"))
-                                    .equals(CommonData.DOCUMENT_TYPE_TUTORIAL_TIME_SCRIPT)) {
+                                    .equals(CommonData.DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT)) {
                             	docSearch.setOutlineContent((String) jsonObjet.get("outlineContent")); 
                             }
                             
@@ -900,6 +899,7 @@ public class HomeController {
 
         List<DocumentSearch> newDocumentSearchTutorialList = documentSearchTutorialList.stream().distinct()
                 .collect(Collectors.toList());
+        logger.info("documentSearchTutorialList Size:{}", documentSearchTutorialList.size());
         /*
          * List<DocumentSearch> newDocumentSearchList = documentSearchList.stream()
          * .collect(Collectors.toMap(DocumentSearch::getVideoPath, Function.identity(),
@@ -1008,7 +1008,7 @@ public class HomeController {
             }
         }
 
-        logger.info("DocumentSearch size:{}", docSearchToView1.size());
+        logger.info("size of DocumentSearchList on the current page:{}", docSearchToView1.size());
 
 //        if (localCat == null) {
 //            Collections.sort(tutToView1, Tutorial.UserVisitComp);
