@@ -1930,6 +1930,11 @@ $("#languageId1").change(function() {
 			  	  			     })
 						$("#inputLanguage").prop('disabled',false);
 						$('#inputLanguage').html(html);
+						if (catgoryid != 0) {
+							$("#catresetdiv").show();
+						} else {
+						$("#catresetdiv").hide();
+						}
 						
 
 					},
@@ -2020,6 +2025,11 @@ $("#languageId1").change(function() {
 			  	  			     })
 						$("#inputLanguage").prop('disabled',false);
 						$('#inputLanguage').html(html);
+						if (topicid != 0) {
+							$("#topicresetdiv").show();
+						} else {
+						$("#topicresetdiv").hide();
+						}
 
 					},
 					error : function(err) {
@@ -2095,6 +2105,12 @@ $("#languageId1").change(function() {
 			  	  			     })
 						$("#inputTopicName").prop('disabled',false);
 						$('#inputTopicName').html(html);
+						
+						if (languageid != 0) {
+							$("#langresetdiv").show();
+						} else {
+						$("#langresetdiv").hide();
+						}
 
 					},
 					error : function(err) {
