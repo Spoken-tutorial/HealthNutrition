@@ -900,19 +900,6 @@ public class HomeController {
         List<DocumentSearch> newDocumentSearchTutorialList = documentSearchTutorialList.stream().distinct()
                 .collect(Collectors.toList());
         logger.info("documentSearchTutorialList Size:{}", documentSearchTutorialList.size());
-        /*
-         * List<DocumentSearch> newDocumentSearchList = documentSearchList.stream()
-         * .collect(Collectors.toMap(DocumentSearch::getVideoPath, Function.identity(),
-         * (existing, replacement) -> existing, LinkedHashMap::new)) // Use
-         * LinkedHashMap to preserve // insertion order
-         * .values().stream().collect(Collectors.toList());
-         * 
-         */
-
-//        if (cat == 0 && topic == 0 && lan == 0 && query.isEmpty()) {
-//            newDocumentSearchList = newDocumentSearchList.stream().sorted(Comparator.comparing(Tutorial::getTutorialId))
-//                    .collect(Collectors.toList());
-//        }
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), newDocumentSearchTutorialList.size());
 
@@ -1010,13 +997,6 @@ public class HomeController {
 
         logger.info("size of DocumentSearchList on the current page:{}", docSearchToView1.size());
 
-//        if (localCat == null) {
-//            Collections.sort(tutToView1, Tutorial.UserVisitComp);
-//        } else {
-//            Collections.sort(tutToView1, Tutorial.SortByOrderValue);
-//        }
-
-        // sorting based on order value
 
         int totalPages = 0;
 
