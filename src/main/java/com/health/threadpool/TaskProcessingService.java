@@ -196,13 +196,14 @@ public class TaskProcessingService {
     public Map<String, String> addDocument(String documentId, String documentType, String documentPath,
             String documentUrl, int rank, String view_url, int languageId, String language,
             Optional<Integer> categoryId, Optional<String> category, Optional<Integer> topicId, Optional<String> topic,
-            Optional<String> outlinePath, String requestType) {
+            Optional<String> outlinePath, String requestType, Optional<String> videoPath, Optional<String> title,
+            Optional<String> description) {
 
         logger.info(
                 "addDocument documentId: {}, documentType:{}, documentPath:{}, documentUrl:{}, rank:{}, view_url:{}, languageId: {}, language:{}, "
-                        + "categoryId:{}, category:{},topicId:{}, topic:{},outlinePath: {},requestType: {}",
+                        + "categoryId:{}, category:{},topicId:{}, topic:{},outlinePath: {},requestType: {} , videoPath: {} , title: {}, description: {}",
                 documentId, documentType, documentPath, documentUrl, rank, view_url, languageId, language, categoryId,
-                category, topicId, topic, outlinePath, requestType);
+                category, topicId, topic, outlinePath, requestType, videoPath, title, description);
 
         Map<String, String> resultMap = new HashMap<>();
 
@@ -257,6 +258,15 @@ public class TaskProcessingService {
         if (topicId != null && topicId.isPresent())
             queuemnt.setTopicId(topicId.get());
 
+        if (videoPath != null && videoPath.isPresent())
+            queuemnt.setVideoPath(videoPath.get());
+
+        if (title != null && title.isPresent())
+            queuemnt.setTitle(title.get());
+
+        if (description != null && description.isPresent())
+            queuemnt.setDescription(description.get());
+
         queueRepo.save(queuemnt);
 
         resultMap.put(CommonData.QUEUE_ID, Long.toString(queuemnt.getQueueId()));
@@ -268,7 +278,8 @@ public class TaskProcessingService {
 
     public void addUpdateDeleteTutorial(Tutorial tutorial, String requestType) {
 
-        String documentType = CommonData.DOCUMENT_TYPE_TUTORIAL;
+        String documentTypeforOriginalScript = CommonData.DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT;
+        String documentTypeforTimeScript = CommonData.DOCUMENT_TYPE_TUTORIAL_TIME_SCRIPT;
         String documentPathforTimeScript = "";
         String documentUrlforTimeScript = "";
         String documentIdforTimeScript = "";
@@ -297,6 +308,10 @@ public class TaskProcessingService {
         Optional<String> category = Optional.of(topicCat.getCat().getCatName());
         Optional<Integer> topicId = Optional.of(topicCat.getTopic().getTopicId());
         Optional<String> topic = Optional.of(topicCat.getTopic().getTopicName());
+        Optional<String> videoPath = Optional.of(tutorial.getVideo());
+        Optional<String> title=Optional.of("");
+        Optional<String> description=Optional.of("");
+        Optional<String> videoPathEmpty=Optional.of("");
         Optional<String> outlinePath = null;
         if (tutorial.getOutlinePath() != null) {
             outlinePath = Optional.of(tutorial.getOutlinePath());
@@ -306,21 +321,23 @@ public class TaskProcessingService {
 
             if (languageId == 22) {
 
-                Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType,
+                Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentTypeforTimeScript,
                         documentPathforTimeScript, documentUrlforTimeScript, rank, view_urlforTimeScript, languageId,
-                        language, categoryId, category, topicId, topic, null, requestType);
+                        language, categoryId, category, topicId, topic, null, requestType, videoPathEmpty, title, description);
 
-                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
+                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentTypeforOriginalScript,
                         documentPathforOriginalScript, documentUrlforOriginalScript, rank, view_urlforOriginalScript,
-                        languageId, language, categoryId, category, topicId, topic, outlinePath, requestType);
+                        languageId, language, categoryId, category, topicId, topic, outlinePath, requestType, videoPath,
+                        title, description);
 
                 if (resultMap1.containsValue(CommonData.SUCCESS) && resultMap2.containsValue(CommonData.SUCCESS))
                     tutorial.setAddedQueue(true);
             } else {
 
-                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
+                Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentTypeforOriginalScript,
                         documentPathforOriginalScript, documentUrlforOriginalScript, rank, view_urlforOriginalScript,
-                        languageId, language, categoryId, category, topicId, topic, outlinePath, requestType);
+                        languageId, language, categoryId, category, topicId, topic, outlinePath, requestType, videoPath,
+                        title, description);
 
                 if (resultMap2.containsValue(CommonData.SUCCESS))
                     tutorial.setAddedQueue(true);
@@ -334,14 +351,15 @@ public class TaskProcessingService {
 
                 if (languageId == 22) {
 
-                    Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentType,
+                    Map<String, String> resultMap1 = addDocument(documentIdforTimeScript, documentTypeforTimeScript,
                             documentPathforTimeScript, documentUrlforTimeScript, rank, view_urlforTimeScript,
-                            languageId, language, categoryId, category, topicId, topic, null, requestType);
+                            languageId, language, categoryId, category, topicId, topic, null, requestType, null, null,
+                            null);
 
-                    Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
-                            documentPathforOriginalScript, documentUrlforOriginalScript, rank,
-                            view_urlforOriginalScript, languageId, language, categoryId, category, topicId, topic,
-                            outlinePath, requestType);
+                    Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript,
+                            documentTypeforOriginalScript, documentPathforOriginalScript, documentUrlforOriginalScript,
+                            rank, view_urlforOriginalScript, languageId, language, categoryId, category, topicId, topic,
+                            outlinePath, requestType, videoPath, null, null);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap1.containsValue(CommonData.SUCCESS)
@@ -351,10 +369,10 @@ public class TaskProcessingService {
 
                 } else {
 
-                    Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript, documentType,
-                            documentPathforOriginalScript, documentUrlforOriginalScript, rank,
-                            view_urlforOriginalScript, languageId, language, categoryId, category, topicId, topic,
-                            outlinePath, requestType);
+                    Map<String, String> resultMap2 = addDocument(documentIdforOriginalScript,
+                            documentTypeforOriginalScript, documentPathforOriginalScript, documentUrlforOriginalScript,
+                            rank, view_urlforOriginalScript, languageId, language, categoryId, category, topicId, topic,
+                            outlinePath, requestType, videoPath, null, null);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap2.containsValue(CommonData.SUCCESS))
@@ -378,14 +396,25 @@ public class TaskProcessingService {
         String documentUrl = "/ResearchPaper/ " + researchPaper.getId();
         int rank = 5 * researchPaper.getResearchPaperVisit();
         String view_url = researchPaper.getResearchPaperPath();
-        ;
+       
+        Optional<String> videoPath=Optional.of("");
+        Optional<Integer> categoryId=Optional.of(0);
+        Optional<Integer> topicId=Optional.of(0);
+        Optional<String> category=Optional.of("");
+        Optional<String> topic=Optional.of("");
+        
+
+        Optional<String> title = Optional.of(researchPaper.getTitle());
+        Optional<String> description = Optional.of(researchPaper.getDescription());
         int languageId = 22;
         String language = "English";
 
         if (requestType.equals(CommonData.ADD_DOCUMENT) && !researchPaper.isAddedQueue()) {
 
-            Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                    view_url, languageId, language, null, null, null, null, null, requestType);
+            Map<String, String> resultMap = addDocument(documentId, documentType,
+                    documentPath, documentUrl, rank, view_url,
+                    languageId, language, categoryId, category, topicId, topic, null, requestType, videoPath,
+                    title, description);
             if (resultMap.containsValue(CommonData.SUCCESS))
                 researchPaper.setAddedQueue(true);
 
@@ -394,8 +423,10 @@ public class TaskProcessingService {
         else if (researchPaper.isAddedQueue()) {
             if (requestType.equals(CommonData.UPDATE_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
                     || requestType.equals(CommonData.DELETE_DOCUMENT)) {
+            	logger.info("Update Research Paper");
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                        view_url, languageId, language, null, null, null, null, null, requestType);
+                        view_url, languageId, language, null, null, null, null, null, requestType, null, title,
+                        description);
 
                 if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                     if (resultMap.containsValue(CommonData.SUCCESS))
@@ -418,6 +449,11 @@ public class TaskProcessingService {
 
         int languageId = brochure.getLan().getLanId();
         String language = brochure.getLan().getLangName();
+
+        Optional<String> title = Optional.of(brochure.getTitle());
+        Optional<String> description = Optional.of("");
+        Optional<String> videoPath = Optional.of("");
+
         Optional<Integer> catId = Optional.empty();
         Optional<String> category = Optional.empty();
         Optional<Integer> topicId1 = Optional.empty();
@@ -431,7 +467,7 @@ public class TaskProcessingService {
 
         }
         String documentType = CommonData.DOCUMENT_TYPE_BROCHURE;
-        String documentUrl = "/Brochure/" + brochure.getId();
+       
 
         for (FilesofBrouchure fileofBro : filesOfBroList) {
 
@@ -441,11 +477,13 @@ public class TaskProcessingService {
 
             String documentPath = fileofBro.getWebPath();
             String view_url = fileofBro.getWebPath();
+            String documentUrl = "/Brochure/" + fileofBro.getBroFileId();
 
             if (requestType.equals(CommonData.ADD_DOCUMENT) && !fileofBro.isAddedQueue()) {
 
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                        view_url, languageId, language, catId, category, topicId1, topicName, null, requestType);
+                        view_url, languageId, language, catId, category, topicId1, topicName, null, requestType, videoPath,
+                        title, description);
                 if (resultMap.containsValue(CommonData.SUCCESS))
                     fileofBro.setAddedQueue(true);
 
@@ -457,7 +495,7 @@ public class TaskProcessingService {
                         || requestType.equals(CommonData.DELETE_DOCUMENT)) {
                     Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl,
                             rank, view_url, languageId, language, catId, category, topicId1, topicName, null,
-                            requestType);
+                            requestType, null, title, null);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap.containsValue(CommonData.SUCCESS))
@@ -492,6 +530,9 @@ public class TaskProcessingService {
         }
         tutRepo.saveAll(newtTutorials);
     }
+    
+    
+   
 
     public void addAllResearchPapertoQueue() {
 
@@ -499,6 +540,22 @@ public class TaskProcessingService {
         for (ResearchPaper researchPaper : researchPapers) {
             try {
                 addUpdateDeleteResearchPaper(researchPaper, CommonData.ADD_DOCUMENT);
+            } catch (Exception e) {
+                logger.error("Exception of addAllResearchPapertoQueue: {}", researchPaper, e);
+            }
+
+        }
+
+    }
+    
+    
+    
+    public void updateAllResearchPapertoQueue() {
+
+        List<ResearchPaper> researchPapers = researchPaperService.findByShowOnHomepageIsTrueAndAddedQueueIsTrue();
+        for (ResearchPaper researchPaper : researchPapers) {
+            try {
+                addUpdateDeleteResearchPaper(researchPaper, CommonData.UPDATE_DOCUMENT);
             } catch (Exception e) {
                 logger.error("Exception of addAllResearchPapertoQueue: {}", researchPaper, e);
             }
@@ -519,6 +576,20 @@ public class TaskProcessingService {
 
         }
     }
+    
+    public void updateAllBrochureToQueue() {
+
+        List<Brouchure> broList = broService.findAllBrouchuresForCache();
+        for (Brouchure brochure : broList) {
+            try {
+                addUpdateDeleteBrochure(brochure, CommonData.UPDATE_DOCUMENT);
+            } catch (Exception e) {
+                logger.error("Exception of addAllBrochureToQueue :{}", brochure, e);
+            }
+
+        }
+    }
+
 
     public void checkoutlinedata() {
         List<Tutorial> tutList = tutRepo.findByOutlinePathNotNull();

@@ -280,7 +280,8 @@ public class CommonData {
     public static final String CURRENT_TIME = "currentTime";
     public static final String DOCUMENT_ID = "documentId";
     public static final String DOCUMENT_TYPE = "documentType";
-    public static final String DOCUMENT_TYPE_TUTORIAL = "Tutorial";
+    public static final String DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT = "Tutorial_for_Original_Script";
+    public static final String DOCUMENT_TYPE_TUTORIAL_TIME_SCRIPT = "Tutorial_for_Time_Script";
     public static final String DOCUMENT_TYPE_BROCHURE = "Brochure";
     public static final String DOCUMENT_TYPE_VERSION = "Version";
     public static final String DOCUMENT_TYPE_FILES_OF_BROCHURE = "Files_Of_Brochure";

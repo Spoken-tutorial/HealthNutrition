@@ -25,7 +25,10 @@ function resetInput(id) {
              
               <option  th:each="category : ${categories}" th:selected="${category.value==localCat}" th:value="${category.value}" th:text="${category.key}" ></option>
             </select>
-            <span class="input-group-btn" style=" padding-top: 4px;"><button  id="catreset"  > <span style="font-size:8px;">&#10060;</span></button></span>
+            <div th:if="${localCat != null and localCat != 0}" class="input-group-btn" id="catresetdiv" style=" padding-top: 4px;"><button  id="catreset"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localCat != null and localCat != 0}" class="input-group-btn" id="catresetdiv" style=" padding-top: 4px;  display: none;"><button  id="catreset"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
            
 </div>
 
@@ -36,7 +39,10 @@ function resetInput(id) {
               <option value="0">Select Topic</option>
               <option th:each="topic : ${topics}" th:selected="${topic.value==localTopic}" th:value="${topic.value}" span th:text="${topic.key}"></option>
             </select>
-            <div class="input-group-btn"  style=" padding-top: 4px;"><button  id="topicreset" > <span style="font-size:8px;">&#10060;</span></button></div>
+            <div th:if="${localTopic != null and localTopic != 0}"  class="input-group-btn" id="topicresetdiv" style=" padding-top: 4px;"><button  id="topicreset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
+            <div th:unless="${localTopic != null and localTopic != 0}" class="input-group-btn" id="topicresetdiv" style=" padding-top: 4px;  display: none;"><button  id="topicreset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
 </div>
 
 
@@ -47,7 +53,10 @@ function resetInput(id) {
               <option value="0">Select Language</option>
               <option th:each="language : ${languages}"  th:selected="${language.value==localLan}"th:value="${language.value}" th:text="${language.key}"></option> 
             </select>
-            <div class="input-group-btn"  style=" padding-top: 4px;"><button  id="langreset" > <span style="font-size:8px;">&#10060;</span></button></div>
+             <div th:if="${localLan != null and localLan != 0}" class="input-group-btn"  id="langresetdiv" style=" padding-top: 4px;"><button  id="langreset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
+            <div th:unless="${localLan != null and localLan != 0}" class="input-group-btn"  id="langresetdiv" style=" padding-top: 4px; display: none;"><button  id="langreset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
             
 </div>
 
@@ -59,7 +68,33 @@ function resetInput(id) {
    
   
       <input name="query" id="query"  th:value="${query}" placeholder="Search Here.................."  style="width:100%; height:38px"/>
-   
+   		<div class="row" style="width:100%; padding-top:1px;">
+    <div class="col-12 col-sm-6 col-md-3 mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="typeTutorial" name="typeTutorial" value="typeTutorial">
+            <label class="form-check-label" for="typeTutorial">Tutorial</label>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3 mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="typeTimeScript" name="typeTimeScript" value="typeTimeScript">
+            <label class="form-check-label" for="typeTimeScript">TimeScript</label>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3 mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="typeBrochure" name="typeBrochure" value="typeBrochure">
+            <label class="form-check-label" for="typeBrochure">Brochure</label>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3 mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="typeResearchPaper" name="typeResearchPaper" value="typeResearchPaper">
+            <label class="form-check-label" for="typeResearchPaper">ResearchPaper</label>
+        </div>
+    </div>
+</div>
+
    
     </div>
   
@@ -72,6 +107,7 @@ function resetInput(id) {
      </div>
    
   </div> 
+ 
 
 </form>
 
@@ -241,6 +277,15 @@ function resetInput(id) {
 	</td>
 
 
+ <style>
+        .form-check-input:checked {
+            background-color: orange;
+            border-color: orange;
+        }
 
+        .form-check-input:checked::before {
+            border-color: orange;
+        }
+    </style>
 </body>
 </html>
