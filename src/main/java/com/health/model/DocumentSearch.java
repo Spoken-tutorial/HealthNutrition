@@ -38,7 +38,7 @@ public class DocumentSearch {
     private String title;
 
     private String description;
-    
+
     private String thumbnailPath;
 
     private Long creationTime;
@@ -126,18 +126,16 @@ public class DocumentSearch {
     public void setCategory(String category) {
         this.category = category;
     }
-    
-    
 
     public String getThumbnailPath() {
-		return thumbnailPath;
-	}
+        return thumbnailPath;
+    }
 
-	public void setThumbnailPath(String thumbnailPath) {
-		this.thumbnailPath = thumbnailPath;
-	}
+    public void setThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
+    }
 
-	public String getTopic() {
+    public String getTopic() {
         return topic;
     }
 
@@ -215,6 +213,7 @@ public class DocumentSearch {
 
     public void setDocumentContent(String documentContent) {
         this.documentContent = documentContent;
+
     }
 
     public DocumentSearch() {
