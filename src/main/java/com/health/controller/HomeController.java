@@ -942,7 +942,7 @@ public class HomeController {
 
         if (typeBrochure != null && !typeBrochure.isEmpty() && typeBrochure.equals("typeBrochure")) {
             typeBrochure = CommonData.DOCUMENT_TYPE_BROCHURE;
-            model.addAttribute("typeBrochureforQuery", "Promotional Material ");
+            model.addAttribute("typeBrochureforQuery", "Promotional Material");
         }
 
         if (typeResearchPaper != null && !typeResearchPaper.isEmpty()
