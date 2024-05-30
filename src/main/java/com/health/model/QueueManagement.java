@@ -128,6 +128,9 @@ public class QueueManagement implements Runnable {
 
     @Column(name = "videoPath", nullable = true)
     private String videoPath;
+    
+    @Column(name = "thumbnailPath", nullable = true)
+    private String thumbnailPath;
 
     @Column(name = "outlinePath", nullable = true)
     private String outlinePath;
@@ -151,8 +154,17 @@ public class QueueManagement implements Runnable {
     public Long getResponseId() {
         return responseId;
     }
+    
 
-    public void setResponseId(Long responseId) {
+    public String getThumbnailPath() {
+		return thumbnailPath;
+	}
+
+	public void setThumbnailPath(String thumbnailPath) {
+		this.thumbnailPath = thumbnailPath;
+	}
+
+	public void setResponseId(Long responseId) {
         this.responseId = responseId;
     }
 
@@ -487,6 +499,7 @@ public class QueueManagement implements Runnable {
                     
                    
                         paramsforAddDocument.add(new BasicNameValuePair("description", getDescription()));
+                        paramsforAddDocument.add(new BasicNameValuePair("thumbnailPath", getThumbnailPath()));
 
                     
                     HttpPost httpPost = (HttpPost) request;

@@ -30,6 +30,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -824,7 +825,7 @@ public class HomeController {
 
                 request.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
 
-                HttpResponse response = httpClient.execute(request);
+                CloseableHttpResponse response = httpClient.execute(request);
 
                 int statusCode = response.getStatusLine().getStatusCode();
 
@@ -868,6 +869,8 @@ public class HomeController {
                                     .equals(CommonData.DOCUMENT_TYPE_BROCHURE) || ((String) jsonObjet.get("documentType"))
                                     .equals(CommonData.DOCUMENT_TYPE_RESEARCHPAPER)) {
                             	docSearch.setTitle((String) jsonObjet.get("title")); 
+                            	docSearch.setThumbnailPath((String) jsonObjet.get("thumbnailPath")); 
+                            	
                             }
                             
                             if(((String) jsonObjet.get("documentType"))
@@ -930,27 +933,23 @@ public class HomeController {
         
         if(typeTutorial!=null && !typeTutorial.isEmpty() && typeTutorial.equals("typeTutorial")) {
         	typeTutorial=CommonData.DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT;
-        }else {
-			typeTutorial="";
-		}
+        	 model.addAttribute("typeTutorialforQuery", "Tutorial");
+        }
         
         if(typeTimeScript!=null && !typeTimeScript.isEmpty() && typeTimeScript.equals("typeTimeScript")) {
         	typeTimeScript=CommonData.DOCUMENT_TYPE_TUTORIAL_TIME_SCRIPT;
-        }else {
-        	typeTimeScript="";
-		}
+        	 model.addAttribute("typeTimeScriptforQuery", "Timed Script");
+        }
         
         if(typeBrochure!=null && !typeBrochure.isEmpty() && typeBrochure.equals("typeBrochure")) {
         	typeBrochure=CommonData.DOCUMENT_TYPE_BROCHURE;
-        }else {
-        	typeBrochure="";
-		}
+        	 model.addAttribute("typeBrochureforQuery", "Promotional Material ");
+        }
         
         if(typeResearchPaper!=null && !typeResearchPaper.isEmpty() && typeResearchPaper.equals("typeResearchPaper")) {
         	typeResearchPaper=CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
-        }else {
-        	typeResearchPaper="";
-		}
+        	 model.addAttribute("typeResearchPaperforQuery", "Research Paper");
+        }
         
         
 
@@ -1010,6 +1009,10 @@ public class HomeController {
         int lastPage = page + 1 < totalPages - 5 ? page + 1 + 5 : totalPages;
 
         model.addAttribute("docSearchList", docSearchToView1);
+        model.addAttribute("typeTutorial", typeTutorial);
+        model.addAttribute("typeTimeScript", typeTimeScript);
+        model.addAttribute("typeBrochure", typeBrochure);
+        model.addAttribute("typeResearchPaper", typeResearchPaper);
         model.addAttribute("currentPage", page);
         model.addAttribute("firstPage", firstPage);
         model.addAttribute("lastPage", lastPage);

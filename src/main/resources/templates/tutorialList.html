@@ -76,9 +76,6 @@
 		</div>
 			<div th:if="${docSearch.getDocumentType()=='Tutorial_for_Time_Script'}"  class="col-md-6" >
 		<div style="width: 100%; margin: auto;">
-			 <iframe th:src="@{/files/}+@{${docSearch.getViewUrl()}}" width="50%" height="200px"></iframe>
-			  <a th:if="${docSearch.getViewUrl()!=null and docSearch.getViewUrl()!=''}" th:href="${docSearch.getDocumentUrl()}" target="_blank"> View</a> &nbsp;&nbsp;
-				<a th:if="${docSearch.getViewUrl()!=null and docSearch.getViewUrl()!=''}" th:href="${docSearch.getDocumentUrl()}" download >Download</a>
 			
 			</div>
 		</div>
@@ -99,7 +96,8 @@
 		
 		<div th:if="${docSearch.getDocumentType()=='Brochure'}"  class="col-md-6" >
 		<div style="width: 100%; margin: auto;">
-			 <iframe th:src="@{/files/}+@{${docSearch.getViewUrl()}}" width="50%" height="200px"></iframe>
+			
+			 <img style=" height: 200px" th:if="${docSearch.getThumbnailPath()!=null}" th:src="@{/files/}+@{${docSearch.getThumbnailPath()}}"></img>
 			  <a th:if="${docSearch.getViewUrl()!=null and docSearch.getViewUrl()!=''}" th:href="${docSearch.getDocumentUrl()}" target="_blank"> View</a> &nbsp;&nbsp;
 				<a th:if="${docSearch.getViewUrl()!=null and docSearch.getViewUrl()!=''}" th:href="${docSearch.getDocumentUrl()}" download >Download</a>
 			
@@ -124,7 +122,7 @@
 		<br>
 		<div th:if="${docSearch.getDocumentType()=='ResearchPaper'}"  class="col-md-6" >
 		<div style="width: 100%; margin: auto;">
-			 <iframe th:src="@{/files/}+@{${docSearch.getViewUrl()}}" width="50%" height="200px"></iframe>
+			 <img style=" height: 200px" th:if="${docSearch.getThumbnailPath()!=null}" th:src="@{/files/}+@{${docSearch.getThumbnailPath()}}"></img>
 			  <a th:if="${docSearch.getViewUrl()!=null and docSearch.getViewUrl()!=''}" th:href="${docSearch.getDocumentUrl()}" target="_blank"> View</a> &nbsp;&nbsp;
 				<a th:if="${docSearch.getViewUrl()!=null and docSearch.getViewUrl()!=''}" th:href="${docSearch.getDocumentUrl()}" download >Download</a>
 			
@@ -150,7 +148,11 @@
 	<div th:unless="${docSearchList.size()>0}" ><h4>No Content found for  query: <span th:text="${query}"></span></h4>
 	<br><h5 th:if="${catforQuery!=null}"><b>Category:</b> <span th:text="${catforQuery.getCatName()}"></span></h5>
 	<h5 th:if="${topicforQuery!=null}"><b>Topic:</b> <span th:text="${topicforQuery.getTopicName()}"></span></h5>
-	<h5 th:if="${lanforQuery!=null}"><b>Language:</b> <span th:text="${lanforQuery.getLangName()}"></span></h5> 
+	<h5 th:if="${lanforQuery!=null}"><b>Language:</b> <span th:text="${lanforQuery.getLangName()}"></span></h5>
+	<h5 th:if="${typeTutorialforQuery!=null}"> <b><span th:text="${typeTutorialforQuery}"></span></b></h5>
+	<h5 th:if="${typeTimeScriptforQuery!=null}"><b><span th:text="${typeTimeScriptforQuery}"></span></b></h5>
+	<h5 th:if="${typeBrochureforQuery!=null}"> <b><span th:text="${typeBrochureforQuery}"></span></b></h5>
+	<h5 th:if="${typeResearchPaperforQuery!=null}"> <b><span th:text="${typeResearchPaperforQuery}"></span></b></h5> 
 		<br><br></div>
 	
 	
@@ -161,11 +163,11 @@
 		  <ul class="pagination pagination-sm ">
 		  
 		  
-		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${0}}"> &laquo</a></li>
-		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query}+'&page='+${currentPage -1}}"> &lt</a></li>
-		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
-		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${currentPage +1 }}">&gt</a></li>
-		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&page='+${totalPages-1}}"> &raquo</a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&typeTutorial='+${typeTutorial} +'&typeTimeScript='+${typeTimeScript} +'&typeBrochure='+${typeBrochure} +'&typeResearchPaper='+${typeResearchPaper} +'&page='+${0}}"> &laquo</a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&typeTutorial='+${typeTutorial} +'&typeTimeScript='+${typeTimeScript} +'&typeBrochure='+${typeBrochure} +'&typeResearchPaper='+${typeResearchPaper} +'&page='+${currentPage -1}}"> &lt</a></li>
+		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&typeTutorial='+${typeTutorial} +'&typeTimeScript='+${typeTimeScript} +'&typeBrochure='+${typeBrochure} +'&typeResearchPaper='+${typeResearchPaper} +'&page='+${i-1}}"><span th:text="${i}"/></a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&typeTutorial='+${typeTutorial} +'&typeTimeScript='+${typeTimeScript} +'&typeBrochure='+${typeBrochure} +'&typeResearchPaper='+${typeResearchPaper}  +'&page='+${currentPage +1 }}">&gt</a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/tutorials?categoryName='+${category}+'&topic='+${topic}+'&lan='+${language} +'&query='+${query} +'&typeTutorial='+${typeTutorial} +'&typeTimeScript='+${typeTimeScript} +'&typeBrochure='+${typeBrochure} +'&typeResearchPaper='+${typeResearchPaper} +'&page='+${totalPages-1}}"> &raquo</a></li>
 		  </ul>
 		</nav>
 		
