@@ -129,6 +129,9 @@ public class QueueManagement implements Runnable {
     @Column(name = "videoPath", nullable = true)
     private String videoPath;
 
+    @Column(name = "thumbnailPath", nullable = true)
+    private String thumbnailPath;
+
     @Column(name = "outlinePath", nullable = true)
     private String outlinePath;
 
@@ -150,6 +153,14 @@ public class QueueManagement implements Runnable {
 
     public Long getResponseId() {
         return responseId;
+    }
+
+    public String getThumbnailPath() {
+        return thumbnailPath;
+    }
+
+    public void setThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
     }
 
     public void setResponseId(Long responseId) {
@@ -457,8 +468,6 @@ public class QueueManagement implements Runnable {
                     api_url = documentSb.toString();
                     logger.info("API_URL:{}", api_url);
 
-                   
-             
                     request = new HttpGet(api_url);
 
                 }
@@ -477,18 +486,13 @@ public class QueueManagement implements Runnable {
 
                     }
 
-                    
-                        paramsforAddDocument.add(new BasicNameValuePair("videoPath", getVideoPath()));
+                    paramsforAddDocument.add(new BasicNameValuePair("videoPath", getVideoPath()));
 
-                    
-                    
-                        paramsforAddDocument.add(new BasicNameValuePair("title", getTitle()));
+                    paramsforAddDocument.add(new BasicNameValuePair("title", getTitle()));
 
-                    
-                   
-                        paramsforAddDocument.add(new BasicNameValuePair("description", getDescription()));
+                    paramsforAddDocument.add(new BasicNameValuePair("description", getDescription()));
+                    paramsforAddDocument.add(new BasicNameValuePair("thumbnailPath", getThumbnailPath()));
 
-                    
                     HttpPost httpPost = (HttpPost) request;
                     httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
 
