@@ -14,32 +14,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-/**
- * city Object to store city related data on database
- * 
- * @author om prkash soni
- * @version 1.0
- */
 @Entity
 public class City implements Comparable<City>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     @Column(name = "city_id", nullable = false)
     private int id;
 
-    /**
-     * timestamp on added
-     */
     private Timestamp dateAdded;
 
-    /**
-     * name of city
-     */
     private String cityName;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -83,7 +68,7 @@ public class City implements Comparable<City>, Serializable {
 
     @Override
     public int compareTo(City o) {
-        // TODO Auto-generated method stub
+
         return this.getCityName().compareTo(o.getCityName());
     }
 

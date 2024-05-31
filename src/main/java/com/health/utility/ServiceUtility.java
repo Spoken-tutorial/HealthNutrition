@@ -48,29 +48,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.User;
 import com.health.repository.UserRepository;
 
-/**
- * Utility class
- * 
- * @author om Prakash
- * @version 1.0
- *
- */
-
 public class ServiceUtility {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceUtility.class);
 
-    /**
-     * To get current time
-     * 
-     * @return Timestamp object
-     */
-
     @Autowired
     private JavaMailSender mailSender;
 
-    public static Timestamp getCurrentTime() { // Current Date
-
+    public static Timestamp getCurrentTime() {
         Date date = new Date();
         long t = date.getTime();
         Timestamp st = new Timestamp(t);
@@ -93,14 +78,7 @@ public class ServiceUtility {
         return Long.toString(differenceDate);
     }
 
-    /**
-     * to create folder in system
-     * 
-     * @param path relative path
-     * @return
-     * @throws IOException
-     */
-    public static boolean createFolder(String file) throws IOException { // check for existence of path
+    public static boolean createFolder(String file) throws IOException {
         boolean status = false;
         Path path = Paths.get(file);
         if (Files.createDirectories(path) != null) {
@@ -110,7 +88,7 @@ public class ServiceUtility {
 
     }
 
-    public static boolean createFolder(Path path) throws IOException { // check for existence of path
+    public static boolean createFolder(Path path) throws IOException {
         boolean status = false;
         if (Files.exists(path))
             return status;
@@ -120,15 +98,6 @@ public class ServiceUtility {
         return status;
 
     }
-
-    /**
-     * to upload file in system
-     * 
-     * @param uploadFile   Multipart object
-     * @param pathToUpload relative path
-     * @return
-     * @throws Exception not found
-     */
 
     public static String sanitizeFilename(String fileName) {
         if (fileName == null || fileName.isEmpty()) {
@@ -148,7 +117,7 @@ public class ServiceUtility {
         return newFileName;
     }
 
-    private static String uploadFile(MultipartFile uploadFile, String pathToUpload) throws Exception { // uploading file
+    private static String uploadFile(MultipartFile uploadFile, String pathToUpload) throws Exception {
         String path = null;
 
         Path fileNameAndPath = Paths.get(pathToUpload, uploadFile.getOriginalFilename());
@@ -181,27 +150,19 @@ public class ServiceUtility {
         String pathName = env.getProperty("spring.applicationexternalPath.name");
         try (PDDocument document = PDDocument.load(new File(pathName + pdfFilePath))) {
             PDFRenderer pdfRenderer = new PDFRenderer(document);
-            BufferedImage image = pdfRenderer.renderImageWithDPI(0, 15); // Render the first page with 300 DPI
-
-            // logger.info("Image Width and Height:{} {}", image.getWidth(),
-            // image.getHeight());
+            BufferedImage image = pdfRenderer.renderImageWithDPI(0, 15);
 
             if (image.getHeight() > 200) {
                 int newDPI = (int) Math.ceil(15.0 * 200 / image.getHeight());
                 if (newDPI > 2 && newDPI < 15) {
                     image = pdfRenderer.renderImageWithDPI(0, newDPI);
-                    // logger.info("After setting dpi {}, Width and Height of Image: {} {}", newDPI,
-                    // image.getWidth(), image.getHeight());
+
                 }
             }
 
-            // Save the image to the output folder
             String fileName = outputFolderPath + "/" + "thumbnail.png";
             File outputFile = new File(pathName, fileName);
             ImageIO.write(image, "png", outputFile);
-
-            // Convert the byte array to a Base64-encoded string
-            // String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
             return fileName;
         }
@@ -225,7 +186,7 @@ public class ServiceUtility {
 
                 } catch (Exception e) {
                     logger.error("Exception Generating thumbnail from  :{}", pdfFile, e);
-                    // ignore
+
                 }
 
             }
@@ -239,15 +200,7 @@ public class ServiceUtility {
 
     }
 
-    /**
-     * to upload video file in system
-     * 
-     * @param file         multipart object
-     * @param pathToUpload relative path
-     * @return
-     * @throws Exception not found
-     */
-    private static String uploadVideoFile(MultipartFile file, String pathToUpload) throws Exception { // uploading file
+    private static String uploadVideoFile(MultipartFile file, String pathToUpload) throws Exception {
         String path = null;
 
         Path fileNameAndPath = Paths.get(pathToUpload, file.getOriginalFilename());
@@ -259,13 +212,7 @@ public class ServiceUtility {
         return path;
     }
 
-    /**
-     * to check whether PDF file or not
-     * 
-     * @param pdfFile MultipartFile object
-     * @return
-     */
-    public static boolean checkFileExtensiononeFilePDF(MultipartFile pdfFile) { // validate file against PDF extension
+    public static boolean checkFileExtensiononeFilePDF(MultipartFile pdfFile) {
 
         if (!pdfFile.getOriginalFilename().endsWith(".pdf") && !pdfFile.getOriginalFilename().endsWith(".PDF")) {
             return false;
@@ -274,13 +221,7 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether CSV file or not
-     * 
-     * @param pdfFile MultipartFile object
-     * @return
-     */
-    public static boolean checkFileExtensiononeFileCSV(MultipartFile pdfFile) { // validate file against PDF extension
+    public static boolean checkFileExtensiononeFileCSV(MultipartFile pdfFile) {
 
         if (!pdfFile.getOriginalFilename().endsWith(".csv") && !pdfFile.getOriginalFilename().endsWith(".CSV")) {
             return false;
@@ -289,13 +230,7 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether IMAGE file or not
-     * 
-     * @param temp MultipartFile object
-     * @return
-     */
-    public static boolean checkFileExtensionImage(MultipartFile temp) { // validate file against Image Extension
+    public static boolean checkFileExtensionImage(MultipartFile temp) {
 
         if (!temp.getOriginalFilename().endsWith(".jpg") && !temp.getOriginalFilename().endsWith(".jpeg")
                 && !temp.getOriginalFilename().endsWith(".png") && !temp.getOriginalFilename().endsWith(".JPG")
@@ -307,13 +242,7 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether MP4 file or not
-     * 
-     * @param videoFile MultipartFile object
-     * @return
-     */
-    public static boolean checkFileExtensionVideo(MultipartFile videoFile) { // validate file against Image Extension
+    public static boolean checkFileExtensionVideo(MultipartFile videoFile) {
 
         if (!videoFile.getOriginalFilename().endsWith(".mp4") && !videoFile.getOriginalFilename().endsWith(".mov")
                 && !videoFile.getOriginalFilename().endsWith(".MP4")
@@ -324,13 +253,7 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether ZIP file or not
-     * 
-     * @param temp MultipartFile object
-     * @return
-     */
-    public static boolean checkFileExtensionZip(MultipartFile temp) { // validate file against HTML Extension
+    public static boolean checkFileExtensionZip(MultipartFile temp) {
 
         if (!temp.getOriginalFilename().endsWith(".zip") && !temp.getOriginalFilename().endsWith(".ZIP")) {
 
@@ -340,12 +263,6 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether size of file is within the limit
-     * 
-     * @param temp MultipartFile object
-     * @return
-     */
     public static boolean checkVideoSize(MultipartFile temp) {
 
         if (temp.getSize() > CommonData.videoSize) {
@@ -354,12 +271,6 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether size of Testimonial video is within the limit
-     * 
-     * @param temp MultipartFile object
-     * @return
-     */
     public static boolean checkVideoSizeTestimonial(MultipartFile temp) {
         logger.info("Video Size:{}", temp.getSize());
         if (temp.getSize() > CommonData.videoSizeTest) {
@@ -378,12 +289,6 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether size of file is within the limit
-     * 
-     * @param temp MultipartFile object
-     * @return
-     */
     public static boolean checkScriptSlideProfileQuestion(MultipartFile temp) {
 
         if (temp.getSize() > CommonData.fileSize) {
@@ -392,12 +297,6 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to check whether size of file is within the limit
-     * 
-     * @param temp MultipartFile object
-     * @return
-     */
     public static boolean checkCatAndAllImageFile(MultipartFile temp) {
 
         if (temp.getSize() > CommonData.categoryFileSizeImageFileSize) {
@@ -406,23 +305,12 @@ public class ServiceUtility {
         return true;
     }
 
-    /**
-     * to get present working path
-     * 
-     * @return
-     */
     public static String presentDirectory() {
         Path currentRelativePath = Paths.get("");
         String currentpath = currentRelativePath.toAbsolutePath().toString();
         return currentpath;
 
     }
-
-    /**
-     * Craete Zip File
-     * 
-     * @throws IOException
-     **/
 
     public static String createZipFile(List<String> fileUrls, Environment env) throws IOException {
         String document = "";
@@ -545,12 +433,6 @@ public class ServiceUtility {
         return document;
     }
 
-    /**
-     * File Info
-     * 
-     * @throws IOException
-     **/
-
     public static List<String> FileInfoSizeAndCreationDate(String fileUrl, Environment env) {
 
         List<String> fileInfo = new ArrayList<>();
@@ -576,11 +458,6 @@ public class ServiceUtility {
 
     }
 
-    /*
-     * Delete Files of N old days
-     * 
-     */
-
     public static void deleteFilesOlderThanNDays(int days, Environment env, String dirPath) throws IOException {
 
         long cutOff = System.currentTimeMillis() - (days * 24 * 60 * 60 * 1000);
@@ -600,12 +477,6 @@ public class ServiceUtility {
         });
     }
 
-    /**
-     * to validate email
-     * 
-     * @param email String object
-     * @return
-     */
     public static boolean checkEmailValidity(String email) {
 
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
@@ -618,12 +489,6 @@ public class ServiceUtility {
         return pat.matcher(email).matches();
     }
 
-    /**
-     * to check numeral value in string
-     * 
-     * @param input String object
-     * @return
-     */
     public static boolean checkContainNumeralInString(String input) {
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) == '0' || input.charAt(i) == '1' || input.charAt(i) == '2' || input.charAt(i) == '3'
@@ -634,14 +499,6 @@ public class ServiceUtility {
         }
         return true;
     }
-
-    /**
-     * to convert String into date Object
-     * 
-     * @param date String object
-     * @return
-     * @throws ParseException
-     */
 
     public static java.sql.Date convertStringToDate(String date) throws ParseException {
         SimpleDateFormat sd1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -677,12 +534,6 @@ public class ServiceUtility {
             throw new RuntimeException("Error sending mail notification", ex);
         }
     }
-
-    /**
-     * 
-     * @param emailVerificationCode
-     * @return
-     */
 
     public static boolean verify(String emailVerificationCode) {
         User user = UserRepository.findByVerificationCode(emailVerificationCode);
@@ -745,8 +596,6 @@ public class ServiceUtility {
                 listofScriptVersions.add(x);
                 return listofScriptVersions;
             }
-
-            // Close the HTTP client
 
         } catch (Exception e) {
             e.printStackTrace();

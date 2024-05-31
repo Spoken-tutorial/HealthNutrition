@@ -10,63 +10,29 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-/**
- * TraineeInfromation object
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Entity
 public class TraineeInformation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     @Column(name = "TraineeId")
     private int TraineeId;
 
-    /**
-     * name of person
-     */
     private String name;
 
-    /**
-     * email
-     */
     private String email;
 
-    /**
-     * contact number
-     */
     private long phone;
 
-    /**
-     * age
-     */
     private int age;
 
-    /**
-     * aadhar number
-     */
     private long aadhar;
 
-    /**
-     * gender of trainee
-     */
     private String gender;
 
-    /**
-     * name of organization
-     */
     private String organization;
 
-    /**
-     * training for trainee is being added
-     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Training_id")
     private TrainingInformation traineeInfos;

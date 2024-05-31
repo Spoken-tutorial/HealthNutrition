@@ -15,21 +15,10 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.ColumnDefault;
 
-/**
- * Brochure Object to store brochure related data on database
- * 
- * @author Om Prakash Soni
- * @version 1.0
- *
- */
 @Entity
 public class Brouchure implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * unique brochure id
-     */
 
     @Id
     private int id;
@@ -56,14 +45,8 @@ public class Brouchure implements Serializable {
         this.title = title;
     }
 
-    /**
-     * Location to store brochure
-     */
     private String posterPath;
 
-    /**
-     * Boolean value to show on Homepage or not
-     */
     private boolean showOnHomepage = false;
 
     private int primaryVersion;
@@ -87,16 +70,10 @@ public class Brouchure implements Serializable {
         this.versions = versions;
     }
 
-    /**
-     * Language mapped object it is associated with
-     */
     @ManyToOne
     @JoinColumn(name = "lan_id")
     private Language lan;
 
-    /**
-     * Topic category Mapped object to which it belongs
-     */
     @ManyToOne
     @JoinColumn(name = "topicCat_id")
     private TopicCategoryMapping topicCatId;

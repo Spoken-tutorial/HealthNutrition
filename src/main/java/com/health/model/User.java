@@ -24,82 +24,39 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.health.domain.security.Authority;
 import com.health.domain.security.UserRole;
 
-/**
- * User Object
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Entity
 public class User implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id
-     */
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
-    /**
-     * username of user
-     */
     private String username;
 
-    /**
-     * date of birth of user
-     */
     private Date dob;
 
-    /**
-     * password of user
-     */
     private String password;
 
-    /**
-     * first name of user
-     */
     private String firstName;
 
-    /**
-     * gender of user
-     */
     private String gender;
 
-    /**
-     * last name of user
-     */
     private String lastName;
 
-    /**
-     * address of user
-     */
     @Column(length = 1000)
     private String address;
 
-    /**
-     * token used for forget password
-     */
     @Column(name = "token")
     private String token;
 
-    /**
-     * age of user
-     */
     @Column(name = "age")
     private int age;
 
-    /**
-     * rorganization
-     */
     @Column(name = "master_trainer_organization")
     private String organization;
 
-    /**
-     * org object
-     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "org_role_id")
     private OrganizationRole orgRolev;
@@ -112,43 +69,21 @@ public class User implements UserDetails, Serializable {
         this.orgRolev = orgRolev;
     }
 
-    /**
-     * experience in year
-     */
     @Column(name = "master_trainer_experience")
     private int experience;
 
-    /**
-     * aadhar number
-     */
     @Column(name = "master_trainer_aadhar")
     private long aadharNumber;
 
-    /**
-     * relative path of profile picture
-     */
     @Column(name = "profilePic")
     private String profilePic;
 
-    /**
-     * e-mail of user
-     */
     @Column(name = "email", nullable = false, updatable = false)
     private String email;
 
-    /**
-     * contact number
-     */
     private long phone;
 
-    /**
-     * status of user
-     */
     private boolean registered = true;
-
-    /**
-     * timestamp when object is created
-     */
 
     @Column(name = "email_verification_code", nullable = false, updatable = false)
     private String emailVerificationCode;
@@ -159,9 +94,6 @@ public class User implements UserDetails, Serializable {
     @Column(name = "loggedintime")
     private Timestamp loggedInTime;
 
-    /**
-     * user roles
-     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     @OrderBy("role, cat, lan")
@@ -312,19 +244,19 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isAccountNonExpired() {
-        // TODO Auto-generated method stub
+
         return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        // TODO Auto-generated method stub
+
         return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        // TODO Auto-generated method stub
+
         return true;
     }
 
@@ -591,11 +523,6 @@ public class User implements UserDetails, Serializable {
 
     public void setEmailVerificationCode(String emailVerificationCode) {
         this.emailVerificationCode = emailVerificationCode;
-    }
-
-    public void setEnabled(boolean b) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

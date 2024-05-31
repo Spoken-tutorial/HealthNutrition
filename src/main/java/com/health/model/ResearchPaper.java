@@ -32,14 +32,8 @@ public class ResearchPaper {
     @ColumnDefault("0")
     private int researchPaperVisit = 0;
 
-    /**
-     * Location to store brochure
-     */
     private String ResearchPaperPath;
 
-    /**
-     * Boolean value to show on Homepage or not
-     */
     private boolean showOnHomepage = false;
 
     public int getResearchPaperVisit() {

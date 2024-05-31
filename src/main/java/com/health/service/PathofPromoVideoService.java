@@ -8,11 +8,6 @@ import com.health.model.PromoVideo;
 
 public interface PathofPromoVideoService {
 
-    /**
-     * Find the next unique id for brochure object
-     * 
-     * @return primitive integer value
-     */
     int getNewId();
 
     void save(PathofPromoVideo pathofPromoVideo);

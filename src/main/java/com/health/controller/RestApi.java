@@ -30,13 +30,6 @@ import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.utility.CommonData;
 
-/**
- * Rest APi class return data in JSON format
- * 
- * @author om prakash
- * @version 1.0
- *
- */
 @RestController
 public class RestApi {
 
@@ -61,11 +54,6 @@ public class RestApi {
     @Autowired
     private UserRoleService usrRoleService;
 
-    /**
-     * This url fetches all the category and language available in the system
-     * 
-     * @return ResponseEntity object
-     */
     @GetMapping("/getCatAndLan")
     public ResponseEntity<Object> getcat() {
 
@@ -113,9 +101,6 @@ public class RestApi {
      * This url fetches out all the tutorial based on given category id and language
      * id
      * 
-     * @param catId int value
-     * @param lanId int value
-     * @return ResponseEntity object
      */
     @GetMapping("/getTopicOnCatAndLan/{catId}/{lanId}")
     public ResponseEntity<Object> getTopic(@PathVariable(name = "catId") int catId,
@@ -165,11 +150,6 @@ public class RestApi {
     /**
      * This url fetches out all the roles user entitled to based on given category
      * and language id
-     * 
-     * @param catId    int value
-     * @param lanId    int value
-     * @param username String object
-     * @return ResponseEntity object
      */
     @GetMapping("/getRolesOnCatLanUser/{catId}/{lanId}/{username}")
     public ResponseEntity<Object> getRoles(@PathVariable(name = "catId") int catId,
@@ -224,12 +204,6 @@ public class RestApi {
 
     }
 
-    /**
-     * This url fetch out the tutorial data given tutorial id
-     * 
-     * @param tutorialId int value
-     * @return ResponseEntity object
-     */
     @GetMapping("/getTutorial/{tutorialId}")
     public ResponseEntity<Object> getTutorial(@PathVariable(name = "tutorialId") int tutorialId) {
 
@@ -268,10 +242,6 @@ public class RestApi {
     /**
      * This url tells whether a user has contributor role or not on tutorial
      * 
-     * @param tutId    int value
-     * @param lanId    int value
-     * @param username String object
-     * @return ResponseEntity object
      */
     @GetMapping("/getContributorByTutLanUser/{tutorialId}/{lanId}/{username}")
     public ResponseEntity<Object> getContributorBoolean(@PathVariable(name = "tutorialId") int tutId,

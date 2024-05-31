@@ -6,42 +6,21 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-/**
- * Carousel Object to store carousel related data on database
- * 
- * @author Om Prakash Soni
- * @version 1.0
- */
 @Entity
 public class Carousel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id to identify object
-     */
     @Id
     private int id;
 
-    /**
-     * relative path of image stored specific to object
-     */
     private String posterPath;
 
-    /**
-     * Boolean value to show on Homepage or not
-     */
     private boolean showOnHomepage = false;
 
-    /**
-     * name of event
-     */
     @Column(length = 1000)
     private String eventName;
 
-    /**
-     * description of event
-     */
     @Column(length = 2000)
     private String description;
 

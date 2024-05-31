@@ -27,7 +27,7 @@ public class PathofPromoVideoServiceImpl implements PathofPromoVideoService {
         try {
             return pathofPromoVideoRepository.getNewId() + 1;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error(" New Id error in  Path of Promo Video Service Impl: {}",
                     pathofPromoVideoRepository.getNewId(), e);
             return 1;
@@ -57,7 +57,7 @@ public class PathofPromoVideoServiceImpl implements PathofPromoVideoService {
         try {
             return pathofPromoVideoRepository.findById(id).get();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("  Id error in  Path of Promo Video Service Impl: {}", id, e);
             return null;
         }

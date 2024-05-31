@@ -15,10 +15,6 @@ import javax.persistence.Table;
 /**
  * userAssignedTutorial Object to store userAssignedTutorial related data on
  * database
- * 
- * @author om prakash soni
- * @version 1.0
- *
  */
 @Entity
 @Table(name = "UserOnTutorialAssigned")
@@ -26,28 +22,16 @@ public class ContributorAssignedMultiUserTutorial implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     private int id;
 
-    /**
-     * timestamp of object created
-     */
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    /**
-     * user assigned for tutorial
-     */
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_assigned")
     private User user;
 
-    /**
-     * tutorial info
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conAssignedTutorial")
     private ContributorAssignedTutorial conAssignedTutorial;

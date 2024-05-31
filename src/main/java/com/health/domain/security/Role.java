@@ -10,24 +10,13 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-/**
- * Role object
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Entity
 public class Role implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    /**
-     * unique id of object
-     */
+
     @Id
     private int roleId;
-    /**
-     * role name
-     */
 
     private String name;
 

@@ -21,11 +21,11 @@ public class ResearchPaperServiceImpl implements ResearchPaperService {
 
     @Override
     public int getNewId() {
-        // TODO Auto-generated method stub
+
         try {
             return repo.getNewId() + 1;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error(" New Id error in Research Paper Service Impl: {}", repo.getNewId(), e);
             return 1;
         }
@@ -33,7 +33,7 @@ public class ResearchPaperServiceImpl implements ResearchPaperService {
 
     @Override
     public void save(ResearchPaper temp) {
-        // TODO Auto-generated method stub
+
         repo.save(temp);
     }
 
@@ -46,13 +46,13 @@ public class ResearchPaperServiceImpl implements ResearchPaperService {
 
     @Override
     public void delete(ResearchPaper temp) {
-        // TODO Auto-generated method stub
+
         repo.delete(temp);
     }
 
     @Override
     public List<ResearchPaper> findByOnHome(boolean value) {
-        // TODO Auto-generated method stub
+
         return repo.findAllByshowOnHomepage(value);
     }
 
@@ -67,20 +67,19 @@ public class ResearchPaperServiceImpl implements ResearchPaperService {
     public List<ResearchPaper> findByShowOnHomepageIsTrueAndAddedQueueIsFalse() {
         return repo.findByShowOnHomepageIsTrueAndAddedQueueIsFalse();
     }
-    
+
     @Override
     public List<ResearchPaper> findByShowOnHomepageIsTrueAndAddedQueueIsTrue() {
         return repo.findByShowOnHomepageIsTrueAndAddedQueueIsTrue();
     }
 
-
     @Override
     public ResearchPaper findById(int id) {
-        // TODO Auto-generated method stub
+
         try {
             return repo.findById(id).get();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("Id error in Research Paper Service Impl: {}", id, e);
             return null;
         }

@@ -8,42 +8,20 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-/**
- * this modal is used for master trainer
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Entity
 public class UserIndianLanguageMapping implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id
-     */
     @Id
     private int id;
 
-    /**
-     * redaing check
-     */
     private boolean reading = false;
 
-    /**
-     * write check
-     */
     private boolean writing = false;
 
-    /**
-     * speak check
-     */
     private boolean speaking = false;
 
-    /**
-     * user object
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

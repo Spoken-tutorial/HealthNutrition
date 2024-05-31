@@ -14,13 +14,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.health.service.impl.UserSecurityService;
 import com.health.utility.SecurityUtility;
 
-/**
- * Spring security configuration file
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -33,9 +26,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return SecurityUtility.passwordEncoder();
     }
 
-    /**
-     * public matcher doesn't require authentication
-     */
     private static final String[] PUBLIC_MATCHERS = { "/VenoBox/**", "/css/**", "/js/**", "/image/**", "/", "/files/**",
             "/newUser", "/Media/**", "/forgetPassword", "/feedcustomerdat", "/feedbackForUser", "/login", "/tutorials",
             "/s/**", "/loadByCategoryTuturial", "/addContactForm", "/ControllerHealth", "/showTutorial",
@@ -54,9 +44,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/loadLanguageAndTopicByCategoryResource", "/loadTutorialCountByTopicAndLanguage",
             "/loadTutorialCountByTopics", "/downloadResources", "/api/scriptPublished/**", };
 
-    /**
-     * url matcher for SUPERADMIN
-     */
     public static final String[] SUPERUSER_URL = { "/addCategory/**", "/updateCategory/**", "/category/edit/**",
             "/addOrganizationRole/**", "/organization_role/edit/**", "/update_organization_role/**", "/addLanguage/**",
             "/language/edit/**", "/updateLanguage/**", "/addRole/**", "/addTopic/**", "/topic/edit/**",
@@ -65,13 +52,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/enableRoleById/**", "/deleteMasterRole/**", "/viewTrainee/**", "/details/**", "/tutorialStatus/**",
             "/users/**", "/unpublishTopic/**", "/clearAllCaches/**", "/addConsultant/**",
 
-//			"/unpublishTutorial/**"
-
     };
 
-    /**
-     * url matcher for MASTERTRAINER
-     */
     public static final String[] MASTERTRAINER_URL = {
 
             "/masterTrainerOperation/**", "/details/**", "/addTrainingInfo/**", "/uploadfeedback/**",
@@ -80,9 +62,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     };
 
-    /**
-     * url matcher for CONTRIBUTOR
-     */
     public static final String[] CONTRIBUTOR_URL = { "/uploadTutorial/**", "/addOutline/**", "/addKeyword**",
             "/addPreRequisticWhenNotRequired/**", "/addPreRequistic/**", "/addVideo/**", "/addSlide/**",
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
@@ -90,26 +69,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     };
 
-    /**
-     * url matcher for Admin Role
-     */
     public static final String[] ADMIN_URL = { "/listTutorialForAdminReview/**", "/adminreview/review/**",
             "/acceptAdminVideo/**",
 
     };
 
-    /**
-     * url matcher for domain role
-     */
     public static final String[] DOMAIN_URL = { "/listTutorialForDomainReview/**", "/domainreview/review/**",
             "/acceptDomainOutline/**", "/acceptDomainScript/**", "/acceptDomainVideo/**", "/acceptDomainSlide/**",
             "/acceptDomainKeywords/**", "/acceptDomainPreRequistic/**",
 
     };
 
-    /**
-     * url matcher for quality role
-     */
     public static final String[] QUALITY_URL = { "/listTutorialForQualityReview/**", "/publish/**",
             "/tutorialToPublish/**", "/qualityreview/review/**", "/acceptQualityOutline/**", "/acceptQualityScript/**",
             "/acceptQualityVideo/**", "/acceptQualitySlide/**", "/acceptQualityKeywords/**",
@@ -117,9 +87,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     };
 
-    /**
-     * configuration method
-     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -127,13 +94,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .headers().frameOptions().sameOrigin().httpStrictTransportSecurity().disable();
         http
-                // ...
+
                 .headers()
-                // do not use any default headers unless explicitly listed
+
                 .defaultsDisabled().cacheControl();
 
         http
-                // ...
+
                 .headers().disable();
 
         http.authorizeRequests().antMatchers("/").hasAnyAuthority().antMatchers(SUPERUSER_URL)
@@ -154,8 +121,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin().defaultSuccessUrl("/dashBoard", true);
 
         http.csrf().disable().cors().disable().formLogin().failureUrl("/login?error")
-                // ("userDetail.html")
-                /* .defaultSuccessUrl("/") */
+
                 .loginPage("/login").permitAll().and().logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/?logout")
                 .deleteCookies("remember-me").permitAll().and().rememberMe();

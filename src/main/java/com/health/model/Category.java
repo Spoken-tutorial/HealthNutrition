@@ -17,58 +17,31 @@ import javax.persistence.Table;
 
 import com.health.domain.security.UserRole;
 
-/**
- * category Object to store category related data on database
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Entity
 @Table(name = "category")
 public class Category implements Comparable<Category>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id to identify object
-     */
     @Id
     @Column(name = "category_id", nullable = false, updatable = false)
     private int categoryId;
 
-    /**
-     * category name
-     */
     @Column(name = "category_name", nullable = false)
     private String catName;
 
-    /**
-     * Timestamp on added
-     */
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    /**
-     * boolean value to mark visible/invisible in application
-     */
     @Column(name = "status", nullable = false)
     private boolean status = true;
 
-    /**
-     * relative path of image stored
-     */
     @Column(name = "Image_path", nullable = false)
     private String posterPath;
 
-    /**
-     * description of category
-     */
     @Column(name = "Description", nullable = false, length = 2000)
     private String description;
 
-    /**
-     * user who created it
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -164,7 +137,6 @@ public class Category implements Comparable<Category>, Serializable {
 
     @Override
     public int compareTo(Category o) {
-        // TODO Auto-generated method stub
 
         return this.getCatName().compareTo(o.getCatName());
 

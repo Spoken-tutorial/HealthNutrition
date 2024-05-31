@@ -114,7 +114,6 @@ public class LiveTutorial implements Comparable<LiveTutorial>, Serializable {
 
     public static Comparator<LiveTutorial> SortByUploadTime = new Comparator<LiveTutorial>() {
 
-        // Method
         @Override
         public int compare(LiveTutorial t1, LiveTutorial t2) {
             return t2.getDateAdded().compareTo(t1.getDateAdded());

@@ -24,7 +24,7 @@ public class promoVideoServiceImpl implements PromoVideoService {
         try {
             return promoVideoRepository.getNewId() + 1;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error(" New Id error in Promo Video Service Impl: {}", promoVideoRepository.getNewId(), e);
             return 1;
         }
@@ -62,7 +62,7 @@ public class promoVideoServiceImpl implements PromoVideoService {
         try {
             return promoVideoRepository.findById(id).get();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error(" Id error in Promo Video Service Impl: {}", id, e);
             return null;
         }

@@ -15,46 +15,28 @@ import javax.persistence.Table;
 
 /**
  * Pre-tutorial Object to store Pre-tutorial related data on database
- * 
- * @author om prakash soni
- * @version 1.0
- *
  */
 @Entity
 @Table(name = "contributor_Role")
 public class ContributorAssignedTutorial implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    /**
-     * unique id of object
-     */
+
     @Id
     private int id;
     private Timestamp dateAdded;
 
-    /**
-     * topicCategory Object
-     */
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "topicCat_ID")
     private TopicCategoryMapping topicCatId;
 
-    /**
-     * language object
-     */
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "language_id")
     private Language lan;
 
-    /**
-     * tutorial associated with it
-     */
     @OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
     private Set<Tutorial> tutorials = new HashSet<Tutorial>();
 
-    /**
-     * user to which tutorial is assigned
-     */
     @OneToMany(mappedBy = "conAssignedTutorial", cascade = CascadeType.ALL)
     private Set<ContributorAssignedMultiUserTutorial> multiUserAssigned = new HashSet<ContributorAssignedMultiUserTutorial>();
 

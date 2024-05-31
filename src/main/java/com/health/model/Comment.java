@@ -10,55 +10,28 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-/**
- * Comment Object to store Comment related data on database
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Entity
 public class Comment implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     private int commentId;
 
-    /**
-     * actual comment
-     */
     @Column(length = 2000)
     private String comment;
 
-    /**
-     * timestamp of comment
-     */
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    /**
-     * component for which comment is made
-     */
     private String type;
 
-    /**
-     * role name of user who made comment
-     */
     private String roleName;
 
-    /**
-     * user who made comment
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    /**
-     * tutorial for which comment is made
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Tutorial_id")
     private Tutorial tutorialInfos;

@@ -8,11 +8,6 @@ import com.health.model.Version;
 
 public interface FilesofBrouchureService {
 
-    /**
-     * Find the next unique id for brochure object
-     * 
-     * @return primitive integer value
-     */
     int getNewId();
 
     void save(FilesofBrouchure filesofBrouchure);

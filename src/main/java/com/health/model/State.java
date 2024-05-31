@@ -12,33 +12,17 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-/**
- * this modal object records state object in database
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Entity
 public class State implements Comparable<State>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     @Column(name = "state_id", nullable = false)
     private int id;
 
-    /**
-     * name of state
-     */
     private String stateName;
 
-    /**
-     * timestamp of object created
-     */
     private Timestamp dateAdded;
 
     @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -81,7 +65,7 @@ public class State implements Comparable<State>, Serializable {
 
     @Override
     public int compareTo(State o) {
-        // TODO Auto-generated method stub
+
         return this.getStateName().compareTo(o.getStateName());
     }
 

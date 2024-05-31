@@ -21,13 +21,6 @@ import com.health.model.Tutorial;
 import com.health.repository.TutorialRepository;
 import com.health.service.TutorialService;
 
-/**
- * Default implementation of the {@link com.health.service.TutorialService}
- * interface.
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Service
 public class TutorialServiceImpl implements TutorialService {
 
@@ -36,12 +29,9 @@ public class TutorialServiceImpl implements TutorialService {
     @Autowired
     private TutorialRepository tutorialRepo;
 
-    /**
-     * @see com.health.service.TutorialService#findAll()
-     */
     @Override
     public List<Tutorial> findAll() {
-        // TODO Auto-generated method stub
+
         return tutorialRepo.findAll();
     }
 
@@ -63,27 +53,21 @@ public class TutorialServiceImpl implements TutorialService {
         return finalTutorials;
     }
 
-    /**
-     * @see com.health.service.TutorialService#getNewId()
-     */
     @Override
     public int getNewId() {
-        // TODO Auto-generated method stub
+
         try {
             return tutorialRepo.getNewId() + 1;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("New Id error in Tutorial Service Impl: {}", tutorialRepo.getNewId(), e);
             return 1;
         }
     }
 
-    /**
-     * @see com.health.service.TutorialService#findAllByContributorAssignedTutorial(ContributorAssignedTutorial)
-     */
     @Override
     public List<Tutorial> findAllByContributorAssignedTutorial(ContributorAssignedTutorial con) {
-        // TODO Auto-generated method stub
+
         return tutorialRepo.findAllByconAssignedTutorial(con);
     }
 
@@ -98,44 +82,34 @@ public class TutorialServiceImpl implements TutorialService {
         return tutorialRepo.findByOutlinePathNull();
     }
 
-    // New Function By Alok
     @Override
     public List<Tutorial> findAllByContributorAssignedTutorialEnabled(ContributorAssignedTutorial con) {
-        // TODO Auto-generated method stub
+
         return tutorialRepo.findAllByconAssignedTutorialByStatusTrue(con);
     }
 
-    /**
-     * @see com.health.service.TutorialService#save(Tutorial)
-     */
     @Override
     public void save(Tutorial tut) {
-        // TODO Auto-generated method stub
+
         tutorialRepo.save(tut);
     }
 
-    /**
-     * @see com.health.service.TutorialService#getById(int)
-     */
     @Override
     public Tutorial getById(int id) {
-        // TODO Auto-generated method stub
+
         try {
             Optional<Tutorial> local = tutorialRepo.findById(id);
             return local.get();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("Id error in Tutorial Service Impl: {}", id, e);
             return null;
         }
     }
 
-    /**
-     * @see com.health.service.TutorialService#findAllByContributorAssignedTutorialList(List)
-     */
     @Override
     public List<Tutorial> findAllByContributorAssignedTutorialList(List<ContributorAssignedTutorial> con) {
-        // TODO Auto-generated method stub
+
         List<Tutorial> localList = new ArrayList<Tutorial>();
         for (ContributorAssignedTutorial conTemp : con) {
             localList.addAll(tutorialRepo.findAllByconAssignedTutorial(conTemp));
@@ -144,10 +118,9 @@ public class TutorialServiceImpl implements TutorialService {
 
     }
 
-    // New Function By Alok
     @Override
     public List<Tutorial> findAllByContributorAssignedTutorialList1(List<ContributorAssignedTutorial> con) {
-        // TODO Auto-generated method stub
+
         List<Tutorial> localList = new ArrayList<Tutorial>();
         for (ContributorAssignedTutorial conTemp : con) {
             localList.addAll(tutorialRepo.findAllByconAssignedTutorialByStatusTrue(conTemp));
@@ -156,27 +129,15 @@ public class TutorialServiceImpl implements TutorialService {
 
     }
 
-    /**
-     * @see com.health.service.TutorialService#findAllByStatus(boolean)
-     */
     @Override
     public List<Tutorial> findAllByStatus(boolean status) {
-        // TODO Auto-generated method stub
+
         return tutorialRepo.findAllByStatus(status);
     }
 
-    /*
-     * @Override public List<Tutorial> findAllByStatusTrue() { // TODO
-     * Auto-generated method stub return tutorialRepo.findAllByStatusTrue(); }
-     * 
-     */
-
-    /**
-     * @see com.health.service.TutorialService#findAllPagination(Pageable)
-     */
     @Override
     public Page<Tutorial> findAllPagination(Pageable page) {
-        // TODO Auto-generated method stub
+
         return tutorialRepo.findAll(page);
     }
 
@@ -204,7 +165,6 @@ public class TutorialServiceImpl implements TutorialService {
 
         List<Tutorial> tutorials = new ArrayList<>();
 
-        // List<Tutorial> tutList= tutorialRepo.findAll();
         for (Tutorial temp : tutList) {
             if (temp.getConAssignedTutorial().getTopicCatId().getCat().isStatus() && temp.isStatus()) {
                 tutorials.add(temp);
@@ -218,13 +178,9 @@ public class TutorialServiceImpl implements TutorialService {
         return pageOfTutorials;
     }
 
-    /**
-     * @see com.health.service.TutorialService#findAllByconAssignedTutorialPagination(ContributorAssignedTutorial,
-     *      Pageable)
-     */
     @Override
     public Page<Tutorial> findAllByconAssignedTutorialPagination(ContributorAssignedTutorial con, Pageable page) {
-        // TODO Auto-generated method stub
+
         return tutorialRepo.findAllByconAssignedTutorialPagination(con, page);
 
     }
@@ -232,13 +188,12 @@ public class TutorialServiceImpl implements TutorialService {
     @Override
     public Page<Tutorial> findAllByconAssignedTutorialListPagination(List<ContributorAssignedTutorial> con,
             Pageable page) {
-        // TODO Auto-generated method stub
+
         return tutorialRepo.findAllByconAssignedTutorialListPagination(con, page);
     }
 
     @Override
     public List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con) {
-        // TODO Auto-generated method stub
 
         return tutorialRepo.findAllByconAssignedTutorialAndStatus(con);
     }
@@ -265,10 +220,6 @@ public class TutorialServiceImpl implements TutorialService {
         return searchResult;
     }
 
-    /*
-     * New Algorithm to search Outline by combination of Words ...... Author: Alok
-     * Kumar
-     */
     @Override
     public Page<Tutorial> SearchOutlineByCombinationOfWords(String query, Pageable page) {
         Page<Tutorial> tutorialPageList = null;

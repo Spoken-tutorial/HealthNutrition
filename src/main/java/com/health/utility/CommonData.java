@@ -3,13 +3,6 @@ package com.health.utility;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * coomon data used in application
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Component
 public class CommonData {
 
@@ -171,7 +164,6 @@ public class CommonData {
     public static String[] tutorialStatus = { ADD_CONTENT, ADMIN_REVIEW_MSG, DOMAIN_REVIEW_MSG, QUALITY_REVIEW_MSG,
             NEED_IMPROVEMENT_MSG, WAITING_PUBLISH, PUBLISHED };
 
-//	public static String COMMENT_SUCCESS = "Comment Added";
     public static String COMMENT_SUCCESS = "Your comment is posted successfully.";
 
     public static String FAILURE = "Failed";
@@ -238,7 +230,6 @@ public class CommonData {
 
     public static final String SCRIPT_UPLOAD_ERROR = "Script Not Uploaded";
 
-//public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
     public static String SCRIPT_MANAGER_BASE = "https://scriptmanager.spoken-tutorial.org/";
 
     public static String SCRIPT_MANAGER_CREATE = "create/healthnutrition/";
@@ -308,7 +299,5 @@ public class CommonData {
     public static final Long TASK_SLEEP_TIME = 10L * 1000;
     public static final Long NO_TASK_SLEEP_TIME_FOR_DELETE = 60L * 1000 * 60;
     public static final Long TASK_SLEEP_TIME_FOR_DELETE = 60L * 1000 * 60;
-
-//	public static String SCRIPT_MANAGER_VIEW= "view/healthnutrition";
 
 }

@@ -14,66 +14,35 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-/**
- * This modal add Training information to database
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Entity
 public class TrainingInformation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     private int trainingId;
 
-    /**
-     * number of participant
-     */
     @Column(name = "totalParticipant")
     private int totalParticipant;
 
-    /**
-     * relative path of photos of training
-     */
     @Column(name = "PosterPath")
     private String posterPath;
 
-    /**
-     * language
-     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "state_id")
     private Language lan;
 
-    /**
-     * event name
-     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id")
     private Event event;
 
-    /**
-     * user who added this
-     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
-    /**
-     * Timestaamp when object created
-     */
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    /**
-     * address
-     */
     @Column(name = "address", length = 10000)
     private String address;
 

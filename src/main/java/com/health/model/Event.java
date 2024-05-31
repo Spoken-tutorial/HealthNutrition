@@ -15,131 +15,70 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-/**
- * Event Object to store Event related data on database
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Entity
 public class Event implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     @Column(name = "event_id", updatable = false, nullable = false)
     private int eventId;
 
-    /**
-     * name of event
-     */
     @Column(name = "event_name", nullable = false, length = 1000)
     private String eventName;
 
-    /**
-     * description of event
-     */
     @Column(name = "description", nullable = false, length = 2000)
     private String description;
 
-    /**
-     * location of event
-     */
     @Column(name = "location", nullable = false)
     private String location;
 
-    /**
-     * coordinator of event
-     */
     @Column(name = "contactPerson", nullable = false)
     private String contactPerson;
 
-    /**
-     * coordinator contact number
-     */
     @Column(name = "contactNumber", nullable = false)
     private long contactNumber;
 
-    /**
-     * E-mail
-     */
     @Column(name = "email", nullable = false)
     private String email;
 
-    /**
-     * relative path of poster
-     */
     @Column(name = "path", nullable = false)
     private String posterPath;
 
-    /**
-     * start date of event
-     */
     @Column(name = "start_Date", nullable = false)
     private Date startDate;
 
-    /**
-     * end date of event
-     */
     @Column(name = "end_date", nullable = false)
     private Date endDate;
 
-    /**
-     * timestamp of event added
-     */
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    /**
-     * pincode of location
-     */
     @Column(name = "pincode")
     private int pincode;
 
-    /**
-     * langauge in which event is occuring
-     */
     @ManyToOne
     @JoinColumn(name = "lan_id")
     private Language lan;
 
-    /**
-     * state of location
-     */
     @ManyToOne
     @JoinColumn(name = "state_id")
     private State state;
 
-    /**
-     * district of location
-     */
     @ManyToOne
     @JoinColumn(name = "district_id")
     private District district;
 
-    /**
-     * city of location
-     */
     @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
 
-    /**
-     * full address
-     */
     @Column(name = "address", length = 10000)
     private String address;
 
     @OneToMany(mappedBy = "traineeInfos", cascade = CascadeType.ALL)
     private Set<TrainingTopic> trainingTopicId = new HashSet<TrainingTopic>();
 
-    /**
-     * user who added
-     */
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -309,7 +248,6 @@ public class Event implements Serializable {
 
     public static Comparator<Event> SortByEventAddedTimeInDesc = new Comparator<Event>() {
 
-        // Method
         @Override
         public int compare(Event e1, Event e2) {
             return e2.getDateAdded().compareTo(e1.getDateAdded());

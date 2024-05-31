@@ -6,22 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-/*
- * Author: Alok Kumar
- */
-
 @Configuration
 public class EhcacheConfig {
-
-    /*
-     * @Bean CacheManager cacheManager(){ return new
-     * EhCacheCacheManager(ehCacheManager()); //return CacheManager.create(); }
-     * 
-     * private net.sf.ehcache.CacheManager ehCacheManager() {
-     * EhCacheManagerFactoryBean factoryBean = new EhCacheManagerFactoryBean();
-     * factoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
-     * factoryBean.setShared(true); return factoryBean.getObject(); }
-     */
 
     @Bean
     public EhCacheCacheManager ehCacheCacheManager() {

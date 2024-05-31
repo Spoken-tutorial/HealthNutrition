@@ -21,13 +21,6 @@ import com.health.repository.TopicRepository;
 import com.health.repository.TutorialRepository;
 import com.health.service.TopicService;
 
-/**
- * Default implementation of the {@link com.health.service.TopicService}
- * interface.
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Service
 public class TopicServiceImpl implements TopicService {
     private static final Logger logger = LoggerFactory.getLogger(TopicServiceImpl.class);
@@ -38,67 +31,52 @@ public class TopicServiceImpl implements TopicService {
     @Autowired
     private TutorialRepository tutRepo;
 
-    /**
-     * @see com.health.service.TopicService#getNewTopicId()
-     */
     @Override
     public int getNewTopicId() {
-        // TODO Auto-generated method stub
+
         try {
             return topicRepo.getNewId() + 1;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error(" New Id error in Topic Service Impl: {}", topicRepo.getNewId(), e);
             return 1;
         }
     }
 
-    /**
-     * @see com.health.service.TopicService#findBytopicName(String)
-     */
     @Override
 
     public Topic findBytopicName(String name) {
-        // TODO Auto-generated method stub
+
         return topicRepo.findBytopicName(name);
     }
 
-    /**
-     * @see com.health.service.TopicService#findById(int)
-     */
     @Override
 
     public Topic findById(int id) {
-        // TODO Auto-generated method stub
+
         try {
             Optional<Topic> local = topicRepo.findById(id);
 
             return local.get();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("Id error in Topic Service Impl: {}", id, e);
             return null;
         }
     }
 
-    /**
-     * @see com.health.service.TopicService#findAll()
-     */
     @Override
     public List<Topic> findAll() {
-        // TODO Auto-generated method stub
+
         List<Topic> topics = (List<Topic>) topicRepo.findAll();
         Collections.sort(topics);
         return topics;
     }
 
-    /**
-     * @see com.health.service.TopicService#save(Topic)
-     */
     @Override
     @CachePut(cacheNames = "topics", key = "#topic.id")
     public void save(Topic topic) {
-        // TODO Auto-generated method stub
+
         topicRepo.save(topic);
     }
 
@@ -107,7 +85,7 @@ public class TopicServiceImpl implements TopicService {
     public List<Topic> getTopicsForcache() {
 
         List<Tutorial> tutorials = tutRepo.findAllByStatus(true);
-        // List<Tutorial> tutorials = tutRepo.findAllByStatusTrue();
+
         Set<Topic> topicTemp = new HashSet<Topic>();
         for (Tutorial temp : tutorials) {
 

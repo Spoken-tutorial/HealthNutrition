@@ -10,45 +10,23 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-/**
- * Modal class to record post questionnaire for training conducted
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Entity
 public class PostQuestionaire implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     private int id;
 
-    /**
-     * relative path of questionnaire
-     */
     private String questionPath;
 
-    /**
-     * timestamp of object created
-     */
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    /**
-     * training for object created
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Training_id")
     private TrainingInformation traineeInfos;
 
-    /**
-     * trainer who added this info.
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

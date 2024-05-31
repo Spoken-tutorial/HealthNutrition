@@ -10,26 +10,14 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-/**
- * langauge object for master trainer to store in database
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Entity
 public class IndianLanguage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * unique id of object
-     */
     @Id
     private int id;
 
-    /**
-     * language name
-     */
     private String lanName;
 
     @OneToMany(mappedBy = "indianlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

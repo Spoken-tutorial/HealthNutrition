@@ -131,7 +131,7 @@ public class Version {
 
     public Version() {
         super();
-        // TODO Auto-generated constructor stub
+
     }
 
     public Version(int verId, Timestamp dateAdded, String versionPosterPath, Brouchure brouchure) {
@@ -144,7 +144,6 @@ public class Version {
 
     public static Comparator<Version> SortByBroVersionInDesc = new Comparator<Version>() {
 
-        // Method
         @Override
         public int compare(Version v1, Version v2) {
 
@@ -159,7 +158,6 @@ public class Version {
 
     public static Comparator<Version> SortByBroVersionTime = new Comparator<Version>() {
 
-        // Method
         @Override
         public int compare(Version v1, Version v2) {
             return v2.getDateAdded().compareTo(v1.getDateAdded());

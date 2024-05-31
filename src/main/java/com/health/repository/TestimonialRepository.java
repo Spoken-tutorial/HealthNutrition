@@ -8,21 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.Testimonial;
 
-/**
- * This Interface Extend CrudRepository to handle all database operation related
- * to Testimonial object
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 public interface TestimonialRepository extends CrudRepository<Testimonial, Integer> {
 
-    /**
-     * Find the next unique id for the object
-     * 
-     * @return primitive integer value
-     */
     @Query("select max(testimonialId) from Testimonial")
     int getNewId();
 
@@ -33,16 +20,8 @@ public interface TestimonialRepository extends CrudRepository<Testimonial, Integ
     @CacheEvict(cacheNames = "testimonials", allEntries = true)
     <S extends Testimonial> S save(S entity);
 
-    /**
-     * Find list of all Testimonial object given approve value
-     * 
-     * @param value boolean value
-     * @return list of Testimonial object
-     */
-    // @Cacheable(cacheNames ="testimonials", key="#value")
     List<Testimonial> findByapproved(boolean value);
 
-    // @Cacheable(cacheNames ="testimonials")
     @Override
     List<Testimonial> findAll();
 

@@ -9,11 +9,6 @@ import com.health.model.PromoVideo;
 
 public interface promoVideoRepository extends CrudRepository<PromoVideo, Integer> {
 
-    /**
-     * Find the next unique id for the object
-     * 
-     * @return primitive integer value
-     */
     @Query("select max(promoId) from PromoVideo")
     int getNewId();
 

@@ -11,11 +11,6 @@ import com.health.model.Version;
 
 public interface FilesofBrouchureRepository extends CrudRepository<FilesofBrouchure, Integer> {
 
-    /**
-     * Find the next unique id for the object
-     * 
-     * @return primitive integer value
-     */
     @Query("select max(broFileId) from FilesofBrouchure")
     int getNewId();
 

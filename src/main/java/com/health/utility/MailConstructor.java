@@ -11,13 +11,6 @@ import com.health.model.Category;
 import com.health.model.Language;
 import com.health.model.User;
 
-/**
- * Mail constructor Class file
- * 
- * @author om prakash soni
- * @version 1.0
- *
- */
 @Component
 public class MailConstructor {
 
@@ -52,9 +45,6 @@ public class MailConstructor {
 
     /**
      * This method used to send email to consultant
-     * 
-     * @param usr user object
-     * @return SimpleMailMessage object
      */
     public SimpleMailMessage domainRoleMailSend(User usr) {
         String message = "Hello Your account has been created please use below details to access\n" + "username : "
@@ -82,11 +72,7 @@ public class MailConstructor {
      * This method to send email to user when role is being accepted from super
      * admin
      * 
-     * @param usr  user object
-     * @param role role object
-     * @param cat  category object
-     * @param lan  language object
-     * @return SimpleMailMessage object
+     * 
      */
     public SimpleMailMessage approveRole(User usr, Role role, Category cat, Language lan) {
 
@@ -114,11 +100,6 @@ public class MailConstructor {
      * This method to send email to user when role is being rejected from super
      * admin
      * 
-     * @param usr  user object
-     * @param role role object
-     * @param cat  category object
-     * @param lan  language object
-     * @return SimpleMailMessage object
      */
     public SimpleMailMessage rejectRole(User usr, Role role, Category cat, Language lan) {
 
@@ -143,9 +124,6 @@ public class MailConstructor {
 
     /**
      * This method used to send email when feedback form is filled
-     * 
-     * @param usr user object
-     * @return SimpleMailMessage object
      */
     public SimpleMailMessage feedbackMailSend(String name, String email, String message) {
         String mail_body = "Feedback Mail : \n" + "name : " + name + "\n" + "email : " + email + "\n" + "message : "

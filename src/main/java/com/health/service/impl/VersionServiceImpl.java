@@ -25,7 +25,7 @@ public class VersionServiceImpl implements VersionService {
         try {
             return verRepository.getNewId() + 1;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("New Id error in Version Service Impl: {}", verRepository.getNewId(), e);
             return 1;
         }
@@ -56,7 +56,7 @@ public class VersionServiceImpl implements VersionService {
         try {
             return verRepository.findById(id).get();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("Id error in Version Service Impl: {}", id, e);
             return null;
         }
@@ -68,7 +68,7 @@ public class VersionServiceImpl implements VersionService {
         try {
             return verRepository.findByBrouchureAndBroVersion(brochure, primaryVersion);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("brochure and Primary Version error in Version Service Impl: {} {}", brochure, primaryVersion,
                     e);
             return null;

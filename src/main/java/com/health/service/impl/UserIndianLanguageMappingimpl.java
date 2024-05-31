@@ -8,13 +8,6 @@ import org.springframework.stereotype.Service;
 import com.health.repository.UserIndianLanguageMappingRepository;
 import com.health.service.UserIndianLanguageMappingService;
 
-/**
- * Default implementation of the
- * {@link com.health.service.UserIndianLanguageMappingService} interface.
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Service
 public class UserIndianLanguageMappingimpl implements UserIndianLanguageMappingService {
 
@@ -23,16 +16,13 @@ public class UserIndianLanguageMappingimpl implements UserIndianLanguageMappingS
     @Autowired
     private UserIndianLanguageMappingRepository repo;
 
-    /**
-     * @see com.health.service.UserIndianLanguageMappingService#getNewId()
-     */
     @Override
     public int getNewId() {
-        // TODO Auto-generated method stub
+
         try {
             return repo.getNewId() + 1;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("New Id error in User Indian Language Mapping Service Impl: {}", repo.getNewId(), e);
             return 1;
         }
