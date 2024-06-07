@@ -50,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/loadTopicAndLanguageByCategory/**", "/loadCategoryAndLanguageByTopic/**",
             "/loadCategoryAndTopicByLanguage/**", "/tutorialsSearch/**", "/tutorialsSearch1/**", "/checkTutorial/**",
             "/Slide/**", "/TimeScript/**", "/OriginalScript/**", "/Brochure-English/**", "/Brochure/**",
-            "/ResearchPaper/**", "/downloads", "/loadLanguageByCategoryResource",
+            "/ResearchPaper/**", "/downloads", "/loadLanguageByCategoryResource", "/autosuggest/**",
             "/loadLanguageAndTopicByCategoryResource", "/loadTutorialCountByTopicAndLanguage",
             "/loadTutorialCountByTopics", "/downloadResources", "/api/scriptPublished/**", };
 

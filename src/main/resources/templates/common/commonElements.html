@@ -67,7 +67,8 @@ function resetInput(id) {
     <div class="col-md-8 mb-3" style="width:100%; height:120%">
    
   
-      <input name="query" id="query"  th:value="${query}" placeholder="Search Here.................."  style="width:100%; height:38px"/>
+      <input name="query" id="query" autocomplete="off"  th:value="${query}" placeholder="Search Here.................."  style="width:100%; height:38px"/>
+       <div id="autocomplete-container" class="autocomplete-suggestions"></div>
    		<div class="row" style="width:100%; padding-top:1px; ">
     <div class="col col col-auto col" >
         <div class="form-check">
@@ -286,6 +287,27 @@ function resetInput(id) {
 
         .form-check-input:checked::before {
             border-color: orange;
+        }
+         .autocomplete-suggestions {
+            border: 1px solid #e4e4e4;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            background-color: black;
+            width: calc(100% - 20px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            color: white;
+        }
+        .autocomplete-suggestion {
+            padding: 1px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestion:hover {
+            background-color: #e4e4e4;
         }
     </style>
 </body>

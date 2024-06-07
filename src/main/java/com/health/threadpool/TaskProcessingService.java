@@ -416,7 +416,6 @@ public class TaskProcessingService {
         Optional<String> thumbnailPath = Optional.of("");
         Optional<String> title = Optional.of("");
         Optional<String> description = Optional.of("");
-        Optional<Integer> orderValue = Optional.of(0);
 
         if (researchPaper.getThumbnailPath() != null) {
             thumbnailPath = Optional.of(researchPaper.getThumbnailPath());
@@ -437,7 +436,7 @@ public class TaskProcessingService {
 
             Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
                     view_url, languageId, language, categoryId, category, topicId, topic, null, requestType, videoPath,
-                    title, description, thumbnailPath, orderValue);
+                    title, description, thumbnailPath, null);
             if (resultMap.containsValue(CommonData.SUCCESS))
                 researchPaper.setAddedQueue(true);
 
@@ -449,7 +448,7 @@ public class TaskProcessingService {
                 logger.info("Update Research Paper");
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
                         view_url, languageId, language, null, null, null, null, null, requestType, null, title,
-                        description, thumbnailPath, orderValue);
+                        description, thumbnailPath, null);
 
                 if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                     if (resultMap.containsValue(CommonData.SUCCESS))
@@ -482,7 +481,7 @@ public class TaskProcessingService {
         Optional<String> category = Optional.empty();
         Optional<Integer> topicId1 = Optional.empty();
         Optional<String> topicName = Optional.empty();
-        Optional<Integer> orderValue = Optional.of(0);
+
         TopicCategoryMapping topicCat = brochure.getTopicCatId();
         if (topicCat != null) {
             catId = Optional.of(topicCat.getCat().getCategoryId());
@@ -511,7 +510,7 @@ public class TaskProcessingService {
 
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
                         view_url, languageId, language, catId, category, topicId1, topicName, null, requestType,
-                        videoPath, title, description, thumbnailPath, orderValue);
+                        videoPath, title, description, thumbnailPath, null);
                 if (resultMap.containsValue(CommonData.SUCCESS))
                     fileofBro.setAddedQueue(true);
 
@@ -523,7 +522,7 @@ public class TaskProcessingService {
                         || requestType.equals(CommonData.DELETE_DOCUMENT)) {
                     Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl,
                             rank, view_url, languageId, language, catId, category, topicId1, topicName, null,
-                            requestType, null, title, null, thumbnailPath, orderValue);
+                            requestType, null, title, null, thumbnailPath, null);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap.containsValue(CommonData.SUCCESS))
