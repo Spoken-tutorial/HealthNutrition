@@ -1,4 +1,4 @@
-package com.health;
+package com.health.config;
 
 import java.util.List;
 

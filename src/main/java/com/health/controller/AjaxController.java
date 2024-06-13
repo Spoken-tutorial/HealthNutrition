@@ -112,6 +112,9 @@ public class AjaxController {
     private CategoryService catService;
 
     @Autowired
+    private CommonData commonData;
+
+    @Autowired
     private PromoVideoService promoVideoService;
 
     @Autowired

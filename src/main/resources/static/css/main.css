@@ -600,6 +600,16 @@ footer{
 	color: #fff;
 }
 
+ .form-check-input:checked {
+            background-color: orange;
+            border-color: orange;
+        }
+
+        .form-check-input:checked::before {
+            border-color: orange;
+        }
+      
+
 /****************************************Tutorial Page Starts************************************************/
 .main-color{
 	color: #0066A1; 

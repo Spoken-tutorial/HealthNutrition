@@ -99,6 +99,9 @@ public class QueueManagement implements Runnable {
     @Column(name = "rankView", nullable = true)
     private int rank;
 
+    @Column(name = "orderValue", nullable = true)
+    private int orderValue;
+
     @Column(name = "viewUrl", nullable = true)
     private String viewUrl;
 
@@ -149,6 +152,14 @@ public class QueueManagement implements Runnable {
 
     public void setVideoPath(String videoPath) {
         this.videoPath = videoPath;
+    }
+
+    public int getOrderValue() {
+        return orderValue;
+    }
+
+    public void setOrderValue(int orderValue) {
+        this.orderValue = orderValue;
     }
 
     public Long getResponseId() {
@@ -375,7 +386,7 @@ public class QueueManagement implements Runnable {
     }
 
     public QueueManagement(long queueId, Timestamp request, String requestType, String status, long startTime,
-            long endTime, long procesingTime, String videoPath) {
+            long endTime, long procesingTime, String videoPath, int orderValue) {
         super();
         this.queueId = queueId;
         this.requestTime = request;
@@ -385,6 +396,7 @@ public class QueueManagement implements Runnable {
         this.endTime = endTime;
         this.procesingTime = procesingTime;
         this.videoPath = videoPath;
+        this.orderValue = orderValue;
 
     }
 
@@ -411,7 +423,7 @@ public class QueueManagement implements Runnable {
     public String toString() {
         return "QueueManagement [queueId=" + queueId + ", requestTime=" + requestTime + ", requestType=" + requestType
                 + ", status=" + status + ", documentId=" + documentId + ", documentType=" + documentType + ", rank="
-                + rank + ", language=" + language + "]";
+                + rank + ", language=" + language + ", orderValue=" + orderValue + "]";
     }
 
     @Override
@@ -492,6 +504,7 @@ public class QueueManagement implements Runnable {
 
                     paramsforAddDocument.add(new BasicNameValuePair("description", getDescription()));
                     paramsforAddDocument.add(new BasicNameValuePair("thumbnailPath", getThumbnailPath()));
+                    paramsforAddDocument.add(new BasicNameValuePair("orderValue", Integer.toString(getOrderValue())));
 
                     HttpPost httpPost = (HttpPost) request;
                     httpPost.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));

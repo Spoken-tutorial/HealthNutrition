@@ -23,6 +23,8 @@ public class DocumentSearch {
 
     private int categoryId;
 
+    private int orderValue;
+
     private String topic;
 
     private String videoPath;
@@ -77,6 +79,14 @@ public class DocumentSearch {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getOrderValue() {
+        return orderValue;
+    }
+
+    public void setOrderValue(int orderValue) {
+        this.orderValue = orderValue;
     }
 
     public String getDescription() {
@@ -228,13 +238,15 @@ public class DocumentSearch {
         this.documentId = documentId;
     }
 
-    public DocumentSearch(String id, String documentContent, String documentType, String documentId, String videoPath) {
+    public DocumentSearch(String id, String documentContent, String documentType, String documentId, String videoPath,
+            int orderValue) {
         super();
         this.id = id;
         this.documentContent = documentContent;
         this.documentType = documentType;
         this.documentId = documentId;
         this.videoPath = videoPath;
+        this.orderValue = orderValue;
     }
 
     public DocumentSearch(String id, String documentContent) {
@@ -247,7 +259,8 @@ public class DocumentSearch {
     public String toString() {
         return "DocumentSearch [documentType=" + documentType + ", documentId=" + documentId + ", language=" + language
                 + ", rank=" + rank + ", viewUrl=" + viewUrl + ", videoPath=" + videoPath + ", creationTime="
-                + creationTime + ", modificationTime=" + modificationTime + ", changeTime=" + changeTime + "]";
+                + creationTime + ", modificationTime=" + modificationTime + ", changeTime=" + changeTime
+                + ", orderValue=" + orderValue + "]";
     }
 
 }
