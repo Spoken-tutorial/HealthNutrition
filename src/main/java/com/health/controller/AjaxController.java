@@ -3,7 +3,6 @@ package com.health.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,16 +17,6 @@ import java.util.TreeMap;
 //import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1419,123 +1408,6 @@ public class AjaxController {
 
         return topicName;
     }
-
-    /************ AutoSuggestSearch *****************/
-
-    private List<String> suggestedQueriesonElastic(int cat, int topic, int lan, String query, String typeTutorial,
-            String typeTimeScript, String typeBrochure, String typeResearchPaper) {
-
-        StringBuilder documentSb = new StringBuilder();
-        documentSb.append(commonData.elasticSearch_url);
-        documentSb.append("/");
-        documentSb.append("autoSearchSuggest");
-
-        String tempUrl = documentSb.toString();
-
-        Set<String> suggestedQueriesSet = new LinkedHashSet<>();
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-
-            try {
-
-                logger.info("API_URL:{}", tempUrl);
-
-                HttpPost request = new HttpPost(tempUrl);
-
-                List<NameValuePair> paramsforAddDocument = new ArrayList<>();
-
-                paramsforAddDocument.add(new BasicNameValuePair("categoryId", Integer.toString(cat)));
-                paramsforAddDocument.add(new BasicNameValuePair("topicId", Integer.toString(topic)));
-                paramsforAddDocument.add(new BasicNameValuePair("languageId", Integer.toString(lan)));
-                paramsforAddDocument.add(new BasicNameValuePair("query", query));
-                paramsforAddDocument.add(new BasicNameValuePair("typeTutorial", typeTutorial));
-                paramsforAddDocument.add(new BasicNameValuePair("typeTimeScript", typeTimeScript));
-                paramsforAddDocument.add(new BasicNameValuePair("typeBrochure", typeBrochure));
-                paramsforAddDocument.add(new BasicNameValuePair("typeResearchPaper", typeResearchPaper));
-
-                request.setEntity(new UrlEncodedFormEntity(paramsforAddDocument, "UTF-8"));
-
-                CloseableHttpResponse response = httpClient.execute(request);
-
-                int statusCode = response.getStatusLine().getStatusCode();
-
-                if (statusCode == 200 || statusCode == 201) {
-                    String jsonResponse = EntityUtils.toString(response.getEntity());
-                    JSONObject mainJsonObject = new JSONObject(jsonResponse);
-                    JSONArray jsonArray = (JSONArray) mainJsonObject.get("suggestedQueries");
-
-                    logger.info("jsonArray:{}", jsonArray);
-
-                    if (jsonArray != null) {
-
-                        for (int i = 0; i < jsonArray.length(); i++) {
-
-                            suggestedQueriesSet.add(jsonArray.getString(i));
-                        }
-
-                    } else {
-                        logger.error("suggestedQueries is not an array or is null");
-                    }
-
-                } else {
-                    logger.info("Status Code:{} API URl:{}", statusCode, tempUrl);
-
-                }
-
-            } catch (Exception e) {
-                logger.error("Exception of serach :{}", query, e);
-
-            }
-
-        } catch (IOException e1) {
-
-            logger.error("Exception: ", e1);
-        }
-
-        return new ArrayList<>(suggestedQueriesSet);
-
-    }
-
-    private static final List<String> data = Arrays.asList("Apple", "Banana", "Orange", "Mango", "Grapes", "Pineapple");
-
-    @RequestMapping("/autosuggest")
-    public @ResponseBody List<String> search(@RequestParam(name = "searchQuery", defaultValue = "") String searchQuery,
-            @RequestParam(name = "cat", required = false, defaultValue = "0") int cat,
-            @RequestParam(name = "topic", required = false, defaultValue = "0") int topic,
-            @RequestParam(name = "lan", required = false, defaultValue = "0") int lan,
-            @RequestParam(name = "typeTutorial", required = false, defaultValue = "") String typeTutorial,
-            @RequestParam(name = "typeTimeScript", required = false, defaultValue = "") String typeTimeScript,
-            @RequestParam(name = "typeBrochure", required = false, defaultValue = "") String typeBrochure,
-            @RequestParam(name = "typeResearchPaper", required = false, defaultValue = "") String typeResearchPaper) {
-
-        if (typeTutorial != null && !typeTutorial.isEmpty() && typeTutorial.equals("typeTutorial")) {
-            typeTutorial = CommonData.DOCUMENT_TYPE_TUTORIAL_ORIGINAL_SCRIPT;
-
-        }
-
-        if (typeTimeScript != null && !typeTimeScript.isEmpty() && typeTimeScript.equals("typeTimeScript")) {
-            typeTimeScript = CommonData.DOCUMENT_TYPE_TUTORIAL_TIME_SCRIPT;
-
-        }
-
-        if (typeBrochure != null && !typeBrochure.isEmpty() && typeBrochure.equals("typeBrochure")) {
-            typeBrochure = CommonData.DOCUMENT_TYPE_BROCHURE;
-
-        }
-
-        if (typeResearchPaper != null && !typeResearchPaper.isEmpty()
-                && typeResearchPaper.equals("typeResearchPaper")) {
-            typeResearchPaper = CommonData.DOCUMENT_TYPE_RESEARCHPAPER;
-
-        }
-        // return data.stream().filter(item ->
-        // item.toLowerCase().contains(querysearch.toLowerCase()))
-        // .collect(Collectors.toList());
-        return suggestedQueriesonElastic(cat, topic, lan, searchQuery, typeTutorial, typeTimeScript, typeBrochure,
-                typeResearchPaper);
-    }
-
-    /************ AutoSuggestSearch End **************/
 
     /**
      * Enable role from approve role tab under super admin role

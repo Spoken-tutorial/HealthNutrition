@@ -2633,56 +2633,7 @@ $("#languageId1").change(function() {
 					});
 					
 			
-			/*****AutoSuggestions ***********/
-	
-	 $(document).ready(function () {
-            $('#query').on('input', function () {
 				
-                var searchQuery = $(this).val();
-                var cat=$("#categoryname").val();
-                var topic = $("#inputTopicName").val();
-                var lan = $("#inputLanguage").val();
-                var typeTutorial = $("#typeTutorial").val();
-                var typeTimeScript = $("#typeTimeScript").val();
-                var typeBrochure = $("#typeBrochure").val();
-                var typeResearchPaper = $("#typeResearchPaper").val();
-               
-                
-                if (searchQuery.length > 0) {
-                    $.ajax({
-                        url: '/autosuggest',
-                        method: 'GET',
-                        data: { "searchQuery": searchQuery,
-                        		"cat": cat,
-                        		"topic": topic,
-                        		"lan" : lan,
-                        		"typeTutorial": typeTutorial,
-                        		"typeTimeScript": typeTimeScript,
-                        		"typeBrochure": typeBrochure,
-                        		"typeResearchPaper": typeResearchPaper
-                        
-                        
-                         },
-                        success: function (data) {
-                            var suggestions = data.map(function (item) {
-                                return '<div class="autocomplete-suggestion">' + item + '</div>';
-                            }).join('');
-                            $('#autocomplete-container').html(suggestions);
-                        }
-                    });
-                } else {
-                    $('#autocomplete-container').empty();
-                }
-            });
-
-            $(document).on('click', '.autocomplete-suggestion', function () {
-                $('#query').val($(this).text());
-                $('#autocomplete-container').empty();
-            });
-        });
-	
-	/***********AutoSugestions end  */		
-		
 	
 	
 	/* A java Script funtion to load primary version by checked or unchecked checkbox 

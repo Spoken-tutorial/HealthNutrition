@@ -608,22 +608,7 @@ footer{
         .form-check-input:checked::before {
             border-color: orange;
         }
-        
-         .autocomplete-suggestions {
-            border: 1px solid #e4e4e4;
-            max-height: 150px;
-            overflow-y: auto;
-            background-color: rgb(31, 31, 33);
-            color: white;
-            font-size: 14px;
-        }
-        .autocomplete-suggestion {
-            padding: 1px;
-            cursor: pointer;
-        }
-        .autocomplete-suggestion:hover {
-            background-color: rgb(101, 99, 111);
-        }
+      
 
 /****************************************Tutorial Page Starts************************************************/
 .main-color{
