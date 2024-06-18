@@ -83,7 +83,13 @@ public class Language implements Comparable<Language>, Serializable {
     private Set<PathofPromoVideo> pathofPromoVideo = new HashSet<PathofPromoVideo>();
 
     @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Event> events = new HashSet<Event>();
+
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<LiveTutorial> liveTutorial = new HashSet<LiveTutorial>();
+
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<PackageLanMapping> packageLanMap = new HashSet<PackageLanMapping>();
 
     public Set<LiveTutorial> getLiveTutorial() {
         return liveTutorial;
@@ -117,6 +123,14 @@ public class Language implements Comparable<Language>, Serializable {
         this.events = events;
     }
 
+    public Set<PackageLanMapping> getPackageLanMap() {
+        return packageLanMap;
+    }
+
+    public void setPackageLanMap(Set<PackageLanMapping> packageLanMap) {
+        this.packageLanMap = packageLanMap;
+    }
+
     public Set<FilesofBrouchure> getFilesofBrouchure() {
         return filesofBrouchure;
     }
@@ -124,9 +138,6 @@ public class Language implements Comparable<Language>, Serializable {
     public void setFilesofBrouchure(Set<FilesofBrouchure> filesofBrouchure) {
         this.filesofBrouchure = filesofBrouchure;
     }
-
-    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Event> events = new HashSet<Event>();
 
     public int getLanId() {
         return lanId;
