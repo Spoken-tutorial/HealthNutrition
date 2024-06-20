@@ -31,8 +31,8 @@ public class PackageEntity implements Comparable<PackageEntity>, Serializable {
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    @OneToMany(mappedBy = "package1", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<PackageLanMapping> packageLanMap = new HashSet<PackageLanMapping>();
+    @OneToMany(mappedBy = "packageEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<NptelTutorial> nptelTutorials = new HashSet<NptelTutorial>();
 
     @Column(name = "status", nullable = false)
     private boolean status = true;
@@ -45,12 +45,12 @@ public class PackageEntity implements Comparable<PackageEntity>, Serializable {
         this.dateAdded = dateAdded;
     }
 
-    public Set<PackageLanMapping> getPackageLanMap() {
-        return packageLanMap;
+    public Set<NptelTutorial> getNptelTutorials() {
+        return nptelTutorials;
     }
 
-    public void setPackageLanMap(Set<PackageLanMapping> packageLanMap) {
-        this.packageLanMap = packageLanMap;
+    public void setNptelTutorials(Set<NptelTutorial> nptelTutorials) {
+        this.nptelTutorials = nptelTutorials;
     }
 
     public int getPackageId() {

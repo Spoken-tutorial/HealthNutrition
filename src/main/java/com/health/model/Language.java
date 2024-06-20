@@ -89,7 +89,7 @@ public class Language implements Comparable<Language>, Serializable {
     private Set<LiveTutorial> liveTutorial = new HashSet<LiveTutorial>();
 
     @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<PackageLanMapping> packageLanMap = new HashSet<PackageLanMapping>();
+    private Set<NptelTutorial> nptelTutorials = new HashSet<NptelTutorial>();
 
     public Set<LiveTutorial> getLiveTutorial() {
         return liveTutorial;
@@ -123,12 +123,12 @@ public class Language implements Comparable<Language>, Serializable {
         this.events = events;
     }
 
-    public Set<PackageLanMapping> getPackageLanMap() {
-        return packageLanMap;
+    public Set<NptelTutorial> getNptelTutorials() {
+        return nptelTutorials;
     }
 
-    public void setPackageLanMap(Set<PackageLanMapping> packageLanMap) {
-        this.packageLanMap = packageLanMap;
+    public void setNptelTutorials(Set<NptelTutorial> nptelTutorials) {
+        this.nptelTutorials = nptelTutorials;
     }
 
     public Set<FilesofBrouchure> getFilesofBrouchure() {

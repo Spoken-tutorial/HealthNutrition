@@ -65,11 +65,32 @@ font-weight:bold!important;
 												
 											</div>
 											
+											 
+											  
 											  <div class="form-group">
-											  <label for="packageName">Package *</label>
-											    <input class="form-control" type="text"  id="packageName" name="packageName" required>
-											   
-											  </div>
+													<label for="packageId"><b>Select Package *</b></label> <select id="packageId"
+														class="form-control" name="packageId" required="required">
+
+															<option value='0'>Select Package</option>
+															<option value='-1'>Enter New Package</option>
+															<option th:each="packageItr: ${packageEntitiesList}" th:value="${packageItr.getPackageId()}" th:text="${packageItr.getPackageName()}">
+														</option>
+								
+													</select>
+
+											</div>
+							
+							
+
+											<div class="form-group" id="enterNewPackageName">
+
+													<label for="packageName"><b>Package</b></label> <input type="text"
+													class="form-control" id="packageName" name="packageName"
+														 placeholder="Enter Package name" />
+
+											</div>
+
+											  
 											<br>
 																        
 									         <div class="form-group"  id=csv_file_div >
@@ -103,7 +124,7 @@ font-weight:bold!important;
 							<thead>
 								<tr>
 									<th scope="col">Date Added</th>
-									
+									<th scope="col">Package</th>
 									<th scope="col">Title</th>
 									<th scope="col">Week</th>
 									<th scope="col">Language</th>
@@ -114,9 +135,10 @@ font-weight:bold!important;
 							<tbody>
 								<tr th:each="tut : ${nptelTutorials}">
 								 <td scope="row"><span th:text = "${tut.getDateAdded()}"></span></td>
+								 <td scope="row"><span th:text = "${tut.getPackageEntity().getPackageName()}"></span></td>
 							      <td scope="row"><span th:text = "${tut.getTitle()}"></span></td>
-							      <td><span th:text = "${tut.getPackLanWeek().getWeek().getWeekName()}"></span></td>
-							      <td><span th:text = "${tut.getPackLanWeek().getPackageLan().getLan().getLangName()}"></span></td>
+							      <td><span th:text = "${tut.getWeek()}"></span></td>
+							      <td><span th:text = "${tut.getLan().getLangName()}"></span></td>
 							      <td>
 							      	<div th:if="${tut.getVideoUrl() != 'null'}"
 												style="width: 400px;">
@@ -148,6 +170,7 @@ font-weight:bold!important;
 	<script type="text/javascript">
 $(document).ready( function () {
     $('#myTable').DataTable();
+     $('#enterNewPackageName').hide();
    
 } );
 </script>

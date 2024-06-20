@@ -29,6 +29,9 @@ public class NptelTutorial implements Comparable<NptelTutorial>, Serializable {
     @Column(name = "video_url", nullable = false, unique = true)
     private String videoUrl;
 
+    @Column(name = "week", nullable = false)
+    private int week;
+
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
@@ -36,8 +39,12 @@ public class NptelTutorial implements Comparable<NptelTutorial>, Serializable {
     private boolean status = true;
 
     @ManyToOne
-    @JoinColumn(name = "pack_lan_week_id", nullable = false)
-    private PackLanWeekMapping packLanWeek;
+    @JoinColumn(name = "package_id", nullable = false)
+    private PackageEntity packageEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "lan_id", nullable = false)
+    private Language lan;
 
     public String getTitle() {
         return title;
@@ -53,6 +60,22 @@ public class NptelTutorial implements Comparable<NptelTutorial>, Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getWeek() {
+        return week;
+    }
+
+    public void setWeek(int week) {
+        this.week = week;
+    }
+
+    public Language getLan() {
+        return lan;
+    }
+
+    public void setLan(Language lan) {
+        this.lan = lan;
     }
 
     public int getNptelTutorialId() {
@@ -71,12 +94,12 @@ public class NptelTutorial implements Comparable<NptelTutorial>, Serializable {
         this.videoUrl = videoUrl;
     }
 
-    public PackLanWeekMapping getPackLanWeek() {
-        return packLanWeek;
+    public PackageEntity getPackageEntity() {
+        return packageEntity;
     }
 
-    public void setPackLanWeek(PackLanWeekMapping packLanWeek) {
-        this.packLanWeek = packLanWeek;
+    public void setPackageEntity(PackageEntity packageEntity) {
+        this.packageEntity = packageEntity;
     }
 
     public Timestamp getDateAdded() {
