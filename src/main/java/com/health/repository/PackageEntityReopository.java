@@ -1,8 +1,6 @@
 
 package com.health.repository;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.health.model.PackageEntity;
@@ -17,6 +15,6 @@ public interface PackageEntityReopository extends JpaRepository<PackageEntity, I
 
     PackageEntity findByPackageName(String packageName);
 
-    Optional<PackageEntity> findByPackageId(int id);
+    PackageEntity findByPackageId(int id);
 
 }

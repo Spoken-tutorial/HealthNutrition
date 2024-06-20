@@ -2922,6 +2922,18 @@ $("#languageId1").change(function() {
         }
       });
       
+       $('#packageId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewPackageName');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+      
+      
+      
        $('languageNameId1').on('change', function() {
         var selectedValue = $(this).val();
         var divToHide = $('#showOneMoreRow1');
