@@ -22,4 +22,6 @@ public interface NptelTutorialRepository
     NptelTutorial findByTitleAndPackageEntityAndLanAndWeek(String title, PackageEntity packageEntity, Language lan,
             int week);
 
+    NptelTutorial findByTitleAndPackageEntityAndLan(String title, PackageEntity packageEntity, Language lan);
+
 }
