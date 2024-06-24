@@ -17,4 +17,8 @@ public interface PackageEntityReopository extends JpaRepository<PackageEntity, I
 
     PackageEntity findByPackageId(int id);
 
+    PackageEntity findByChecksum(String checksum);
+
+    PackageEntity findByFileName(String fileName);
+
 }
