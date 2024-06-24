@@ -1,6 +1,7 @@
 package com.health.service;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.ui.Model;
@@ -17,6 +18,6 @@ public interface NptelTutorialService {
     List<NptelTutorial> findAll();
 
     void saveNptelTutorialsFromCSV(MultipartFile file, Model model, PackageEntity packageEntity)
-            throws IOException, CsvException;
+            throws IOException, CsvException, NoSuchAlgorithmException;
 
 }

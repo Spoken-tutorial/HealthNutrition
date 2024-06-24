@@ -31,6 +31,15 @@ public class PackageEntity implements Comparable<PackageEntity>, Serializable {
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
+    @Column(name = "date_uploaded", nullable = true)
+    private Timestamp dateUploaded;
+
+    @Column(name = "file_name", nullable = true)
+    private String fileName;
+
+    @Column(name = "checksum", nullable = true)
+    private String checksum;
+
     @OneToMany(mappedBy = "packageEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<NptelTutorial> nptelTutorials = new HashSet<NptelTutorial>();
 
@@ -55,6 +64,30 @@ public class PackageEntity implements Comparable<PackageEntity>, Serializable {
 
     public int getPackageId() {
         return packageId;
+    }
+
+    public Timestamp getDateUploaded() {
+        return dateUploaded;
+    }
+
+    public void setDateUploaded(Timestamp dateUploaded) {
+        this.dateUploaded = dateUploaded;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
     }
 
     public void setPackageId(int packageId) {

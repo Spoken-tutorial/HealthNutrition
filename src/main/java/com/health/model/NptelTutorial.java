@@ -14,7 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class NptelTutorial implements Comparable<NptelTutorial>, Serializable {
+public class NptelTutorial implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public class NptelTutorial implements Comparable<NptelTutorial>, Serializable {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "video_url", nullable = false, unique = true)
+    @Column(name = "video_url", nullable = false)
     private String videoUrl;
 
     @Column(name = "week", nullable = false)
@@ -125,18 +125,11 @@ public class NptelTutorial implements Comparable<NptelTutorial>, Serializable {
 
     public static Comparator<NptelTutorial> SortByUploadTime = new Comparator<NptelTutorial>() {
 
-        // Method
         @Override
         public int compare(NptelTutorial t1, NptelTutorial t2) {
             return t2.getDateAdded().compareTo(t1.getDateAdded());
 
         }
     };
-
-    @Override
-    public int compareTo(NptelTutorial o) {
-
-        return this.getTitle().compareTo(o.getTitle());
-    }
 
 }

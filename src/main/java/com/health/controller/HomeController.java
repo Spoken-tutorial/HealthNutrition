@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -1105,35 +1106,25 @@ public class HomeController {
             packageEntityService.save(packageEntity);
         }
 
-        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadNptelTutorial, "Sample_CSV_file_for_Nptel_Tutorial" + ".csv");
-        String temp = csvFilePath.toString();
-        int indexToStart = temp.indexOf("Media");
-        String document = temp.substring(indexToStart, temp.length());
-        model.addAttribute("sample_csv_file", document);
-
         try {
             nptelTutorialService.saveNptelTutorialsFromCSV(csv_file, model, packageEntity);
-            List<PackageEntity> packageEntitiesList = packageEntityService.findAll();
-            Collections.sort(packageEntitiesList);
-            model.addAttribute("packageEntitiesList", packageEntitiesList);
 
         } catch (IOException e) {
 
             model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
             logger.error("Exception: ", e);
-            return "addNptelTutorial";
+            return addNptelTutorial(req, principal, model);
         } catch (CsvException e) {
             model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
             logger.error("Exception: ", e);
-            return "addNptelTutorial";
+            return addNptelTutorial(req, principal, model);
+        } catch (NoSuchAlgorithmException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return addNptelTutorial(req, principal, model);
         }
 
-        List<NptelTutorial> nptelTutorials = nptelTutorialService.findAll();
-        Collections.sort(nptelTutorials, NptelTutorial.SortByUploadTime);
-        model.addAttribute("nptelTutorials", nptelTutorials);
-
-        return "addNptelTutorial";
+        return addNptelTutorial(req, principal, model);
     }
 
     @GetMapping("/addLiveTutorial")
