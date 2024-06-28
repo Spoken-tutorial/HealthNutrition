@@ -142,6 +142,7 @@ public class CommonData {
     public static String uploadDirectoryScriptHtmlFile = "Media/Content/Tutorial/ScriptHtmlFile/";
     public static String uploadDirectoryScriptHtmlFileforDownload = "Media/Content/Tutorial/ScriptDownloadHtmlFile/";
     public static String uploadDirectoryScriptOdtFileforDownload = "Media/Content/Tutorial/ScriptDownloadOdtFile/";
+    public static String uploadDirectoryTimeScriptsrtFile = "Media/Content/Tutorial/SrtFile/";
     public static String uploadDirectoryScriptJsonFile = "Media/Content/Tutorial/ScriptJsonFile/";
     public static String uploadDirectoryScriptZipFiles = "Media/Content/Tutorial/ScriptZipFiles/";
 

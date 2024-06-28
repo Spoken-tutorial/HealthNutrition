@@ -1,9 +1,12 @@
 package com.health.utility;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
@@ -14,6 +17,8 @@ import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -34,6 +39,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +52,13 @@ import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.User;
 import com.health.repository.UserRepository;
+import com.health.service.TutorialService;
 
 /**
  * Utility class
@@ -68,6 +80,9 @@ public class ServiceUtility {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private TutorialService tutorialService;
 
     public static Timestamp getCurrentTime() { // Current Date
 
@@ -599,6 +614,83 @@ public class ServiceUtility {
 
         });
     }
+
+    /********** srt file conversion start **********/
+
+    public static String extractTextFromFile(Path timeScriptPath) throws IOException, TikaException, SAXException {
+
+        String content = "";
+        try (InputStream inputStream = Files.newInputStream(timeScriptPath)) {
+            BodyContentHandler handler = new BodyContentHandler();
+            Metadata metadata = new Metadata();
+            ParseContext pcontext = new ParseContext();
+
+            AutoDetectParser parser = new AutoDetectParser();
+            parser.parse(inputStream, handler, metadata, pcontext);
+            content = handler.toString();
+        } catch (Exception e) {
+            logger.error("InputStream Exception Error", e);
+        }
+
+        return content;
+    }
+
+    public static void writeTextToSrt(String text, Path srtFilePath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(srtFilePath.toFile()))) {
+            String[] lines = text.split("\n");
+            int index = 1;
+
+            String textValue = "";
+            String startTimeString = "00:";
+            boolean textFlag = true;
+
+            for (String line : lines) {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                if (line.trim().equalsIgnoreCase("Time"))
+                    continue;
+                if (line.trim().equalsIgnoreCase("Narration")) {
+                    writer.write("<b>" + line + "</b>" + "\n\n");
+                    continue;
+                }
+                if (line.trim().matches("^([01]?\\d|2[0-3]):([0-5]?\\d)$")) {
+                    textFlag = false;
+                    String newtimeValue = "00:" + line.trim();
+                    if (!startTimeString.equals("00:")) {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                        LocalTime endTime = LocalTime.parse(newtimeValue, formatter);
+
+                        endTime = endTime.minusSeconds(1);
+
+                        String endTimeString = formatter.format(endTime);
+                        writer.write(index + "\n");
+                        writer.write(startTimeString + " --> " + endTimeString + "\n"); // Placeholder for start and end
+                                                                                        // time
+                        writer.write(textValue + "\n\n");
+                        index++;
+                    }
+                    startTimeString = newtimeValue;
+
+                } else {
+                    if (textFlag) {
+                        textValue = textValue + line;
+
+                    } else {
+                        textValue = line.trim();
+                        textFlag = true;
+                    }
+                }
+
+            }
+
+            writer.write(index + "\n");
+            writer.write(startTimeString + " --> " + "\n");
+            writer.write(textValue + "\n\n");
+        }
+    }
+
+    /************ srt file conversion ends **********/
 
     /**
      * to validate email
