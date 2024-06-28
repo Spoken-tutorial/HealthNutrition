@@ -21,6 +21,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.tika.exception.TikaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -31,6 +32,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,6 +74,9 @@ public class TaskProcessingService {
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
+
+    @Autowired
+    private TutorialService tutorialService;
 
     @Autowired
     private QueueManagementService queueService;
@@ -610,6 +615,20 @@ public class TaskProcessingService {
             }
 
         }
+    }
+
+    public void convertTimeScriptFileToSrt(int tutorialId) throws IOException, TikaException, SAXException {
+        Tutorial tutorial = tutorialService.findByTutorialId(tutorialId);
+        String timeScript = tutorial.getTimeScript();
+        if (timeScript != null) {
+            Path timeScriptPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), timeScript);
+            Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryTimeScriptsrtFile, tutorialId + ".srt");
+            String extractedText = ServiceUtility.extractTextFromFile(timeScriptPath);
+
+            ServiceUtility.writeTextToSrt(extractedText, srtPath);
+        }
+
     }
 
     public void checkoutlinedata() {
