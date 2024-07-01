@@ -51,6 +51,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Override
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
+
         try {
 
             taskProcessingService.createOutlineFile();
@@ -65,6 +66,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 
             logger.error("Exception: ", e);
         }
+
         String baseDir = env.getProperty("spring.applicationexternalPath.name");
         new File(baseDir + CommonData.uploadDirectoryCategory).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryQuestion).mkdirs();
