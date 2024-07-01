@@ -1319,6 +1319,18 @@ public class HomeController {
             catName = null;
         }
 
+        // Testing Start
+        Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryTimeScriptvttFile, 1 + ".vtt");
+        String tempString = srtPath.toString();
+        int indexToStart = tempString.indexOf("Media");
+
+        String srtFile = tempString.substring(indexToStart, tempString.length());
+        logger.info("srtFile:{}", srtFile);
+        model.addAttribute("srtFile", srtFile);
+
+        // Testing End
+
         Topic topicName = topicService.findBytopicName(topic);
         Language lanName = lanService.getByLanName(lan);
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);

@@ -635,8 +635,8 @@ public class ServiceUtility {
         return content;
     }
 
-    public static void writeTextToSrt(String text, Path srtFilePath) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(srtFilePath.toFile()))) {
+    public static void writeTextToVtt(String text, Path vttFilePath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(vttFilePath.toFile()))) {
             String[] lines = text.split("\n");
             int index = 1;
 
@@ -651,26 +651,28 @@ public class ServiceUtility {
                 if (line.trim().equalsIgnoreCase("Time"))
                     continue;
                 if (line.trim().equalsIgnoreCase("Narration")) {
-                    writer.write("<b>" + line + "</b>" + "\n\n");
+                    writer.write("WEBVTT" + "\n\n");
                     continue;
                 }
                 if (line.trim().matches("^([01]?\\d|2[0-3]):([0-5]?\\d)$")) {
                     textFlag = false;
-                    String newtimeValue = "00:" + line.trim();
+
+                    String newtimeValue = "00:" + formatToTimeScript(line.trim());
+
                     if (!startTimeString.equals("00:")) {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                         LocalTime endTime = LocalTime.parse(newtimeValue, formatter);
 
                         endTime = endTime.minusSeconds(1);
 
-                        String endTimeString = formatter.format(endTime);
-                        writer.write(index + "\n");
+                        String endTimeString = formatter.format(endTime) + ".000";
+                        // writer.write(index + "\n");
                         writer.write(startTimeString + " --> " + endTimeString + "\n"); // Placeholder for start and end
                                                                                         // time
                         writer.write(textValue + "\n\n");
                         index++;
                     }
-                    startTimeString = newtimeValue;
+                    startTimeString = newtimeValue + ".000";
 
                 } else {
                     if (textFlag) {
@@ -684,10 +686,20 @@ public class ServiceUtility {
 
             }
 
-            writer.write(index + "\n");
-            writer.write(startTimeString + " --> " + "\n");
+            // writer.write(index + "\n");
+            writer.write(startTimeString + " --> " + "END\n");
             writer.write(textValue + "\n\n");
         }
+    }
+
+    public static String formatToTimeScript(String line) {
+
+        String[] parts = line.split(":");
+
+        String minutes = parts.length > 0 ? String.format("%02d", Integer.parseInt(parts[0])) : "00";
+        String seconds = parts.length > 1 ? String.format("%02d", Integer.parseInt(parts[1])) : "00";
+
+        return minutes + ":" + seconds;
     }
 
     /************ srt file conversion ends **********/

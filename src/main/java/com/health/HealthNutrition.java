@@ -51,21 +51,6 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Override
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
-        try {
-
-            taskProcessingService.createOutlineFile();
-            taskProcessingService.addAllBrochureToQueue();
-            taskProcessingService.addAllResearchPapertoQueue();
-            taskProcessingService.addAllTuttorialsToQueue();
-            taskProcessingService.convertTimeScriptFileToSrt(1);
-            taskProcessingService.intializeQueue();
-            taskProcessingService.deleteQueueByApiStatus();
-            taskProcessingService.queueProcessor();
-
-        } catch (Exception e) {
-
-            logger.error("Exception: ", e);
-        }
         String baseDir = env.getProperty("spring.applicationexternalPath.name");
         new File(baseDir + CommonData.uploadDirectoryCategory).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryQuestion).mkdirs();
@@ -76,7 +61,23 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         new File(baseDir + CommonData.uploadDirectoryEvent).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
         new File(baseDir + CommonData.uploadLiveTutorial).mkdirs();
-        new File(baseDir + CommonData.uploadDirectoryTimeScriptsrtFile).mkdirs();
+        new File(baseDir + CommonData.uploadDirectoryTimeScriptvttFile).mkdirs();
+
+        try {
+
+            taskProcessingService.createOutlineFile();
+            // taskProcessingService.addAllBrochureToQueue();
+            // taskProcessingService.addAllResearchPapertoQueue();
+            // taskProcessingService.addAllTuttorialsToQueue();
+            taskProcessingService.convertAllTimeScriptFilesToVttFiles();
+            taskProcessingService.intializeQueue();
+            taskProcessingService.deleteQueueByApiStatus();
+            taskProcessingService.queueProcessor();
+
+        } catch (Exception e) {
+
+            logger.error("Exception: ", e);
+        }
     }
 
 }

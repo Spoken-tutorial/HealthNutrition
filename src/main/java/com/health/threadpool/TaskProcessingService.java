@@ -1,5 +1,6 @@
 package com.health.threadpool;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -617,18 +618,48 @@ public class TaskProcessingService {
         }
     }
 
-    public void convertTimeScriptFileToSrt(int tutorialId) throws IOException, TikaException, SAXException {
+    public void convertTimeScriptFileToVtt(int tutorialId, String lanName)
+            throws IOException, TikaException, SAXException {
         Tutorial tutorial = tutorialService.findByTutorialId(tutorialId);
-        String timeScript = tutorial.getTimeScript();
-        if (timeScript != null) {
-            Path timeScriptPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), timeScript);
-            Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                    CommonData.uploadDirectoryTimeScriptsrtFile, tutorialId + ".srt");
-            String extractedText = ServiceUtility.extractTextFromFile(timeScriptPath);
 
-            ServiceUtility.writeTextToSrt(extractedText, srtPath);
+        Path odtFilePath;
+        if (lanName.equalsIgnoreCase("English")) {
+            String timeScript = tutorial.getTimeScript();
+            if (timeScript == null) {
+                return;
+            }
+            odtFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), timeScript);
+
+        } else {
+            odtFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryScriptOdtFileforDownload, tutorialId + ".odt");
+
+        }
+        File odtFile = odtFilePath.toFile();
+
+        if (odtFile.exists()) {
+
+            Path vttPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryTimeScriptvttFile, tutorialId + ".vtt");
+            String extractedText = ServiceUtility.extractTextFromFile(odtFilePath);
+
+            ServiceUtility.writeTextToVtt(extractedText, vttPath);
         }
 
+    }
+
+    public void convertAllTimeScriptFilesToVttFiles() {
+        List<Tutorial> tutorialList = tutRepo.findTutorialsWithStatusTrueAndAndCatregoryEnabled();
+        logger.info("Size of tutorials for vtt file conversion:{}", tutorialList.size());
+        for (Tutorial tut : tutorialList) {
+            logger.info("TutorialId vtt conversion method:{}", tut.getTutorialId());
+            String lanName = tut.getConAssignedTutorial().getLan().getLangName();
+            try {
+                convertTimeScriptFileToVtt(tut.getTutorialId(), lanName);
+            } catch (IOException | TikaException | SAXException e) {
+                logger.error("Exception error for vtt conversion", e);
+            }
+        }
     }
 
     public void checkoutlinedata() {
