@@ -66,9 +66,9 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         try {
 
             taskProcessingService.createOutlineFile();
-            // taskProcessingService.addAllBrochureToQueue();
-            // taskProcessingService.addAllResearchPapertoQueue();
-            // taskProcessingService.addAllTuttorialsToQueue();
+            taskProcessingService.addAllBrochureToQueue();
+            taskProcessingService.addAllResearchPapertoQueue();
+            taskProcessingService.addAllTuttorialsToQueue();
             taskProcessingService.convertAllTimeScriptFilesToVttFiles();
             taskProcessingService.intializeQueue();
             taskProcessingService.deleteQueueByApiStatus();
