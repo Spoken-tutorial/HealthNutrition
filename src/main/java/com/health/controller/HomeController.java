@@ -1298,6 +1298,56 @@ public class HomeController {
 
     }
 
+    // Map of languages with their ISO 639 codes and some custom codes
+    private static final Map<String, String> languageAndCodeMapping = new HashMap<>();
+
+    static {
+        languageAndCodeMapping.put("Assamese", "as");
+        languageAndCodeMapping.put("Bengali", "bn");
+        languageAndCodeMapping.put("Bhojpuri", "bho"); // Bhojpuri doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Bodo", "brx"); // Bodo doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Gujarati", "gu");
+        languageAndCodeMapping.put("Hindi", "hi");
+        languageAndCodeMapping.put("Kannada", "kn");
+        languageAndCodeMapping.put("Khasi", "kha"); // Khasi doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Konkani", "kok");
+        languageAndCodeMapping.put("Maithili", "mai"); // Maithili doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Malayalam", "ml");
+        languageAndCodeMapping.put("Marathi", "mr");
+        languageAndCodeMapping.put("Oriya", "or");
+        languageAndCodeMapping.put("Punjabi", "pa");
+        languageAndCodeMapping.put("Rajasthani", "raj"); // Rajasthani doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Sanskrit", "sa");
+        languageAndCodeMapping.put("Sindhi", "sd");
+        languageAndCodeMapping.put("Tamil", "ta");
+        languageAndCodeMapping.put("Telugu", "te");
+        languageAndCodeMapping.put("Urdu", "ur");
+        languageAndCodeMapping.put("Kashmiri", "ks");
+        languageAndCodeMapping.put("English", "en");
+        languageAndCodeMapping.put("Nepali", "ne");
+        languageAndCodeMapping.put("Spanish", "es");
+        languageAndCodeMapping.put("English-USA", "en-US");
+        languageAndCodeMapping.put("Thai", "th");
+        languageAndCodeMapping.put("Persian", "fa");
+        languageAndCodeMapping.put("Khmer", "km");
+        languageAndCodeMapping.put("Manipuri", "mni"); // Manipuri (Meitei) doesn't have an ISO 639-1 code, using ISO
+                                                       // 639-2
+        languageAndCodeMapping.put("Santhali", "sat"); // Santhali doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Arabic", "ar");
+        languageAndCodeMapping.put("Dogri", "doi"); // Dogri doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Portuguese", "pt");
+        languageAndCodeMapping.put("Vietnamese", "vi");
+        languageAndCodeMapping.put("Korku", "kfq"); // Korku doesn't have an ISO 639-1 code, using ISO 639-3
+        languageAndCodeMapping.put("Kokni", "kok"); // Assuming Kokni refers to Konkani
+        languageAndCodeMapping.put("Mavchi", "mav"); // Custom code
+        languageAndCodeMapping.put("Mathwadi", "mat"); // Custom code
+        languageAndCodeMapping.put("Pawara", "pwr"); // Custom code
+    }
+
+    private static String getLanguageCode(String languageName) {
+        return languageAndCodeMapping.getOrDefault(languageName, "Unknown");
+    }
+
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
@@ -1318,18 +1368,6 @@ public class HomeController {
         if (!catName.isStatus()) {
             catName = null;
         }
-
-        // Testing Start
-        Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadDirectoryTimeScriptvttFile, 1 + ".vtt");
-        String tempString = srtPath.toString();
-        int indexToStart = tempString.indexOf("Media");
-
-        String srtFile = tempString.substring(indexToStart, tempString.length());
-        logger.info("srtFile:{}", srtFile);
-        model.addAttribute("srtFile", srtFile);
-
-        // Testing End
 
         Topic topicName = topicService.findBytopicName(topic);
         Language lanName = lanService.getByLanName(lan);
@@ -1360,6 +1398,21 @@ public class HomeController {
 
         tutorial.setUserVisit(tutorial.getUserVisit() + 1);
         tutService.save(tutorial);
+        // Caption Start
+        Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryTimeScriptvttFile, tutorial.getTutorialId() + ".vtt");
+        String tempString = srtPath.toString();
+        int indexToStart = tempString.indexOf("Media");
+
+        String vttFile = tempString.substring(indexToStart, tempString.length());
+        logger.info("vttFile:{}", vttFile);
+        model.addAttribute("vttFile", vttFile);
+        model.addAttribute("label", lan);
+
+        String languageCode = getLanguageCode(lan);
+        model.addAttribute("srclang", languageCode);
+
+        // Caption End
 
         model.addAttribute("tutorial", tutorial);
 
