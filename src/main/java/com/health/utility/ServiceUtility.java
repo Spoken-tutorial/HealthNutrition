@@ -1,12 +1,9 @@
 package com.health.utility;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
@@ -17,8 +14,6 @@ import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -39,11 +34,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +42,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -615,94 +604,84 @@ public class ServiceUtility {
         });
     }
 
-    /********** srt file conversion start **********/
+    /********** vtt file conversion start **********/
+    // Currently this code is used in elasticSearch Project so, I commented here
+    /*
+     * public static String extractTextFromFile(Path timeScriptPath) throws
+     * IOException, TikaException, SAXException {
+     * 
+     * String content = ""; try (InputStream inputStream =
+     * Files.newInputStream(timeScriptPath)) { BodyContentHandler handler = new
+     * BodyContentHandler(); Metadata metadata = new Metadata(); ParseContext
+     * pcontext = new ParseContext();
+     * 
+     * AutoDetectParser parser = new AutoDetectParser(); parser.parse(inputStream,
+     * handler, metadata, pcontext); content = handler.toString(); } catch
+     * (Exception e) { logger.error("InputStream Exception Error", e); }
+     * 
+     * return content; }
+     * 
+     * public static void writeTextToVtt(String text, Path vttFilePath) throws
+     * IOException { try (BufferedWriter writer = new BufferedWriter(new
+     * FileWriter(vttFilePath.toFile()))) { String[] lines = text.split("\n"); int
+     * index = 1;
+     * 
+     * String textValue = ""; String startTimeString = "00:"; boolean textFlag =
+     * true;
+     * 
+     * for (String line : lines) { if (line.trim().isEmpty()) { continue; } if
+     * (line.trim().equalsIgnoreCase("Time")) continue; if
+     * (line.trim().equalsIgnoreCase("Narration")) { writer.write("WEBVTT" +
+     * "\n\n"); continue; } if (line.replace("\u00A0",
+     * "").trim().matches("^([01]?\\d|2[0-3]):([0-5]?\\d)$") ||
+     * line.replace("\u00A0",
+     * "").trim().matches("^([01]?\\d|2[0-3])\\.([0-5]?\\d)$")) { textFlag = false;
+     * 
+     * String newtimeValue = "00:" + formatToTimeScript(line.replace("\u00A0",
+     * "").trim());
+     * 
+     * if (!startTimeString.equals("00:")) { DateTimeFormatter formatter =
+     * DateTimeFormatter.ofPattern("HH:mm:ss"); LocalTime endTime =
+     * LocalTime.parse(newtimeValue, formatter);
+     * 
+     * endTime = endTime.minusNanos(500_000_000);
+     * 
+     * String endTimeString = endTime.toString();// formatter.format(endTime) +
+     * ".000"; // writer.write(index + "\n"); writer.write(startTimeString + " --> "
+     * + endTimeString + "\n"); // Placeholder for start and end // time
+     * writer.write(textValue + "\n\n"); index++; } startTimeString = newtimeValue +
+     * ".000";
+     * 
+     * } else { if (textFlag) { textValue = textValue + line;
+     * 
+     * } else { textValue = line.trim(); textFlag = true; } }
+     * 
+     * }
+     * 
+     * // writer.write(index + "\n"); DateTimeFormatter formatter =
+     * DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+     * 
+     * LocalTime startTime = LocalTime.parse(startTimeString, formatter); LocalTime
+     * newTime = startTime.plusSeconds(7);
+     * 
+     * String endTimeString = formatter.format(newTime);
+     * writer.write(startTimeString + " --> " + endTimeString + "\n");
+     * writer.write(textValue + "\n\n"); } }
+     * 
+     * public static String formatToTimeScript(String line) { line =
+     * line.replace(".", ":");
+     * 
+     * String[] parts = line.split(":");
+     * 
+     * String minutes = parts.length > 0 ? String.format("%02d",
+     * Integer.parseInt(parts[0])) : "00"; String seconds = parts.length > 1 ?
+     * String.format("%02d", Integer.parseInt(parts[1])) : "00";
+     * 
+     * return minutes + ":" + seconds; }
+     * 
+     */
 
-    public static String extractTextFromFile(Path timeScriptPath) throws IOException, TikaException, SAXException {
-
-        String content = "";
-        try (InputStream inputStream = Files.newInputStream(timeScriptPath)) {
-            BodyContentHandler handler = new BodyContentHandler();
-            Metadata metadata = new Metadata();
-            ParseContext pcontext = new ParseContext();
-
-            AutoDetectParser parser = new AutoDetectParser();
-            parser.parse(inputStream, handler, metadata, pcontext);
-            content = handler.toString();
-        } catch (Exception e) {
-            logger.error("InputStream Exception Error", e);
-        }
-
-        return content;
-    }
-
-    public static void writeTextToVtt(String text, Path vttFilePath) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(vttFilePath.toFile()))) {
-            String[] lines = text.split("\n");
-            int index = 1;
-
-            String textValue = "";
-            String startTimeString = "00:";
-            boolean textFlag = true;
-
-            for (String line : lines) {
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-                if (line.trim().equalsIgnoreCase("Time"))
-                    continue;
-                if (line.trim().equalsIgnoreCase("Narration")) {
-                    writer.write("WEBVTT" + "\n\n");
-                    continue;
-                }
-                if (line.trim().matches("^([01]?\\d|2[0-3]):([0-5]?\\d)$")) {
-                    textFlag = false;
-
-                    String newtimeValue = "00:" + formatToTimeScript(line.trim());
-
-                    if (!startTimeString.equals("00:")) {
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                        LocalTime endTime = LocalTime.parse(newtimeValue, formatter);
-
-                        endTime = endTime.minusSeconds(1);
-
-                        String endTimeString = formatter.format(endTime) + ".000";
-                        // writer.write(index + "\n");
-                        writer.write(startTimeString + " --> " + endTimeString + "\n"); // Placeholder for start and end
-                                                                                        // time
-                        writer.write(textValue + "\n\n");
-                        index++;
-                    }
-                    startTimeString = newtimeValue + ".000";
-
-                } else {
-                    if (textFlag) {
-                        textValue = textValue + line;
-
-                    } else {
-                        textValue = line.trim();
-                        textFlag = true;
-                    }
-                }
-
-            }
-
-            // writer.write(index + "\n");
-            writer.write(startTimeString + " --> " + "END\n");
-            writer.write(textValue + "\n\n");
-        }
-    }
-
-    public static String formatToTimeScript(String line) {
-
-        String[] parts = line.split(":");
-
-        String minutes = parts.length > 0 ? String.format("%02d", Integer.parseInt(parts[0])) : "00";
-        String seconds = parts.length > 1 ? String.format("%02d", Integer.parseInt(parts[1])) : "00";
-
-        return minutes + ":" + seconds;
-    }
-
-    /************ srt file conversion ends **********/
+    /************ vtt file conversion ends **********/
 
     /**
      * to validate email

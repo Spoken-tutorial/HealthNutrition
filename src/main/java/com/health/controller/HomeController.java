@@ -1399,6 +1399,36 @@ public class HomeController {
         tutorial.setUserVisit(tutorial.getUserVisit() + 1);
         tutService.save(tutorial);
         // Caption Start
+
+        if (!lan.equals("English")) {
+
+            Language lanEnglish = lanService.getByLanName("English");
+
+            ContributorAssignedTutorial conTutforEnglish = conRepo.findByTopicCatAndLanViewPart(topicCatMap,
+                    lanEnglish);
+
+            List<Tutorial> tempTutorialsforEnglish = tutService
+                    .findAllByContributorAssignedTutorialEnabled(conTutforEnglish);
+            if (tempTutorialsforEnglish == null || tempTutorialsforEnglish.size() == 0) {
+                return "redirect:/";
+
+            }
+
+            Tutorial tutorialforEnglish = tempTutorialsforEnglish.get(0);
+            Path vttPathforEnglish = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryTimeScriptvttFile, tutorialforEnglish.getTutorialId() + ".vtt");
+            String tempStringEnglish = vttPathforEnglish.toString();
+            int indexToStart1 = tempStringEnglish.indexOf("Media");
+
+            String vttFileforEnglish = tempStringEnglish.substring(indexToStart1, tempStringEnglish.length());
+            logger.info("vttFileforEnglish:{}", vttFileforEnglish);
+            model.addAttribute("vttFileforEnglish", vttFileforEnglish);
+            model.addAttribute("labelforEnglish", "English");
+
+            String languageCodeforEnglish = getLanguageCode("English");
+            model.addAttribute("srclangforEnglish", languageCodeforEnglish);
+
+        }
         Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                 CommonData.uploadDirectoryTimeScriptvttFile, tutorial.getTutorialId() + ".vtt");
         String tempString = srtPath.toString();
@@ -1411,6 +1441,7 @@ public class HomeController {
 
         String languageCode = getLanguageCode(lan);
         model.addAttribute("srclang", languageCode);
+        model.addAttribute("languageCheck", lan);
 
         // Caption End
 

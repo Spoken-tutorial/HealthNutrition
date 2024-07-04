@@ -1,6 +1,5 @@
 package com.health.threadpool;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,7 +21,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.tika.exception.TikaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -33,7 +31,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -618,49 +615,48 @@ public class TaskProcessingService {
         }
     }
 
-    public void convertTimeScriptFileToVtt(int tutorialId, String lanName)
-            throws IOException, TikaException, SAXException {
-        Tutorial tutorial = tutorialService.findByTutorialId(tutorialId);
-
-        Path odtFilePath;
-        if (lanName.equalsIgnoreCase("English")) {
-            String timeScript = tutorial.getTimeScript();
-            if (timeScript == null) {
-                return;
-            }
-            odtFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), timeScript);
-
-        } else {
-            odtFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                    CommonData.uploadDirectoryScriptOdtFileforDownload, tutorialId + ".odt");
-
-        }
-        File odtFile = odtFilePath.toFile();
-
-        if (odtFile.exists()) {
-
-            Path vttPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                    CommonData.uploadDirectoryTimeScriptvttFile, tutorialId + ".vtt");
-            String extractedText = ServiceUtility.extractTextFromFile(odtFilePath);
-
-            ServiceUtility.writeTextToVtt(extractedText, vttPath);
-        }
-
-    }
-
-    public void convertAllTimeScriptFilesToVttFiles() {
-        List<Tutorial> tutorialList = tutRepo.findTutorialsWithStatusTrueAndAndCatregoryEnabled();
-        logger.info("Size of tutorials for vtt file conversion:{}", tutorialList.size());
-        for (Tutorial tut : tutorialList) {
-            logger.info("TutorialId vtt conversion method:{}", tut.getTutorialId());
-            String lanName = tut.getConAssignedTutorial().getLan().getLangName();
-            try {
-                convertTimeScriptFileToVtt(tut.getTutorialId(), lanName);
-            } catch (IOException | TikaException | SAXException e) {
-                logger.error("Exception error for vtt conversion", e);
-            }
-        }
-    }
+    /*
+     * 
+     * // This code is used in elastic search project , so I commented here.
+     * 
+     * public void convertTimeScriptFileToVtt(int tutorialId, String lanName) throws
+     * IOException, TikaException, SAXException { Tutorial tutorial =
+     * tutorialService.findByTutorialId(tutorialId);
+     * 
+     * Path odtFilePath; if (lanName.equalsIgnoreCase("English")) { String
+     * timeScript = tutorial.getTimeScript(); if (timeScript == null) { return; }
+     * odtFilePath =
+     * Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+     * timeScript);
+     * 
+     * } else { odtFilePath =
+     * Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+     * CommonData.uploadDirectoryScriptOdtFileforDownload, tutorialId + ".odt");
+     * 
+     * } File odtFile = odtFilePath.toFile();
+     * 
+     * if (odtFile.exists()) {
+     * 
+     * Path vttPath =
+     * Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+     * CommonData.uploadDirectoryTimeScriptvttFile, tutorialId + ".vtt"); String
+     * extractedText = ServiceUtility.extractTextFromFile(odtFilePath);
+     * 
+     * ServiceUtility.writeTextToVtt(extractedText, vttPath); }
+     * 
+     * }
+     * 
+     * public void convertAllTimeScriptFilesToVttFiles() { List<Tutorial>
+     * tutorialList = tutRepo.findTutorialsWithStatusTrueAndAndCatregoryEnabled();
+     * logger.info("Size of tutorials for vtt file conversion:{}",
+     * tutorialList.size()); for (Tutorial tut : tutorialList) {
+     * logger.info("TutorialId vtt conversion method:{}", tut.getTutorialId());
+     * String lanName = tut.getConAssignedTutorial().getLan().getLangName(); try {
+     * convertTimeScriptFileToVtt(tut.getTutorialId(), lanName); } catch
+     * (IOException | TikaException | SAXException e) {
+     * logger.error("Exception error for vtt conversion", e); } } }
+     * 
+     */
 
     public void checkoutlinedata() {
         List<Tutorial> tutList = tutRepo.findByOutlinePathNotNull();
