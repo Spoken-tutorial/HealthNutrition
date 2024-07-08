@@ -104,6 +104,7 @@
 
 			</video>
 			
+			
 				</div>
 				<div class="col-md-4 px-4 d-none d-md-block" >
 					<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
@@ -135,6 +136,9 @@
 		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span>
 		</a></p></section>
 		<section><p> User Visit : <span th:text="${tutorial.getUserVisit()}"/></p></section>
+		<section><div class="col-md-8" id="scrolling-captions" style="max-height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #ccc;"></div>
+		<div class="col-md-4"></div>
+</section>
 		<section id="t-content" class="row">
 			<div id="resources" class="col-md-8">
 				<ul class="nav nav-pills mb-3 nav-justified  mx-1" id="pills-tab"
@@ -291,6 +295,19 @@
   fill:#ffffff; /* change to your desired color */
 }
 
+ /* Style for scrolling captions */
+        #scrolling-captions {
+            max-height: 200px; /* Set max height for scrolling container */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 10px; /* Add padding for better readability */
+            border: 1px solid #ccc; /* Optional: Add border for visual separation */
+        }
+
+        .highlight {
+            background-color: yellow; /* Highlight color */
+        }
+
+
  </style>
 <script>
 		var projectPath='[(@{/})]';		
@@ -320,5 +337,59 @@
   const player = new Plyr('.vid1',{controls});
 			
 	</script>
+	
+	
+	<!-- JavaScript for scrolling captions -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('storedVideoId');
+        const captions = video.textTracks[0]; // Assuming English captions are the first track
+        const scrollingCaptions = document.getElementById('scrolling-captions');
+
+        // Load and display all captions initially
+        captions.mode = 'hidden';
+        captions.oncuechange = function () {
+            scrollingCaptions.innerHTML = ''; // Clear previous captions
+
+            for (let i = 0; i < captions.cues.length; i++) {
+                const cue = captions.cues[i];
+                const captionDiv = document.createElement('div');
+                captionDiv.textContent = cue.text;
+                captionDiv.classList.add('caption');
+                captionDiv.setAttribute('data-start', cue.startTime);
+                captionDiv.setAttribute('data-end', cue.endTime);
+                captionDiv.style.padding = '5px 0'; // Inline CSS for caption padding
+                scrollingCaptions.appendChild(captionDiv);
+            }
+        };
+
+        video.addEventListener('timeupdate', function () {
+            const currentTime = video.currentTime;
+            updateScrollingCaptions(currentTime);
+        });
+
+        function updateScrollingCaptions(currentTime) {
+            const captionsDivs = document.querySelectorAll('#scrolling-captions .caption');
+            
+            captionsDivs.forEach(div => {
+                const start = parseFloat(div.getAttribute('data-start'));
+                const end = parseFloat(div.getAttribute('data-end'));
+                
+                if (currentTime >= start && currentTime <= end) {
+                    div.classList.add('highlight');
+                    div.style.backgroundColor = 'yellow'; // Inline CSS for highlight
+                    const offsetTop = div.offsetTop;
+                    scrollingCaptions.scrollTop = offsetTop - scrollingCaptions.offsetHeight / 2 + div.offsetHeight / 2;
+                } else {
+                    div.classList.remove('highlight');
+                    div.style.backgroundColor = ''; // Remove highlight
+                }
+            });
+        }
+    });
+</script>
+
+
+
 </body>
 </html>
