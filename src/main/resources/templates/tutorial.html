@@ -343,7 +343,7 @@
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function () {
         const video = document.getElementById('storedVideoId');
-        const captions = video.textTracks[0]; // Assuming English captions are the first track
+        const captions = video.textTracks[0]; // fetching captions from the first track
         const scrollingCaptions = document.getElementById('scrolling-captions');
 
         // Load and display all captions initially
@@ -354,7 +354,20 @@
             for (let i = 0; i < captions.cues.length; i++) {
                 const cue = captions.cues[i];
                 const captionDiv = document.createElement('div');
-                captionDiv.textContent = cue.text;
+
+                // Format the start time to a readable format (e.g., mm:ss)
+                const startTime = formatTime(cue.startTime);
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.textContent = `${startTime} - `;
+                timeSpan.classList.add('time');
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = cue.text;
+                textSpan.classList.add('text');
+
+                captionDiv.appendChild(timeSpan);
+                captionDiv.appendChild(textSpan);
                 captionDiv.classList.add('caption');
                 captionDiv.setAttribute('data-start', cue.startTime);
                 captionDiv.setAttribute('data-end', cue.endTime);
@@ -374,21 +387,27 @@
             captionsDivs.forEach(div => {
                 const start = parseFloat(div.getAttribute('data-start'));
                 const end = parseFloat(div.getAttribute('data-end'));
+                const textSpan = div.querySelector('.text');
                 
                 if (currentTime >= start && currentTime <= end) {
-                    div.classList.add('highlight');
-                    div.style.backgroundColor = 'yellow'; // Inline CSS for highlight
+                    textSpan.classList.add('highlight');
+                    textSpan.style.backgroundColor = 'lightgreen'; // Inline CSS for highlight
                     const offsetTop = div.offsetTop;
                     scrollingCaptions.scrollTop = offsetTop - scrollingCaptions.offsetHeight / 2 + div.offsetHeight / 2;
                 } else {
-                    div.classList.remove('highlight');
-                    div.style.backgroundColor = ''; // Remove highlight
+                    textSpan.classList.remove('highlight');
+                    textSpan.style.backgroundColor = ''; // Remove highlight
                 }
             });
         }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
     });
 </script>
-
 
 
 </body>
