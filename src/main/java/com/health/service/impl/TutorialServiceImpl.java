@@ -2,8 +2,10 @@ package com.health.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,12 +137,16 @@ public class TutorialServiceImpl implements TutorialService {
      */
     @Override
     public List<Tutorial> findAllByContributorAssignedTutorialList(List<ContributorAssignedTutorial> con) {
-        // TODO Auto-generated method stub
-        List<Tutorial> localList = new ArrayList<Tutorial>();
+        // Use a Set to store unique Tutorials
+        Set<Tutorial> uniqueTutorials = new HashSet<>();
+
         for (ContributorAssignedTutorial conTemp : con) {
-            localList.addAll(tutorialRepo.findAllByconAssignedTutorial(conTemp));
+            List<Tutorial> tutorials = tutorialRepo.findAllByconAssignedTutorial(conTemp);
+            uniqueTutorials.addAll(tutorials);
         }
-        return localList;
+
+        // Convert the Set back to a List
+        return new ArrayList<>(uniqueTutorials);
 
     }
 

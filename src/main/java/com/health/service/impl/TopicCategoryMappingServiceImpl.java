@@ -1,7 +1,9 @@
 package com.health.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,15 +62,16 @@ public class TopicCategoryMappingServiceImpl implements TopicCategoryMappingServ
      */
     @Override
     public List<TopicCategoryMapping> findAllByCategoryBasedOnUserRoles(List<UserRole> userRoles) {
-        // TODO Auto-generated method stub
 
-        List<TopicCategoryMapping> temp = new ArrayList<TopicCategoryMapping>();
+        // Use a Set to automatically handle uniqueness
+        Set<TopicCategoryMapping> uniqueMappings = new HashSet<>();
+
         for (UserRole x : userRoles) {
-
-            temp.addAll(topicCatRepo.findAllBycat(x.getCategory()));
+            uniqueMappings.addAll(topicCatRepo.findAllBycat(x.getCategory()));
         }
 
-        return temp;
+        // Convert the Set back to a List
+        return new ArrayList<>(uniqueMappings);
     }
 
     /**

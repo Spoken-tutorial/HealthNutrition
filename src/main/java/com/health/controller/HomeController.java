@@ -6078,11 +6078,17 @@ public class HomeController {
         Role role = roleService.findByname(CommonData.adminReviewerRole);
 
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
+        for (UserRole roleTemp : userRoles) {
+
+            logger.info("User RoleId: {}", roleTemp.getUserRoleId());
+        }
+
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
-
+        logger.info("TopicCatMap size: {}", localMap.size());
         List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
-
+        logger.info("conTutorials size: {}", conTutorials.size());
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
+        logger.info("tutorials size: {}", tutorials.size());
         for (Tutorial temp : tutorials) {
             int videoStatus = temp.getVideoStatus();
             if (videoStatus == CommonData.ADMIN_STATUS) {
@@ -6154,10 +6160,13 @@ public class HomeController {
 
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
+        logger.info("TopicCatMap size: {}", localMap.size());
 
         List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
+        logger.info("conTutorials size: {}", conTutorials.size());
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
+        logger.info("tutorials size: {}", tutorials.size());
         for (Tutorial temp : tutorials) {
 
             if (temp.getOutlineStatus() > CommonData.DOMAIN_STATUS && temp.getScriptStatus() > CommonData.DOMAIN_STATUS
@@ -6250,10 +6259,13 @@ public class HomeController {
 
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
+        logger.info("TopicCatMap size: {}", localMap.size());
 
         List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
+        logger.info("conTutorials size: {}", conTutorials.size());
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
+        logger.info("tutorials size: {}", tutorials.size());
         for (Tutorial temp : tutorials) {
 
             if (temp.getOutlineStatus() == CommonData.PUBLISH_STATUS
