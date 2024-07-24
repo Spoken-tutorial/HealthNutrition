@@ -1,7 +1,9 @@
 package com.health.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,17 +54,14 @@ public class ContributorAssignedTutorialServiceImpl implements ContributorAssign
     @Override
     public List<ContributorAssignedTutorial> findByTopicCatLan(List<TopicCategoryMapping> topCat,
             List<UserRole> usrRole) {
-        // TODO Auto-generated method stub
-        List<ContributorAssignedTutorial> localData = new ArrayList<ContributorAssignedTutorial>();
+        // Extract the languages from the UserRole list
+        List<Language> languages = usrRole.stream().map(UserRole::getLanguage).collect(Collectors.toList());
 
-        for (TopicCategoryMapping temp : topCat) {
-            for (UserRole xlan : usrRole) {
-                localData.add(conRepo.findByTopicCatLan(temp, xlan.getLanguage()));
-            }
+        // Call the repository method with the lists of topic categories and languages
+        List<ContributorAssignedTutorial> tutorials = conRepo.findByTopicCatLanList(topCat, languages);
 
-        }
-
-        return localData;
+        // Use a Set to store unique items and then convert back to a List
+        return new ArrayList<>(new HashSet<>(tutorials));
     }
 
     /**

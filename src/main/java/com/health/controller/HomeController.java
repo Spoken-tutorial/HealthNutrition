@@ -6078,11 +6078,13 @@ public class HomeController {
         Role role = roleService.findByname(CommonData.adminReviewerRole);
 
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
+
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
 
         List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
+
         for (Tutorial temp : tutorials) {
             int videoStatus = temp.getVideoStatus();
             if (videoStatus == CommonData.ADMIN_STATUS) {
@@ -6158,6 +6160,7 @@ public class HomeController {
         List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
+
         for (Tutorial temp : tutorials) {
 
             if (temp.getOutlineStatus() > CommonData.DOMAIN_STATUS && temp.getScriptStatus() > CommonData.DOMAIN_STATUS
@@ -6254,6 +6257,7 @@ public class HomeController {
         List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
+
         for (Tutorial temp : tutorials) {
 
             if (temp.getOutlineStatus() == CommonData.PUBLISH_STATUS

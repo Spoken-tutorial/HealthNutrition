@@ -64,6 +64,10 @@ public interface ContributorAssignedTutorialRepository extends CrudRepository<Co
     @Query("from ContributorAssignedTutorial where topicCatId=?1 and lan=?2")
     ContributorAssignedTutorial findByTopicCatLan(TopicCategoryMapping topicCat, Language lan);
 
+    @Query("from ContributorAssignedTutorial where topicCatId IN :topicCats and lan IN :languages")
+    List<ContributorAssignedTutorial> findByTopicCatLanList(@Param("topicCats") List<TopicCategoryMapping> topicCats,
+            @Param("languages") List<Language> languages);
+
     /**
      * Find list of ContributorAssignedTutorial object given list of
      * TopicCategoryMapping object
