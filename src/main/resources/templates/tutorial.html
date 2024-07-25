@@ -295,18 +295,7 @@
   fill:#ffffff; /* change to your desired color */
 }
 
- /* Style for scrolling captions */
-        #scrolling-captions {
-            max-height: 200px; /* Set max height for scrolling container */
-            overflow-y: auto; /* Enable vertical scrolling */
-            padding: 10px; /* Add padding for better readability */
-            border: 1px solid #ccc; /* Optional: Add border for visual separation */
-        }
-
-        .highlight {
-            background-color: yellow; /* Highlight color */
-        }
-
+ 
 
  </style>
 <script>
@@ -391,7 +380,9 @@
                 
                 if (currentTime >= start && currentTime <= end) {
                     textSpan.classList.add('highlight');
-                    textSpan.style.backgroundColor = 'lightgreen'; // Inline CSS for highlight
+                    textSpan.style.padding = '4px'; // Add padding around the text
+                    textSpan.style.backgroundColor = '#343AC4'; // Inline CSS for highlight
+                    textSpan.style.color = 'white';
                     const offsetTop = div.offsetTop;
                     scrollingCaptions.scrollTop = offsetTop - scrollingCaptions.offsetHeight / 2 + div.offsetHeight / 2;
                 } else {
