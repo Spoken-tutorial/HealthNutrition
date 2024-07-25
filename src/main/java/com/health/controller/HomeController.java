@@ -638,11 +638,11 @@ public class HomeController {
 
     private void getModelData(Model model, int catId, int topicId, int lanId, String query) {
 
-        ArrayList<Map<String, Integer>> arlist = ajaxController.getTopicAndLanguageByCategory(catId, topicId, lanId);
+        ArrayList<Map<String, Object>> arlist = ajaxController.getTopicAndLanguageByCategory(catId, topicId, lanId);
         ArrayList<Map<String, Integer>> arlist1 = ajaxController.getCategoryAndLanguageByTopic(catId, topicId, lanId);
         Map<String, Integer> cat = arlist1.get(0);
         Map<String, Integer> lan = arlist1.get(1);
-        Map<String, Integer> topic = arlist.get(0);
+        Map<String, Object> topic = arlist.get(0);
         model.addAttribute("categories", cat);
         model.addAttribute("languages", lan);
         model.addAttribute("topics", topic);

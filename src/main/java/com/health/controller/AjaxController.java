@@ -932,15 +932,16 @@ public class AjaxController {
 
     @RequestMapping("/loadTopicAndLanguageByCategory")
     @Cacheable(cacheNames = "categories", key = "{#root.methodName, #catId, #topicId, #languageId }")
-    public @ResponseBody ArrayList<Map<String, Integer>> getTopicAndLanguageByCategory(
+    public @ResponseBody ArrayList<Map<String, Object>> getTopicAndLanguageByCategory(
             @RequestParam(value = "catId") int catId, @RequestParam(value = "topicId") int topicId,
             @RequestParam(value = "languageId") int languageId) {
 
-        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+        ArrayList<Map<String, Object>> arlist = new ArrayList<>();
 
-        Map<String, Integer> topics = new LinkedHashMap<>();
+        Map<String, Object> topics = new LinkedHashMap<>();
+        Map<String, Object> topicswithOrderValue = new LinkedHashMap<>();
         // HashMap<String,Integer> topics=new LinkedHashMap<>();
-        Map<String, Integer> languages = new TreeMap<>();
+        Map<String, Object> languages = new TreeMap<>();
 
         Category cat = catId != 0 ? catService.findByid(catId) : null;
         Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
@@ -991,6 +992,13 @@ public class AjaxController {
             Collections.sort(tcmList, TopicCategoryMapping.SortByTopicName);
         } else {
             Collections.sort(tcmList, TopicCategoryMapping.SortByOrderValue);
+            for (TopicCategoryMapping tcm : tcmList) {
+                Topic topicforOrder = tcm.getTopic();
+
+                topicswithOrderValue.put(topicforOrder.getTopicName(),
+                        topicforOrder.getTopicId() + "," + tcm.getOrder());
+
+            }
         }
 
         for (TopicCategoryMapping tcm : tcmList) {
@@ -1019,6 +1027,7 @@ public class AjaxController {
         }
 
         arlist.add(languages);
+        arlist.add(topicswithOrderValue);
 
         return arlist;
 

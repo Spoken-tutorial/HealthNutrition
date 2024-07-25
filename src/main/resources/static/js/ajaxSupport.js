@@ -1906,17 +1906,30 @@ $("#languageId1").change(function() {
 					},
 					contentType : "application/json",
 					success : function(resultarlist) {
-						var result= resultarlist[0];
-						
-						console.log(result);
-						var html = '';
-						html += '<option value="0">Select Topic</option>';
-						$.each(result , function( value ,key) {
-							var selected=(topicid==key)?"selected":"";
-			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
-			  	  			     })
-						$("#inputTopicName").prop('disabled',false);
-						$('#inputTopicName').html(html);
+						var topics = resultarlist[0];
+			            var topicsWithOrderValue = resultarlist[2];
+			
+			            console.log(topics);
+			            var html = '';
+			            html += '<option value="0">Select Topic</option>';
+			
+			            if (catgoryid == 0 || catgoryid == null) {
+			                // Display only topicName
+			                $.each(topics, function (key, value) {
+			                    var selected = (topicid == value) ? "selected" : "";
+			                    html += `<option value="${value}" ${selected}>${key}</option>`;
+			                });
+			            } else {
+			                // Display topicName with orderValue
+			                $.each(topicsWithOrderValue, function (key, value) {
+			                    var [id, order] = value.split(',');
+			                    var selected = (topicid == id) ? "selected" : "";
+			                    html += `<option value="${id}" ${selected}>${key} (Order: ${order})</option>`;
+			                });
+			            }
+			
+			            $("#inputTopicName").prop('disabled', false);
+			            $('#inputTopicName').html(html);
 						
 						result= resultarlist[1];
 						
