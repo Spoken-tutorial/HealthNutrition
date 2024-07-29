@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.User;
 import com.health.repository.UserRepository;
-import com.health.service.TutorialService;
 
 /**
  * Utility class
@@ -69,9 +68,6 @@ public class ServiceUtility {
 
     @Autowired
     private JavaMailSender mailSender;
-
-    @Autowired
-    private TutorialService tutorialService;
 
     public static Timestamp getCurrentTime() { // Current Date
 
@@ -603,85 +599,6 @@ public class ServiceUtility {
 
         });
     }
-
-    /********** vtt file conversion start **********/
-    // Currently this code is used in elasticSearch Project so, I commented here
-    /*
-     * public static String extractTextFromFile(Path timeScriptPath) throws
-     * IOException, TikaException, SAXException {
-     * 
-     * String content = ""; try (InputStream inputStream =
-     * Files.newInputStream(timeScriptPath)) { BodyContentHandler handler = new
-     * BodyContentHandler(); Metadata metadata = new Metadata(); ParseContext
-     * pcontext = new ParseContext();
-     * 
-     * AutoDetectParser parser = new AutoDetectParser(); parser.parse(inputStream,
-     * handler, metadata, pcontext); content = handler.toString(); } catch
-     * (Exception e) { logger.error("InputStream Exception Error", e); }
-     * 
-     * return content; }
-     * 
-     * public static void writeTextToVtt(String text, Path vttFilePath) throws
-     * IOException { try (BufferedWriter writer = new BufferedWriter(new
-     * FileWriter(vttFilePath.toFile()))) { String[] lines = text.split("\n"); int
-     * index = 1;
-     * 
-     * String textValue = ""; String startTimeString = "00:"; boolean textFlag =
-     * true;
-     * 
-     * for (String line : lines) { if (line.trim().isEmpty()) { continue; } if
-     * (line.trim().equalsIgnoreCase("Time")) continue; if
-     * (line.trim().equalsIgnoreCase("Narration")) { writer.write("WEBVTT" +
-     * "\n\n"); continue; } if (line.replace("\u00A0",
-     * "").trim().matches("^([01]?\\d|2[0-3]):([0-5]?\\d)$") ||
-     * line.replace("\u00A0",
-     * "").trim().matches("^([01]?\\d|2[0-3])\\.([0-5]?\\d)$")) { textFlag = false;
-     * 
-     * String newtimeValue = "00:" + formatToTimeScript(line.replace("\u00A0",
-     * "").trim());
-     * 
-     * if (!startTimeString.equals("00:")) { DateTimeFormatter formatter =
-     * DateTimeFormatter.ofPattern("HH:mm:ss"); LocalTime endTime =
-     * LocalTime.parse(newtimeValue, formatter);
-     * 
-     * endTime = endTime.minusNanos(500_000_000);
-     * 
-     * String endTimeString = endTime.toString();// formatter.format(endTime) +
-     * ".000"; // writer.write(index + "\n"); writer.write(startTimeString + " --> "
-     * + endTimeString + "\n"); // Placeholder for start and end // time
-     * writer.write(textValue + "\n\n"); index++; } startTimeString = newtimeValue +
-     * ".000";
-     * 
-     * } else { if (textFlag) { textValue = textValue + line;
-     * 
-     * } else { textValue = line.trim(); textFlag = true; } }
-     * 
-     * }
-     * 
-     * // writer.write(index + "\n"); DateTimeFormatter formatter =
-     * DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
-     * 
-     * LocalTime startTime = LocalTime.parse(startTimeString, formatter); LocalTime
-     * newTime = startTime.plusSeconds(7);
-     * 
-     * String endTimeString = formatter.format(newTime);
-     * writer.write(startTimeString + " --> " + endTimeString + "\n");
-     * writer.write(textValue + "\n\n"); } }
-     * 
-     * public static String formatToTimeScript(String line) { line =
-     * line.replace(".", ":");
-     * 
-     * String[] parts = line.split(":");
-     * 
-     * String minutes = parts.length > 0 ? String.format("%02d",
-     * Integer.parseInt(parts[0])) : "00"; String seconds = parts.length > 1 ?
-     * String.format("%02d", Integer.parseInt(parts[1])) : "00";
-     * 
-     * return minutes + ":" + seconds; }
-     * 
-     */
-
-    /************ vtt file conversion ends **********/
 
     /**
      * to validate email
