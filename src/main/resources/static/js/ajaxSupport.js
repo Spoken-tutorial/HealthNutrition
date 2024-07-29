@@ -1909,14 +1909,23 @@ $("#languageId1").change(function() {
 						var result= resultarlist[0];
 						
 						console.log(result);
-						var html = '';
-						html += '<option value="0">Select Topic</option>';
-						$.each(result , function( value ,key) {
-							var selected=(topicid==key)?"selected":"";
-			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
-			  	  			     })
-						$("#inputTopicName").prop('disabled',false);
-						$('#inputTopicName').html(html);
+			            var html = '';
+			            html += '<option value="0">Select Topic</option>';
+			            if (catgoryid != null && catgoryid != 0) { // Check if catgoryid is not null or 0
+			                let counter = 1; // Initialize a counter for serial numbers
+			                $.each(result, function (value, key) {
+			                    var selected = (topicid == key) ? "selected" : "";
+			                    html += `<option value="${key}" ${selected}>${counter}. ${value}</option>`;
+			                    counter++; // Increment the counter
+			                });
+			            } else {
+			                $.each(result, function (value, key) {
+			                    var selected = (topicid == key) ? "selected" : "";
+			                    html += `<option value="${key}" ${selected}>${value}</option>`;
+			                });
+			            }
+			            $("#inputTopicName").prop('disabled', false);
+			            $('#inputTopicName').html(html);
 						
 						result= resultarlist[1];
 						
