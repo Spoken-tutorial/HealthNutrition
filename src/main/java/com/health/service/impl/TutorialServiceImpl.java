@@ -814,4 +814,16 @@ public class TutorialServiceImpl implements TutorialService {
         }
     }
 
+    @Override
+    public List<Tutorial> findAllEnabledEnglishTuorialsWithCitationNotNull() {
+
+        return tutorialRepo.findTutorialsWithStatusTrueAndCategoryEnabledAndLanEnglishAndCitationNotNull();
+    }
+
+    @Override
+    public List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNull() {
+
+        return tutorialRepo.findTutorialsWithStatusTrueAndCategoryEnabledAndLanEnglishAndCitationIsNull();
+    }
+
 }

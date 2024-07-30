@@ -127,6 +127,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @Column(name = "outline", length = 3500)
     private String outline;
 
+    @Column(name = "citation", length = 3500)
+    private String citation;
+
     /**
      * outline status
      */
@@ -271,6 +274,14 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     public void setTutorialId(int tutorialId) {
         this.tutorialId = tutorialId;
+    }
+
+    public String getCitation() {
+        return citation;
+    }
+
+    public void setCitation(String citation) {
+        this.citation = citation;
     }
 
     public String getScript() {

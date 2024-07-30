@@ -121,7 +121,10 @@ public interface TutorialService {
      */
 
     List<Tutorial> findAllByStatus(boolean status);
-    // List<Tutorial> findAllByStatusTrue();
+
+    List<Tutorial> findAllEnabledEnglishTuorialsWithCitationNotNull();
+
+    List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNull();
 
     List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con);
 
