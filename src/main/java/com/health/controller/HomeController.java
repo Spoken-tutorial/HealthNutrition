@@ -96,6 +96,7 @@ import com.health.model.IndianLanguage;
 import com.health.model.Language;
 import com.health.model.LiveTutorial;
 import com.health.model.LogManegement;
+import com.health.model.NptelTutorial;
 import com.health.model.OrganizationRole;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PostQuestionaire;
@@ -133,6 +134,7 @@ import com.health.service.IndianLanguageService;
 import com.health.service.LanguageService;
 import com.health.service.LiveTutorialService;
 import com.health.service.LogMangementService;
+import com.health.service.NptelTutorialService;
 import com.health.service.OrganizationRoleService;
 import com.health.service.PathofPromoVideoService;
 import com.health.service.PostQuestionaireService;
@@ -228,6 +230,9 @@ public class HomeController {
 
     @Autowired
     private QuestionService questService;
+
+    @Autowired
+    private NptelTutorialService nptelTutorialService;
 
     @Autowired
     private EventService eventservice;
@@ -1047,6 +1052,60 @@ public class HomeController {
         model.addAttribute("totalPages", totalPages);
 
         return "tutorialList";
+    }
+
+    @GetMapping("/addNptelTutorial")
+    public String addNptelTutorial(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadNptelTutorial, "Sample_CSV_file_for_Nptel_Tutorial" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
+        List<NptelTutorial> nptelTutorials = nptelTutorialService.findAll();
+        Collections.sort(nptelTutorials, NptelTutorial.SortByUploadTime);
+        model.addAttribute("nptelTutorials", nptelTutorials);
+        return "addNptelTutorial";
+    }
+
+    @PostMapping("/addNptelTutorial")
+    public String addNptelTutorialPost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
+            @RequestParam(name = "packageName") String packageName,
+
+            HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadNptelTutorial, "Sample_CSV_file_for_Nptel_Tutorial" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
+
+        try {
+            nptelTutorialService.saveNptelTutorialsFromCSV(csv_file, model, packageName);
+
+        } catch (IOException e) {
+
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return "addNptelTutorial";
+        } catch (CsvException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return "addNptelTutorial";
+        }
+
+        List<NptelTutorial> nptelTutorials = nptelTutorialService.findAll();
+        Collections.sort(nptelTutorials, NptelTutorial.SortByUploadTime);
+        model.addAttribute("nptelTutorials", nptelTutorials);
+
+        return "addNptelTutorial";
     }
 
     @GetMapping("/addLiveTutorial")
