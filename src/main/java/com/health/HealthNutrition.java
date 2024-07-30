@@ -51,12 +51,13 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Override
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
+
         try {
 
-            // taskProcessingService.createOutlineFile();
-            // taskProcessingService.addAllBrochureToQueue();
-            // taskProcessingService.addAllResearchPapertoQueue();
-            // taskProcessingService.addAllTuttorialsToQueue();
+            taskProcessingService.createOutlineFile();
+            taskProcessingService.addAllBrochureToQueue();
+            taskProcessingService.addAllResearchPapertoQueue();
+            taskProcessingService.addAllTuttorialsToQueue();
             taskProcessingService.intializeQueue();
             taskProcessingService.deleteQueueByApiStatus();
             taskProcessingService.queueProcessor();
@@ -65,6 +66,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 
             logger.error("Exception: ", e);
         }
+
         String baseDir = env.getProperty("spring.applicationexternalPath.name");
         new File(baseDir + CommonData.uploadDirectoryCategory).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryQuestion).mkdirs();
@@ -75,6 +77,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         new File(baseDir + CommonData.uploadDirectoryEvent).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
         new File(baseDir + CommonData.uploadLiveTutorial).mkdirs();
+
     }
 
 }
