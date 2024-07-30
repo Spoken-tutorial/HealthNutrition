@@ -637,6 +637,33 @@ public class HomeController {
         return lanTempSorted;
     }
 
+    private List<Category> getCategoriesforNullCitation() {
+        List<Tutorial> tutorials = tutService.findAllEnabledEnglishTuorialsWithCitationIsNull();
+        Set<Category> catTemp = new HashSet<Category>();
+        for (Tutorial temp : tutorials) {
+
+            Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+            catTemp.add(c);
+
+        }
+
+        List<Category> catTempSorted = new ArrayList<Category>(catTemp);
+        Collections.sort(catTempSorted);
+
+        return catTempSorted;
+    }
+
+    private List<Topic> getTopicsforNullCitation() {
+        List<Tutorial> tutorials = tutService.findAllEnabledEnglishTuorialsWithCitationIsNull();
+        Set<Topic> topicTemp = new HashSet<Topic>();
+        for (Tutorial temp : tutorials) {
+            topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic());
+        }
+        List<Topic> topicTempSorted = new ArrayList<Topic>(topicTemp);
+        Collections.sort(topicTempSorted);
+        return topicTempSorted;
+    }
+
     private void getModelData(Model model) {
         getModelData(model, 0, 0, 0, "");
 
@@ -2668,6 +2695,28 @@ public class HomeController {
         }
         return addPromoVideoGet(req, model, principal);
     }
+
+    /***********************************
+     * Citation Start
+     ************************************/
+    @GetMapping("/addCitation")
+    public String addCitationGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        List<Category> categories = getCategoriesforNullCitation();
+        model.addAttribute("categories", categories);
+        List<Topic> topics = getTopicsforNullCitation();
+        model.addAttribute("topics", topics);
+        List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        model.addAttribute("citationTuorials", citationTuorials);
+
+        return "addCitation";
+    }
+
+    /***********************************
+     * Citation End
+     *************************************/
 
     @GetMapping("/addBrochure")
     public String addBrochureGet(HttpServletRequest req, Model model, Principal principal) {
