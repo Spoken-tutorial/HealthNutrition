@@ -1004,7 +1004,7 @@ public class AjaxController {
                 Topic topic2 = tcm.getTopic();
 
                 topics.put(counter + ". " + topic2.getTopicName(), topic2.getTopicId());
-                logger.info("Order Value:{}", tcm.getOrder());
+
                 counter++;
             }
         }
