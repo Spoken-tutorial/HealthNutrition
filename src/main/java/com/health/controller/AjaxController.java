@@ -987,7 +987,7 @@ public class AjaxController {
 
         }
 
-        if (cat == null) {
+        if (cat == null || (topic != null && language != null)) {
             Collections.sort(tcmList, TopicCategoryMapping.SortByTopicName);
             for (TopicCategoryMapping tcm : tcmList) {
                 Topic topic2 = tcm.getTopic();

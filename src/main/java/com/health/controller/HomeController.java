@@ -1348,9 +1348,12 @@ public class HomeController {
         return languageAndCodeMapping.getOrDefault(languageName, "Unknown");
     }
 
-    @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
+    @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{catId}/{topicId}/{lanId}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
+            @PathVariable(name = "catId") int catId, @PathVariable(name = "topicId") int topicId,
+            @PathVariable(name = "lanId") int lanId,
+
             @PathVariable(name = "query") String query, Principal principal, Model model) {
 
         Category catName = catService.findBycategoryname(cat);
@@ -1373,9 +1376,6 @@ public class HomeController {
         Language lanName = lanService.getByLanName(lan);
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
         ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
-        int catId = catName.getCategoryId();
-        int topicId = topicName.getTopicId();
-        int lanId = lanName.getLanId();
 
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
             return "redirect:/";
