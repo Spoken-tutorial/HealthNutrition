@@ -2718,36 +2718,89 @@ public class HomeController {
     @PostMapping("/addCitation")
     public String addCitationPost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(value = "categoryforCitation") int categoryId,
-            @RequestParam(name = "topicforCitation") int topicId, @RequestParam(name = "citation") String citation) {
+            @RequestParam(name = "topicforCitation") int[] topicIds, @RequestParam(name = "citation") String citation) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         Category cat = catService.findByid(categoryId);
-        Topic topic = topicService.findById(topicId);
+        Set<TopicCategoryMapping> tcmSet = new HashSet<>();
         Language lan = lanService.getById(22);
-        if (cat == null || topic == null) {
+
+        if (cat == null || topicIds.length == 0) {
             model.addAttribute("error_msg", "category and topic should not be null");
             return addCitationGet(req, model, principal);
         }
-        TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat, topic);
-        ContributorAssignedTutorial con = conService.findByTopicCatAndLanViewPart(tcm, lan);
-        List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialEnabled(con);
-        if (tutorials != null) {
-            if (tutorials.size() > 1) {
-                model.addAttribute("error_msg", "Duplicate Tutorial found");
-                return addCitationGet(req, model, principal);
-            } else {
-                Tutorial tuorial = tutorials.get(0);
-                tuorial.setCitation(citation);
-                tutService.save(tuorial);
-                model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
-                return addCitationGet(req, model, principal);
+
+        for (int i = 0; i < topicIds.length; i++) {
+            Topic topic = topicService.findById(topicIds[i]);
+            tcmSet.add(topicCatService.findAllByCategoryAndTopic(cat, topic));
+        }
+
+        List<TopicCategoryMapping> tcmList = new ArrayList<>(tcmSet);
+        List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
+        List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(conList);
+        List<Tutorial> newTutorialList = new ArrayList<>();
+
+        if (tutorials != null && tutorials.size() > 0) {
+            for (Tutorial tutorial : tutorials) {
+                tutorial.setCitation(citation);
+                newTutorialList.add(tutorial);
             }
+
+            tutService.saveAll(newTutorialList);
+            model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+            return addCitationGet(req, model, principal);
+
         } else {
             model.addAttribute("error_msg", "No Tutorial found");
             return addCitationGet(req, model, principal);
+        }
+
+    }
+
+    @GetMapping("/citation/edit/{id}")
+    public String editCitationGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        Tutorial tutorial = tutService.findByTutorialId(id);
+
+        if (tutorial == null) {
+
+            return "redirect:/addCitation";
+        }
+
+        model.addAttribute("tutorial", tutorial);
+
+        return "updateCitation";
+    }
+
+    @PostMapping("/updateCitation")
+    public String updateCitationPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "citation") String citation) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String tutorialIdString = req.getParameter("tutorialId");
+        int id = Integer.parseInt(tutorialIdString);
+
+        Tutorial tutorial = tutService.findByTutorialId(id);
+
+        if (tutorial == null) {
+            model.addAttribute("error_msg", "tutorial doesn't exist");
+            return editCitationGet(id, req, model, principal);
+        } else {
+            tutorial.setCitation(citation);
+            tutService.save(tutorial);
+            model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+            return editCitationGet(id, req, model, principal);
         }
 
     }

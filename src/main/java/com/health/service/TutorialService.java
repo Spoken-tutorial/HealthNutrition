@@ -105,6 +105,8 @@ public interface TutorialService {
      */
     void save(Tutorial tut);
 
+    void saveAll(List<Tutorial> tutorialList);
+
     /**
      * Find Tutorial object given id
      * 
