@@ -80,8 +80,8 @@ font-weight:bold!important;
 										<div class="form-group">
 											<label for="topicforCitation">Select Topic * </label> <select
 												id="topicforCitation" class="form-control" name="topicforCitation"
-												required="required">
-												<option value="0">Select Topic</option>
+												required="required" size="15" multiple="multiple">
+												
 											</select>
 										</div>
 
@@ -154,6 +154,9 @@ font-weight:bold!important;
 $(document).ready( function () {
     $('#myTable').DataTable();
 } );
+
+
+
 </script>
 
 	<script th:inline="javascript">
@@ -170,6 +173,11 @@ $(document).ready( function () {
 	        console.error( error );
 	    } );
 	
+	
+	
+
+
+
 		
 	</script>
 </body>

@@ -1565,7 +1565,6 @@ $("#languageId1").change(function() {
 
 								var html = '';
 								var len = result.length;
-								html += '<option value="0">Select Topic</option>';
 	  	  			            $.each(result , function( key, value ) {
 		  	  			        html += '<option value=' + key + '>'
 		  			               + value
@@ -1586,6 +1585,18 @@ $("#languageId1").change(function() {
 
 					});
 
+
+$(document).ready(function () {
+    const multiSelectWithoutCtrl = (elemSelector) => {
+        $(elemSelector).find('option').on('mousedown', function (e) {
+            e.preventDefault();
+            $(this).prop('selected', !$(this).prop('selected'));
+            return false;
+        });
+    };
+
+    multiSelectWithoutCtrl('#topicforCitation');
+});
 
 /***********************************Citation End***********************************************/			
 			

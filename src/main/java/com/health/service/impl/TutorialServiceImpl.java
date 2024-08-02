@@ -116,6 +116,12 @@ public class TutorialServiceImpl implements TutorialService {
         tutorialRepo.save(tut);
     }
 
+    @Override
+    public void saveAll(List<Tutorial> tutorialList) {
+        // TODO Auto-generated method stub
+        tutorialRepo.saveAll(tutorialList);
+    }
+
     /**
      * @see com.health.service.TutorialService#getById(int)
      */
