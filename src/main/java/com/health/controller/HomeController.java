@@ -1361,6 +1361,10 @@ public class HomeController {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
+        model.addAttribute("category", catId);
+        model.addAttribute("language", lanId);
+        model.addAttribute("topic", topicId);
+
         if (query.equals("q")) {
             query = "";
         }

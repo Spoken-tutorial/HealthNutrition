@@ -112,7 +112,7 @@
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
 			
 			
-					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} + '/' + 'q' +'/'} " class="col-12">
+					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} + '/' + ${category} +'/' + ${topic} +'/' + ${language} +'/' + 'q' +'/'} " class="col-12">
 						
 							
 							
@@ -222,7 +222,7 @@
 				<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
-					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}  +'/' + 'q' +'/'}" class="col-12">
+					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}  +'/'+ ${category} +'/' + ${topic} +'/' + ${language} +'/' + 'q' +'/'}" class="col-12">
 						
 							
 							<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >
