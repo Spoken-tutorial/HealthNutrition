@@ -1746,7 +1746,7 @@ $(document).ready(function () {
         });
     };
 
-    multiSelectWithoutCtrl('#topicforCitation');
+    multiSelectWithoutCtrl("#topicforCitation");
 });
 
 /***********************************Citation End***********************************************/			

@@ -2805,6 +2805,17 @@ public class HomeController {
 
     }
 
+    @GetMapping("/citations")
+    public String showCitationsGet(HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        model.addAttribute("citationTuorials", citationTuorials);
+        return "citations";
+    }
+
     /***********************************
      * Citation End
      *************************************/
