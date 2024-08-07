@@ -63,9 +63,9 @@ font-weight:bold!important;
 											
 											
 											<div class="form-group">
-											<label for="categoryforCitation">Select Category </label> <select
+											<label for="categoryforCitation">Select Category * </label> <select
 												id="categoryforCitation" class="form-control"
-												name="categoryforCitation" >
+												name="categoryforCitation" required="required" >
 	
 												<option value="0">Select any one category</option>
 												
@@ -78,18 +78,18 @@ font-weight:bold!important;
 										</div>
 	
 										<div class="form-group">
-											<label for="topicforCitation">Select Topic </label> <select
+											<label for="topicforCitation">Select Topic * </label> <select
 												id="topicforCitation" class="form-control" name="topicforCitation"
-												>
+												required="required">
 												<option value="0">Select Topic</option>
 											</select>
 										</div>
 
 											<div class="form-group">
 											<label for="citation" class="col-form-label"><span>Add
-													Citation : </span><span class="text-muted">(Characters limit : 2500)</span></label>
+													Citation : </span><span class="text-muted">(Characters limit : 2500) *</span></label>
 											<textarea class="form-control editor" name="citation"
-												id="citation" rows="15" maxlength="2500">		 
+												id="citation" rows="15" maxlength="2500" required="required">		 
 										     </textarea>
 										</div>
 										
@@ -123,7 +123,7 @@ font-weight:bold!important;
        
       							</td>
 							      <td><span th:text = "${ tut.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></td>
-							      <td><span th:text = "${tut.getCitation()}"></span></td>
+							      <td><span th:utext = "${tut.getCitation()}"></span></td>
 						
 							     
 					
