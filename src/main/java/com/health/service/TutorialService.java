@@ -105,6 +105,8 @@ public interface TutorialService {
      */
     void save(Tutorial tut);
 
+    void saveAll(List<Tutorial> tutorialList);
+
     /**
      * Find Tutorial object given id
      * 
@@ -121,7 +123,10 @@ public interface TutorialService {
      */
 
     List<Tutorial> findAllByStatus(boolean status);
-    // List<Tutorial> findAllByStatusTrue();
+
+    List<Tutorial> findAllEnabledEnglishTuorialsWithCitationNotNull();
+
+    List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNull();
 
     List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con);
 
