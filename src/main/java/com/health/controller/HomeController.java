@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -95,7 +96,9 @@ import com.health.model.IndianLanguage;
 import com.health.model.Language;
 import com.health.model.LiveTutorial;
 import com.health.model.LogManegement;
+import com.health.model.NptelTutorial;
 import com.health.model.OrganizationRole;
+import com.health.model.PackageEntity;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PostQuestionaire;
 import com.health.model.PromoVideo;
@@ -131,7 +134,9 @@ import com.health.service.IndianLanguageService;
 import com.health.service.LanguageService;
 import com.health.service.LiveTutorialService;
 import com.health.service.LogMangementService;
+import com.health.service.NptelTutorialService;
 import com.health.service.OrganizationRoleService;
+import com.health.service.PackageEntityService;
 import com.health.service.PathofPromoVideoService;
 import com.health.service.PostQuestionaireService;
 import com.health.service.PromoVideoService;
@@ -218,10 +223,16 @@ public class HomeController {
     private TopicService topicService;
 
     @Autowired
+    private PackageEntityService packageEntityService;
+
+    @Autowired
     private TopicCategoryMappingService topicCatService;
 
     @Autowired
     private QuestionService questService;
+
+    @Autowired
+    private NptelTutorialService nptelTutorialService;
 
     @Autowired
     private EventService eventservice;
@@ -1014,6 +1025,73 @@ public class HomeController {
         model.addAttribute("totalPages", totalPages);
 
         return "tutorialList";
+    }
+
+    @GetMapping("/addNptelTutorial")
+    public String addNptelTutorial(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadNptelTutorial, "Sample_CSV_file_for_Nptel_Tutorial" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
+
+        List<PackageEntity> packageEntitiesList = packageEntityService.findAll();
+        Collections.sort(packageEntitiesList);
+        model.addAttribute("packageEntitiesList", packageEntitiesList);
+
+        List<NptelTutorial> nptelTutorials = nptelTutorialService.findAll();
+        Collections.sort(nptelTutorials, NptelTutorial.SortByUploadTime);
+        model.addAttribute("nptelTutorials", nptelTutorials);
+        return "addNptelTutorial";
+    }
+
+    @PostMapping("/addNptelTutorial")
+    public String addNptelTutorialPost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
+            @RequestParam(name = "packageId") int packageId, @RequestParam(name = "packageName") String packageName,
+
+            HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        PackageEntity packageEntity;
+
+        if (packageId == -1) {
+            packageEntity = packageEntityService.findByPackageName(packageName);
+        } else {
+            packageEntity = packageEntityService.findByPackageId(packageId);
+        }
+
+        if (packageEntity == null) {
+            packageEntity = new PackageEntity();
+            packageEntity.setPackageName(packageName);
+            packageEntity.setDateAdded(ServiceUtility.getCurrentTime());
+            packageEntityService.save(packageEntity);
+        }
+
+        try {
+            nptelTutorialService.saveNptelTutorialsFromCSV(csv_file, model, packageEntity);
+
+        } catch (IOException e) {
+
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return addNptelTutorial(req, principal, model);
+        } catch (CsvException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return addNptelTutorial(req, principal, model);
+        } catch (NoSuchAlgorithmException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return addNptelTutorial(req, principal, model);
+        }
+
+        return addNptelTutorial(req, principal, model);
     }
 
     @GetMapping("/addLiveTutorial")
