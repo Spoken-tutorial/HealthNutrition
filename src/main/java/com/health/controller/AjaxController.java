@@ -989,14 +989,24 @@ public class AjaxController {
 
         if (cat == null) {
             Collections.sort(tcmList, TopicCategoryMapping.SortByTopicName);
+            for (TopicCategoryMapping tcm : tcmList) {
+                Topic topic2 = tcm.getTopic();
+
+                topics.put(topic2.getTopicName(), topic2.getTopicId());
+            }
         } else {
+            Set<TopicCategoryMapping> tcmset = new HashSet<>(tcmList);
+            tcmList = new ArrayList<>(tcmset);
             Collections.sort(tcmList, TopicCategoryMapping.SortByOrderValue);
-        }
 
-        for (TopicCategoryMapping tcm : tcmList) {
-            Topic topic2 = tcm.getTopic();
+            int counter = 1;
+            for (TopicCategoryMapping tcm : tcmList) {
+                Topic topic2 = tcm.getTopic();
 
-            topics.put(topic2.getTopicName(), topic2.getTopicId());
+                topics.put(counter + ". " + topic2.getTopicName(), topic2.getTopicId());
+
+                counter++;
+            }
         }
 
         arlist.add(topics);
@@ -1160,16 +1170,25 @@ public class AjaxController {
 
         if (cat == null) {
             Collections.sort(tcmList, TopicCategoryMapping.SortByTopicName);
+            for (TopicCategoryMapping tcm : tcmList) {
+                Topic topic2 = tcm.getTopic();
+
+                topics.put(topic2.getTopicName(), topic2.getTopicId());
+            }
         } else {
+            Set<TopicCategoryMapping> tcmset = new HashSet<>(tcmList);
+            tcmList = new ArrayList<>(tcmset);
             Collections.sort(tcmList, TopicCategoryMapping.SortByOrderValue);
+
+            int counter = 1;
+            for (TopicCategoryMapping tcm : tcmList) {
+                Topic topic2 = tcm.getTopic();
+
+                topics.put(counter + ". " + topic2.getTopicName(), topic2.getTopicId());
+
+                counter++;
+            }
         }
-
-        for (TopicCategoryMapping tcm : tcmList) {
-            Topic topic2 = tcm.getTopic();
-
-            topics.put(topic2.getTopicName(), topic2.getTopicId());
-        }
-
         arlist.add(topics);
 
         return arlist;
