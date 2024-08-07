@@ -1699,6 +1699,46 @@ $("#languageId1").change(function() {
 
 /**********************************************************************************************/
 			
+/***********************************Citation Start*********************************************/
+	
+			$("#categoryforCitation").change(function() {
+
+						var catgoryid = $(this).find(":selected").val();
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryforCitation",
+							data : {
+								"id" : catgoryid
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+								html += '<option value="0">Select Topic</option>';
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + key + '>'
+		  			               + value
+		  			               + '</option>';
+		  	  			        })
+	  	  			            html += '</option>';
+								$("#topicforCitation").prop('disabled',false);
+								$('#topicforCitation').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+/***********************************Citation End***********************************************/			
 			
 			
 /***************** changes made by om prakash *********************************************/
