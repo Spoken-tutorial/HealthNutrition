@@ -1737,7 +1737,7 @@ $("#languageId1").change(function() {
 					});
 
 
-$(document).ready(function () {
+/*$(document).ready(function () {
     const multiSelectWithoutCtrl = (elemSelector) => {
         $(elemSelector).find('option').on('mousedown', function (e) {
             e.preventDefault();
@@ -1748,7 +1748,29 @@ $(document).ready(function () {
 
     multiSelectWithoutCtrl("#topicforCitation");
 });
+*/
 
+ $(document).ready(function () {
+            const select = $('#topicforCitation');
+
+            // Handle clicks on options to toggle selection without Ctrl key
+            select.on('mousedown', 'option', function (e) {
+                e.preventDefault();
+                const option = $(this);
+                option.prop('selected', !option.prop('selected'));
+            });
+
+            // Handle Ctrl+A for selecting/deselecting all options
+            $(document).keydown(function (e) {
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    const allOptions = select.find('option');
+                    const allSelected = allOptions.length === allOptions.filter(':selected').length;
+
+                    allOptions.prop('selected', !allSelected);
+                }
+            });
+        });
 /***********************************Citation End***********************************************/			
 			
 			
