@@ -1523,7 +1523,7 @@ public class HomeController {
 
         model.addAttribute("sm_url", sm_url);
         model.addAttribute("sm_url2", sm_url2);
-        return "oldTutorial";
+        return viewTutorial(req, cat, topic, lan, 0, 0, 0, query, principal, model);
     }
 
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{catId}/{topicId}/{lanId}/{query}/")
