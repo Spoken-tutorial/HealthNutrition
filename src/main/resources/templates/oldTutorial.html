@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<html>
+<head th:replace="common/trail :: common-trail (pageTitle='Tutorial - Health And Nutrition')"> 
+
+<title>tutorials - Health And Nutrition</title> 
+
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
+	<section>
+		<div class="px-md-3">
+			<div class="row header-top pt-2">
+				<div
+					class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+					<!-- <div>
+						<p>
+							<a href="tel:1800-267-7782"> <span
+								class="contact-num top-banner p-2"><i
+									class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a>
+						</p>
+					</div> -->
+				</div>
+				<div
+					class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+					<div>
+						<p class="d-inline-block">
+							<span class="top-banner"> <a sec:authorize="isAnonymous()"
+								th:href="@{/login}">Login | New User</a> <a
+								sec:authorize="isAuthenticated()" th:href="@{/dashBoard}">My
+									Account</a>
+							</span>
+						</p>
+						<p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<nav th:replace="index.html :: navbar"></nav>
+	<div class="container">
+	<div th:replace="common/commonElements :: search_bar"></div> 
+	<!-- <section id="search-bar" class="container-lg my-5">
+<form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
+<div class="row" style="width: 100%;">
+<div class="col-md-3 mb-3">
+            <select class="custom-select d-block w-100" id="categoryname" name="categoryName">
+              <option value="0">Select Category</option>
+              <option th:each="category : ${categories}" th:value="${category.getCategoryId()}"><span th:text="${category.getCatName()}"></span></option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a valid foss.
+            </div>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputTopicName" name="topic">
+              <option value="0">Select Topic</option>
+              <option th:each="topic : ${topics}" th:value="${topic.getTopicId()}"><span th:text="${topic.getTopicName()}">Title ...</span></option>
+            </select>
+</div>
+<div class="col-md-3 mb-3">
+<select class="custom-select d-block w-100" id="inputLanguage" name="lan">
+              <option value="0">Select Language</option>
+              <option th:each="language : ${languages}" th:value="${language.getLanId()}"><span th:text="${language.getLangName()}">Title ...</span></option> 
+            </select>
+            <div class="invalid-feedback">
+              Please provide a valid language.
+            </div>
+</div>
+          <div class="col-md-3 mb-3" style="width: 100%;">
+           <button type="submit" class="btn btn-outline-info" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
+          </div>
+</div>
+</form>
+          
+</section> -->
+	</div>
+	<main id="tutorialPage" class=" p-4">
+		<section id="t-video">
+			<div class="my-2 title">
+				<h1>
+					<span
+						th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}">
+					</span> : <span
+						th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"
+						style="color: black;"> (Topic)</span>: <span
+						th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"
+						style="color: black;"> (Language)</span>
+				</h1>
+			</div>
+			<div class="row">
+				<div class="col-md-8 p-2">
+											
+			<video id="storedVideoId" style="  top: 0; left: 0; width: 100%; height: 100%;" class="video-fluid z-depth-1 vid1"  controls autoplay >
+  			<source th:src="@{/files/}+@{${tutorial.getVideo()}}" type="video/mp4" />
+  			
+  			 <!-- Condition for English tutorial -->
+   			 <track kind="captions" th:if="${languageCheck == 'English'}" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" />
+			
+			 <!-- Condition for non-English tutorial -->
+   			 <track kind="captions" th:unless="${languageCheck == 'English'}" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
+   			 <track kind="captions" th:unless="${languageCheck == 'English'}" th:label="${labelforEnglish}" th:src="@{/files/} + @{${vttFileforEnglish}}" th:srclang="${srclangforEnglish}" />
+
+
+			</video>
+			
+			
+				</div>
+				<div class="col-md-4 px-4 d-none d-md-block" >
+					<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
+					<div class="t-related">
+					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+			
+			
+				  <a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} + '/' + 'q' +'/'} " class="col-12">
+							
+							
+							<!--<div class="col-md-4">
+							</div>  -->
+							
+							
+								<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >
+								
+								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></span></h4>
+								<h6><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span></h6>
+							</div>
+					</a>
+					</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section th:if="${tutorial.getPreRequistic() != null}"><p>Watch pre-requisite : <a th:href="@{'/tutorialView/'+ ${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getPreRequistic().getConAssignedTutorial().getLan().getLangName()}+ '/' +${query} +'/'}">
+		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span> :
+		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span>
+		</a></p></section>
+		<section><p> User Visit : <span th:text="${tutorial.getUserVisit()}"/></p></section>
+		<section><div class="col-md-8" id="scrolling-captions" style="max-height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #ccc;"></div>
+		<div class="col-md-4"></div>
+</section>
+		<section id="t-content" class="row">
+			<div id="resources" class="col-md-8">
+				<ul class="nav nav-pills mb-3 nav-justified  mx-1" id="pills-tab"
+					role="tablist">
+					<li class="nav-item link-style"><a class="nav-link active"
+						id="pills-home-tab" data-toggle="pill" href="#pills-home"
+						role="tab" aria-controls="pills-home" aria-selected="true"><i
+							class="far fa-newspaper mr-2 t-icon"></i> Outline</a></li>
+					<li class="nav-item link-style"><a class="nav-link"
+						id="pills-script-tab" data-toggle="pill" href="#pills-script"
+						role="tab" aria-controls="pills-script" aria-selected="false"><i
+							class="far fa-file-alt mr-2 t-icon"></i>Scripts &amp; Other Resources</a></li>
+					
+				</ul>
+				<div class="tab-content px-0 py-3" id="pills-tabContent-tutorial"
+					style="height: 250px; overflow: auto;">
+					<div class="tab-pane fade show active px-1" id="pills-home" 
+						role="tabpanel" aria-labelledby="pills-home-tab">
+						<p th:utext="${tutorial.getOutline()}"></p>
+					</div>
+					<div class="tab-pane fade px-5" id="pills-script" role="tabpanel"
+						aria-labelledby="pills-script-tab">
+						<ul class="pl-10">
+							<li th:if="${!sm_url.isEmpty()}" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
+							
+							<a class="originalScriptClass" 
+								th:value="${tutorial.getTutorialId()}"
+								th:href="${'/OriginalScript/' + tutorial.getTutorialId()}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Original Script</a>
+								
+								
+								
+								
+								<!-- th:if="${tutorial.getScript()}" -->
+								<!-- <a
+								th:unless="${tutorial.getScript()}"
+								 th:href="@{/files/}+@{${tutorial.getScript()}}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Original Script</a> -->
+								
+							<a
+								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
+								<li  th:if="${!sm_url2.isEmpty()}" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
+								<a 
+								th:href="@{${sm_url2}}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Create a New Original Script (Requires login on scriptmanager)</a>
+								<a
+								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
+								
+								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a 
+								th:if="${tutorial.getScriptStatus() != 0}"
+								th:href="${'/TimeScript/' + tutorial.getTutorialId()}" name="ScriptPdf"
+								target="_blank" id="ScriptPdf">Timed Script</a> <a
+								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								
+							<li class="mb-3" th:unless="${relatedContent}"><i class="fas fa-file-download mr-3"></i> 
+							<a  name="sliedPdf" th:if="${tutorial.getSlideStatus() != 0}" target="_blank" th:href="${'/Slide/' + tutorial.getTutorialId()}"
+																	id="sliedPdf"> Slide</a>
+							</li>
+							<li class="mb-3" th:if="${relatedContent}"><i class="fas fa-file-download mr-3"> </i> 
+							<a name="sliedPdf" target="_blank" th:href="${'/Slide/' + tutorial.getTutorialId()}"
+																	id="sliedPdf"> Slide</a>
+							</li>
+						</ul>
+					</div>
+					<div class="tab-pane fade px-5" id="pills-slides" role="tabpanel"
+						aria-labelledby="pills-slides-tab">
+						<div>
+							<a
+								href="http://spoken-tutorial.org/media/videos/100/1447/resources/Protein-rich-vegetarian-recipes-Slides.zip"
+								download="script"> <i class="fas fa-file-download mr-3"></i>
+								Slides
+							</a>
+						</div>
+					</div>
+
+				</div>
+				
+				<div class="px-0 d-md-none">
+				<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
+					<div class="t-related">
+					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+					  <a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} + '/' + 'q' +'/'} " class="col-12">
+							
+							<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >
+								
+								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></span></h4>
+								<h6><span th:text="${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span></h6>
+							</div>
+					</a>
+					</div>
+					</div>
+					</div>
+			</div>
+			<div id="t-related" class="col-md-4"></div>
+		</section>
+		
+		
+
+	</main>
+	 <br><br>
+	 
+	  <footer class="footer" style="margin-bottom:0px;">
+	  <div class="container" >
+	  
+	  <div class="row"  height="50%" >
+	   <div class="col text-center justify-content" style=" padding-top:12px; height:50%;"> <p> <i class="fas fa-map-marker-alt contact-icon" ></i> Spoken Tutorial Project,<br>
+			TCS Lab,Behind CAD Centre,<br>
+			IIT Bombay, Powai,<br>
+			Mumbai - 400076
+   			</p> 
+   	 </div>
+	  
+	  <div class="col text-center" style=" padding-top:12px; height:50%;"> 
+	
+	  		<p><a href="mailto:health@spoken-tutorial.org"><i class="fas fa-envelope contact-icon mr-2"></i><span style="color:white;"> health@spoken-tutorial.org</span> </a></p>
+		    <p><a href="tel:02225764229"><i class="fas fa-phone-alt contact-icon mr-2"></i><span style="color:white;">022 2576 4229 </span> </a></p>
+	  
+	   </div>
+	   
+	  <div class="col  text-center " style="padding-top:10px; height:50%;">
+		  <a href="https://www.iitb.ac.in/" target="_blank"> <img th:src="@{/image/iitb-logo.png}" width="50%" height="50%"  alt="IITB" > </img>	
+    	  <p class="text-centre"><span  style="color:white;">Developed at IIT-Bombay</span></p></a>
+	  
+	  </div>
+	  
+	  <div class="col   justify-content " style="padding-top:5px; height:30%; ">
+		   	
+		    <p><a href="https://www.youtube.com/channel/UCmyV3lKT1Gs1AfgtV8pp__Q" class="fab fa-youtube fa-1x" style="color: #ed302f;"  target="_blank"> <span  style="color:white; font-size: 14px;">ST Health YouTube Channel</span></a></p>
+		    <p><a href="https://www.youtube.com/user/SpokenTutorialIITB" class="fab fa-youtube fa-1x" style="color: #ed302f;" target="_blank"> <span  style="color: white; font-size: 14px;">ST YouTube Channel</span>  </a> </p>
+		    <p><a href="https://www.facebook.com/SpokenTutorial.org" class="fab fa-facebook-f fa-1x" style="color: #3b5998;" target="_blank"> <span  style="color: white; font-size: 14px;"> ST Facebook Page</span> </a></p>
+    		<p><a href="https://www.linkedin.com/company/spokentutorial?original_referer=" class="fab fa-linkedin-in fa-1x" style="color: #0082ca;" target="_blank">  <span  style="color:white; font-size: 14px;">ST LinkedIn Page</span> </a>  </p>
+    		
+    		<!-- <a href="#" class="fa fa-instagram"></a>    -->	
+   			
+	  </div>
+	 
+	  </div>
+	  
+	  </div>
+	
+    </footer>
+ 
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	
+<style>
+  :root {
+  --plyr-color-main: #ff9033;
+  --plyr-video-control-color: #ffffff;
+}
+.plyr__control[data-plyr="download"] svg {
+  fill:#ffffff; /* change to your desired color */
+}
+
+ 
+
+ </style>
+<script>
+		var projectPath='[(@{/})]';		
+		//var videos = document.querySelectorAll('video');
+			
+		
+			 var controls =
+[
+    'play-large', // The large play button in the center
+   // 'restart', // Restart playback
+   // 'rewind', // Rewind by the seek time (default 10 seconds)
+    'play', // Play/pause playback
+    //'fast-forward', // Fast forward by the seek time (default 10 seconds)
+    'progress', // The progress bar and scrubber for playback and buffering
+    'current-time', // The current time of playback
+    //'duration', // The full duration of the media
+    'mute', // Toggle mute
+    'volume', // Volume control
+   'captions',  // Toggle captions
+    'settings', // Settings menu
+    'pip', // Picture-in-picture (currently Safari only)
+    'airplay', // Airplay (currently Safari only)
+    'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+    'fullscreen' // Toggle fullscreen
+];
+
+  const player = new Plyr('.vid1',{controls});
+			
+	</script>
+	
+	
+	<!-- JavaScript for scrolling captions -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('storedVideoId');
+         video.muted = false;
+
+        // Attempt to play the video with sound
+        video.play().catch(error => {
+            console.error("Autoplay with sound was prevented by the browser.", error);
+            
+        });
+        const captions = video.textTracks[0]; // fetching captions from the first track
+        const scrollingCaptions = document.getElementById('scrolling-captions');
+
+        // Load and display all captions initially
+        captions.mode = 'hidden';
+        captions.oncuechange = function () {
+            scrollingCaptions.innerHTML = ''; // Clear previous captions
+
+            for (let i = 0; i < captions.cues.length; i++) {
+                const cue = captions.cues[i];
+                const captionDiv = document.createElement('div');
+
+                // Format the start time to a readable format (e.g., mm:ss)
+                const startTime = formatTime(cue.startTime);
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.textContent = `${startTime} - `;
+                timeSpan.classList.add('time');
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = cue.text;
+                textSpan.classList.add('text');
+
+                captionDiv.appendChild(timeSpan);
+                captionDiv.appendChild(textSpan);
+                captionDiv.classList.add('caption');
+                captionDiv.setAttribute('data-start', cue.startTime);
+                captionDiv.setAttribute('data-end', cue.endTime);
+                captionDiv.style.padding = '5px 0'; // Inline CSS for caption padding
+                scrollingCaptions.appendChild(captionDiv);
+            }
+        };
+
+        video.addEventListener('timeupdate', function () {
+            const currentTime = video.currentTime;
+            updateScrollingCaptions(currentTime);
+        });
+
+        function updateScrollingCaptions(currentTime) {
+            const captionsDivs = document.querySelectorAll('#scrolling-captions .caption');
+            
+            captionsDivs.forEach(div => {
+                const start = parseFloat(div.getAttribute('data-start'));
+                const end = parseFloat(div.getAttribute('data-end'));
+                const textSpan = div.querySelector('.text');
+                
+                if (currentTime >= start && currentTime <= end) {
+                    textSpan.classList.add('highlight');
+                    textSpan.style.padding = '4px'; // Add padding around the text
+                    textSpan.style.backgroundColor = '#343AC4'; // Inline CSS for highlight
+                    textSpan.style.color = 'white';
+                    const offsetTop = div.offsetTop;
+                    scrollingCaptions.scrollTop = offsetTop - scrollingCaptions.offsetHeight / 2 + div.offsetHeight / 2;
+                } else {
+                    textSpan.classList.remove('highlight');
+                    textSpan.style.backgroundColor = ''; // Remove highlight
+                }
+            });
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+    });
+</script>
+
+
+</body>
+</html>

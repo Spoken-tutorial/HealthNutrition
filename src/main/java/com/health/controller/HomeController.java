@@ -1348,6 +1348,184 @@ public class HomeController {
         return languageAndCodeMapping.getOrDefault(languageName, "Unknown");
     }
 
+    @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
+    public String viewoldTutorialLink(HttpServletRequest req, @PathVariable(name = "catName") String cat,
+            @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
+            @PathVariable(name = "query") String query, Principal principal, Model model) {
+
+        Category catName = catService.findBycategoryname(cat);
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        if (query.equals("q")) {
+            query = "";
+        }
+        if (catName == null) {
+            return "redirect:/";
+        }
+
+        if (!catName.isStatus()) {
+            catName = null;
+        }
+
+        Topic topicName = topicService.findBytopicName(topic);
+        Language lanName = lanService.getByLanName(lan);
+        TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
+        ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+
+        int catId = catName.getCategoryId();
+        int topicId = topicName.getTopicId();
+        int lanId = lanName.getLanId();
+
+        if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
+            return "redirect:/";
+        }
+
+        List<Tutorial> tempTutorials = tutService.findAllByContributorAssignedTutorialEnabled(conTut);
+        if (tempTutorials == null || tempTutorials.size() == 0) {
+            return "redirect:/";
+
+        }
+
+        Tutorial tutorial = tempTutorials.get(0);
+
+        List<Tutorial> relatedTutorial = new ArrayList<>();
+
+        if (tutorial == null || tutorial.isStatus() == false) {
+
+            return "redirect:/";
+        }
+
+        tutorial.setUserVisit(tutorial.getUserVisit() + 1);
+        tutService.save(tutorial);
+        // Caption Start
+
+        if (!lan.equals("English")) {
+
+            Language lanEnglish = lanService.getByLanName("English");
+
+            ContributorAssignedTutorial conTutforEnglish = conRepo.findByTopicCatAndLanViewPart(topicCatMap,
+                    lanEnglish);
+
+            List<Tutorial> tempTutorialsforEnglish = tutService
+                    .findAllByContributorAssignedTutorialEnabled(conTutforEnglish);
+            if (tempTutorialsforEnglish == null || tempTutorialsforEnglish.size() == 0) {
+                return "redirect:/";
+
+            }
+
+            Tutorial tutorialforEnglish = tempTutorialsforEnglish.get(0);
+            Path vttPathforEnglish = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryTimeScriptvttFile, tutorialforEnglish.getTutorialId() + ".vtt");
+            String tempStringEnglish = vttPathforEnglish.toString();
+            int indexToStart1 = tempStringEnglish.indexOf("Media");
+
+            String vttFileforEnglish = tempStringEnglish.substring(indexToStart1, tempStringEnglish.length());
+            logger.info("vttFileforEnglish:{}", vttFileforEnglish);
+            model.addAttribute("vttFileforEnglish", vttFileforEnglish);
+            model.addAttribute("labelforEnglish", "English");
+
+            String languageCodeforEnglish = getLanguageCode("English");
+            model.addAttribute("srclangforEnglish", languageCodeforEnglish);
+
+        }
+        Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryTimeScriptvttFile, tutorial.getTutorialId() + ".vtt");
+        String tempString = srtPath.toString();
+        int indexToStart = tempString.indexOf("Media");
+
+        String vttFile = tempString.substring(indexToStart, tempString.length());
+        logger.info("vttFile:{}", vttFile);
+        model.addAttribute("vttFile", vttFile);
+        model.addAttribute("label", lan);
+
+        String languageCode = getLanguageCode(lan);
+        model.addAttribute("srclang", languageCode);
+        model.addAttribute("languageCheck", lan);
+
+        // Caption End
+
+        model.addAttribute("tutorial", tutorial);
+
+        if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
+            model.addAttribute("relatedContent", tutorial.getRelatedVideo());
+        }
+
+        Category category = catService
+                .findByid(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
+        List<TopicCategoryMapping> topicCatMapping = topicCatService.findAllByCategory(category);
+        List<ContributorAssignedTutorial> contriAssignedTut = conRepo.findAllByTopicCat(topicCatMapping);
+        List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList1(contriAssignedTut);
+
+        for (Tutorial x : tutorials) {
+            if (x == tutorial) {
+                continue;
+            }
+
+            if (x.getConAssignedTutorial().getLan().getLangName()
+                    .equalsIgnoreCase(tutorial.getConAssignedTutorial().getLan().getLangName())) {
+                relatedTutorial.add(x);
+            }
+
+        }
+
+        Collections.sort(relatedTutorial, Tutorial.UserVisitComp);
+
+        model.addAttribute("tutorials", relatedTutorial);
+
+        Set<String> catTemp = new HashSet<String>();
+        Set<String> topicTemp = new HashSet<String>();
+        Set<String> lanTemp = new HashSet<String>();
+
+        List<Tutorial> tutorialse = tutService.findAllByStatus(true);
+        for (Tutorial temp : tutorialse) {
+            ContributorAssignedTutorial conAssignedTutorial = temp.getConAssignedTutorial();
+            catTemp.add(conAssignedTutorial.getTopicCatId().getCat().getCatName());
+            lanTemp.add(conAssignedTutorial.getLan().getLangName());
+            topicTemp.add(conAssignedTutorial.getTopicCatId().getTopic().getTopicName());
+        }
+
+        getModelData(model, catId, topicId, lanId, query);
+        List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
+                tutorial.getTutorialId(), lanName.getLanId());
+        String sm_url = "";
+        String sm_url2 = "";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(scriptmanager_url);
+        sb.append(scriptmanager_path);
+        sb.append(String.valueOf(category.getCategoryId()));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getTutorialId()));
+        sb.append("/");
+        sb.append(String.valueOf(lanName.getLanId()));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+        sb.append("/");
+        if (scriptVerList != null && scriptVerList.size() > 0) {
+
+            StringBuilder sb2 = new StringBuilder(sb);
+            sb2.append(scriptVerList.get(0));
+            sm_url = sb2.toString();
+        }
+
+        if (principal != null) {
+
+            boolean flag = checkRole(usr, category, lanName);
+            if (flag) {
+                StringBuilder sb1 = new StringBuilder(sb);
+                sb1.append('2');
+                sm_url2 = sb1.toString();
+
+            }
+        }
+
+        model.addAttribute("sm_url", sm_url);
+        model.addAttribute("sm_url2", sm_url2);
+        return "oldTutorial";
+    }
+
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{catId}/{topicId}/{lanId}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
