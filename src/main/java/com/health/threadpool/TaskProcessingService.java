@@ -308,7 +308,6 @@ public class TaskProcessingService {
         String documentPathforOriginalScript = createJsonSmUrl(tutorial);
 
         int rank = tutorial.getUserVisit() + 3 * tutorial.getResourceVisit();
-
         int languageId = conAssignedTutorial.getLan().getLanId();
         String language = conAssignedTutorial.getLan().getLangName();
         TopicCategoryMapping topicCat = conAssignedTutorial.getTopicCatId();
