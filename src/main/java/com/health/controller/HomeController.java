@@ -1348,6 +1348,14 @@ public class HomeController {
         return languageAndCodeMapping.getOrDefault(languageName, "Unknown");
     }
 
+    @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{query}/")
+    public String viewoldTutorialLink(HttpServletRequest req, @PathVariable(name = "catName") String cat,
+            @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
+            @PathVariable(name = "query") String query, Principal principal, Model model) {
+
+        return viewTutorial(req, cat, topic, lan, 0, 0, 0, query, principal, model);
+    }
+
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{catId}/{topicId}/{lanId}/{query}/")
     public String viewTutorial(HttpServletRequest req, @PathVariable(name = "catName") String cat,
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
