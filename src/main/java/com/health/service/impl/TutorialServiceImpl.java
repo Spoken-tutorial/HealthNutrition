@@ -832,4 +832,11 @@ public class TutorialServiceImpl implements TutorialService {
         return tutorialRepo.findTutorialsWithStatusTrueAndCategoryEnabledAndLanEnglishAndCitationIsNull();
     }
 
+    @Override
+    public List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNullByCategory(Category cat) {
+
+        return tutorialRepo.findTutorialsByCategoryAndStatusTrueAndCategoryEnabledAndLanEnglishAndCitationIsNull(
+                cat.getCategoryId());
+    }
+
 }

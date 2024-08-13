@@ -947,12 +947,13 @@ public class AjaxController {
         Category cat = catService.findByid(id);
         logger.info("Variables of getTopicByCategory catId :{} category : {}", id, cat);
 
-        List<Tutorial> tutorials = tutService.findAllEnabledEnglishTuorialsWithCitationIsNull();
+        List<Tutorial> tutorials = tutService.findAllEnabledEnglishTuorialsWithCitationIsNullByCategory(cat);
 
         for (Tutorial temp : tutorials) {
-            if (temp.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId() == cat.getCategoryId())
-                topicName.put(temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicId(),
-                        temp.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+
+            Topic topic = temp.getConAssignedTutorial().getTopicCatId().getTopic();
+            topicName.put(topic.getTopicId(), topic.getTopicName());
+            topicName.put(topic.getTopicId(), topic.getTopicName());
         }
 
         return topicName;
