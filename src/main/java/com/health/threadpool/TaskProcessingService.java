@@ -325,8 +325,10 @@ public class TaskProcessingService {
         if (tutorial.getOutlinePath() != null) {
             outlinePath = Optional.of(tutorial.getOutlinePath());
         }
+        boolean scriptUrlStatus = isURLWorking(documentPathforOriginalScript);
 
-        if (requestType.equals(CommonData.ADD_DOCUMENT) && !tutorial.isAddedQueue() && !sm_url.isEmpty()) {
+        if (requestType.equals(CommonData.ADD_DOCUMENT) && !tutorial.isAddedQueue() && !sm_url.isEmpty()
+                && scriptUrlStatus) {
 
             if (languageId == 22) {
 
@@ -355,7 +357,7 @@ public class TaskProcessingService {
 
         }
 
-        else if (tutorial.isAddedQueue()) {
+        else if (tutorial.isAddedQueue() && scriptUrlStatus) {
             if (requestType.equals(CommonData.UPDATE_DOCUMENT) || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
                     || requestType.equals(CommonData.DELETE_DOCUMENT)) {
 

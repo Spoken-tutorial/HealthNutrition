@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -7218,6 +7219,7 @@ public class HomeController {
 
         List<Brouchure> brouchures = broService.findAllBrouchuresForCache();
         List<Language> languages = lanService.getAllLanguages();
+        Set<Language> brochurelanguages = new HashSet<>();
 
         List<Version> versions = new ArrayList<Version>();
         for (Brouchure bro : brouchures) {
@@ -7230,13 +7232,17 @@ public class HomeController {
         List<FilesofBrouchure> filesList = new ArrayList<>();
         for (Version ver1 : versions) {
             for (Language lan : languages) {
+
                 FilesofBrouchure filesBro = filesofbrouchureService.findByLanguageandVersion(lan, ver1);
                 if (filesBro != null) {
+                    brochurelanguages.add(lan);
                     filesList.add(filesBro);
                 }
             }
         }
 
+        languages = new ArrayList<>(brochurelanguages);
+        languages.sort(Comparator.comparing(Language::getLangName));
         model.addAttribute("filesList", filesList);
         model.addAttribute("brouchures", brouchures);
         model.addAttribute("versions", versions);
