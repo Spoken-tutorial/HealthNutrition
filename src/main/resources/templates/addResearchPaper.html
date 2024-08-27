@@ -126,10 +126,10 @@ font-weight:bold!important;
 								 <td>
 	  		
 	   			<div th:if="${res.isShowOnHomepage()}">
-	   				<a class="disableResearchPaper" th:value="${res.getId()}" title="Click to Disable Brochure"><i class="fas fa-times-circle" th:id="${res.getId()}" style="color:red"></i></a>
+	   				<a class="disableResearchPaper" th:value="${res.getId()}" title="Click to Disable ResearchPaper"><i class="fas fa-times-circle" th:id="${res.getId()}" style="color:red"></i></a>
 	   			</div>
 	   			<div th:unless="${res.isShowOnHomepage()}">
-	   				<a class="enableResearchPaper" th:value="${res.getId()}" title="Click to Enable Brochure"><i class="fas fa-check-circle" th:id="${res.getId()}" style="color:green"></i> </a>
+	   				<a class="enableResearchPaper" th:value="${res.getId()}" title="Click to Enable ResearchPaper"><i class="fas fa-check-circle" th:id="${res.getId()}" style="color:green"></i> </a>
 	   			</div>
 	   		
 	  

@@ -27,6 +27,8 @@ public interface EventRepository extends CrudRepository<Event, Integer> {
     @Query("select max(eventId) from Event")
     int getNewId();
 
+    List<Event> findAllByshowOnHomepage(boolean value);
+
     /**
      * Find List of Event object given user object
      * 

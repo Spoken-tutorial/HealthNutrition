@@ -265,6 +265,7 @@ font-weight:bold!important;
       <th scope="col">Start Date</th>
       <th scope="col">End Date</th>
       <th scope="col">Poster</th>
+      <th scope="col">Enable/Disable</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
@@ -282,6 +283,17 @@ font-weight:bold!important;
       <td><img th:if="${event.getPosterPath()!=null}" id="imagesource" th:src="@{${'/files/' + event.getPosterPath()}}"
 			style="width: 150px; height: 100px" />
 			<span th:unless="${event.getPosterPath()!=null}"> NA</span>
+	  </td>
+	   <td>
+	  		
+	   			<div th:if="${event.isShowOnHomepage()}">
+	   				<a class="disableEvent" th:value="${event.getEventId()}" title="Click to Disable Event"><i class="fas fa-times-circle" th:id="${event.getEventId()}" style="color:red"></i></a>
+	   			</div>
+	   			<div th:unless="${event.isShowOnHomepage()}">
+	   				<a class="enableEvent" th:value="${event.getEventId()}" title="Click to Enable Event"><i class="fas fa-check-circle" th:id="${event.getEventId()}" style="color:green"></i> </a>
+	   			</div>
+	   		
+	  
 	  </td>
 	  <td><a th:href="@{${'/event/edit/' + event.getEventId()}}">Edit</a></td>
 	  <!-- </div> -->

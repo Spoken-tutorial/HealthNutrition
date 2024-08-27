@@ -658,7 +658,7 @@ public class HomeController {
     @RequestMapping("/")
     public String index(Model model) {
 
-        List<Event> events = eventservice.findAllEventForCache(); // findAllEvent();
+        List<Event> events = eventservice.findAllEnabledEventForCache(); // findAllEvent();
         List<Testimonial> testi = testService.findAllTestimonialByapprovedForCache(); // findAllTestimonialByapproved();
         List<Consultant> consults = consultService.findAllConsultHomeTrueForCache(); // findAllConsultHomeTrue();
         List<Brouchure> brochures = broService.findAllBrouchuresForCache(); // findAllBrouchures();
@@ -1548,7 +1548,7 @@ public class HomeController {
     public String showEventGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
-        List<Event> events = eventservice.findAll();
+        List<Event> events = eventservice.findAllEnabledEventForCache();
 
         model.addAttribute("Events", events);
         return "events";

@@ -70,6 +70,8 @@ public class Event implements Serializable {
     @Column(name = "email", nullable = false)
     private String email;
 
+    private boolean showOnHomepage = false;
+
     /**
      * relative path of poster
      */
@@ -161,6 +163,14 @@ public class Event implements Serializable {
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public boolean isShowOnHomepage() {
+        return showOnHomepage;
+    }
+
+    public void setShowOnHomepage(boolean showOnHomepage) {
+        this.showOnHomepage = showOnHomepage;
     }
 
     public String getDescription() {

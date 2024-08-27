@@ -112,8 +112,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Cacheable(cacheNames = "events")
-    public List<Event> findAllEventForCache() {
-        return eventRepo.findAll();
+    public List<Event> findAllEnabledEventForCache() {
+        return eventRepo.findAllByshowOnHomepage(true);
     }
 
 }

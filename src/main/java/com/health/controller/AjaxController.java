@@ -580,6 +580,32 @@ public class AjaxController {
 
     }
 
+    @GetMapping("/enableDisableEvent")
+    public @ResponseBody boolean enableDisableEvent(int id) {
+        Event event = eventService.findById(id);
+
+        try {
+            if (event.isShowOnHomepage()) {
+
+                event.setShowOnHomepage(false);
+
+                eventService.save(event);
+                return true;
+
+            } else {
+                event.setShowOnHomepage(true);
+
+                eventService.save(event);
+                return true;
+            }
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Event: {}", event, e);
+            return false;
+        }
+
+    }
+
     /*
      * A function to get primary version by checked and unchecked checkbox Author:
      * Alok Kumar
