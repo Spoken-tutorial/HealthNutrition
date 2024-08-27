@@ -252,6 +252,14 @@ public class User implements UserDetails, Serializable {
         this.username = username;
     }
 
+    public Set<SpokenVideo> getSpokenvideos() {
+        return spokenvideos;
+    }
+
+    public void setSpokenvideos(Set<SpokenVideo> spokenvideos) {
+        this.spokenvideos = spokenvideos;
+    }
+
     @Override
     public String getPassword() {
         return password;

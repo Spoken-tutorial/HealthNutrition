@@ -6,28 +6,18 @@ import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-/**
- * category Object to store category related data on database
- * 
- * @author om prakash soni
- * @version 1.0
- */
 @Entity
-
 public class SpokenVideo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, updatable = false)
-    private int id;
+    private int spokenVideoId;
 
     @Column(name = "display_name", nullable = false, unique = true)
     private String displayName;
@@ -35,21 +25,12 @@ public class SpokenVideo implements Serializable {
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    /**
-     * Timestamp on added
-     */
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
-    /**
-     * relative path of image stored
-     */
-    @Column(name = "file_path", nullable = false)
+    @Column(name = "file_path", nullable = false, unique = true)
     private String filePath;
 
-    /**
-     * description of category
-     */
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
@@ -59,6 +40,10 @@ public class SpokenVideo implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "lan_id")
+    private Language lan;
 
     public Timestamp getDateAdded() {
         return dateAdded;
@@ -76,20 +61,28 @@ public class SpokenVideo implements Serializable {
         this.user = user;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getDisplayName() {
         return displayName;
     }
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public int getSpokenVideoId() {
+        return spokenVideoId;
+    }
+
+    public void setSpokenVideoId(int spokenVideoId) {
+        this.spokenVideoId = spokenVideoId;
+    }
+
+    public Language getLan() {
+        return lan;
+    }
+
+    public void setLan(Language lan) {
+        this.lan = lan;
     }
 
     public String getFileName() {
@@ -116,10 +109,27 @@ public class SpokenVideo implements Serializable {
         this.fileSize = fileSize;
     }
 
+    public SpokenVideo() {
+
+    }
+
+    public SpokenVideo(int spokenVideoId, String displayName, String fileName, Timestamp dateAdded, String filePath,
+            Long fileSize, User user, Language lan) {
+        super();
+        this.spokenVideoId = spokenVideoId;
+        this.displayName = displayName;
+        this.fileName = fileName;
+        this.dateAdded = dateAdded;
+        this.filePath = filePath;
+        this.fileSize = fileSize;
+        this.user = user;
+        this.lan = lan;
+    }
+
     @Override
     public String toString() {
-        return "SpokenVideo [id=" + id + ", displayName=" + displayName + ", fileName=" + fileName + ", dateAdded="
-                + dateAdded + ", filePath=" + filePath + ", fileSize=" + fileSize + ", user=" + user + "]";
+        return "SpokenVideo [spokenVideoId=" + spokenVideoId + ", displayName=" + displayName + ", fileName=" + fileName
+                + ", dateAdded=" + dateAdded + ", filePath=" + filePath + ", fileSize=" + fileSize + "]";
     }
 
 }

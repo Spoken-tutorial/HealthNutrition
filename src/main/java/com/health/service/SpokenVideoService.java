@@ -16,4 +16,8 @@ public interface SpokenVideoService {
 
     SpokenVideo findByDisplayName(String displayName);
 
+    SpokenVideo findByFilePath(String filePath);
+
+    int getNewSpokenVideoId();
+
 }

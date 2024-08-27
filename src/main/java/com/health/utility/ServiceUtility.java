@@ -369,6 +369,15 @@ public class ServiceUtility {
         return true;
     }
 
+    public static boolean checkVideoSizeSpokenVideo(MultipartFile temp) {
+        logger.info("Video Size:{}", temp.getSize());
+        if (temp.getSize() > CommonData.videoSizeSpokenVideo) {
+
+            return false;
+        }
+        return true;
+    }
+
     public static boolean checkVideoSizePromoVideo(MultipartFile temp) {
         logger.info("Video Size: {}", temp.getSize());
         if (temp.getSize() > CommonData.videoSizePromoVideo) {
