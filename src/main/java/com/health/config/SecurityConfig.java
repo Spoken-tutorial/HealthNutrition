@@ -86,7 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String[] CONTRIBUTOR_URL = { "/uploadTutorial/**", "/addOutline/**", "/addKeyword**",
             "/addPreRequisticWhenNotRequired/**", "/addPreRequistic/**", "/addVideo/**", "/addSlide/**",
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
-            "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo",
+            "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**",
 
     };
 
@@ -145,7 +145,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/addBrochure/**", "/addCarousel/**", "/addConsultant/**", "/addEvent/**",
                         "/addTestimonial/**", "/addPromoVideo/**", "/addResearchPaper/**", "/brochure/edit/**",
                         "/promoVideo/edit/**", "/carousel/edit/**", "/event/edit/**", "/testimonial/edit/**",
-                        "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**")
+                        "/researchPaper/edit/**", "/enableDisableBrouchure/**", "/enableDisableConsultant/**",
+                        "/enableDisableTestimonial/**")
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
 
