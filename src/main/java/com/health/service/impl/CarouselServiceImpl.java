@@ -93,6 +93,6 @@ public class CarouselServiceImpl implements CarouselService {
     @Override
     @Cacheable(cacheNames = "carousels")
     public List<Carousel> findCarouselForCache() {
-        return repo.findAll();
+        return repo.findAllByshowOnHomepage(true);
     }
 }

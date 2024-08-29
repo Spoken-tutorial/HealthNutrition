@@ -40,6 +40,10 @@
     	background:#fff;
     }
     .carousel-indicators li{
+		 width: 20px; /* Adjust the width as needed */
+  		 
+    	
+   		
     	background-color: orange!important;
     }
     .carousel-indicators{
@@ -153,8 +157,10 @@ the globe.
         <br>
         <br>
         <a href="https://script.spoken-tutorial.org/index.php/Health_and_Nutrition" class="button spk-btn mb-2" target="_blank">Know More</a>
+       
               </span>
-              
+            <br>   
+            <br>  
 		</div>
 		<div class="col-md-6" th:if="${carousel}">
 <div id="myCarousel" class="carousel slide" data-ride="carousel">
@@ -166,17 +172,17 @@ the globe.
   <div class="carousel-inner mt-sm-3 mt-md-0">
      <div class="carousel-item active">
       <img th:src="@{/files/}+@{${carousel.getPosterPath()}}" class="d-block w-100" alt="..." style="height:400px;">
-      <div class="carousel-caption">
+      <!--div class="carousel-caption">
         <p th:text="${carousel.getEventName()}" class="c-header"></p>
         <p th:text="${carousel.getDescription()}" class="c-text"></p>
-      </div>
+      </div-->
     </div> 
  <div class="carousel-item " th:each="c: ${carouselList}">
       <img th:src="@{/files/}+@{${c.getPosterPath()}}" class="d-block w-100" alt="..." style="height:400px;">
-      <div class="carousel-caption">
+      <!--div class="carousel-caption">
         <p th:text="${c.getEventName()}" class="c-header"></p>
         <p th:text="${c.getDescription()}" class="c-text"></p>
-      </div>
+      </div -->
     </div> 
     
   </div>

@@ -722,7 +722,7 @@ public class HomeController {
 
         categoryHome = (catTempSorted.size() > upperlimit) ? catTempSorted.subList(0, upperlimit) : catTempSorted;
         versionHome = (versions.size() > upperlimit) ? versions.subList(0, upperlimit) : versions;
-        carouselHome = (carousel.size() > upperlimit) ? carousel.subList(0, upperlimit) : carousel;
+        carouselHome = (carousel.size() > 5) ? carousel.subList(0, 5) : carousel;
         promoVideoHome = (promoVideos.size() > 1) ? promoVideos.subList(0, 1) : promoVideos;
         researchPapersHome = (researchPapers.size() > upperlimit) ? researchPapers.subList(0, upperlimit)
                 : researchPapers;
