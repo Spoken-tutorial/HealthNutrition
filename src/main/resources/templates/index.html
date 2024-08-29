@@ -250,7 +250,7 @@ the globe.
 	    	<div class="col-md-4 col-lg-3 br-right br-bottom py-3" th:each="category : ${listofCategories}">
 	    	<div class="d-flex flex-column align-items-center ">
 	    		<div>
-	    		<img th:src="@{/files/}+@{${category.getPosterPath()}}" width="80px" style="max-width: 80px;height: auto;" class="d-block"/>
+	    		<img th:src="@{/files/}+@{${category.getPosterPath()}}" width="200px" style="max-width: 200px;height: auto;" class="d-block"/>
 	    		</div>
 	    		<hr style="border: 1px solid orange; width: 50%;">
 	    		<p class="mb-1"><span th:text="${category.getCatName()}"></span></p>

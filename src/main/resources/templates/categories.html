@@ -41,7 +41,7 @@ border-right: 2px solid #014F7A;
 					            <tbody>
 					            	<tr th:each="category : ${categories}" style="">
 					                <!-- <td class="td-name" th:text="${category.getPosterPath()}"> -->
-					               <td> <img th:src="@{/files/}+@{${category.getPosterPath()}}" style="width:100px;"/>
+					               <td> <img th:src="@{/files/}+@{${category.getPosterPath()}}" style="width:200px; height: auto;"/>
 					                </td>
 					                <td th:text="${category.getCatName()}"></td>
 					                <td th:text="${category.getDescription()}"></td>
