@@ -1,6 +1,5 @@
 package com.health.model;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -9,11 +8,11 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
-public class SpokenVideo implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@Table(name = "spoken_video")
+public class SpokenVideo {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -41,8 +40,8 @@ public class SpokenVideo implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "lan_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lang_id")
     private Language lan;
 
     public Timestamp getDateAdded() {

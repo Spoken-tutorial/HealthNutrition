@@ -4023,7 +4023,7 @@ public class HomeController {
         SpokenVideo spokenVideo = spokenVideoService.findById(Integer.parseInt(spokenVideoId));
 
         if (spokenVideo == null) {
-            model.addAttribute("error_msg", "ResearchPaper doesn't exist");
+            model.addAttribute("error_msg", "Spoken Video doesn't exist");
             return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
         }
 
