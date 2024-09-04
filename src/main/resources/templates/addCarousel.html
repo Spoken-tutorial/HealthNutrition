@@ -101,6 +101,7 @@ font-weight:bold!important;
 									<th scope="col">Event Name</th>
 									<th scope="col">Short Description</th>
 									<th scope="col">Poster</th>
+									 <th scope="col">Enable/Disable</th>
 									 <th scope="col">Action</th>
 								</tr>
 							</thead>
@@ -112,6 +113,16 @@ font-weight:bold!important;
 							      <td><img id="imagesource" th:src="@{/files/}+@{${cara.getPosterPath()}}"
 										style="width: 150px; height: 100px" />
 								  </td>
+								   <td>
+	  		
+						   			<div th:if="${cara.isShowOnHomepage()}">
+						   				<a class="disableCarousel" th:value="${cara.getId()}" title="Click to Disable Carousel"><i class="fas fa-times-circle" th:id="${cara.getId()}" style="color:red"></i></a>
+						   			</div>
+						   			<div th:unless="${cara.isShowOnHomepage()}">
+						   				<a class="enableCarousel" th:value="${cara.getId()}" title="Click to Enable Carousel"><i class="fas fa-check-circle" th:id="${cara.getId()}" style="color:green"></i> </a>
+						   			</div>
+						   		
+						  			</td>
 								   <td><a th:href="@{${'/carousel/edit/' + cara.getId()}}">Edit</a></td>
 								
 							    </tr>

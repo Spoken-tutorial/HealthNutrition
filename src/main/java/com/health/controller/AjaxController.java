@@ -37,6 +37,7 @@ import com.health.config.SecurityConfig;
 import com.health.domain.security.Role;
 import com.health.domain.security.UserRole;
 import com.health.model.Brouchure;
+import com.health.model.Carousel;
 import com.health.model.Category;
 import com.health.model.City;
 import com.health.model.Comment;
@@ -63,6 +64,7 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.Version;
 import com.health.service.BrouchureService;
+import com.health.service.CarouselService;
 import com.health.service.CategoryService;
 import com.health.service.CityService;
 import com.health.service.CommentService;
@@ -143,6 +145,9 @@ public class AjaxController {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private CarouselService caroService;
 
     @Autowired
     private ContributorAssignedTutorialService conService;
@@ -601,6 +606,32 @@ public class AjaxController {
         } catch (Exception e) {
 
             logger.error("Error in Enable Disbale Event: {}", event, e);
+            return false;
+        }
+
+    }
+
+    @GetMapping("/enableDisableCarousel")
+    public @ResponseBody boolean enableDisableCarousel(int id) {
+        Carousel cara = caroService.findById(id);
+
+        try {
+            if (cara.isShowOnHomepage()) {
+
+                cara.setShowOnHomepage(false);
+
+                caroService.save(cara);
+                return true;
+
+            } else {
+                cara.setShowOnHomepage(true);
+
+                caroService.save(cara);
+                return true;
+            }
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Carousel: {}", cara, e);
             return false;
         }
 
