@@ -26,19 +26,6 @@ public class SpokenVideoServiceImpl implements SpokenVideoService {
     }
 
     @Override
-    public int getNewSpokenVideoId() {
-
-        try {
-            Integer newId = repo.getNewId();
-            return (newId != null ? newId : 0) + 1;
-        } catch (Exception e) {
-
-            logger.error("New Id error in SpokenVideo  Service Impl: {}", repo.getNewId(), e);
-            return 1;
-        }
-    }
-
-    @Override
     public List<SpokenVideo> findAll() {
 
         return (List<SpokenVideo>) repo.findAll();

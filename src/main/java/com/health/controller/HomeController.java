@@ -3951,14 +3951,13 @@ public class HomeController {
             }
 
             SpokenVideo spokenVideo = new SpokenVideo();
-            int id = spokenVideoService.getNewSpokenVideoId();
+
             spokenVideo.setDateAdded(ServiceUtility.getCurrentTime());
             spokenVideo.setDisplayName(displayName);
             spokenVideo.setLan(lan);
             spokenVideo.setFileSize(file.getSize());
             spokenVideo.setUser(usr);
             spokenVideo.setFileName(file.getOriginalFilename());
-            spokenVideo.setSpokenVideoId(id);
 
             try {
 
@@ -4031,8 +4030,9 @@ public class HomeController {
             model.addAttribute("error_msg", "display name should not be null");
             return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
         } else {
-            if (spokenVideoService.findByDisplayName(displayName) != null) {
-                int tempId = spokenVideoService.findByDisplayName(displayName).getSpokenVideoId();
+            SpokenVideo video = spokenVideoService.findByDisplayName(displayName);
+            if (video != null) {
+                int tempId = video.getSpokenVideoId();
                 if (spokenVideo.getSpokenVideoId() != tempId) {
                     model.addAttribute("error_msg", "display name already exists");
                     return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
@@ -4061,9 +4061,9 @@ public class HomeController {
                 String folder = CommonData.uploadDirectorySpokenVideo + lanId;
 
                 String document = ServiceUtility.uploadMediaFile(file, env, folder);
-
-                if (spokenVideoService.findByFilePath(document) != null) {
-                    int tempId = spokenVideoService.findByFilePath(document).getSpokenVideoId();
+                SpokenVideo video = spokenVideoService.findByFilePath(document);
+                if (video != null) {
+                    int tempId = video.getSpokenVideoId();
                     if (spokenVideo.getSpokenVideoId() != tempId) {
                         model.addAttribute("error_msg", "duplicate source location");
                         return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
