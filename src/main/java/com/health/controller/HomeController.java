@@ -102,6 +102,7 @@ import com.health.model.PostQuestionaire;
 import com.health.model.PromoVideo;
 import com.health.model.Question;
 import com.health.model.ResearchPaper;
+import com.health.model.SpokenVideo;
 import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
@@ -139,6 +140,7 @@ import com.health.service.PromoVideoService;
 import com.health.service.QuestionService;
 import com.health.service.ResearchPaperService;
 import com.health.service.RoleService;
+import com.health.service.SpokenVideoService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
 import com.health.service.TopicCategoryMappingService;
@@ -184,6 +186,9 @@ public class HomeController {
 
     @Autowired
     private LiveTutorialRepository liveTutorialRepo;
+
+    @Autowired
+    private SpokenVideoService spokenVideoService;
 
     @Autowired
     private AjaxController ajaxController;
@@ -3889,6 +3894,206 @@ public class HomeController {
         return "addTestimonial";
 
     }
+
+    /*************************************************
+     * Spoken Video Start
+     *************************************/
+    @GetMapping("/addSpokenVideo")
+    public String addSpokenVideoGet(HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        List<Language> lans = lanService.getAllLanguages();
+        model.addAttribute("languages", lans);
+
+        List<SpokenVideo> spokenVideos = spokenVideoService.findAll();
+
+        model.addAttribute("spokenVideos", spokenVideos);
+
+        return "addSpokenVideo";
+
+    }
+
+    @PostMapping("/addSpokenVideo")
+    public String addSpokenVideoPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam("spokenVideoFile") MultipartFile file, @RequestParam("displayName") String displayName,
+            @RequestParam(value = "lanId") int lanId) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        if (displayName == null || displayName.isEmpty()) {
+            model.addAttribute("error_msg", "display name should not be null");
+            return addSpokenVideoGet(req, principal, model);
+        } else {
+            if (spokenVideoService.findByDisplayName(displayName) != null) {
+                model.addAttribute("error_msg", "display name already exists");
+                return addSpokenVideoGet(req, principal, model);
+            }
+        }
+        Language lan = lanService.getById(lanId);
+        if (lan == null) {
+            model.addAttribute("error_msg", "lan should not be null");
+            return addSpokenVideoGet(req, principal, model);
+        }
+
+        if (!file.isEmpty()) {
+            if (!ServiceUtility.checkFileExtensionVideo(file)) { // throw error on extension
+                model.addAttribute("error_msg", CommonData.VIDEO_FILE_EXTENSION_ERROR);
+                return addSpokenVideoGet(req, principal, model);
+            }
+
+            if (!ServiceUtility.checkVideoSizeSpokenVideo(file)) {
+                model.addAttribute("error_msg", "File size must be less than 20MB");
+                return addSpokenVideoGet(req, principal, model);
+            }
+
+            SpokenVideo spokenVideo = new SpokenVideo();
+
+            spokenVideo.setDateAdded(ServiceUtility.getCurrentTime());
+            spokenVideo.setDisplayName(displayName);
+            spokenVideo.setLan(lan);
+            spokenVideo.setFileSize(file.getSize());
+            spokenVideo.setUser(usr);
+            spokenVideo.setFileName(file.getOriginalFilename());
+
+            try {
+
+                String folder = CommonData.uploadDirectorySpokenVideo + lanId;
+
+                String document = ServiceUtility.uploadMediaFile(file, env, folder);
+
+                if (spokenVideoService.findByFilePath(document) != null) {
+                    model.addAttribute("error_msg", "duplicate source location");
+                    return addSpokenVideoGet(req, principal, model);
+                }
+
+                spokenVideo.setFilePath(document);
+
+                spokenVideoService.save(spokenVideo);
+
+            } catch (Exception e) {
+
+                logger.error("Error in Add Spoken Video: {} {}", file, lanId, e);
+                model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+                return addSpokenVideoGet(req, principal, model);
+            }
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        return addSpokenVideoGet(req, principal, model);
+
+    }
+
+    @GetMapping("/spokenVideo/edit/{id}")
+    public String editSpokenVideoGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        SpokenVideo spokenVideo = spokenVideoService.findById(id);
+
+        if (spokenVideo == null) {
+
+            return "redirect:/addSpokenVideo";
+        }
+
+        model.addAttribute("spokenVideo", spokenVideo);
+
+        return "updateSpokenVideo";
+    }
+
+    @PostMapping("/updateSpokenVideo")
+    public String updateSpokenVideoPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam("spokenVideoFile") MultipartFile file) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String spokenVideoId = req.getParameter("spokenVideoId");
+        String displayName = req.getParameter("displayName");
+
+        SpokenVideo spokenVideo = spokenVideoService.findById(Integer.parseInt(spokenVideoId));
+
+        if (spokenVideo == null) {
+            model.addAttribute("error_msg", "Spoken Video doesn't exist");
+            return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+        }
+
+        if (displayName == null || displayName.isEmpty()) {
+            model.addAttribute("error_msg", "display name should not be null");
+            return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+        } else {
+            SpokenVideo video = spokenVideoService.findByDisplayName(displayName);
+            if (video != null) {
+                int tempId = video.getSpokenVideoId();
+                if (spokenVideo.getSpokenVideoId() != tempId) {
+                    model.addAttribute("error_msg", "display name already exists");
+                    return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+                }
+
+            }
+        }
+
+        if (!file.isEmpty()) {
+            if (!ServiceUtility.checkFileExtensionVideo(file)) { // throw error on extension
+                model.addAttribute("error_msg", CommonData.VIDEO_FILE_EXTENSION_ERROR);
+                return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+            }
+
+            if (!ServiceUtility.checkVideoSizeSpokenVideo(file)) {
+                model.addAttribute("error_msg", "File size must be less than 20MB");
+                return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+            }
+
+            spokenVideo.setFileSize(file.getSize());
+            spokenVideo.setFileName(file.getOriginalFilename());
+            int lanId = spokenVideo.getLan().getLanId();
+
+            try {
+
+                String folder = CommonData.uploadDirectorySpokenVideo + lanId;
+
+                String document = ServiceUtility.uploadMediaFile(file, env, folder);
+                SpokenVideo video = spokenVideoService.findByFilePath(document);
+                if (video != null) {
+                    int tempId = video.getSpokenVideoId();
+                    if (spokenVideo.getSpokenVideoId() != tempId) {
+                        model.addAttribute("error_msg", "duplicate source location");
+                        return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+                    }
+
+                }
+
+                spokenVideo.setFilePath(document);
+
+            } catch (Exception e) {
+
+                logger.error("Error in Add Spoken Video: {} {}", file, lanId, e);
+                model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+                return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+            }
+        }
+
+        spokenVideo.setDateAdded(ServiceUtility.getCurrentTime());
+        spokenVideo.setDisplayName(displayName);
+        spokenVideo.setUser(usr);
+        spokenVideoService.save(spokenVideo);
+
+        model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        return editSpokenVideoGet(Integer.parseInt(spokenVideoId), req, model, principal);
+
+    }
+
+    /**************************************************
+     * Spoken Video End
+     *************************************/
 
     @GetMapping("/category/edit/{catName}")
     public String editCategoryGet(@PathVariable(name = "catName") String catName, HttpServletRequest req, Model model,

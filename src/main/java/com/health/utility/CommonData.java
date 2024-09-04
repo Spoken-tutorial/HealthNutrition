@@ -147,6 +147,7 @@ public class CommonData {
     public static String uploadDirectoryScriptZipFiles = "Media/Content/Tutorial/ScriptZipFiles/";
 
     public static String uploadDirectoryTestimonial = "Media/Content/Testimonial/";
+    public static String uploadDirectorySpokenVideo = "Media/Content/Source/";
 
     public static String uploadDirectoryConsultant = "Media/Content/Consultant/";
 
@@ -228,6 +229,8 @@ public class CommonData {
     public static final long videoSizeTest = 30 * 1024 * 1024;
 
     public static final long videoSizePromoVideo = 1000 * 1024 * 1024;
+
+    public static final long videoSizeSpokenVideo = 1000 * 1024 * 1024;
 
     public static final long fileSize = 10 * 1024 * 1024;
 

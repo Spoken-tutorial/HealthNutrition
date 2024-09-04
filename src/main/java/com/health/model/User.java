@@ -173,6 +173,10 @@ public class User implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
+    private Set<SpokenVideo> spokenvideos = new HashSet<SpokenVideo>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Topic> topics = new HashSet<Topic>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -246,6 +250,14 @@ public class User implements UserDetails, Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Set<SpokenVideo> getSpokenvideos() {
+        return spokenvideos;
+    }
+
+    public void setSpokenvideos(Set<SpokenVideo> spokenvideos) {
+        this.spokenvideos = spokenvideos;
     }
 
     @Override
