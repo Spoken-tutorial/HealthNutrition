@@ -953,7 +953,7 @@ public class AjaxController {
 
             Topic topic = temp.getConAssignedTutorial().getTopicCatId().getTopic();
             topicName.put(topic.getTopicId(), topic.getTopicName());
-            topicName.put(topic.getTopicId(), topic.getTopicName());
+
         }
 
         return topicName;
