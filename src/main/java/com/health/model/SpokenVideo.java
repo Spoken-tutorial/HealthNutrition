@@ -17,7 +17,8 @@ import javax.persistence.Table;
 public class SpokenVideo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
     private int spokenVideoId;
 
