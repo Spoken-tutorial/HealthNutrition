@@ -51,6 +51,23 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Integer>, Jp
     @Query(nativeQuery = true, value = "select  * from tutorial_resource join  contributor_role on contributor_role.id=tutorial_resource.con_assigned_tutorial inner join topic_category on topic_category.topic_category_id=contributor_role.topic_cat_id inner join  language on language.lan_id=contributor_role.language_id inner join category on category.category_id=topic_category.category_id inner join topic on topic.topic_id=topic_category.topic_id  where category.status =1 and tutorial_resource.enabled =1")
     List<Tutorial> findTutorialsWithStatusTrueAndAndCatregoryEnabled();
 
+    @Query(nativeQuery = true, value = "select  * from tutorial_resource join  contributor_role on contributor_role.id=tutorial_resource.con_assigned_tutorial inner join topic_category on topic_category.topic_category_id=contributor_role.topic_cat_id inner join  language on language.lan_id=contributor_role.language_id inner join category on category.category_id=topic_category.category_id inner join topic on topic.topic_id=topic_category.topic_id  where category.status =1 and tutorial_resource.enabled =1 and language.lang_name='English' and tutorial_resource.citation IS  NULL")
+    List<Tutorial> findTutorialsWithStatusTrueAndCategoryEnabledAndLanEnglishAndCitationIsNull();
+
+    @Query(nativeQuery = true, value = "select  * from tutorial_resource join  contributor_role on contributor_role.id=tutorial_resource.con_assigned_tutorial inner join topic_category on topic_category.topic_category_id=contributor_role.topic_cat_id inner join  language on language.lan_id=contributor_role.language_id inner join category on category.category_id=topic_category.category_id inner join topic on topic.topic_id=topic_category.topic_id  where category.status =1 and tutorial_resource.enabled =1 and language.lang_name='English' and tutorial_resource.citation IS NOT NULL")
+    List<Tutorial> findTutorialsWithStatusTrueAndCategoryEnabledAndLanEnglishAndCitationNotNull();
+
+    @Query(nativeQuery = true, value = "select * from tutorial_resource "
+            + "join contributor_role on contributor_role.id = tutorial_resource.con_assigned_tutorial "
+            + "inner join topic_category on topic_category.topic_category_id = contributor_role.topic_cat_id "
+            + "inner join language on language.lan_id = contributor_role.language_id "
+            + "inner join category on category.category_id = topic_category.category_id "
+            + "inner join topic on topic.topic_id = topic_category.topic_id "
+            + "where category.status = 1 and tutorial_resource.enabled = 1 " + "and language.lang_name = 'English' "
+            + "and tutorial_resource.citation IS NULL " + "and category.category_id = :categoryId")
+    List<Tutorial> findTutorialsByCategoryAndStatusTrueAndCategoryEnabledAndLanEnglishAndCitationIsNull(
+            @Param("categoryId") int categoryId);
+
     /**
      * List of Tutorial Object given ContributorAssignedTutorial object
      * 

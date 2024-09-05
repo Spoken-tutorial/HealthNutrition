@@ -116,6 +116,12 @@ public class TutorialServiceImpl implements TutorialService {
         tutorialRepo.save(tut);
     }
 
+    @Override
+    public void saveAll(List<Tutorial> tutorialList) {
+        // TODO Auto-generated method stub
+        tutorialRepo.saveAll(tutorialList);
+    }
+
     /**
      * @see com.health.service.TutorialService#getById(int)
      */
@@ -812,6 +818,25 @@ public class TutorialServiceImpl implements TutorialService {
 
             return tutorialPageList;
         }
+    }
+
+    @Override
+    public List<Tutorial> findAllEnabledEnglishTuorialsWithCitationNotNull() {
+
+        return tutorialRepo.findTutorialsWithStatusTrueAndCategoryEnabledAndLanEnglishAndCitationNotNull();
+    }
+
+    @Override
+    public List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNull() {
+
+        return tutorialRepo.findTutorialsWithStatusTrueAndCategoryEnabledAndLanEnglishAndCitationIsNull();
+    }
+
+    @Override
+    public List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNullByCategory(Category cat) {
+
+        return tutorialRepo.findTutorialsByCategoryAndStatusTrueAndCategoryEnabledAndLanEnglishAndCitationIsNull(
+                cat.getCategoryId());
     }
 
 }

@@ -1699,6 +1699,79 @@ $("#languageId1").change(function() {
 
 /**********************************************************************************************/
 			
+/***********************************Citation Start*********************************************/
+	
+			$("#categoryforCitation").change(function() {
+
+						var catgoryid = $(this).find(":selected").val();
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryforCitation",
+							data : {
+								"id" : catgoryid
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + key + '>'
+		  			               + value
+		  			               + '</option>';
+		  	  			        })
+	  	  			            html += '</option>';
+								$("#topicforCitation").prop('disabled',false);
+								$('#topicforCitation').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+/*$(document).ready(function () {
+    const multiSelectWithoutCtrl = (elemSelector) => {
+        $(elemSelector).find('option').on('mousedown', function (e) {
+            e.preventDefault();
+            $(this).prop('selected', !$(this).prop('selected'));
+            return false;
+        });
+    };
+
+    multiSelectWithoutCtrl("#topicforCitation");
+});
+*/
+
+ $(document).ready(function () {
+            const select = $('#topicforCitation');
+
+            // Handle clicks on options to toggle selection without Ctrl key
+            select.on('mousedown', 'option', function (e) {
+                e.preventDefault();
+                const option = $(this);
+                option.prop('selected', !option.prop('selected'));
+            });
+
+            // Handle Ctrl+A for selecting/deselecting all options
+            $(document).keydown(function (e) {
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    const allOptions = select.find('option');
+                    const allSelected = allOptions.length === allOptions.filter(':selected').length;
+
+                    allOptions.prop('selected', !allSelected);
+                }
+            });
+        });
+/***********************************Citation End***********************************************/			
 			
 			
 /***************** changes made by om prakash *********************************************/

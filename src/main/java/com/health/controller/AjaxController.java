@@ -940,6 +940,25 @@ public class AjaxController {
 
     }
 
+    @RequestMapping("/loadTopicByCategoryforCitation")
+    public @ResponseBody HashMap<Integer, String> getTopicByCategoryforCitation(@RequestParam(value = "id") int id) {
+        HashMap<Integer, String> topicName = new HashMap<>();
+
+        Category cat = catService.findByid(id);
+        logger.info("Variables of getTopicByCategory catId :{} category : {}", id, cat);
+
+        List<Tutorial> tutorials = tutService.findAllEnabledEnglishTuorialsWithCitationIsNullByCategory(cat);
+
+        for (Tutorial temp : tutorials) {
+
+            Topic topic = temp.getConAssignedTutorial().getTopicCatId().getTopic();
+            topicName.put(topic.getTopicId(), topic.getTopicName());
+
+        }
+
+        return topicName;
+    }
+
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,
             @RequestParam(value = "promoId") int promoId) {

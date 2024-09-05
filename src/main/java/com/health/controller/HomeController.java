@@ -248,7 +248,7 @@ public class HomeController {
     private UserRoleService usrRoleService;
 
     @Autowired
-    private ContributorAssignedTutorialService conRepo;
+    private ContributorAssignedTutorialService conService;
 
     @Autowired
     private ContributorAssignedMultiUserTutorialService conMultiUser;
@@ -635,6 +635,33 @@ public class HomeController {
         Collections.sort(lanTempSorted);
 
         return lanTempSorted;
+    }
+
+    private List<Category> getCategoriesforNullCitation() {
+        List<Tutorial> tutorials = tutService.findAllEnabledEnglishTuorialsWithCitationIsNull();
+        Set<Category> catTemp = new HashSet<Category>();
+        for (Tutorial temp : tutorials) {
+
+            Category c = temp.getConAssignedTutorial().getTopicCatId().getCat();
+            catTemp.add(c);
+
+        }
+
+        List<Category> catTempSorted = new ArrayList<Category>(catTemp);
+        Collections.sort(catTempSorted);
+
+        return catTempSorted;
+    }
+
+    private List<Topic> getTopicsforNullCitation() {
+        List<Tutorial> tutorials = tutService.findAllEnabledEnglishTuorialsWithCitationIsNull();
+        Set<Topic> topicTemp = new HashSet<Topic>();
+        for (Tutorial temp : tutorials) {
+            topicTemp.add(temp.getConAssignedTutorial().getTopicCatId().getTopic());
+        }
+        List<Topic> topicTempSorted = new ArrayList<Topic>(topicTemp);
+        Collections.sort(topicTempSorted);
+        return topicTempSorted;
     }
 
     private void getModelData(Model model) {
@@ -1151,7 +1178,7 @@ public class HomeController {
 
             for (Language lan : languages) {
 
-                List<ContributorAssignedTutorial> conList1 = conRepo.findAllByTopicCatAndLan(tcmList, lan);
+                List<ContributorAssignedTutorial> conList1 = conService.findAllByTopicCatAndLan(tcmList, lan);
                 if (conList1 != null) {
                     conList.addAll(conList1);
 
@@ -1162,7 +1189,7 @@ public class HomeController {
             List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
             for (Language lan : languages) {
 
-                List<ContributorAssignedTutorial> conList1 = conRepo.findAllByTopicCatAndLan(tcm, lan);
+                List<ContributorAssignedTutorial> conList1 = conService.findAllByTopicCatAndLan(tcm, lan);
                 if (conList1 != null) {
                     conList.addAll(conList1);
 
@@ -1170,11 +1197,11 @@ public class HomeController {
             }
 
         } else if ((topicIds != null && topicIds.isPresent() && topicIds.get().length != 0)) {
-            conList = conRepo.findAllByTopicCat(tcmList);
+            conList = conService.findAllByTopicCat(tcmList);
 
         } else {
             List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
-            conList = conRepo.findAllByTopicCat(tcm);
+            conList = conService.findAllByTopicCat(tcm);
         }
 
         tutList = tutService.findAllByconAssignedTutorialAndStatus(conList);
@@ -1393,7 +1420,8 @@ public class HomeController {
         Topic topicName = topicService.findBytopicName(topic);
         Language lanName = lanService.getByLanName(lan);
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
-        ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+
+        ContributorAssignedTutorial conTut = conService.findByTopicCatAndLanViewPart(topicCatMap, lanName);
 
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
             return "redirect:/";
@@ -1422,7 +1450,7 @@ public class HomeController {
 
             Language lanEnglish = lanService.getByLanName("English");
 
-            ContributorAssignedTutorial conTutforEnglish = conRepo.findByTopicCatAndLanViewPart(topicCatMap,
+            ContributorAssignedTutorial conTutforEnglish = conService.findByTopicCatAndLanViewPart(topicCatMap,
                     lanEnglish);
 
             List<Tutorial> tempTutorialsforEnglish = tutService
@@ -1472,7 +1500,7 @@ public class HomeController {
         Category category = catService
                 .findByid(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
         List<TopicCategoryMapping> topicCatMapping = topicCatService.findAllByCategory(category);
-        List<ContributorAssignedTutorial> contriAssignedTut = conRepo.findAllByTopicCat(topicCatMapping);
+        List<ContributorAssignedTutorial> contriAssignedTut = conService.findAllByTopicCat(topicCatMapping);
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList1(contriAssignedTut);
 
         for (Tutorial x : tutorials) {
@@ -1599,7 +1627,7 @@ public class HomeController {
         HashMap<String, Integer> map = new HashMap<>();
         List<Language> langs = getLanguages();
         for (Language lang : langs) {
-            List<ContributorAssignedTutorial> con = conRepo.findAllByLan(lang);
+            List<ContributorAssignedTutorial> con = conService.findAllByLan(lang);
             List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList1(con);
             List<Tutorial> finalTutorials = new ArrayList<>();
 
@@ -2668,6 +2696,129 @@ public class HomeController {
         }
         return addPromoVideoGet(req, model, principal);
     }
+
+    /***********************************
+     * Citation Start
+     ************************************/
+    @GetMapping("/addCitation")
+    public String addCitationGet(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        List<Category> categories = getCategoriesforNullCitation();
+        model.addAttribute("categories", categories);
+        List<Topic> topics = getTopicsforNullCitation();
+        model.addAttribute("topics", topics);
+        List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        model.addAttribute("citationTuorials", citationTuorials);
+
+        return "addCitation";
+    }
+
+    @PostMapping("/addCitation")
+    public String addCitationPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(value = "categoryforCitation") int categoryId,
+            @RequestParam(name = "topicforCitation") int[] topicIds, @RequestParam(name = "citation") String citation) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        Category cat = catService.findByid(categoryId);
+        Set<TopicCategoryMapping> tcmSet = new HashSet<>();
+        Language lan = lanService.getById(22);
+
+        if (cat == null || topicIds.length == 0) {
+            model.addAttribute("error_msg", "category and topic should not be null");
+            return addCitationGet(req, model, principal);
+        }
+
+        for (int i = 0; i < topicIds.length; i++) {
+            Topic topic = topicService.findById(topicIds[i]);
+            tcmSet.add(topicCatService.findAllByCategoryAndTopic(cat, topic));
+        }
+
+        List<TopicCategoryMapping> tcmList = new ArrayList<>(tcmSet);
+        List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
+        List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(conList);
+        List<Tutorial> newTutorialList = new ArrayList<>();
+
+        if (tutorials != null && tutorials.size() > 0) {
+            for (Tutorial tutorial : tutorials) {
+                tutorial.setCitation(citation);
+                newTutorialList.add(tutorial);
+            }
+
+            tutService.saveAll(newTutorialList);
+            model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+            return addCitationGet(req, model, principal);
+
+        } else {
+            model.addAttribute("error_msg", "No Tutorial found");
+            return addCitationGet(req, model, principal);
+        }
+
+    }
+
+    @GetMapping("/citation/edit/{id}")
+    public String editCitationGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        Tutorial tutorial = tutService.findByTutorialId(id);
+
+        if (tutorial == null) {
+
+            return "redirect:/addCitation";
+        }
+
+        model.addAttribute("tutorial", tutorial);
+
+        return "updateCitation";
+    }
+
+    @PostMapping("/updateCitation")
+    public String updateCitationPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "citation") String citation) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String tutorialIdString = req.getParameter("tutorialId");
+        int id = Integer.parseInt(tutorialIdString);
+
+        Tutorial tutorial = tutService.findByTutorialId(id);
+
+        if (tutorial == null) {
+            model.addAttribute("error_msg", "tutorial doesn't exist");
+            return editCitationGet(id, req, model, principal);
+        } else {
+            tutorial.setCitation(citation);
+            tutService.save(tutorial);
+            model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+            return editCitationGet(id, req, model, principal);
+        }
+
+    }
+
+    @GetMapping("/citations")
+    public String showCitationsGet(HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        model.addAttribute("citationTuorials", citationTuorials);
+        return "citations";
+    }
+
+    /***********************************
+     * Citation End
+     *************************************/
 
     @GetMapping("/addBrochure")
     public String addBrochureGet(HttpServletRequest req, Model model, Principal principal) {
@@ -6016,7 +6167,7 @@ public class HomeController {
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
 
-        List<ContributorAssignedTutorial> userRoles = conRepo.findAll();
+        List<ContributorAssignedTutorial> userRoles = conService.findAll();
         List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
             if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
@@ -6051,7 +6202,7 @@ public class HomeController {
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
 
-        List<ContributorAssignedTutorial> userRoles = conRepo.findAll();
+        List<ContributorAssignedTutorial> userRoles = conService.findAll();
         List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
             if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
@@ -6079,7 +6230,7 @@ public class HomeController {
         Category cat = catService.findByid(Integer.parseInt(catName));
         User userAssigned = userService.findByUsername(contributorName);
 
-        int conNewId = conRepo.getNewId();
+        int conNewId = conService.getNewId();
         int conMutliUserNewId = conMultiUser.getNewId();
 
         for (String topic : topics) {
@@ -6089,13 +6240,13 @@ public class HomeController {
 
                 TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat, localtopic);
 
-                ContributorAssignedTutorial x = conRepo.findByTopicCatAndLanViewPart(topicCat, lan);
+                ContributorAssignedTutorial x = conService.findByTopicCatAndLanViewPart(topicCat, lan);
 
                 if (x == null) {
 
                     ContributorAssignedTutorial temp = new ContributorAssignedTutorial(conNewId++,
                             ServiceUtility.getCurrentTime(), topicCat, lan);
-                    conRepo.save(temp);
+                    conService.save(temp);
                     ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
                             conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, temp);
                     conMultiUser.save(multiUser);
@@ -6115,7 +6266,7 @@ public class HomeController {
             }
         }
 
-        userRoles = conRepo.findAll();
+        userRoles = conService.findAll();
 
         userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
@@ -6149,7 +6300,7 @@ public class HomeController {
         List<ContributorAssignedMultiUserTutorial> con = conMultiUser.getAllByuser(usr);
 
         for (ContributorAssignedMultiUserTutorial temp : con) {
-            ContributorAssignedTutorial conTemp = conRepo.findById(temp.getConAssignedTutorial().getId());
+            ContributorAssignedTutorial conTemp = conService.findById(temp.getConAssignedTutorial().getId());
             catName.add(conTemp.getTopicCatId().getCat().getCatName());
         }
         HashSet<String> uniqueCatName = new HashSet<String>(catName);
@@ -6170,9 +6321,9 @@ public class HomeController {
                 List<ContributorAssignedTutorial> con_t = new ArrayList<ContributorAssignedTutorial>();
                 if (!tcm.isEmpty()) {
                     if (lan == null) {
-                        con_t = conRepo.findAllByTopicCat(tcm);
+                        con_t = conService.findAllByTopicCat(tcm);
                     } else {
-                        con_t = conRepo.findAllByTopicCatAndLan(tcm, lan);
+                        con_t = conService.findAllByTopicCatAndLan(tcm, lan);
                     }
                     for (ContributorAssignedTutorial c : con_t) {
                         List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(c);
@@ -6214,7 +6365,7 @@ public class HomeController {
 
         Tutorial tutorial = null;
 
-        ContributorAssignedTutorial conTutorial = conRepo.findByTopicCatAndLanViewPart(topicCat, lan);
+        ContributorAssignedTutorial conTutorial = conService.findByTopicCatAndLanViewPart(topicCat, lan);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTutorial);
 
@@ -6226,7 +6377,7 @@ public class HomeController {
 
             boolean goAhead = false;
             Language englishLan = lanService.getByLanName("english");
-            ContributorAssignedTutorial conTutorialforEnglish = conRepo.findByTopicCatAndLanViewPart(topicCat,
+            ContributorAssignedTutorial conTutorialforEnglish = conService.findByTopicCatAndLanViewPart(topicCat,
                     englishLan);
             List<Tutorial> tutorialsForEnglish = tutService.findAllByContributorAssignedTutorial(conTutorialforEnglish);
 
@@ -6284,7 +6435,7 @@ public class HomeController {
 
         for (ContributorAssignedMultiUserTutorial conMultiTemp : conTutorials) {
 
-            ContributorAssignedTutorial conTemp = conRepo.findById(conMultiTemp.getConAssignedTutorial().getId());
+            ContributorAssignedTutorial conTemp = conService.findById(conMultiTemp.getConAssignedTutorial().getId());
 
             tutorials.addAll(tutService.findAllByContributorAssignedTutorial(conTemp));
         }
@@ -6309,7 +6460,7 @@ public class HomeController {
         Topic topicName = topicService.findBytopicName(topic);
         Language lanName = lanService.getByLanName(lan);
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
-        ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+        ContributorAssignedTutorial conTut = conService.findByTopicCatAndLanViewPart(topicCatMap, lanName);
 
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
             return "redirect:/listTutorialForContributorReview";
@@ -6395,7 +6546,7 @@ public class HomeController {
 
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
 
-        List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
+        List<ContributorAssignedTutorial> conTutorials = conService.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
 
@@ -6433,7 +6584,7 @@ public class HomeController {
         Topic topicName = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
         Language lanName = tutorial1.getConAssignedTutorial().getLan();
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(catName, topicName);
-        ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, lanName);
+        ContributorAssignedTutorial conTut = conService.findByTopicCatAndLanViewPart(topicCatMap, lanName);
 
         if (catName == null || topicName == null || lanName == null || topicCatMap == null || conTut == null) {
 
@@ -6471,7 +6622,7 @@ public class HomeController {
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
 
-        List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
+        List<ContributorAssignedTutorial> conTutorials = conService.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
 
@@ -6520,7 +6671,7 @@ public class HomeController {
         Topic topic = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
         Language language = tutorial1.getConAssignedTutorial().getLan();
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
-        ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
+        ContributorAssignedTutorial conTut = conService.findByTopicCatAndLanViewPart(topicCatMap, language);
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorial(conTut);
 
         model.addAttribute("category", tutorial1.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
@@ -6568,7 +6719,7 @@ public class HomeController {
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
 
-        List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
+        List<ContributorAssignedTutorial> conTutorials = conService.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
 
@@ -6617,7 +6768,7 @@ public class HomeController {
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
 
-        List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
+        List<ContributorAssignedTutorial> conTutorials = conService.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
         for (Tutorial temp : tutorials) {
@@ -6673,7 +6824,7 @@ public class HomeController {
         List<UserRole> userRoles = usrRoleService.findByRoleUser(usr, role);
         List<TopicCategoryMapping> localMap = topicCatService.findAllByCategoryBasedOnUserRoles(userRoles);
 
-        List<ContributorAssignedTutorial> conTutorials = conRepo.findByTopicCatLan(localMap, userRoles);
+        List<ContributorAssignedTutorial> conTutorials = conService.findByTopicCatLan(localMap, userRoles);
 
         List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList(conTutorials);
         for (Tutorial temp : tutorials) {
@@ -6799,7 +6950,7 @@ public class HomeController {
         Topic topic = tutorial1.getConAssignedTutorial().getTopicCatId().getTopic();
         Language language = tutorial1.getConAssignedTutorial().getLan();
         TopicCategoryMapping topicCatMap = topicCatService.findAllByCategoryAndTopic(category, topic);
-        ContributorAssignedTutorial conTut = conRepo.findByTopicCatAndLanViewPart(topicCatMap, language);
+        ContributorAssignedTutorial conTut = conService.findByTopicCatAndLanViewPart(topicCatMap, language);
 
         if (category == null || topic == null || language == null || topicCatMap == null || conTut == null) {
             return "redirect:/listTutorialForQualityReview";
@@ -7629,7 +7780,7 @@ public class HomeController {
 
         for (ContributorAssignedMultiUserTutorial conMultiTemp : conTutorials) {
 
-            ContributorAssignedTutorial conTemp = conRepo.findById(conMultiTemp.getConAssignedTutorial().getId());
+            ContributorAssignedTutorial conTemp = conService.findById(conMultiTemp.getConAssignedTutorial().getId());
 
             tutorials.addAll(tutService.findAllByContributorAssignedTutorial(conTemp));
         }
@@ -7696,7 +7847,7 @@ public class HomeController {
 
         List<Language> lan = getLanguages();
 
-        List<ContributorAssignedTutorial> contributor_Role = conRepo.findAll();
+        List<ContributorAssignedTutorial> contributor_Role = conService.findAll();
 
         Collections.sort(cat);
         Collections.sort(lan);
@@ -7730,7 +7881,7 @@ public class HomeController {
             Language language = lanService.getById(languageId);
             Category category = catService.findByid(categoryId);
             List<TopicCategoryMapping> topicCategoryMappings = topicCatService.findAllByCategory(category);
-            List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo
+            List<ContributorAssignedTutorial> contributorAssignedTutorials = conService
                     .findAllByTopicCatAndLan(topicCategoryMappings, language);
             tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
 
@@ -7748,7 +7899,7 @@ public class HomeController {
             Category category = catService.findByid(categoryId);
             List<TopicCategoryMapping> topicCategoryMappings = topicCatService.findAllByCategory(category);
             if (!topicCategoryMappings.isEmpty()) {
-                List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo
+                List<ContributorAssignedTutorial> contributorAssignedTutorials = conService
                         .findAllByTopicCat(topicCategoryMappings);
                 tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
                 for (Tutorial temp : tutorials) {
@@ -7767,7 +7918,7 @@ public class HomeController {
             model.addAttribute("lan_value", 0);
         } else if (languageId != 0) {
             Language language = lanService.getById(languageId);
-            List<ContributorAssignedTutorial> contributorAssignedTutorials = conRepo.findAllByLan(language);
+            List<ContributorAssignedTutorial> contributorAssignedTutorials = conService.findAllByLan(language);
             tutorials = tutService.findAllByContributorAssignedTutorialList(contributorAssignedTutorials);
 
             for (Tutorial temp : tutorials) {
@@ -7954,7 +8105,7 @@ public class HomeController {
         model.addAttribute("lan", lan.getLangName());
         model.addAttribute("catname", cat.getCatName());
         TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(cat, topic);
-        ContributorAssignedTutorial con = conRepo.findByTopicCatAndLanViewPart(tcm, lan);
+        ContributorAssignedTutorial con = conService.findByTopicCatAndLanViewPart(tcm, lan);
         List<Tutorial> tut = tutService.findAllByContributorAssignedTutorial(con);
 
         if (tut == null || tut.size() == 0) {

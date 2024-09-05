@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Tutorial;
 
@@ -105,6 +106,8 @@ public interface TutorialService {
      */
     void save(Tutorial tut);
 
+    void saveAll(List<Tutorial> tutorialList);
+
     /**
      * Find Tutorial object given id
      * 
@@ -121,7 +124,10 @@ public interface TutorialService {
      */
 
     List<Tutorial> findAllByStatus(boolean status);
-    // List<Tutorial> findAllByStatusTrue();
+
+    List<Tutorial> findAllEnabledEnglishTuorialsWithCitationNotNull();
+
+    List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNull();
 
     List<Tutorial> findAllByconAssignedTutorialAndStatus(List<ContributorAssignedTutorial> con);
 
@@ -135,5 +141,7 @@ public interface TutorialService {
     Page<Tutorial> findPaginationWithEnabledCategoryandTrueTutorial(List<Tutorial> tutList, Pageable page);
 
     List<Tutorial> findByOutlinePathNull();
+
+    List<Tutorial> findAllEnabledEnglishTuorialsWithCitationIsNullByCategory(Category cat);
 
 }

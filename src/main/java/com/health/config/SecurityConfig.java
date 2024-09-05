@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/Slide/**", "/TimeScript/**", "/OriginalScript/**", "/Brochure-English/**", "/Brochure/**",
             "/ResearchPaper/**", "/downloads", "/loadLanguageByCategoryResource", "/autosuggest/**",
             "/loadLanguageAndTopicByCategoryResource", "/loadTutorialCountByTopicAndLanguage",
-            "/loadTutorialCountByTopics", "/downloadResources", "/api/scriptPublished/**", };
+            "/loadTutorialCountByTopics", "/downloadResources", "/citations", "/api/scriptPublished/**", };
 
     /**
      * url matcher for SUPERADMIN
@@ -145,8 +145,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/addBrochure/**", "/addCarousel/**", "/addConsultant/**", "/addEvent/**",
                         "/addTestimonial/**", "/addPromoVideo/**", "/addResearchPaper/**", "/brochure/edit/**",
                         "/promoVideo/edit/**", "/carousel/edit/**", "/event/edit/**", "/testimonial/edit/**",
+
                         "/researchPaper/edit/**", "/enableDisableBrouchure/**", "/enableDisableConsultant/**",
-                        "/enableDisableTestimonial/**")
+                        "/enableDisableTestimonial/**", "/addCitation/**", "/citation/edit/**")
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
 
