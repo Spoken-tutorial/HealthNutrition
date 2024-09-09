@@ -186,9 +186,13 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
         NptelTutorial nptelTutorial = nptelTutorialRepo.findByTitleAndPackageEntityAndLan(row[titleColumn],
                 packageEntity, lan);
         if (nptelTutorial == null) {
-            nptelTutorial = new NptelTutorial();
-            nptelTutorial.setPackageEntity(packageEntity);
-            nptelTutorial.setLan(lan);
+            nptelTutorial = nptelTutorialRepo.findByVideoUrlAndPackageEntityAndLan(row[urlColumn], packageEntity, lan);
+            if (nptelTutorial == null) {
+                nptelTutorial = new NptelTutorial();
+                nptelTutorial.setPackageEntity(packageEntity);
+                nptelTutorial.setLan(lan);
+            }
+
         }
         nptelTutorial.setTitle(row[titleColumn]);
         nptelTutorial.setWeek(Integer.parseInt(row[weekColumn]));

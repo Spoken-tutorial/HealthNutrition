@@ -24,4 +24,6 @@ public interface NptelTutorialRepository
 
     NptelTutorial findByTitleAndPackageEntityAndLan(String title, PackageEntity packageEntity, Language lan);
 
+    NptelTutorial findByVideoUrlAndPackageEntityAndLan(String videoUrl, PackageEntity packageEntity, Language lan);
+
 }
