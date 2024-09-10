@@ -75,10 +75,10 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
     @Override
     public void saveNptelTutorialsFromCSV(MultipartFile file, Model model, PackageEntity packageEntity)
             throws IOException, CsvException, NoSuchAlgorithmException {
-        RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));) {
-            CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(reader).withCSVParser(rfc4180Parser);
-            CSVReader csvReader = csvReaderBuilder.build();
+        RFC4180Parser parser = new RFC4180ParserBuilder().build();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+                CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build()) {
             List<NptelTutorial> nptelTutorialsList = new ArrayList<>();
             List<String> errorMessages = new ArrayList<>();
 
