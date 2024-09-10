@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +34,9 @@ import com.health.service.LanguageService;
 import com.health.service.NptelTutorialService;
 import com.health.utility.ServiceUtility;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.RFC4180Parser;
+import com.opencsv.RFC4180ParserBuilder;
 import com.opencsv.exceptions.CsvException;
 
 @Service
@@ -46,6 +51,9 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
 
     @Autowired
     private LanguageService lanService;
+
+    @Autowired
+    private Environment env;
 
     @Override
     public NptelTutorial findById(int id) {
@@ -67,9 +75,10 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
     @Override
     public void saveNptelTutorialsFromCSV(MultipartFile file, Model model, PackageEntity packageEntity)
             throws IOException, CsvException, NoSuchAlgorithmException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-                CSVReader csvReader = new CSVReader(reader)) {
-
+        RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));) {
+            CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(reader).withCSVParser(rfc4180Parser);
+            CSVReader csvReader = csvReaderBuilder.build();
             List<NptelTutorial> nptelTutorialsList = new ArrayList<>();
             List<String> errorMessages = new ArrayList<>();
 
@@ -119,6 +128,7 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
 
             Map<String, List<Integer>> titleLanguageMap = new HashMap<>();
             Map<String, List<Integer>> urlMap = new HashMap<>();
+
             String[] row;
             int rowIndex = 1; // To track the row number for error reporting
 
@@ -180,6 +190,16 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
             model.addAttribute("error_msg", "Could not get language from " + row[languageColumn]);
             return false;
         }
+        String filePath = row[urlColumn];
+        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
+        logger.info(filePath);
+
+        if (!Files.exists(path)) {
+            model.addAttribute("error_msg", "File does not exist; url : " + row[urlColumn]);
+            return false;
+        }
+
+        String fileName = path.getFileName().toString();
 
         logger.info(row[urlColumn]);
 
@@ -199,6 +219,7 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
 
         nptelTutorial.setVideoUrl(row[urlColumn]);
         nptelTutorial.setDateAdded(ServiceUtility.getCurrentTime());
+        nptelTutorial.setFileName(fileName);
         nptelTutorialsList.add(nptelTutorial);
 
         return true;

@@ -19,12 +19,15 @@ public class NptelTutorial implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "nptel_tutorial_id", nullable = false, updatable = false)
     private int nptelTutorialId;
 
     @Column(name = "title", nullable = false)
     private String title;
+
+    @Column(name = "fileName", nullable = false)
+    private String fileName;
 
     @Column(name = "video_url", nullable = false)
     private String videoUrl;
@@ -60,6 +63,14 @@ public class NptelTutorial implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public int getWeek() {

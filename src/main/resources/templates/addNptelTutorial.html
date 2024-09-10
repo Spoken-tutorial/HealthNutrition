@@ -127,6 +127,7 @@ font-weight:bold!important;
 									<th scope="col">Package</th>
 									<th scope="col">Title</th>
 									<th scope="col">Week</th>
+									<th scope="col">FileName</th>
 									<th scope="col">Language</th>
 									<th scope="col">Url</th>
 									 
@@ -138,6 +139,7 @@ font-weight:bold!important;
 								 <td scope="row"><span th:text = "${tut.getPackageEntity().getPackageName()}"></span></td>
 							      <td scope="row"><span th:text = "${tut.getTitle()}"></span></td>
 							      <td><span th:text = "${tut.getWeek()}"></span></td>
+							       <td><span th:text = "${tut.getFileName()}"></span></td>
 							      <td><span th:text = "${tut.getLan().getLangName()}"></span></td>
 							      <td>
 							      	<div th:if="${tut.getVideoUrl() != 'null'}"

@@ -18,7 +18,7 @@ public class LiveTutorial implements Comparable<LiveTutorial>, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "live_tutorial_id", nullable = false, updatable = false)
     private int id;
 
