@@ -34,6 +34,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -413,6 +415,22 @@ public class ServiceUtility {
             return false;
         }
         return true;
+    }
+
+    /***** To add missing html tag in string content *******/
+    public static void addMissingHtmlTag(Element element) {
+        Elements children = element.children();
+        for (int i = 0; i < children.size(); i++) {
+            Element child = children.get(i);
+            if (child.tagName().equals("p")) {
+                Element nextSibling = child.nextElementSibling();
+                if (nextSibling != null && !nextSibling.tagName().equals("p")) {
+                    child.appendChild(nextSibling);
+                    i--; // Re-check the current index as the sibling has moved
+                }
+            }
+            addMissingHtmlTag(child); // Recursive call to add missing html tag
+        }
     }
 
     /**
