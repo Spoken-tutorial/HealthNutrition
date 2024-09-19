@@ -1694,6 +1694,14 @@ $("#languageId1").change(function() {
 						outerhtml += 'document.getElementById("newvid1").addEventListener("play", function(){pauseAll(this)}, true);';
 						outerhtml += '</script>';
 						$('#promoVideoSourceOuter').html(outerhtml);
+						
+						var langName= $(this).find(":selected").text();
+						var promoVideoId = $('#promoVideoId').val();
+						var viewPromoVideo='<a href="/promoVideoView/'+  langName + '/' + promoVideoId  + '/' + '">';
+						viewPromoVideo += 'View </a>';
+						$('#promoVideoViewId').html(viewPromoVideo);
+						
+						
 					});
 
 

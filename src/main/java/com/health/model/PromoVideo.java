@@ -148,6 +148,14 @@ public class PromoVideo {
         return videoPath;
     }
 
+    public String GetLangNameofFirstVideoFile() {
+        if (pathofPromoVideo.size() == 0)
+            return "";
+        PathofPromoVideo first = pathofPromoVideo.iterator().next();
+        String langName = first.getLan().getLangName();
+        return langName;
+    }
+
     public HashMap<Integer, String> getVideoFiles() {
         HashMap<Integer, String> videoFiles = new HashMap<>();
         for (PathofPromoVideo video : pathofPromoVideo) {
