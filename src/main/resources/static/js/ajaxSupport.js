@@ -1697,14 +1697,30 @@ $("#languageId1").change(function() {
 						
 						var langName= $(this).find(":selected").text();
 						var promoVideoId = $('#promoVideoId').val();
-						var viewPromoVideo='<a href="/promoVideoView/'+  langName + '/' + promoVideoId  + '/' + '">';
+						var viewPromoVideo='<a id="promoVideoViewUrl" href="/promoVideoView/'+  langName + '/' + promoVideoId  + '/' + '" style="display: none;" >';
 						viewPromoVideo += 'View </a>';
+						viewPromoVideo += '<button id="copyButton" class="share-button" data-clipboard-target="#promoVideoViewUrl"> copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>'
 						$('#promoVideoViewId').html(viewPromoVideo);
 						
 						
 					});
 
+        $(document).ready(function() {
+            var clipboard = new ClipboardJS('#copyButton', {
+                text: function(trigger) {
+                    return $('#promoVideoViewUrl').prop('href');
+                }
+            });
 
+            clipboard.on('success', function(e) {
+                alert('Link copied to clipboard!');
+                e.clearSelection();
+            });
+
+            clipboard.on('error', function(e) {
+                alert('Failed to copy link.');
+            });
+        });
 /**********************************************************************************************/
 			
 /***********************************Citation Start*********************************************/
