@@ -73,9 +73,25 @@
             margin: 2px 1px;
             cursor: pointer;
             border-radius: 4px;
+            position: relative;
+   
         }
-        .share-button:hover {
-            background-color: lightblue;
+        .share-button:hover::after {
+          
+		    position: absolute;
+		    top: -30px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #333;
+		    color: #fff;
+		    padding: 5px 10px;
+		    border-radius: 4px;
+		    white-space: nowrap;
+		    z-index: 1000;
+		    opacity: 0.9;
+		    font-size: 12px;
+		    line-height: 1.2;
+		    pointer-events: none;
         }    
     </style>
   </head>
@@ -481,8 +497,8 @@ the globe.
 							</div>
 							
 				<div id="promoVideoViewId" style="float:left; margin-left:5px; margin-right:40px;"> 
-				<a  id="promoVideoViewUrl" th:href="@{'/promoVideoView/'+ ${pro.GetLangNameofFirstVideoFile()} + '/' +${pro.getPromoId()}  + '/'}" style="display: none;"> View </a>
-				<button id="copyButton" class="share-button" data-clipboard-target="#promoVideoViewUrl"> Copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>
+				<a  id="promoVideoViewUrl" th:href="@{'/promoVideoView/'+ ${pro.GetLangNameofFirstVideoFile()} + '/' }" style="display: none;"> View </a>
+				<button id="copyButton" class="share-button" data-clipboard-target="#promoVideoViewUrl" title="Copy to clipboard"> Copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>
 				 </div>			
                 
               </div>

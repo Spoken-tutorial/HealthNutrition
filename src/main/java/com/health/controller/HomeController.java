@@ -1571,9 +1571,9 @@ public class HomeController {
         return "tutorial";
     }
 
-    @GetMapping("/promoVideoView/{langName}/{promoVideoId}/")
+    @GetMapping("/promoVideoView/{langName}/")
     public String promoVideoView(HttpServletRequest req, @PathVariable(name = "langName") String langName,
-            @PathVariable(name = "promoVideoId") int promoVideoId, Principal principal, Model model) {
+            Principal principal, Model model) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
@@ -1583,7 +1583,12 @@ public class HomeController {
         }
 
         Language lan = lanService.getByLanName(langName);
-        PromoVideo promoVideo = promoVideoService.findById(promoVideoId);
+        List<PathofPromoVideo> pathofPromoVideoList = pathofPromoVideoService.findByLanguage(lan);
+        PromoVideo promoVideo = null;
+        if (pathofPromoVideoList != null && pathofPromoVideoList.size() > 0) {
+            promoVideo = pathofPromoVideoList.get(0).getPromoVideo();
+        }
+
         String promoVideoFile = "";
 
         if (lan == null || promoVideo == null) {
