@@ -127,7 +127,7 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @Column(name = "outline", length = 3500)
     private String outline;
 
-    @Column(name = "citation", length = 3500)
+    @Column(columnDefinition = "TEXT", nullable = true)
     private String citation;
 
     /**

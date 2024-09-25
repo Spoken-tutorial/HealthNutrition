@@ -1694,7 +1694,45 @@ $("#languageId1").change(function() {
 						outerhtml += 'document.getElementById("newvid1").addEventListener("play", function(){pauseAll(this)}, true);';
 						outerhtml += '</script>';
 						$('#promoVideoSourceOuter').html(outerhtml);
+						
+						var langName= $(this).find(":selected").text();
+						var promoVideoId = $('#promoVideoId').val();
+						var viewPromoVideo='<a id="promoVideoViewUrl" href="/promoVideoView/'+  langName + '/' + '" style="display: none;" >';
+						viewPromoVideo += 'View </a>';
+						viewPromoVideo += '<button id="copyButton" class="share-button" data-clipboard-target="#promoVideoViewUrl" title="Copy to clipboard"> copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>'
+						$('#promoVideoViewId').html(viewPromoVideo);
+						
+						
 					});
+
+ $(document).ready(function() {
+				    var clipboard = new ClipboardJS('#copyButton', {
+				        text: function(trigger) {
+				            return $('#promoVideoViewUrl').prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButton');
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+				            button.html(originalHtml);
+				            button.attr('title', originalTitle);
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+
+});
 
 
 /**********************************************************************************************/

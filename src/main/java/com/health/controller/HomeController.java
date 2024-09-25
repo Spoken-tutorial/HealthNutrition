@@ -1571,6 +1571,47 @@ public class HomeController {
         return "tutorial";
     }
 
+    @GetMapping("/promoVideoView/{langName}/")
+    public String promoVideoView(HttpServletRequest req, @PathVariable(name = "langName") String langName,
+            Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        if (langName == null) {
+            return "redirect:/";
+        }
+
+        Language lan = lanService.getByLanName(langName);
+        List<PathofPromoVideo> pathofPromoVideoList = pathofPromoVideoService.findByLanguage(lan);
+        PromoVideo promoVideo = null;
+        if (pathofPromoVideoList != null && pathofPromoVideoList.size() > 0) {
+            promoVideo = pathofPromoVideoList.get(0).getPromoVideo();
+        }
+
+        String promoVideoFile = "";
+
+        if (lan == null || promoVideo == null) {
+            return "redirect:/";
+        }
+        int lanId = lan.getLanId();
+
+        HashMap<Integer, String> promoVideoFiles = promoVideo.getVideoFiles();
+        if (promoVideoFiles != null & promoVideoFiles.size() > 0) {
+            promoVideoFile = promoVideoFiles.get(lanId);
+
+        } else {
+            return "redirect:/";
+        }
+
+        model.addAttribute("promoVideoFile", promoVideoFile);
+        model.addAttribute("promoVideo", promoVideo);
+        model.addAttribute("langName", langName);
+
+        return "promoVideoView";
+
+    }
+
     @RequestMapping("/login") // in use
     public String loginGet(Model model) {
         model.addAttribute("classActiveLogin", true);

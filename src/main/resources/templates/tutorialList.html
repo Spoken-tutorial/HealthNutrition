@@ -58,7 +58,8 @@
 			
 			</h6>
 				<!-- <p th:utext="${tutorial.getOutline()}" class="mx-0"> </p> -->
-				<p th:utext="${#strings.abbreviate(docSearch.getOutlineContent(),600)}" class="mx-0"></p>
+				<!-- p th:utext="${#strings.abbreviate(docSearch.getOutlineContent(),600)}" class="mx-0"></p -->
+				<p th:utext="${docSearch.getOutlineContentUpto600()}" class="mx-0"></p>
 				
 			
 		</a>
@@ -70,7 +71,8 @@
 			
 			</h6>
 				<!-- <p th:utext="${tutorial.getOutline()}" class="mx-0"> </p> -->
-				<p th:utext="${#strings.abbreviate(docSearch.getOutlineContent(),600)}" class="mx-0"></p>
+				<!--p th:utext="${#strings.abbreviate(docSearch.getOutlineContent(),600)}" class="mx-0"></p -->
+				<p th:utext="${docSearch.getOutlineContentUpto600()}" class="mx-0"></p>
 				
 			
 		</a>
