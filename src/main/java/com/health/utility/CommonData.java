@@ -147,7 +147,7 @@ public class CommonData {
     public static String uploadDirectoryScriptZipFiles = "Media/Content/Tutorial/ScriptZipFiles/";
 
     public static String uploadDirectoryTestimonial = "Media/Content/Testimonial/";
-    public static String uploadDirectorySpokenVideo = "Media/Content/Source/";
+    public static String uploadDirectorySource = "Media/Content/Source/";
 
     public static String uploadDirectoryConsultant = "Media/Content/Consultant/";
 

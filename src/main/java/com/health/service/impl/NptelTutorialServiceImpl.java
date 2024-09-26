@@ -32,6 +32,7 @@ import com.health.repository.NptelTutorialRepository;
 import com.health.repository.PackageEntityReopository;
 import com.health.service.LanguageService;
 import com.health.service.NptelTutorialService;
+import com.health.utility.CommonData;
 import com.health.utility.ServiceUtility;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -86,10 +87,10 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
             File tempFile = tempDir.resolve(file.getOriginalFilename()).toFile();
             file.transferTo(tempFile);
             String checksum = getSHA256Checksum(tempFile);
-            String fileName = file.getOriginalFilename();
+            String csvFileName = file.getOriginalFilename();
             PackageEntity tempPackageEntity = packageEntityRepo.findByChecksum(checksum);
             if (tempPackageEntity == null) {
-                tempPackageEntity = packageEntityRepo.findByFileName(fileName);
+                tempPackageEntity = packageEntityRepo.findByFileName(csvFileName);
             }
             if (tempPackageEntity != null) {
                 if (tempPackageEntity.getPackageId() != packageEntity.getPackageId()) {
@@ -101,7 +102,7 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
             int titleColumn = -1;
             int weekColumn = -1;
             int languageColumn = -1;
-            int urlColumn = -1;
+            int fileNameColumn = -1;
 
             for (int i = 0; i < header.length; i++) {
                 switch (header[i]) {
@@ -114,15 +115,15 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
                 case "Language":
                     languageColumn = i;
                     break;
-                case "Url":
-                    urlColumn = i;
+                case "FileName":
+                    fileNameColumn = i;
                     break;
                 }
             }
 
-            if (titleColumn == -1 || weekColumn == -1 || languageColumn == -1 || urlColumn == -1) {
+            if (titleColumn == -1 || weekColumn == -1 || languageColumn == -1 || fileNameColumn == -1) {
                 model.addAttribute("error_msg",
-                        "Some Errors Occurred; missing header for title, week, language, or url");
+                        "Some Errors Occurred; missing header for title, week, language, or FileName");
                 return;
             }
 
@@ -135,14 +136,14 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
             while ((row = csvReader.readNext()) != null) {
 
                 String titleLanguage = row[titleColumn] + "-" + row[languageColumn];
-                String url = row[urlColumn];
+                String fileName = row[fileNameColumn];
 
                 titleLanguageMap.computeIfAbsent(titleLanguage, k -> new ArrayList<>()).add(rowIndex);
-                urlMap.computeIfAbsent(url, k -> new ArrayList<>()).add(rowIndex);
+                urlMap.computeIfAbsent(fileName, k -> new ArrayList<>()).add(rowIndex);
 
                 rowIndex++;
 
-                if (!processRow(row, titleColumn, weekColumn, languageColumn, urlColumn, packageEntity, model,
+                if (!processRow(row, titleColumn, weekColumn, languageColumn, fileNameColumn, packageEntity, model,
                         nptelTutorialsList)) {
                     continue;
                 }
@@ -159,7 +160,7 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
             // Check for duplicates rows for same url. And add error messages
             for (Map.Entry<String, List<Integer>> entry : urlMap.entrySet()) {
                 if (entry.getValue().size() > 1) {
-                    errorMessages.add("Duplicate URL at S. No. " + entry.getValue());
+                    errorMessages.add("Duplicate language and fileName at S. No. " + entry.getValue());
                 }
             }
 
@@ -173,7 +174,7 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
             nptelTutorialRepo.saveAll(nptelTutorialsList);
 
             packageEntity.setDateUploaded(ServiceUtility.getCurrentTime());
-            packageEntity.setFileName(fileName);
+            packageEntity.setFileName(csvFileName);
             packageEntity.setChecksum(checksum);
             packageEntityRepo.save(packageEntity);
 
@@ -181,7 +182,7 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
         }
     }
 
-    private boolean processRow(String[] row, int titleColumn, int weekColumn, int languageColumn, int urlColumn,
+    private boolean processRow(String[] row, int titleColumn, int weekColumn, int languageColumn, int fileNameColumn,
             PackageEntity packageEntity, Model model, List<NptelTutorial> nptelTutorialsList) {
         logger.info("Processing row: {}", Arrays.toString(row));
 
@@ -190,23 +191,24 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
             model.addAttribute("error_msg", "Could not get language from " + row[languageColumn]);
             return false;
         }
-        String filePath = row[urlColumn];
-        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
+        String langName = lan.getLangName();
+        String fileName = row[fileNameColumn];
+        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), CommonData.uploadDirectorySource,
+                langName, fileName);
+        String temp = path.toString();
+        int indexToStart = temp.indexOf("Media");
+        String filePath = temp.substring(indexToStart, temp.length());
         logger.info(filePath);
 
         if (!Files.exists(path)) {
-            model.addAttribute("error_msg", "File does not exist; url : " + row[urlColumn]);
+            model.addAttribute("error_msg", "File does not exist; fileName : " + row[fileNameColumn]);
             return false;
         }
-
-        String fileName = path.getFileName().toString();
-
-        logger.info(row[urlColumn]);
 
         NptelTutorial nptelTutorial = nptelTutorialRepo.findByTitleAndPackageEntityAndLan(row[titleColumn],
                 packageEntity, lan);
         if (nptelTutorial == null) {
-            nptelTutorial = nptelTutorialRepo.findByVideoUrlAndPackageEntityAndLan(row[urlColumn], packageEntity, lan);
+            nptelTutorial = nptelTutorialRepo.findByVideoUrlAndPackageEntityAndLan(filePath, packageEntity, lan);
             if (nptelTutorial == null) {
                 nptelTutorial = new NptelTutorial();
                 nptelTutorial.setPackageEntity(packageEntity);
@@ -217,7 +219,7 @@ public class NptelTutorialServiceImpl implements NptelTutorialService {
         nptelTutorial.setTitle(row[titleColumn]);
         nptelTutorial.setWeek(Integer.parseInt(row[weekColumn]));
 
-        nptelTutorial.setVideoUrl(row[urlColumn]);
+        nptelTutorial.setVideoUrl(filePath);
         nptelTutorial.setDateAdded(ServiceUtility.getCurrentTime());
         nptelTutorial.setFileName(fileName);
         nptelTutorialsList.add(nptelTutorial);

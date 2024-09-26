@@ -1066,7 +1066,7 @@ public class HomeController {
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadNptelTutorial, "Sample_CSV_file_for_Nptel_Tutorial" + ".csv");
+                CommonData.uploadDirectorySource, "CSVFile", "Sample_CSV_file_for_Nptel_Tutorial" + ".csv");
         String temp = csvFilePath.toString();
         int indexToStart = temp.indexOf("Media");
         String document = temp.substring(indexToStart, temp.length());
@@ -4190,7 +4190,7 @@ public class HomeController {
 
             try {
 
-                String folder = CommonData.uploadDirectorySpokenVideo + lanId;
+                String folder = CommonData.uploadDirectorySource + lanId;
 
                 String document = ServiceUtility.uploadMediaFile(file, env, folder);
 
@@ -4287,7 +4287,7 @@ public class HomeController {
 
             try {
 
-                String folder = CommonData.uploadDirectorySpokenVideo + lanId;
+                String folder = CommonData.uploadDirectorySource + lanId;
 
                 String document = ServiceUtility.uploadMediaFile(file, env, folder);
                 SpokenVideo video = spokenVideoService.findByFilePath(document);
