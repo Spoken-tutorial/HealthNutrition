@@ -21,6 +21,9 @@ import com.health.service.LanguageService;
 import com.health.service.LiveTutorialService;
 import com.health.utility.ServiceUtility;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.RFC4180Parser;
+import com.opencsv.RFC4180ParserBuilder;
 import com.opencsv.exceptions.CsvException;
 
 @Service
@@ -52,8 +55,10 @@ public class LiveTutorialServiceImpl implements LiveTutorialService {
 
     @Override
     public void saveLiveTutorialsFromCSV(MultipartFile file, Model model) throws IOException, CsvException {
+        RFC4180Parser parser = new RFC4180ParserBuilder().build();
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-                CSVReader csvReader = new CSVReader(reader)) {
+                CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build()) {
             List<LiveTutorial> liveTutorialsList = new ArrayList<>();
             String[] header = csvReader.readNext();
             int namecolumn = -1;

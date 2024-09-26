@@ -147,7 +147,7 @@ public class CommonData {
     public static String uploadDirectoryScriptZipFiles = "Media/Content/Tutorial/ScriptZipFiles/";
 
     public static String uploadDirectoryTestimonial = "Media/Content/Testimonial/";
-    public static String uploadDirectorySpokenVideo = "Media/Content/Source/";
+    public static String uploadDirectorySource = "Media/Content/Source/";
 
     public static String uploadDirectoryConsultant = "Media/Content/Consultant/";
 
@@ -169,6 +169,7 @@ public class CommonData {
 
     public static String uploadResearchPaper = "Media/Content/ResearchPaper/";
     public static String uploadLiveTutorial = "Media/Content/LiveTutorial/";
+    public static String uploadNptelTutorial = "Media/Content/NptelTutorial/";
 
     public static String[] tutorialStatus = { ADD_CONTENT, ADMIN_REVIEW_MSG, DOMAIN_REVIEW_MSG, QUALITY_REVIEW_MSG,
             NEED_IMPROVEMENT_MSG, WAITING_PUBLISH, PUBLISHED };

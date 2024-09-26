@@ -55,9 +55,9 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         try {
 
             taskProcessingService.createOutlineFile();
-            taskProcessingService.addAllBrochureToQueue();
-            taskProcessingService.addAllResearchPapertoQueue();
-            taskProcessingService.addAllTuttorialsToQueue();
+//            taskProcessingService.addAllBrochureToQueue();
+//            taskProcessingService.addAllResearchPapertoQueue();
+//            taskProcessingService.addAllTuttorialsToQueue();
             taskProcessingService.intializeQueue();
             taskProcessingService.deleteQueueByApiStatus();
             taskProcessingService.queueProcessor();
@@ -77,6 +77,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
         new File(baseDir + CommonData.uploadDirectoryEvent).mkdirs();
         new File(baseDir + CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
         new File(baseDir + CommonData.uploadLiveTutorial).mkdirs();
+        new File(baseDir + CommonData.uploadNptelTutorial).mkdirs();
 
     }
 
