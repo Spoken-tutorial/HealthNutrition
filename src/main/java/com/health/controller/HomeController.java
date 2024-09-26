@@ -1577,12 +1577,49 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        boolean enabledPromoVideo = true;
+        boolean foundVideo = true;
+        List<PromoVideo> promoVideos = promoVideoService.findAllByShowOnHomePage();
+
+        if (promoVideos == null || promoVideos.size() == 0) {
+            enabledPromoVideo = false;
+            foundVideo = false;
+            model.addAttribute("enabledPromoVideo", enabledPromoVideo);
+            model.addAttribute("foundVideo", foundVideo);
+            return "promoVideoView";
+        }
+
+        model.addAttribute("PromoVideos", promoVideos.get(0).getVideoFiles());
 
         if (langName == null) {
             return "redirect:/";
         }
 
         Language lan = lanService.getByLanName(langName);
+        if (lan == null) {
+            return "redirect:/";
+        }
+        List<Language> lanList = promoVideos.get(0).findAlllanguages();
+
+        StringBuilder allLanguageNames = new StringBuilder();
+        for (Language lang : lanList) {
+
+            allLanguageNames.append(", ").append(lang.getLangName());
+        }
+
+        model.addAttribute("allLanguageNames", allLanguageNames.substring(2));
+        if (!lanList.contains(lan)) {
+            foundVideo = false;
+
+        } else {
+            int indexvalue = lanList.indexOf(lan);
+            lanList.remove(indexvalue);
+        }
+        model.addAttribute("enabledPromoVideo", enabledPromoVideo);
+        model.addAttribute("langName", langName);
+        model.addAttribute("language", lan);
+        model.addAttribute("languages", lanList);
+
         List<PathofPromoVideo> pathofPromoVideoList = pathofPromoVideoService.findByLanguage(lan);
         PromoVideo promoVideo = null;
         if (pathofPromoVideoList != null && pathofPromoVideoList.size() > 0) {
@@ -1591,8 +1628,11 @@ public class HomeController {
 
         String promoVideoFile = "";
 
-        if (lan == null || promoVideo == null) {
-            return "redirect:/";
+        if (promoVideo == null) {
+            foundVideo = false;
+            model.addAttribute("foundVideo", foundVideo);
+
+            return "promoVideoView";
         }
         int lanId = lan.getLanId();
 
@@ -1606,7 +1646,8 @@ public class HomeController {
 
         model.addAttribute("promoVideoFile", promoVideoFile);
         model.addAttribute("promoVideo", promoVideo);
-        model.addAttribute("langName", langName);
+
+        model.addAttribute("foundVideo", foundVideo);
 
         return "promoVideoView";
 

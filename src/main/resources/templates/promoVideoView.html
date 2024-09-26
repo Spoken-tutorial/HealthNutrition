@@ -8,24 +8,62 @@
 #tutorials_filter input{
 	width: 400px!important;
 }
+.share-button {
+            background-color: rgb(255, 255, 255);
+           
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 15px;
+            margin: 2px 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+   
+        }
+        .share-button:hover::after {
+          
+		    position: absolute;
+		    top: -30px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #333;
+		    color: #fff;
+		    padding: 5px 10px;
+		    border-radius: 4px;
+		    white-space: nowrap;
+		    z-index: 1000;
+		    opacity: 0.9;
+		    font-size: 12px;
+		    line-height: 1.2;
+		    pointer-events: none;
+        } 
+        
+ 
+          
+
 </style>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
-<section th:replace="index.html :: header-bar"></section>
-  <nav th:replace="index.html :: navbar"></nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+<section th:replace="index.html :: header-bar" ></section>
+<nav th:replace="index.html :: navbar"></nav>
+
 <div class="container">
 <div id="search-bar" class="container-lg mb-3 mt-5">
 
  
-     <h1 class="text-center"> <span style="color: #014F7A;font-size:2rem; border-bottom: 2px solid orange;">Promo Video</span></h1><br>
+     <h1 class="text-center laptop-only"> <span style="color: #014F7A;font-size:2rem; border-bottom: 2px solid orange;">Promo Video</span></h1><br>
     <div class="container-lg">
     	<div class="row">
     <div class="col-md-12 ">
    
-    <div class="card  pt-3" style="width: 100%;" >
-            <div class="card-image text-center" style="margin-left:15px; margin-right:15px;">
+    <div th:if="${enabledPromoVideo}" class="card  pt-3" style="width: 100%;" >
+            <div  class="card-image text-center" style="margin-left:15px; margin-right:15px;">
             <div  id="promoVideoViewSource" style="width:100%;">
-            <video class="promoVideoView" th:if="${promoVideoFile!= 'null'}" controls="controls" style="width:100%;" >
+            <video  class="promoVideoView" th:if="${promoVideoFile!= 'null' and foundVideo }" controls="controls" style="width:100%;" >
 			  <source th:src="@{/files/}+@{${promoVideoFile}}" type="video/mp4" />
  				Your browser does not support HTML video.
 			</video>
@@ -33,18 +71,41 @@
            </div>
             <div class="card-content  " >
               <div class="content">
-              <div style="float:left; margin-left:15px; margin-right:40px;">
-				  <br>
-               <h5 th:text="${promoVideo.getTitle()}"> </h5>
-                <span th:text="${langName}"> </span>
+              <div style="float:left; padding-top: 15px; margin-left:15px; margin-right:40px;">
+				 
+               <h5 th:if="${foundVideo}" th:text="${promoVideo.getTitle()}"> </h5>
+                 <span th:text="${allLanguageNames}"></span>
                 
               </div>
-            
+             <script th:inline="javascript">
+              var promoVideos = /*[[${PromoVideos}]]*/ null;
+      
+              </script>
                 
+              <div class="form-group" style="float:left; padding-top: 15px; margin-left:15px; margin-right:40px;">
+								<label for="languageId1"><h6>Select Language</h6></label> <select id="languageIdViewPage"
+									class="form-control" name="languageName" required="required">
+										<option  th:value="${language.getLanId()}" th:text="${language.getLangName()}"></option>
+										<option th:each="lan: ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}">
+												</option>
+								
+								</select>
+
+							</div>
+							
+				<div id="promoVideoViewPageId" style="float:left; padding-top: 15px; margin-left:5px; margin-right:40px;"> 
+				<a  id="promoVideoViewPageUrl" th:href="@{'/promoVideoView/'+ ${langName} + '/' }" style="display: none;"> View </a>
+				<button id="copyButtonViewPage" class="share-button" data-clipboard-target="#promoVideoViewPageUrl" title="Copy to clipboard"> Copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>
+				 </div>	
+              </div>
               
-              </div>
+                  	
             </div>
           </div>
+          <div th:unless="${foundVideo}">
+			  <p>No Video found for the language: <span th:text="${langName}"></span></p>
+			  
+		  </div>
     </div>
     </div>
     <br>

@@ -1735,6 +1735,63 @@ $("#languageId1").change(function() {
 });
 
 
+
+$("#languageIdViewPage").change(function() {
+
+						var lanId = $(this).find(":selected").val();
+						var video = promoVideos[lanId];
+						var outerhtml = '<video id="newvid1" class="vid1" controls="controls" style="width:100%;" >';
+						outerhtml += '<source src="/files/' + video + '" type="video/mp4" />';
+						outerhtml += 'Your browser does not support HTML video.'
+						outerhtml += '</video>';
+						outerhtml += '<script>';
+						outerhtml += 'new Plyr("#newvid1", {controls});';
+						outerhtml += 'document.getElementById("newvid1").addEventListener("play", function(){pauseAll(this)}, true);';
+						outerhtml += '</script>';
+						$('#promoVideoViewSource').html(outerhtml);
+						
+						var langName= $(this).find(":selected").text();
+						
+						var viewPromoVideo='<a id="promoVideoViewPageUrl" href="/promoVideoView/'+  langName + '/' + '" style="display: none;" >';
+						viewPromoVideo += 'View </a>';
+						viewPromoVideo += '<button id="copyButtonViewPage" class="share-button" data-clipboard-target="#promoVideoViewPageUrl" title="Copy to clipboard"> copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>'
+						$('#promoVideoViewPageId').html(viewPromoVideo);
+						
+						
+					});
+
+ $(document).ready(function() {
+				    var clipboard = new ClipboardJS('#copyButtonViewPage', {
+				        text: function(trigger) {
+				            return $('#promoVideoViewPageUrl').prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButtonViewPage');
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+				            button.html(originalHtml);
+				            button.attr('title', originalTitle);
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+
+});
+
+
+
+
 /**********************************************************************************************/
 			
 /***********************************Citation Start*********************************************/
