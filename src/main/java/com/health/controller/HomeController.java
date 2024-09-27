@@ -1601,19 +1601,9 @@ public class HomeController {
         }
         List<Language> lanList = promoVideos.get(0).findAlllanguages();
 
-        StringBuilder allLanguageNames = new StringBuilder();
-        for (Language lang : lanList) {
-
-            allLanguageNames.append(", ").append(lang.getLangName());
-        }
-
-        model.addAttribute("allLanguageNames", allLanguageNames.substring(2));
         if (!lanList.contains(lan)) {
             foundVideo = false;
 
-        } else {
-            int indexvalue = lanList.indexOf(lan);
-            lanList.remove(indexvalue);
         }
         model.addAttribute("enabledPromoVideo", enabledPromoVideo);
         model.addAttribute("langName", langName);

@@ -1757,6 +1757,8 @@ $("#languageIdViewPage").change(function() {
 						viewPromoVideo += '<button id="copyButtonViewPage" class="share-button" data-clipboard-target="#promoVideoViewPageUrl" title="Copy to clipboard"> copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>'
 						$('#promoVideoViewPageId').html(viewPromoVideo);
 						
+						var lanofCurrentVideo='<span>' +langName + '</span>';
+						$('#languageofCurrentVideo').html(lanofCurrentVideo);
 						
 					});
 

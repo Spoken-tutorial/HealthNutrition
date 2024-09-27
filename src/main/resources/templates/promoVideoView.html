@@ -74,7 +74,10 @@
               <div style="float:left; padding-top: 15px; margin-left:15px; margin-right:40px;">
 				 
                <h5 th:if="${foundVideo}" th:text="${promoVideo.getTitle()}"> </h5>
-                 <span th:text="${allLanguageNames}"></span>
+               <div id="languageofCurrentVideo">
+				   <span th:text="${langName}"></span>
+			   </div>
+                 
                 
               </div>
              <script th:inline="javascript">
@@ -85,7 +88,7 @@
               <div class="form-group" style="float:left; padding-top: 15px; margin-left:15px; margin-right:40px;">
 								<label for="languageId1"><h6>Select Language</h6></label> <select id="languageIdViewPage"
 									class="form-control" name="languageName" required="required">
-										<option  th:value="${language.getLanId()}" th:text="${language.getLangName()}"></option>
+										<option  value="0" >Select Language</option>
 										<option th:each="lan: ${languages}" th:value="${lan.getLanId()}" th:text="${lan.getLangName()}">
 												</option>
 								
@@ -103,7 +106,7 @@
             </div>
           </div>
           <div th:unless="${foundVideo}">
-			  <p>No Video found for the language: <span th:text="${langName}"></span></p>
+			  <p>No video found for the language: <span th:text="${langName}"></span></p>
 			  
 		  </div>
     </div>
