@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -114,6 +115,7 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
+import com.health.model.VideoResource;
 import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
@@ -153,6 +155,7 @@ import com.health.service.UserIndianLanguageMappingService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.service.VersionService;
+import com.health.service.VideoResourceService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -291,6 +294,9 @@ public class HomeController {
 
     @Autowired
     private PathofPromoVideoService pathofPromoVideoService;
+
+    @Autowired
+    private VideoResourceService videoResourceService;
 
     @Autowired
     private IndianLanguageService iLanService;
@@ -4184,7 +4190,7 @@ public class HomeController {
 
             try {
 
-                String folder = CommonData.uploadDirectorySpokenVideo + lanId;
+                String folder = CommonData.uploadDirectorySource + lanId;
 
                 String document = ServiceUtility.uploadMediaFile(file, env, folder);
 
@@ -4281,7 +4287,7 @@ public class HomeController {
 
             try {
 
-                String folder = CommonData.uploadDirectorySpokenVideo + lanId;
+                String folder = CommonData.uploadDirectorySource + lanId;
 
                 String document = ServiceUtility.uploadMediaFile(file, env, folder);
                 SpokenVideo video = spokenVideoService.findByFilePath(document);
@@ -4317,6 +4323,61 @@ public class HomeController {
     /**************************************************
      * Spoken Video End
      *************************************/
+
+    /************************************
+     * Video Resource Start
+     **********************/
+
+    @GetMapping("/addVideoResource")
+    public String addVideoResource(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        Path csvFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectorySource, "CSVFile", "Sample_CSV_file_for_Video_Resource" + ".csv");
+        String temp = csvFilePath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        model.addAttribute("sample_csv_file", document);
+
+        List<VideoResource> videoResourceList = videoResourceService.findAll();
+        Collections.sort(videoResourceList, VideoResource.SortByUploadTime);
+        model.addAttribute("videoResourceList", videoResourceList);
+        return "addVideoResource";
+    }
+
+    @PostMapping("/addVideoResource")
+    public String addNptelTutorialPost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
+            HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        try {
+            videoResourceService.saveVideoResourcesFromCSV(csv_file, model);
+
+        } catch (IOException e) {
+
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return addVideoResource(req, principal, model);
+        } catch (CsvException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return addVideoResource(req, principal, model);
+        } catch (NoSuchAlgorithmException e) {
+            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+            logger.error("Exception: ", e);
+            return addVideoResource(req, principal, model);
+        }
+
+        return addVideoResource(req, principal, model);
+    }
+
+    /***************************************
+     * Video Resource End
+     *********************/
 
     @GetMapping("/category/edit/{catName}")
     public String editCategoryGet(@PathVariable(name = "catName") String catName, HttpServletRequest req, Model model,

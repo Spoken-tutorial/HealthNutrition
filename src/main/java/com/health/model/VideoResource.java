@@ -1,6 +1,8 @@
 package com.health.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Comparator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +30,9 @@ public class VideoResource implements Serializable {
     @Column(name = "video_path", nullable = false, unique = true)
     private String videoPath;
 
+    @Column(name = "date_added", nullable = false)
+    private Timestamp dateAdded;
+
     @ManyToOne
     @JoinColumn(name = "lan_id", nullable = false)
     private Language lan;
@@ -52,6 +57,14 @@ public class VideoResource implements Serializable {
         return fileName;
     }
 
+    public Timestamp getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(Timestamp dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -69,12 +82,21 @@ public class VideoResource implements Serializable {
 
     }
 
-    public VideoResource(int id, String fileName, String videoPath, Language lan) {
+    public VideoResource(int id, String fileName, String videoPath, Timestamp dateAdded, Language lan) {
         super();
         this.id = id;
         this.fileName = fileName;
         this.videoPath = videoPath;
+        this.dateAdded = dateAdded;
         this.lan = lan;
     }
 
+    public static Comparator<VideoResource> SortByUploadTime = new Comparator<VideoResource>() {
+
+        @Override
+        public int compare(VideoResource t1, VideoResource t2) {
+            return t2.getDateAdded().compareTo(t1.getDateAdded());
+
+        }
+    };
 }

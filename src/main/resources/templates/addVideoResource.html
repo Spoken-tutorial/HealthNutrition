@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Video Resource - Admin - Health And Nutrition')"></head>
+<style>
+.nav-video_resource{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-video_resource a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">View</a></li>
+
+
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Video Resource</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+							
+										<form th:action="@{/addVideoResource}" method="post"
+											enctype="multipart/form-data" id="inputForm">
+											<div id="rawData">
+												
+											</div>
+											
+										
+											<br>
+																        
+									         <div class="form-group"  id=csv_file_div >
+											<label th:for="add_csv_file">Upload CSV File *</label>
+											
+											<input type="file" class="form-control" th:id="add_csv_file" name="add_csv_file"  accept=".csv" onchange="validate_file_size(this,50000000)"
+											  / >
+											<small> (Only csv format of max filesize 50 MB)</small > 
+	
+											</div>
+
+											
+											<button type="submit" class="btn  btn-success">Submit</button>
+										</form>
+										<br> <br>
+										<div class="mb-3" style="align-content: center; " ><i class="fas fa-file-download mr-3 fa-lg" style="float: left;"> </i> 
+										<a name="samplecsvdownload" target="_blank" th:href="@{/files/}+@{${sample_csv_file}}"
+										id="samplecsvdownload" style="font-size: large; position: relative; float: left;"> <h6>Download Sample CSV File</h6></a>
+							</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable">
+						
+							</div>
+							<thead>
+								<tr>
+									<th scope="col">Date Added</th>
+									<th scope="col">FileName</th>
+									<th scope="col">Language</th>
+									<th scope="col">Video</th>
+									 
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="videoResource : ${videoResourceList}">
+								 <td scope="row"><span th:text = "${videoResource.getDateAdded()}"></span></td>
+								 <td><span th:text = "${videoResource.getFileName()}"></span></td>
+							     <td><span th:text = "${videoResource.getLan().getLangName()}"></span></td>
+							      <td>
+							      	<div th:if="${videoResource.getVideoPath() != 'null'}"
+												style="width: 400px;">
+												<video controls="controls" style="width: 100%;">
+													<source th:src="@{/files/}+@{${videoResource.getVideoPath()}}"
+														type="video/mp4" />
+													Your browser does not support HTML video.
+												</video>
+											</div>
+								  </td>
+								  
+							    </tr>
+
+							</tbody>
+						</table >
+					</div>
+
+
+
+				</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+     $('#enterNewPackageName').hide();
+   
+} );
+</script>
+
+	<script th:inline="javascript">
+	
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>
