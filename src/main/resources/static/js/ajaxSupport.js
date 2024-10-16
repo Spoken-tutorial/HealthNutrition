@@ -1868,7 +1868,93 @@ $("#languageIdViewPage").change(function() {
                 }
             });
         });
-/***********************************Citation End***********************************************/			
+/***********************************Citation End***********************************************/		
+
+
+/************************   Assign Video Start *****************************************************/	
+
+$("#languageIdforAssignTutorial").change(function() {
+
+						var languageId = $(this).find(":selected").val();
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadVideoResourceByLanguage",
+							data : {
+								"languageId" : languageId
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + key + '>'
+		  			               + value
+		  			               + '</option>';
+		  	  			        })
+	  	  			            html += '</option>';
+								$("#videoResourceIds").prop('disabled',false);
+								$('#videoResourceIds').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+
+$(document).ready(function () {
+            const select = $('#videoResourceIds');
+
+            // Handle clicks on options to toggle selection without Ctrl key
+            select.on('mousedown', 'option', function (e) {
+                e.preventDefault();
+                const option = $(this);
+                option.prop('selected', !option.prop('selected'));
+            });
+
+            // Handle Ctrl+A for selecting/deselecting all options
+            $(document).keydown(function (e) {
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    const allOptions = select.find('option');
+                    const allSelected = allOptions.length === allOptions.filter(':selected').length;
+
+                    allOptions.prop('selected', !allSelected);
+                }
+            });
+        });
+
+
+
+  $('#packageContainerId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewPackageContainerName');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+      
+      
+      $('#weekId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewWeekName');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+/************************************Assign Video End ********************************************** */
 			
 			
 /***************** changes made by om prakash *********************************************/

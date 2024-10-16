@@ -88,6 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addPreRequisticWhenNotRequired/**", "/addPreRequistic/**", "/addVideo/**", "/addSlide/**",
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
+            "/assignTutorial",
 
     };
 

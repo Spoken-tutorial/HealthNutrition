@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -98,6 +99,7 @@ import com.health.model.Language;
 import com.health.model.LiveTutorial;
 import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
+import com.health.model.PackageContainer;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PostQuestionaire;
 import com.health.model.PromoVideo;
@@ -112,10 +114,12 @@ import com.health.model.TraineeInformation;
 import com.health.model.TrainingInformation;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
+import com.health.model.TutorialWithWeekAndPackage;
 import com.health.model.User;
 import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
 import com.health.model.VideoResource;
+import com.health.model.Week;
 import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
@@ -136,6 +140,7 @@ import com.health.service.LanguageService;
 import com.health.service.LiveTutorialService;
 import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
+import com.health.service.PackageContainerService;
 import com.health.service.PathofPromoVideoService;
 import com.health.service.PostQuestionaireService;
 import com.health.service.PromoVideoService;
@@ -151,11 +156,13 @@ import com.health.service.TraineeInformationService;
 import com.health.service.TrainingInformationService;
 import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
+import com.health.service.TutorialWithWeekAndPackageService;
 import com.health.service.UserIndianLanguageMappingService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.service.VersionService;
 import com.health.service.VideoResourceService;
+import com.health.service.WeekService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -219,6 +226,15 @@ public class HomeController {
 
     @Autowired
     private ResearchPaperService researchPaperService;
+
+    @Autowired
+    private PackageContainerService packageContainerService;
+
+    @Autowired
+    private WeekService weekService;
+
+    @Autowired
+    private TutorialWithWeekAndPackageService tutorialWithWeekAndPackageService;
 
     @Autowired
     private RoleService roleService;
@@ -4347,7 +4363,7 @@ public class HomeController {
     }
 
     @PostMapping("/addVideoResource")
-    public String addNptelTutorialPost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
+    public String addVideoResourcePost(@RequestParam(value = "add_csv_file") MultipartFile csv_file,
             HttpServletRequest req, Principal principal, Model model) {
 
         User usr = getUser(principal);
@@ -4378,6 +4394,118 @@ public class HomeController {
     /***************************************
      * Video Resource End
      *********************/
+
+    /******************************************
+     * Assign Tutorial on Week And Package Start
+     ********************/
+
+    @GetMapping("/assignTutorial")
+    public String assignTutorialGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        List<VideoResource> videoList = videoResourceService.findAll();
+
+        List<Language> languages = videoList.stream().map(VideoResource::getLan).collect(Collectors.toSet()).stream()
+                .collect(Collectors.toList());
+
+        languages.sort(Comparator.comparing(Language::getLangName));
+
+        model.addAttribute("languages", languages);
+
+        List<Week> weekList = weekService.findAll();
+        weekList.sort(Comparator.comparing(Week::getWeekName));
+
+        List<PackageContainer> packageList = packageContainerService.findAll();
+        packageList.sort(Comparator.comparing(PackageContainer::getPackageName));
+
+        model.addAttribute("weekList", weekList);
+        model.addAttribute("packageList", packageList);
+        List<TutorialWithWeekAndPackage> tutorials = tutorialWithWeekAndPackageService.findAll();
+        // Collections.sort(tutorials, TutorialWithWeekAndPackage.SortByUploadTime);
+        model.addAttribute("tutorials", tutorials);
+        return "assignTutorialToWeekAndPack";
+    }
+
+    @PostMapping("/assignTutorial")
+    public String assignTutorialPost(@RequestParam(name = "packageContainerId") int packageContainerId,
+            @RequestParam(name = "packageName") String packageName, @RequestParam(name = "weekId") int weekId,
+            @RequestParam(name = "weekName") String weekName, @RequestParam(name = "title") String title,
+            @RequestParam(name = "languageId") int languageId,
+            @RequestParam(name = "videoResourceIds") int[] videoResourceIds,
+
+            HttpServletRequest req, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        PackageContainer packageContainer;
+
+        if (packageContainerId == 0 || weekId == 0 || languageId == 0) {
+            model.addAttribute("error_msg", "package, week and language should not be null");
+            return assignTutorialGet(req, principal, model);
+        }
+
+        if (packageContainerId == -1) {
+            packageContainer = packageContainerService.findByPackageName(packageName);
+        } else {
+            packageContainer = packageContainerService.findByPackageId(packageContainerId);
+        }
+
+        if (packageContainer == null) {
+            packageContainer = new PackageContainer();
+            packageContainer.setPackageName(packageName);
+            packageContainer.setDateAdded(ServiceUtility.getCurrentTime());
+            packageContainerService.save(packageContainer);
+        }
+
+        Week week;
+
+        if (weekId == -1) {
+            week = weekService.findByWeekName(weekName);
+        } else {
+            week = weekService.findByWeekId(weekId);
+        }
+
+        if (week == null) {
+            week = new Week();
+            week.setWeekName(weekName);
+            week.setDateAdded(ServiceUtility.getCurrentTime());
+            weekService.save(week);
+        }
+
+        if (title == null || title.isEmpty() || videoResourceIds.length == 0) {
+            model.addAttribute("error_msg", "title  and video should not be null");
+            return assignTutorialGet(req, principal, model);
+        }
+
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+
+        List<TutorialWithWeekAndPackage> tutorialList = new ArrayList<>();
+
+        try {
+            for (int i = 0; i < videoResourceIds.length; i++) {
+                VideoResource videoResource = videoResourceService.findById(videoResourceIds[i]);
+                tutorialList
+                        .add(new TutorialWithWeekAndPackage(title, dateAdded, week, packageContainer, videoResource));
+            }
+
+            tutorialWithWeekAndPackageService.saveAll(tutorialList);
+
+        } catch (Exception e) {
+            model.addAttribute("error_msg", "Some errors occured, Please contact to Admin");
+            return assignTutorialGet(req, principal, model);
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+
+        return assignTutorialGet(req, principal, model);
+    }
+
+    /******************************************
+     * Assign Tutorial on Week And Package End
+     ********************/
 
     @GetMapping("/category/edit/{catName}")
     public String editCategoryGet(@PathVariable(name = "catName") String catName, HttpServletRequest req, Model model,
