@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -1623,10 +1622,6 @@ public class HomeController {
         }
         List<Language> lanList = promoVideos.get(0).findAlllanguages();
 
-        if (!lanList.contains(lan)) {
-            foundVideo = false;
-
-        }
         model.addAttribute("enabledPromoVideo", enabledPromoVideo);
         model.addAttribute("langName", langName);
         model.addAttribute("language", lan);
@@ -1658,7 +1653,7 @@ public class HomeController {
 
         model.addAttribute("promoVideoFile", promoVideoFile);
         model.addAttribute("promoVideo", promoVideo);
-
+        foundVideo = (promoVideoFile != null);
         model.addAttribute("foundVideo", foundVideo);
 
         return "promoVideoView";
@@ -4373,16 +4368,7 @@ public class HomeController {
         try {
             videoResourceService.saveVideoResourcesFromCSV(csv_file, model);
 
-        } catch (IOException e) {
-
-            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
-            logger.error("Exception: ", e);
-            return addVideoResource(req, principal, model);
-        } catch (CsvException e) {
-            model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
-            logger.error("Exception: ", e);
-            return addVideoResource(req, principal, model);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (Exception e) {
             model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
             logger.error("Exception: ", e);
             return addVideoResource(req, principal, model);
