@@ -61,10 +61,44 @@
   fill:#ffffff; /* change to your desired color */
 }
     
+.share-button {
+            background-color: rgb(255, 255, 255);
+           
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 15px;
+            margin: 2px 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+   
+        }
+        .share-button:hover::after {
+          
+		    position: absolute;
+		    top: -30px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #333;
+		    color: #fff;
+		    padding: 5px 10px;
+		    border-radius: 4px;
+		    white-space: nowrap;
+		    z-index: 1000;
+		    opacity: 0.9;
+		    font-size: 12px;
+		    line-height: 1.2;
+		    pointer-events: none;
+        }    
     </style>
   </head>
   <body>
    <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+
   <div id="back-to-top">
   <a href="#top-fixed-banner"><i class="fas fa-chevron-circle-up"></i></a>
   </div>
@@ -461,6 +495,11 @@ the globe.
 								</select>
 
 							</div>
+							
+				<div id="promoVideoViewId" style="float:left; margin-left:5px; margin-right:40px;"> 
+				<a  id="promoVideoViewUrl" th:href="@{'/promoVideoView/'+ ${pro.GetLangNameofFirstVideoFile()} + '/' }" style="display: none;"> View </a>
+				<button id="copyButton" class="share-button" data-clipboard-target="#promoVideoViewUrl" title="Copy to clipboard"> Copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>
+				 </div>			
                 
               </div>
             </div>

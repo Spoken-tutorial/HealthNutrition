@@ -1694,7 +1694,104 @@ $("#languageId1").change(function() {
 						outerhtml += 'document.getElementById("newvid1").addEventListener("play", function(){pauseAll(this)}, true);';
 						outerhtml += '</script>';
 						$('#promoVideoSourceOuter').html(outerhtml);
+						
+						var langName= $(this).find(":selected").text();
+						var promoVideoId = $('#promoVideoId').val();
+						var viewPromoVideo='<a id="promoVideoViewUrl" href="/promoVideoView/'+  langName + '/' + '" style="display: none;" >';
+						viewPromoVideo += 'View </a>';
+						viewPromoVideo += '<button id="copyButton" class="share-button" data-clipboard-target="#promoVideoViewUrl" title="Copy to clipboard"> copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>'
+						$('#promoVideoViewId').html(viewPromoVideo);
+						
+						
 					});
+
+ $(document).ready(function() {
+				    var clipboard = new ClipboardJS('#copyButton', {
+				        text: function(trigger) {
+				            return $('#promoVideoViewUrl').prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButton');
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+				            button.html(originalHtml);
+				            button.attr('title', originalTitle);
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+
+});
+
+
+
+$("#languageIdViewPage").change(function() {
+
+						var lanId = $(this).find(":selected").val();
+						var video = promoVideos[lanId];
+						var outerhtml = '<video id="newvid1" class="vid1" controls="controls" style="width:100%;" >';
+						outerhtml += '<source src="/files/' + video + '" type="video/mp4" />';
+						outerhtml += 'Your browser does not support HTML video.'
+						outerhtml += '</video>';
+						outerhtml += '<script>';
+						outerhtml += 'new Plyr("#newvid1", {controls});';
+						outerhtml += 'document.getElementById("newvid1").addEventListener("play", function(){pauseAll(this)}, true);';
+						outerhtml += '</script>';
+						$('#promoVideoViewSource').html(outerhtml);
+						
+						var langName= $(this).find(":selected").text();
+						
+						var viewPromoVideo='<a id="promoVideoViewPageUrl" href="/promoVideoView/'+  langName + '/' + '" style="display: none;" >';
+						viewPromoVideo += 'View </a>';
+						viewPromoVideo += '<button id="copyButtonViewPage" class="share-button" data-clipboard-target="#promoVideoViewPageUrl" title="Copy to clipboard"> copy <i style="font-size:14px" class="fa">&#xf0c5;</i> </button>'
+						$('#promoVideoViewPageId').html(viewPromoVideo);
+						
+						var lanofCurrentVideo='<span>' +langName + '</span>';
+						$('#languageofCurrentVideo').html(lanofCurrentVideo);
+						
+					});
+
+ $(document).ready(function() {
+				    var clipboard = new ClipboardJS('#copyButtonViewPage', {
+				        text: function(trigger) {
+				            return $('#promoVideoViewPageUrl').prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButtonViewPage');
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+				            button.html(originalHtml);
+				            button.attr('title', originalTitle);
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+
+});
+
+
 
 
 /**********************************************************************************************/
@@ -1771,7 +1868,93 @@ $("#languageId1").change(function() {
                 }
             });
         });
-/***********************************Citation End***********************************************/			
+/***********************************Citation End***********************************************/		
+
+
+/************************   Assign Video Start *****************************************************/	
+
+$("#languageIdforAssignTutorial").change(function() {
+
+						var languageId = $(this).find(":selected").val();
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadVideoResourceByLanguage",
+							data : {
+								"languageId" : languageId
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + key + '>'
+		  			               + value
+		  			               + '</option>';
+		  	  			        })
+	  	  			            html += '</option>';
+								$("#videoResourceIds").prop('disabled',false);
+								$('#videoResourceIds').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+
+$(document).ready(function () {
+            const select = $('#videoResourceIds');
+
+            // Handle clicks on options to toggle selection without Ctrl key
+            select.on('mousedown', 'option', function (e) {
+                e.preventDefault();
+                const option = $(this);
+                option.prop('selected', !option.prop('selected'));
+            });
+
+            // Handle Ctrl+A for selecting/deselecting all options
+            $(document).keydown(function (e) {
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    const allOptions = select.find('option');
+                    const allSelected = allOptions.length === allOptions.filter(':selected').length;
+
+                    allOptions.prop('selected', !allSelected);
+                }
+            });
+        });
+
+
+
+  $('#packageContainerId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewPackageContainerName');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+      
+      
+      $('#weekId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewWeekName');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+/************************************Assign Video End ********************************************** */
 			
 			
 /***************** changes made by om prakash *********************************************/

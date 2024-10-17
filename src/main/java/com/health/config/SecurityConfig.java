@@ -52,7 +52,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/Slide/**", "/TimeScript/**", "/OriginalScript/**", "/Brochure-English/**", "/Brochure/**",
             "/ResearchPaper/**", "/downloads", "/loadLanguageByCategoryResource", "/autosuggest/**",
             "/loadLanguageAndTopicByCategoryResource", "/loadTutorialCountByTopicAndLanguage",
-            "/loadTutorialCountByTopics", "/downloadResources", "/citations", "/api/scriptPublished/**", };
+            "/loadTutorialCountByTopics", "/downloadResources", "/citations", "/api/scriptPublished/**",
+            "/promoVideoView/**", };
 
     /**
      * url matcher for SUPERADMIN
@@ -86,7 +87,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String[] CONTRIBUTOR_URL = { "/uploadTutorial/**", "/addOutline/**", "/addKeyword**",
             "/addPreRequisticWhenNotRequired/**", "/addPreRequistic/**", "/addVideo/**", "/addSlide/**",
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
-            "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**",
+            "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
+            "/assignTutorial",
 
     };
 

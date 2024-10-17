@@ -1,6 +1,10 @@
 package com.health.model;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Component;
+
+import com.health.utility.ServiceUtility;
 
 @Component
 public class DocumentSearch {
@@ -159,6 +163,16 @@ public class DocumentSearch {
 
     public void setOutlineContent(String outlineContent) {
         this.outlineContent = outlineContent;
+    }
+
+    public String getOutlineContentUpto600() {
+        if (outlineContent.length() > 557) {
+            String tempcontent = outlineContent.substring(0, 557) + "...";
+            Document document = Jsoup.parseBodyFragment(tempcontent, "");
+            ServiceUtility.addMissingHtmlTag(document.body());
+            return document.body().html();
+        }
+        return outlineContent;
     }
 
     public int getRank() {

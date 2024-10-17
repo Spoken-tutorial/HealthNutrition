@@ -63,6 +63,7 @@ import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.Version;
+import com.health.model.VideoResource;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -92,6 +93,7 @@ import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.service.VersionService;
+import com.health.service.VideoResourceService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -118,6 +120,9 @@ public class AjaxController {
 
     @Autowired
     private PromoVideoService promoVideoService;
+
+    @Autowired
+    private VideoResourceService videoResourceService;
 
     @Autowired
     private ResearchPaperService researchPaperService;
@@ -957,6 +962,27 @@ public class AjaxController {
         }
 
         return topicName;
+    }
+
+    @RequestMapping("/loadVideoResourceByLanguage")
+    public @ResponseBody HashMap<Integer, String> getVideoResourceByLanguage(
+            @RequestParam(value = "languageId") int languageId) {
+        HashMap<Integer, String> videoName = new HashMap<>();
+
+        Language lan = langService.getById(languageId);
+        logger.info("Variables of getVideoResourceByLanguage languageId :{} language : {}", languageId, lan);
+
+        String langName = lan.getLangName();
+
+        List<VideoResource> videoresources = videoResourceService.findByLangName(langName);
+
+        for (VideoResource temp : videoresources) {
+
+            videoName.put(temp.getId(), temp.getFileName());
+
+        }
+
+        return videoName;
     }
 
     @RequestMapping("/loadPromoVideoByLanguage")

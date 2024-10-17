@@ -88,6 +88,9 @@ public class Language implements Comparable<Language>, Serializable {
     @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<SpokenVideo> spokenVideos = new HashSet<SpokenVideo>();
 
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<VideoResource> videoResources = new HashSet<VideoResource>();
+
     public Set<LiveTutorial> getLiveTutorial() {
         return liveTutorial;
     }
