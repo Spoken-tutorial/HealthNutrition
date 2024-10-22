@@ -34,7 +34,7 @@ public class PackageContainer implements Serializable {
     private boolean status = true;
 
     @OneToMany(mappedBy = "packageContainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<TutorialWithWeekAndPackage> tutorialsWithWeekAndPack = new HashSet<TutorialWithWeekAndPackage>();
+    private Set<PackageLanguage> packageLanguages = new HashSet<PackageLanguage>();
 
     public int getPackageId() {
         return packageId;
@@ -56,12 +56,12 @@ public class PackageContainer implements Serializable {
         return dateAdded;
     }
 
-    public Set<TutorialWithWeekAndPackage> getTutorialsWithWeekAndPack() {
-        return tutorialsWithWeekAndPack;
+    public Set<PackageLanguage> getPackageLanguages() {
+        return packageLanguages;
     }
 
-    public void setTutorialsWithWeekAndPack(Set<TutorialWithWeekAndPackage> tutorialsWithWeekAndPack) {
-        this.tutorialsWithWeekAndPack = tutorialsWithWeekAndPack;
+    public void setPackageLanguages(Set<PackageLanguage> packageLanguages) {
+        this.packageLanguages = packageLanguages;
     }
 
     public void setDateAdded(Timestamp dateAdded) {

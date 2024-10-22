@@ -8,8 +8,6 @@ public interface WeekService {
 
     Week findByWeekId(int weekId);
 
-    Week findByWeekName(String weekName);
-
     List<Week> findAll();
 
     void save(Week week);

@@ -23,9 +23,6 @@ public class TutorialWithWeekAndPackage implements Serializable {
     @Column(nullable = false, updatable = false)
     private int id;
 
-    @Column(name = "title", nullable = false)
-    private String title;
-
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
@@ -33,16 +30,12 @@ public class TutorialWithWeekAndPackage implements Serializable {
     private boolean status = true;
 
     @ManyToOne
-    @JoinColumn(name = "week_id", nullable = false)
-    private Week week;
+    @JoinColumn(name = "week_title_id", nullable = false)
+    private WeekTitle weekTitle;
 
     @ManyToOne
-    @JoinColumn(name = "package_id", nullable = false)
-    private PackageContainer packageContainer;
-
-    @ManyToOne
-    @JoinColumn(name = "video_resource_id", nullable = false)
-    private VideoResource videoResource;
+    @JoinColumn(name = "package_lan_id", nullable = false)
+    private PackageLanguage packageLanguage;
 
     public int getId() {
         return id;
@@ -52,36 +45,20 @@ public class TutorialWithWeekAndPackage implements Serializable {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public WeekTitle getWeekTitle() {
+        return weekTitle;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setWeekTitle(WeekTitle weekTitle) {
+        this.weekTitle = weekTitle;
     }
 
-    public Week getWeek() {
-        return week;
+    public PackageLanguage getPackageLanguage() {
+        return packageLanguage;
     }
 
-    public void setWeek(Week week) {
-        this.week = week;
-    }
-
-    public PackageContainer getPackageContainer() {
-        return packageContainer;
-    }
-
-    public void setPackageContainer(PackageContainer packageContainer) {
-        this.packageContainer = packageContainer;
-    }
-
-    public VideoResource getVideoResource() {
-        return videoResource;
-    }
-
-    public void setVideoResource(VideoResource videoResource) {
-        this.videoResource = videoResource;
+    public void setPackageLanguage(PackageLanguage packageLanguage) {
+        this.packageLanguage = packageLanguage;
     }
 
     public Timestamp getDateAdded() {
@@ -100,38 +77,31 @@ public class TutorialWithWeekAndPackage implements Serializable {
         this.status = status;
     }
 
-    public TutorialWithWeekAndPackage(String title, Timestamp dateAdded, boolean status, Week week,
-            PackageContainer packageContainer, VideoResource videoResource) {
-
-        this.title = title;
+    public TutorialWithWeekAndPackage(Timestamp dateAdded, boolean status, WeekTitle weekTitle,
+            PackageLanguage packageLanguage) {
+        super();
         this.dateAdded = dateAdded;
         this.status = status;
-        this.week = week;
-        this.packageContainer = packageContainer;
-        this.videoResource = videoResource;
+        this.weekTitle = weekTitle;
+        this.packageLanguage = packageLanguage;
+
     }
 
-    public TutorialWithWeekAndPackage(String title, Timestamp dateAdded, Week week, PackageContainer packageContainer,
-            VideoResource videoResource) {
-
-        this.title = title;
+    public TutorialWithWeekAndPackage(Timestamp dateAdded, WeekTitle weekTitle, PackageLanguage packageLanguage) {
+        super();
         this.dateAdded = dateAdded;
-        this.week = week;
-        this.packageContainer = packageContainer;
-        this.videoResource = videoResource;
+        this.weekTitle = weekTitle;
+        this.packageLanguage = packageLanguage;
+
     }
 
     public TutorialWithWeekAndPackage() {
-
+        super();
     }
 
-//    public static Comparator<TutorialWithWeekAndPackage> SortByUploadTime = new Comparator<TutorialWithWeekAndPackage>() {
-//
-//        @Override
-//        public int compare(TutorialWithWeekAndPackage t1, TutorialWithWeekAndPackage t2) {
-//            return t2.getDateAdded().compareTo(t1.getDateAdded());
-//
-//        }
-//    };
+    @Override
+    public String toString() {
+        return "TutorialWithWeekAndPackage [weekTitle=" + weekTitle + ", packageLanguage=" + packageLanguage + "]";
+    }
 
 }

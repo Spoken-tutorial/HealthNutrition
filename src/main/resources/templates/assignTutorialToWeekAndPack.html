@@ -53,11 +53,11 @@ font-weight:bold!important;
 						role="tabpanel" aria-labelledby="home-tab">
 						<div class="card">
 							<div class="card-header">
-								<h4>Assign Tutorial to Week And Package</h4>
+								<h4>Create Package of Tutorials</h4>
 							</div>
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-6">
+									<div class="col-lg-8">
 							
 										<form th:action="@{/assignTutorial}" method="post"
 											enctype="multipart/form-data" id="inputForm">
@@ -91,38 +91,9 @@ font-weight:bold!important;
 
 											</div>
 											
-											 <div class="form-group">
-													<label for="weekId"><b>Select Week *</b></label> <select id="weekId"
-														class="form-control" name="weekId" required="required">
-
-															<option value='0'>Select Week</option>
-															<option value='-1'>Enter New Week</option>
-															<option th:each="weekItr: ${weekList}" th:value="${weekItr.getWeekId()}" th:text="${weekItr.getWeekName()}">
-														</option>
-								
-													</select>
-
-											</div>
+											
 							
-							
-
-											<div class="form-group" id="enterNewWeekName">
-
-													<label for="weekName"><b>Week</b></label> <input type="text"
-													class="form-control" id="weekName" name="weekName"
-														 placeholder="Enter Week name" />
-
-											</div>
-
-											<div class="form-group" id="title">
-
-													<label for="title"><b>Title *</b></label> <input type="text"
-													class="form-control" id="title" name="title"
-														 placeholder="Enter Title" required="required" />
-
-											</div>
-
-									
+														
 											
 											 <div class="form-group">
 													<label for="languageId"><b>Select Language *</b></label> <select id="languageIdforAssignTutorial"
@@ -138,23 +109,59 @@ font-weight:bold!important;
 											</div>
 					
 											
-											<div class="form-group">
-											<span>To select all videoes press ctrl + A keys. </span>
-											<br>
-											<label for="videoResourceIds">Select Video * </label> 
-											<select
-												id="videoResourceIds" class="form-control" name="videoResourceIds"
-												required="required" size="15" multiple="multiple">
+										 <input type="hidden" id="lengthofweek" name="lengthofweek"  th:value="${weekList.size()}"/>	
+										
+									<div th:each="week,iter: ${weekList}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									
+									<div class="container">
+								        <div class="row">
+								            <div class="col-md-4">
+								              
+								               <div class="form-group">
+		               	                 		<label th:if="${iter.index == 0}" th:for="${'weekId' + iter.index}">Select Week </label>
+												<select th:id="${'weekId' + iter.index}" class="form-control week-select" name="weekName" th:data-index="${iter.index}">
+			  									<option value="0">Select Week</option>
+			  									<option th:each="weekitr : ${weekList}" th:value="${weekitr.getWeekId()}" th:text="${weekitr.getWeekName()}"></option>
+												</select>
+		  									</div>
+								            
+								            </div>
+								            
+								            <div class="col-md-4">
+										      
+										        <div class="form-group">
+												<label th:if="${iter.index == 0}"  th:for="${'video' + iter.index}">Video*  </label>
+												<select th:id="${'videoId' + iter.index}" class="form-control video-select" name="videoName"  th:data-index="${iter.index}">
+												 <option value="0">Select Video</option>	</select>
+												</div>
 												
-											</select>
-										</div>
+								            </div>
+								            
+								            <div class="col-md-4">
+												
+								            <div class="form-group">
 
-											  
+												<label th:if="${iter.index == 0}" th:for="${'title' + iter.index}">Title</label> <input type="text"
+												class="form-control" th:id="${'titleId' + iter.index}" name="title" th:data-index="${iter.index}" />
+
+											</div>
+												
+								            </div>
+								        </div>
+								    </div>
+									
+									
+
+									
+
+									
+									<br>
+									</div>									  
 											<br>
 																        
 									        
 											
-											<button type="submit" class="btn  btn-success">Submit</button>
+											<button type="submit" class="btn  btn-success"  style="float:left;  margin-left:15px; margin-right:40px;">Submit</button>
 										</form>
 										
 									
@@ -173,34 +180,29 @@ font-weight:bold!important;
 								<tr>
 									<th scope="col">Date Added</th>
 									<th scope="col">Package</th>
-									<th scope="col">Title</th>
-									<th scope="col">Week</th>
 									<th scope="col">Language</th>
-									<th scope="col">Video</th>
+									<th scope="col">WeekTitleVideo</th>
+									
 									 
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:each="tut : ${tutorials}">
-								 <td scope="row"><span th:text = "${tut.getDateAdded()}"></span></td>
-								 <td><span th:text = "${tut.getPackageContainer().getPackageName()}"></span></td>
-							      <td><span th:text = "${tut.getTitle()}"></span></td>
-							      <td><span th:text = "${tut.getWeek().getWeekName()}"></span></td>
-							      <td><span th:text = "${tut.getVideoResource().getLan().getLangName()}"></span></td>
-							    
+								<tr th:each="temp : ${packLanList}">
+								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
+								 <td><span th:text = "${temp.getPackageContainer().getPackageName()}"></span></td>
+							      <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
 							      <td>
-									
-							      	<div th:if="${tut.getVideoResource().getVideoPath() != 'null'}"
-												style="width: 400px;">
-												<video controls="controls" style="width: 100%;">
-													<source th:src="@{/files/}+@{${tut.getVideoResource().getVideoPath()}}"
-														type="video/mp4" />
-													Your browser does not support HTML video.
-												</video>
-											</div>
-										<span th:text = "${tut.getVideoResource().getFileName()}">	
-										
+									    <div th:if="${temp.getAllWeekTitle() != null}">
+						                    <table>
+						                        <tr th:each="weektitleTemp : ${temp.getAllWeekTitle()}">
+						                            <td><span th:text="${weektitleTemp.getWeek().getWeekName()}"></span></td>
+						                            <td><span th:text="${weektitleTemp.getVideoResource().getFileName()}"></span></td>
+						                            <td><span th:text="${weektitleTemp.getTitle()}"></span></td>
+						                        </tr>
+						                    </table>
+						                </div>
 								  </td>
+							     
 								  
 							    </tr>
 
@@ -227,6 +229,47 @@ $(document).ready( function () {
       $('#enterNewWeekName').hide();
    
 } );
+
+var divid = 0;
+
+function addListener(divid) {
+	var weekSelect = document.getElementById("weekId" + (divid - 1));
+	if (weekSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	weekSelect.addEventListener("change", function() {
+	  var selectedWeek = weekSelect.value;
+	  if (selectedWeek !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+function setRequired(divid) {
+	var languageName = document.getElementById("languageNameId" + divid).value;
+	var video = document.getElementById("video" + divid);
+	var title = document.getElementById("title" + divid);
+	video.required = (value != "");
+	title.required = (value != "");
+	return false;
+}
+
+addRow(divid);
+
+
 </script>
 
 	<script th:inline="javascript">

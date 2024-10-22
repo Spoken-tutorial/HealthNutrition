@@ -8,6 +8,4 @@ public interface WeekRepository extends JpaRepository<Week, Integer> {
 
     Week findByWeekId(int weekId);
 
-    Week findByWeekName(String weekName);
-
 }
