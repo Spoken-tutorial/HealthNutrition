@@ -4395,7 +4395,7 @@ public class HomeController {
      * Assign Tutorial on Week And Package Start
      ********************/
 
-    @GetMapping("/assignTutorial")
+    @GetMapping("/createPackage")
     public String createPackageGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
@@ -4424,10 +4424,10 @@ public class HomeController {
         List<TutorialWithWeekAndPackage> tutorialweekpackList = tutorialWithWeekAndPackageService.findAll();
         // Collections.sort(tutorials, TutorialWithWeekAndPackage.SortByUploadTime);
         model.addAttribute("tutorialweekpackList", tutorialweekpackList);
-        return "assignTutorialToWeekAndPack";
+        return "addPackage";
     }
 
-    @PostMapping("/assignTutorial")
+    @PostMapping("/createPackage")
     public String createPackagePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "packageContainerId") int packageContainerId,
             @RequestParam(name = "packageName") String packageName, @RequestParam(name = "languageId") int languageId,
@@ -4438,13 +4438,18 @@ public class HomeController {
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         PackageContainer packageContainer;
+        boolean viewSection = false;
 
         if (packageContainerId == 0 || languageId == 0) {
             model.addAttribute("error_msg", "Package and language should not be null");
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
             return createPackageGet(req, principal, model);
         }
 
         if (weekIds.isEmpty() || videoIds.isEmpty()) {
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
             model.addAttribute("error_msg", "Week and video should not be null");
             return createPackageGet(req, principal, model);
         }
@@ -4520,12 +4525,13 @@ public class HomeController {
             return createPackageGet(req, principal, model);
         }
 
+        model.addAttribute("viewSection", viewSection);
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
         return createPackageGet(req, principal, model);
     }
 
     /******************************************
-     * Assign Tutorial on Week And Package End
+     * AssTutorial on Week And Package End
      ********************/
 
     @GetMapping("/category/edit/{catName}")

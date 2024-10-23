@@ -1924,6 +1924,9 @@ $("#languageIdforAssignTutorial").change(function() {
          console.log("language", languageId);
 
         if (weekId != '0' && videoId != '0' && languageId != '0') {
+			  $('.package_input').prop('disabled', true);
+   			  $('.language-input').prop('disabled', true);
+			
             $.ajax({
                 type: 'GET',
                 url: projectPath + 'findTitleByWeekVideoAndLangName',
@@ -1942,7 +1945,7 @@ $("#languageIdforAssignTutorial").change(function() {
                        // titleInput.prop('value', title);
                          console.log(titleInput.val());
                        
-                        titleInput.prop('disabled', false);
+                        titleInput.prop('disabled', true);
                     } else {
                        // titleInput.val('');
                        titleInput.prop('disabled', false);
@@ -1952,16 +1955,23 @@ $("#languageIdforAssignTutorial").change(function() {
                     console.log('Error: ' + JSON.stringify(err));
                 }
             });
-        } else {
-            var titleInput = $('#titleId' + index);
-           // titleInput.val('');
-           // titleInput.prop('disabled', false);
-        }
+        } 
     });
 
 
 
- 
+ $('#inputForm').submit(function(event) {
+    // Enable all disabled  inputs before form submission
+    $('.title-input').prop('disabled', false);
+    $('.package_input').prop('disabled', false);
+    $('.language-input').prop('disabled', false);
+
+    // Optional: Log form data for debugging
+    var formData = $(this).serializeArray();
+    console.log(formData); // Inspect the form data
+
+    
+});
 
 $(document).ready(function () {
             const select = $('#videoResourceIds');

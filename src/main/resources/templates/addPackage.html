@@ -1,14 +1,14 @@
 
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
-<head th:replace="common/trail :: common-trail (pageTitle='Assign Tutorial - Admin - Health And Nutrition')"></head>
+<head th:replace="common/trail :: common-trail (pageTitle='Create Package - Admin - Health And Nutrition')"></head>
 <style>
-.nav-assign_tutorial{
+.nav-create_package{
 border-right: 5px solid orange;
 font-size:0.9rem;
 /* text-decoration: underline; */
 }
-.nav-assign_tutorial a{
+.nav-create_package a{
 color: #044F7A!important;
 font-weight:bold!important;
 }
@@ -42,7 +42,7 @@ font-weight:bold!important;
 					<li class="nav-item"><a class="nav-link active" id="home-tab"
 						data-toggle="tab" href="#add" role="tab" aria-controls="home"
 						aria-selected="true">Add</a></li>
-					<li class="nav-item"><a class="nav-link" id="profile-tab"
+					<li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="profile-tab"
 						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
 						aria-selected="false">View</a></li>
 
@@ -59,7 +59,7 @@ font-weight:bold!important;
 								<div class="row">
 									<div class="col-lg-8">
 							
-										<form th:action="@{/assignTutorial}" method="post"
+										<form th:action="@{/createPackage}" method="post"
 											enctype="multipart/form-data" id="inputForm">
 											<div id="rawData">
 												
@@ -70,7 +70,7 @@ font-weight:bold!important;
 											  
 											  <div class="form-group">
 													<label for="packageContainerId"><b>Select Package *</b></label> <select id="packageContainerId"
-														class="form-control" name="packageContainerId" required="required">
+														class="form-control package_input" name="packageContainerId" required="required">
 
 															<option value='0'>Select Package</option>
 															<option value='-1'>Enter New Package</option>
@@ -97,7 +97,7 @@ font-weight:bold!important;
 											
 											 <div class="form-group">
 													<label for="languageId"><b>Select Language *</b></label> <select id="languageIdforAssignTutorial"
-														class="form-control" name="languageId" required="required">
+														class="form-control language-input" name="languageId" required="required">
 
 															<option value='0'>Select Language</option>
 															
@@ -142,7 +142,7 @@ font-weight:bold!important;
 								            <div class="form-group">
 
 												<label th:if="${iter.index == 0}" th:for="${'title' + iter.index}">Title</label> <input type="text"
-												class="form-control" th:id="${'titleId' + iter.index}" name="title" th:data-index="${iter.index}" />
+												class="form-control title-input" th:id="${'titleId' + iter.index}" name="title" th:data-index="${iter.index}" />
 
 											</div>
 												
@@ -193,12 +193,22 @@ font-weight:bold!important;
 							      <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
 							      <td>
 									    <div th:if="${temp.getAllWeekTitle() != null}">
-						                    <table>
+						                    <table class="table table-striped" id="weekTitleTable">
+												<thead>
+													<tr>
+														<th scope="col">Week </th>
+														<th scope="col">File Name</th>
+														<th scope="col">Title</th>
+														
+													</tr>
+												</thead>
+												<tbody>
 						                        <tr th:each="weektitleTemp : ${temp.getAllWeekTitle()}">
 						                            <td><span th:text="${weektitleTemp.getWeek().getWeekName()}"></span></td>
 						                            <td><span th:text="${weektitleTemp.getVideoResource().getFileName()}"></span></td>
 						                            <td><span th:text="${weektitleTemp.getTitle()}"></span></td>
 						                        </tr>
+						                        </tbody>
 						                    </table>
 						                </div>
 								  </td>
@@ -225,6 +235,7 @@ font-weight:bold!important;
 	<script type="text/javascript">
 $(document).ready( function () {
     $('#myTable').DataTable();
+    $('#weekTitleTable').DataTable();
      $('#enterNewPackageContainerName').hide();
       $('#enterNewWeekName').hide();
    
