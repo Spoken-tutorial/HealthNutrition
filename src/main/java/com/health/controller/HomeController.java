@@ -4534,7 +4534,7 @@ public class HomeController {
             logger.error("Error:", e);
             return createPackageGet(req, principal, model);
         }
-
+        ServiceUtility.deletePackageAndLanZipIfExists(packageContainer.getPackageName(), langName, env);
         model.addAttribute("viewSection", viewSection);
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
         return createPackageGet(req, principal, model);

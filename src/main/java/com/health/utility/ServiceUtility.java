@@ -636,6 +636,30 @@ public class ServiceUtility {
 
     }
 
+    public static void deletePackageAndLanZipIfExists(String originalPackageName, String langName, Environment env) {
+        String packageName = originalPackageName.replace(' ', '_');
+
+        String zipFileName = packageName + "_" + langName + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryTrainingModuleZipFiles, zipFileName);
+
+        File file = zipFilePathName.toFile();
+
+        if (file.exists()) {
+
+            boolean isDeleted = file.delete();
+
+            if (isDeleted) {
+                logger.info("Zip File deleted successfully: {} " + zipFileName);
+            } else {
+                logger.info("Failed to delete the zip file: {} " + zipFileName);
+            }
+        } else {
+            logger.info(" ZipFile does not exist: {} " + zipFileName);
+        }
+    }
+
     /**
      * File Info
      * 
