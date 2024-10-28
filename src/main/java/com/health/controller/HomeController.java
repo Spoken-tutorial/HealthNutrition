@@ -167,6 +167,7 @@ import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
+import com.health.threadpool.ZipCreationThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -238,6 +239,9 @@ public class HomeController {
 
     @Autowired
     private PackageLanguageService packLanService;
+
+    @Autowired
+    private ZipCreationThreadService zipCreationThreadService;
 
     @Autowired
     private TutorialWithWeekAndPackageService tutorialWithWeekAndPackageService;
@@ -4588,6 +4592,8 @@ public class HomeController {
             zipUrl = ServiceUtility.getPackageAndLanZipPath(originalPackageName, langName, env);
 
             model.addAttribute("zipUrl", zipUrl);
+            model.addAttribute("success_msg",
+                    "Record Submitted Successfully ! Click on the download link to download resources");
 
         }
 
@@ -4632,17 +4638,19 @@ public class HomeController {
 
                     try {
 
-                        Path filePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), tutorialPath);
+                        Path sourcePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                tutorialPath);
                         Path destainationPath = destInationDirectoryforLanAndWeek.resolve(title + ".mp4");
 
-                        File sourceFile = filePath.toFile();
+                        File sourceFile = sourcePath.toFile();
                         if (sourceFile.exists()) {
 
-                            FileUtils.copyFile(sourceFile, destainationPath.toFile());
+                            // FileUtils.copyFile(sourceFile, destainationPath.toFile());
+                            zipCreationThreadService.copyFileUsingRsync(sourcePath, destainationPath);
 
                         }
 
-                    } catch (IOException e) {
+                    } catch (Exception e) {
 
                         logger.error("Exception: ", e);
                     }
@@ -4651,47 +4659,12 @@ public class HomeController {
                 String temp = destInationDirectory1.toString();
                 int indexToStart = temp.indexOf("Media");
                 document = temp.substring(indexToStart, temp.length());
-                try {
-                    zipUrl = ServiceUtility.createFileWithSubDirectoriesforTrainingModule(originalPackageName, langName,
-                            document, env);
-                    logger.info(destInationDirectory1.toString());
-                    FileUtils.deleteDirectory(destInationDirectory1.toFile());
-
-                    if (zipUrl.isEmpty()) {
-
-                        model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
-                        return "hstTrainingModule";
-
-                    } else {
-
-                        List<String> fileInfoList = ServiceUtility.FileInfoSizeAndCreationDate(zipUrl, env);
-
-                        if (fileInfoList != null) {
-
-                            model.addAttribute("zipUrl", zipUrl);
-
-                        } else {
-
-                            model.addAttribute("error_msg", "Some errors occured please try again");
-                            return "hstTrainingModule";
-                        }
-
-                    }
-
-                } catch (IOException e) {
-                    logger.error("Exception: ", e);
-
-                    model.addAttribute("error_msg", "Some Errors Occured; please contact Admin or try again");
-                    return "hstTrainingModule";
-
-                }
-
+                zipCreationThreadService.createZipAsynforPackageAndLan(originalPackageName, langName, document, env,
+                        model);
+                model.addAttribute("success_msg", "Zip creation in progress.... , please check back after 30 minutes.");
             }
 
         }
-
-        model.addAttribute("success_msg",
-                "Record Submitted Successfully ! Click on download link to download resources");
 
         return "downloadTrainingModule";
     }
