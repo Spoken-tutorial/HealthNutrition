@@ -50,6 +50,7 @@ import com.health.model.FeedbackForm;
 import com.health.model.FilesofBrouchure;
 import com.health.model.Language;
 import com.health.model.LogManegement;
+import com.health.model.PackageContainer;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PromoVideo;
 import com.health.model.ResearchPaper;
@@ -80,6 +81,8 @@ import com.health.service.FeedbackService;
 import com.health.service.FilesofBrouchureService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
+import com.health.service.PackageContainerService;
+import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
 import com.health.service.PromoVideoService;
 import com.health.service.ResearchPaperService;
@@ -92,6 +95,7 @@ import com.health.service.TraineeInformationService;
 import com.health.service.TrainingInformationService;
 import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
+import com.health.service.TutorialWithWeekAndPackageService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.service.VersionService;
@@ -127,6 +131,15 @@ public class AjaxController {
 
     @Autowired
     private VideoResourceService videoResourceService;
+
+    @Autowired
+    private PackageContainerService packageContainerService;
+
+    @Autowired
+    private PackageLanguageService packLanService;
+
+    @Autowired
+    private TutorialWithWeekAndPackageService tutorialWithPackageAndService;
 
     @Autowired
     private ResearchPaperService researchPaperService;
@@ -993,6 +1006,56 @@ public class AjaxController {
         }
 
         return videoName;
+    }
+
+    @RequestMapping("/loadLanguageByPackage")
+    public @ResponseBody HashMap<Integer, String> getLanguageByPackage(
+            @RequestParam(value = "packageId") int packageId) {
+        logger.info("packageId:{}", packageId);
+        HashMap<Integer, String> langName = new HashMap<>();
+        PackageContainer packageContainer = packageContainerService.findByPackageId(packageId);
+        List<Language> languages = new ArrayList<>();
+        if (packageContainer != null) {
+            languages = packLanService.findAllLanguagesByPackageContainer(packageContainer);
+        }
+
+        if (languages.size() > 0) {
+            for (Language lan : languages) {
+                logger.info("lan:{}", lan.getLangName());
+                langName.put(lan.getLanId(), lan.getLangName());
+
+            }
+
+        }
+
+        return langName;
+
+    }
+
+    @RequestMapping("/loadMessageByPackageAndLan")
+    public @ResponseBody HashMap<Integer, String> loadMessageByPackageAndLan(
+            @RequestParam(value = "packageId") int packageId, @RequestParam(value = "languageId") int languageId) {
+        logger.info("packageId:{}", packageId);
+        HashMap<Integer, String> messageName = new HashMap<>();
+        PackageContainer packageContainer = packageContainerService.findByPackageId(packageId);
+        Language lan = lanService.getById(languageId);
+
+        if (packageContainer != null && lan != null) {
+            String packageName = packageContainer.getPackageName();
+            String langName = lan.getLangName();
+            if (ServiceUtility.IsPackageAndLanZipExist(packageName, langName, env)) {
+                messageName.put(1, "Loading.......");
+            } else {
+                messageName.put(2, " The zip file is creating, please check back after 30 minutes.");
+            }
+
+        } else {
+            messageName.put(2, " The zip file is creating, please check back after 30 minutes.");
+
+        }
+
+        return messageName;
+
     }
 
     @RequestMapping("/findTitleByWeekVideoAndLangName")

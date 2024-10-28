@@ -718,6 +718,12 @@ public class HomeController {
 
     }
 
+    private void getPackageAndLanguageData(Model model) {
+        List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
+        model.addAttribute("packageList", packageList);
+
+    }
+
     @RequestMapping("/")
     public String index(Model model) {
 
@@ -4533,6 +4539,164 @@ public class HomeController {
     /******************************************
      * AssTutorial on Week And Package End
      ********************/
+
+    @GetMapping("/trainingModules")
+    public String hstTrainingModules(HttpServletRequest req, Model model, Principal principal) {
+
+        getPackageAndLanguageData(model);
+        return "hstTrainingModule";
+
+    }
+
+    /********************** Training Modules Download Start **********************/
+
+    @PostMapping("/downloadTrainingModules")
+    public String downloadPackagePost(HttpServletRequest req, Principal principal, Model model,
+            @RequestParam(name = "packageDownloadName") String packageId,
+            @RequestParam(name = "languageDownloadName") String lanId) {
+
+        getPackageAndLanguageData(model);
+        boolean downloadSection = false;
+        model.addAttribute("downloadSection", downloadSection);
+
+        PackageContainer packageContainer = packageContainerService.findByPackageId(Integer.parseInt(packageId));
+        if (packageContainer == null) { // throw error
+
+            model.addAttribute("error_msg", "Please Select Package");
+            return "hstTrainingModule";
+        }
+
+        Language lan = lanService.getById(Integer.parseInt(lanId));
+        if (lan == null) { // throw error
+
+            model.addAttribute("error_msg", "Please Select Language");
+            return "hstTrainingModule";
+        }
+
+        String langName = lan.getLangName();
+        String originalPackageName = packageContainer.getPackageName();
+        String zipUrl = "";
+
+        List<WeekTitle> weekTitleList = new ArrayList<>();
+        List<VideoResource> videoResourceList = new ArrayList<>();
+        List<TutorialWithWeekAndPackage> tutWithWeekAndPacagekList = new ArrayList<>();
+
+        PackageLanguage packLan = packLanService.findByPackageContainerAndLan(packageContainer, langName);
+        tutWithWeekAndPacagekList = new ArrayList<>(packLan.getTutorialsWithWeekAndPack());
+
+        if (ServiceUtility.IsPackageAndLanZipExist(originalPackageName, langName, env)) {
+            zipUrl = ServiceUtility.getPackageAndLanZipPath(originalPackageName, langName, env);
+
+            model.addAttribute("zipUrl", zipUrl);
+
+        }
+
+        else {
+
+            if (tutWithWeekAndPacagekList.size() > 0) {
+                for (TutorialWithWeekAndPackage temp : tutWithWeekAndPacagekList) {
+                    weekTitleList.add(temp.getWeekTitle());
+                    videoResourceList.add(temp.getWeekTitle().getVideoResource());
+                }
+            }
+
+            int countTutorial = videoResourceList.size();
+            if (countTutorial == 0) {
+                model.addAttribute("error_msg", "No Tutorials are available for selected Package,  and Language");
+                return "hstTrainingModule";
+            }
+
+            else {
+                String document = "";
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+                String sdfString = "training_modules-" + sdf.format(new java.util.Date());
+
+                String packageName = originalPackageName.replace(' ', '_');
+                Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, packageName);
+
+                for (WeekTitle temp : weekTitleList) {
+                    String weekName = temp.getWeek().getWeekName().replace(' ', '_');
+                    String title = temp.getTitle().replace(' ', '_');
+
+                    String tutorialPath = temp.getVideoResource().getVideoPath();
+
+                    Path destInationDirectoryforLanAndWeek = Paths.get(destInationDirectory1.toString(), File.separator,
+                            langName, File.separator, weekName);
+                    try {
+                        ServiceUtility.createFolder(destInationDirectoryforLanAndWeek);
+                    } catch (IOException e) {
+
+                        logger.error("Exception: ", e);
+                    }
+
+                    try {
+
+                        Path filePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), tutorialPath);
+                        Path destainationPath = destInationDirectoryforLanAndWeek.resolve(title + ".mp4");
+
+                        File sourceFile = filePath.toFile();
+                        if (sourceFile.exists()) {
+
+                            FileUtils.copyFile(sourceFile, destainationPath.toFile());
+
+                        }
+
+                    } catch (IOException e) {
+
+                        logger.error("Exception: ", e);
+                    }
+
+                }
+                String temp = destInationDirectory1.toString();
+                int indexToStart = temp.indexOf("Media");
+                document = temp.substring(indexToStart, temp.length());
+                try {
+                    zipUrl = ServiceUtility.createFileWithSubDirectoriesforTrainingModule(originalPackageName, langName,
+                            document, env);
+                    logger.info(destInationDirectory1.toString());
+                    FileUtils.deleteDirectory(destInationDirectory1.toFile());
+
+                    if (zipUrl.isEmpty()) {
+
+                        model.addAttribute("error_msg", "Some Errors Occured Please contact Admin or try again");
+                        return "hstTrainingModule";
+
+                    } else {
+
+                        List<String> fileInfoList = ServiceUtility.FileInfoSizeAndCreationDate(zipUrl, env);
+
+                        if (fileInfoList != null) {
+
+                            model.addAttribute("zipUrl", zipUrl);
+
+                        } else {
+
+                            model.addAttribute("error_msg", "Some errors occured please try again");
+                            return "hstTrainingModule";
+                        }
+
+                    }
+
+                } catch (IOException e) {
+                    logger.error("Exception: ", e);
+
+                    model.addAttribute("error_msg", "Some Errors Occured; please contact Admin or try again");
+                    return "hstTrainingModule";
+
+                }
+
+            }
+
+        }
+
+        model.addAttribute("success_msg",
+                "Record Submitted Successfully ! Click on download link to download resources");
+
+        return "downloadTrainingModule";
+    }
+
+    /***************************** Training Modules Download End *****************/
 
     @GetMapping("/category/edit/{catName}")
     public String editCategoryGet(@PathVariable(name = "catName") String catName, HttpServletRequest req, Model model,

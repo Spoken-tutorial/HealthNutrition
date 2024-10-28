@@ -1872,6 +1872,85 @@ $("#languageIdViewPage").change(function() {
 
 
 /************************   Assign Video Start *****************************************************/	
+$("#packageDownloadName").change(function() {
+
+						var packageId = $(this).find(":selected").val();
+						
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadLanguageByPackage",
+							data : {
+								"packageId" : packageId
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '<option value="0">Select Language</option>';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + key + '>'
+		  			               + value
+		  			               + '</option>';
+		  	  			        })
+	  	  			            html += '</option>';
+								
+								$("#languageDownloadName").prop('disabled',false);
+								$("#languageDownloadName").html(html);
+							
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+					
+$("#languageDownloadName").change(function() {
+
+ 						var languageId=$(this).find(":selected").val();
+						var packageId = $("#packageDownloadName").find(":selected").val();
+						
+						
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadMessageByPackageAndLan",
+							data : {
+								"packageId" : packageId,
+								"languageId" : languageId
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += value;
+		  			              
+		  	  			        })
+	  	  			           
+								
+								$("#loadingMessage").prop('disabled',false);
+								$("#loadingMessage").html(html);
+							
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+					
+					
+					
+					
 
 $("#languageIdforAssignTutorial").change(function() {
 
@@ -1887,7 +1966,7 @@ $("#languageIdforAssignTutorial").change(function() {
 							contentType : "application/json",
 							success : function(result) {
 
-								var html = '<option value="0">Select Video</option>';;
+								var html = '<option value="0">Select Video</option>';
 								var len = result.length;
 	  	  			            $.each(result , function( key, value ) {
 		  	  			        html += '<option value=' + key + '>'
@@ -2017,6 +2096,16 @@ $(document).ready(function () {
           divToHide.hide();
         }
       });
+      
+      
+      
+       $(document).ready(function() {
+        $('#packageForm').on('submit', function() {
+			console.log("Alok");
+            // Show the loading message when the form is submitted
+            $('#loadingMessage').show();
+        });
+    });
 /************************************Assign Video End ********************************************** */
 			
 			

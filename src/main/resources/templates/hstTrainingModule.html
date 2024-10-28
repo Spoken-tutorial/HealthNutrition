@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" th:href="@{/image/favicon.ico}" />
+   <title>Health And Nutrition</title>
+    <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
+    
+  <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />  
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.9.1/css/OverlayScrollbars.min.css' />
+  <link rel="stylesheet" th:href="@{/css/main.css}" /> 
+    <link rel="stylesheet" type="text/css" href="../css/hello-parallax.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
+    <link rel="stylesheet" th:href="@{/css/main-style.css}" />
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
+    <link rel="stylesheet" th:href="@{/VenoBox/venobox/venobox.css}" />
+    <style>
+    .c-header{
+    	color:green;
+    	font-size: 0.9rem;
+    	line-height:100%;
+    	text-align: justify; 
+    }
+    .c-text{
+    	color:rgba(0,0,0,0.5);
+    	font-size: 0.9rem;
+    	line-height:100%;
+    	text-align: justify;
+    }
+    .carousel-caption{
+    	right:0.1%;
+    	bottom: 2px;
+    	left: 0.1%;
+    	padding-bottom:0px;
+    	/* background:rgba(0,0,0,0.2); */
+    	background:#fff;
+    }
+    .carousel-indicators li{
+		 width: 20px; /* Adjust the width as needed */
+  		 
+    	
+   		
+    	background-color: orange!important;
+    }
+    .carousel-indicators{
+    	bottom:-20px!important;
+    }
+    #stats a{
+    	color:black!important;
+    }
+    
+      :root {
+  --plyr-color-main: #ff9033;
+  --plyr-video-control-color: #ffffff;
+}
+.plyr__control[data-plyr="download"] svg {
+  fill:#ffffff; /* change to your desired color */
+}
+    
+.share-button {
+            background-color: rgb(255, 255, 255);
+           
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 15px;
+            margin: 2px 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+   
+        }
+        .share-button:hover::after {
+          
+		    position: absolute;
+		    top: -30px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #333;
+		    color: #fff;
+		    padding: 5px 10px;
+		    border-radius: 4px;
+		    white-space: nowrap;
+		    z-index: 1000;
+		    opacity: 0.9;
+		    font-size: 12px;
+		    line-height: 1.2;
+		    pointer-events: none;
+        }    
+    </style>
+  </head>
+  <body>
+   <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+
+  <div id="back-to-top">
+  <a href="#top-fixed-banner"><i class="fas fa-chevron-circle-up"></i></a>
+  </div>
+  <!-- Fixed Header And Menu Bar -->
+  <header class="mb-5" id="top-fixed-banner">
+	<section th:fragment="header-bar">
+	<div class="px-md-3">
+	<div class="row header-top pt-2">
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+	<!-- <div> <a href="tel:1800-267-7782"> <span class="contact-num p-2" style="font-size:1.5rem;"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></div> -->
+	</div>
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+	<div><p class="d-inline-block"><span class="top-banner">
+		<a sec:authorize="isAnonymous()" th:href="@{/login}" target="_blank">Login | New
+		User</a> <a sec:authorize="isAuthenticated()"
+		th:href="@{/dashBoard}">My Account</a> 
+		</span></p>
+	  <p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p></div>
+	</div>
+	</div>
+	</div>
+	</section>
+	
+  <nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="navbar">
+    <div class="container-fluid">
+        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">HST Training Modules  </span> </span>
+
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavBar">
+            <div class="navbar-nav ml-auto">
+                <a class="nav-item nav-link active" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
+                <div th:replace="common/commonItemsHSTTrainingModule :: download_package"></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+  </header>
+  <!-- Fixed Header And Menu Bar Ends-->
+    <main>
+    <div th:replace="common/commonElements :: search_bar"></div>
+<section>
+<div class="container-lg py-3">
+<div class="row">
+<div class="col-12">
+<span style="line-height: 2rem;font-size:1.2rem;">
+Spoken Tutorial Health and Nutrition project, IIT Bombay, offers valuable advice on <span style="border-bottom: 1.5px solid orange;">Maternal Nutrition</span>, <span style="border-bottom: 1.5px solid orange;">Child
+Nutrition</span>, <span style="border-bottom: 1.5px solid orange;">General Nutrition</span> and <span style="border-bottom: 1.5px solid orange;">Covid</span> related information by a team of emminent Doctors, Nutritionists and
+field officers with 10+ years of experience
+</span>
+</div>
+</div>
+</div>
+</section>
+<section>
+
+</section>
+    
+       </main>
+    
+    <footer class="footer">
+    <div class="text-center">	<p>Developed at IIT-Bombay</p>
+    </div>
+	
+    </footer>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script> 
+<script src="/js/ajaxSupport.js"></script>
+<script src="/VenoBox/venobox/venobox.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#myCarousel").carousel();
+	$('.venobox').venobox(); 
+	$('.consultant_modal').on('shown.bs.modal', function () {
+		
+		id = $(this).attr('id');
+		var consultant_id = id.substring(7);
+		
+		$.ajax({
+
+			type : "GET",
+			url  : projectPath+"getConsultantDetails",
+
+			data : {
+
+				"id" : consultant_id
+
+			},
+			contentType : "application/json",
+			success : function(result) {
+				
+				$('#details').html(result);
+				/* console.log(result); */
+			},
+
+			error : function(err) {
+				console.log("not working. ERROR: "+ JSON.stringify(err));
+			}
+		});
+		
+		})
+	
+	$(document).on('click', 'a[href^="#"]', function (event) {
+	    event.preventDefault();
+	  /*   alert("1"); */
+	    $('html, body').animate({
+	        scrollTop: $($.attr(this, 'href')).offset().top - 200
+	    }, 500);
+	});
+	
+	  $('.your-class').slick({
+		  slidesToShow: 4,
+		  slidesToScroll:2
+      
+	  });
+
+     $(".slick-prev").html('<i class="fas fa-chevron-left"></i>');
+     $(".slick-next").html('<i class="fas fa-chevron-right"></i>');
+
+     $('.testimonials-wrapper').slick({
+      slidesToShow: 2,
+      slidesToScroll:2,
+      arrows: false,
+      dots:true,
+    });
+     
+     $(".slick-dots li").html('');
+     
+     $(".modalBtn").html('');
+     
+     $(".c-modal-close").click(function(){
+    	   
+    	  $('html').css({overflow: 'scroll'});
+    	  $(".modal").removeClass("is-active");
+    	});
+     
+	});
+</script>
+
+	
+	<script th:inline="javascript">
+    	
+		var projectPath='[(@{/})]';
+		
+	
+		 
+		var isPlaying = [];
+				
+				var videos = document.querySelectorAll('video');
+				for(var i=0; i<videos.length; i++){
+				  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+				}
+				
+				
+
+				function pauseAll(elem){
+					var videos2 = document.querySelectorAll('video');
+					for(var i=0; i<videos2.length; i++){
+				                if(videos2[i] == elem) continue;
+				                if(videos2[i].played.length > 0 && !videos2[i].paused){
+				                  videos2[i].pause();
+				                }
+				        }
+				  }
+				
+				
+				
+				
+				   // Functions to play the video with/without sound
+					function playMutedVideoMouseOver(event) {
+						var video = event.target;
+					 	var flag=0;
+					 	for (var j = 0; j < videos.length; j++){
+							 if(!videos[j].paused && !videos[j].muted)
+					 			flag=flag+1;
+						 }
+					 	if(flag==0){
+					 	video.play();
+					 	video.muted = true;
+						}
+					 
+					}
+				   
+
+					function playUnmutedVideoOnClick(event) {
+					 var video = event.target;
+					 video.muted = false;
+					 video.play();
+					}
+					
+					function pauseWithMutedVideoMouseOut(event) {
+						 var video = event.target;
+							if(video.muted){
+								video.pause();
+								//video.muted=!video.muted;
+							}
+						 
+						}
+						
+					
+				
+					 
+					
+					
+		
+		
+		
+		 var controls =
+[
+'play-large', // The large play button in the center
+// 'restart', // Restart playback
+// 'rewind', // Rewind by the seek time (default 10 seconds)
+'play', // Play/pause playback
+//'fast-forward', // Fast forward by the seek time (default 10 seconds)
+'progress', // The progress bar and scrubber for playback and buffering
+'current-time', // The current time of playback
+//'duration', // The full duration of the media
+'mute', // Toggle mute
+'volume', // Volume control
+'captions', // Toggle captions
+'settings', // Settings menu
+'pip', // Picture-in-picture (currently Safari only)
+'airplay', // Airplay (currently Safari only)
+'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+'fullscreen' // Toggle fullscreen
+];
+
+//const player = new Plyr('.vid1',{controls});
+
+//var videos = document.querySelectorAll('video');
+
+for(var i=0; i<videos.length; i++){
+	
+	const player = new Plyr(videos[i],{controls});	
+	
+	
+	   
+}
+		
+	</script>
+    
+  </body>
+
+</html>
