@@ -4504,7 +4504,8 @@ public class HomeController {
                     Week week = weekService.findByWeekId(weekIds.get(i));
                     VideoResource video = videoResourceService.findById(videoIds.get(i));
                     if (video.getLan().getLangName().equals(langName)) {
-                        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video, langName);
+                        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video,
+                                langName);
 
                         if (weekTitleVideo == null) {
                             weekTitleVideo = new WeekTitleVideo(titles.get(i), dateAdded, week, video);
@@ -4581,7 +4582,7 @@ public class HomeController {
         String originalPackageName = packageContainer.getPackageName();
         String zipUrl = "";
 
-        List<WeekTitle> weekTitleList = new ArrayList<>();
+        List<WeekTitleVideo> weekTitleList = new ArrayList<>();
         List<VideoResource> videoResourceList = new ArrayList<>();
         List<TutorialWithWeekAndPackage> tutWithWeekAndPacagekList = new ArrayList<>();
 
@@ -4621,7 +4622,7 @@ public class HomeController {
                 Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                         CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, packageName);
 
-                for (WeekTitle temp : weekTitleList) {
+                for (WeekTitleVideo temp : weekTitleList) {
                     String weekName = temp.getWeek().getWeekName().replace(' ', '_');
                     String title = temp.getTitle().replace(' ', '_');
 
