@@ -722,10 +722,27 @@ public class HomeController {
 
     }
 
-    private void getPackageAndLanguageData(Model model) {
+    private void getPackageAndLanguageData(Model model, int weekId, int lanId) {
         List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
         model.addAttribute("packageList", packageList);
 
+        ArrayList<Map<String, Integer>> arlist = ajaxController.getLanguageByWeek(weekId, lanId);
+        ArrayList<Map<String, Integer>> arlist1 = ajaxController.getWeekByLanguage(weekId, lanId);
+        Map<String, Integer> languages = arlist.get(0);
+        Map<String, Integer> weeks = arlist1.get(0);
+
+        model.addAttribute("weekList", weeks);
+        model.addAttribute("languages", languages);
+        model.addAttribute("localWeek", weekId);
+
+        model.addAttribute("localLanguage", lanId);
+
+        model.addAttribute("languageCount", languages.size());
+
+    }
+
+    private void getPackageAndLanguageData(Model model) {
+        getPackageAndLanguageData(model, 0, 0);
     }
 
     @RequestMapping("/")

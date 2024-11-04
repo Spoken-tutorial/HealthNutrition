@@ -2105,6 +2105,159 @@ $(document).ready(function () {
             $('#loadingMessage').show();
         });
     });
+    
+    
+    
+     function loadLanguageByWeek(weekId, languageId){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadLanguageByWeek",
+					data : {
+						"weekId":weekId,
+						"languageId":languageId,
+						
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Language</option>';
+						$.each(result , function( value ,key ) {
+							var selected=(languageId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#languageView").prop('disabled',false);
+						$('#languageView').html(html);
+						
+						
+						if (weekId != 0) {
+							$("#weekresetdiv").show();
+						} else {
+						$("#weekresetdiv").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#weekView').change(function() {
+				var weekId = $(this).val();
+				var languageId = $("#languageView").val();
+				
+				loadLanguageByWeek(weekId, languageId);
+				
+				
+			});
+			
+			 $( "#weekreset" ).click(function() {
+			
+				var weekId = 0;
+				$("#weekView").val("0");
+				var languageId = $("#languageView").val();
+				
+				loadLanguageByWeek(weekId, languageId);
+				
+				return false;
+				
+			});
+			
+			
+			 
+     function loadWeekByLanguage(weekId, languageId){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadWeekByLanguage",
+					data : {
+						"weekId":weekId,
+						"languageId":languageId,
+						
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Week</option>';
+						$.each(result , function( value ,key ) {
+							var selected=(weekId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#weekView").prop('disabled',false);
+						$('#weekView').html(html);
+						
+						
+						if (languageId != 0) {
+							$("#languageresetdiv").show();
+						} else {
+						$("#languageresetdiv").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#languageView').change(function() {
+				var languageId = $(this).val();
+				var weekId = $("#weekView").val();
+				
+				loadWeekByLanguage(weekId, languageId);
+				
+				
+			});
+			
+			 $( "#languagereset" ).click(function() {
+			
+				var languageId = 0;
+				$("#languageView").val("0");
+				var weekId = $("#weekView").val();
+				
+				loadWeekByLanguage(weekId, languageId);
+				
+				return false;
+				
+			});
+			
+
+			
+			
+			
+			
+			$( "#btnClearFormView" ).click(function() {
+				
+				
+				var languageId = 0;
+				$("#languageView").val("0");
+				var weekId =0; 
+				$("#weekView").val("0");
+				
+				loadLanguageByWeek(weekId, languageId);
+				loadWeekByLanguage(weekId, languageId);
+				
+				return false;
+				
+			});
+			
+			
+			
+
+    
+    
+    
 /************************************Assign Video End ********************************************** */
 			
 			

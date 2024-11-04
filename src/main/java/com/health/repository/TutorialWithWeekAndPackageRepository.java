@@ -1,5 +1,7 @@
 package com.health.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +18,10 @@ public interface TutorialWithWeekAndPackageRepository extends JpaRepository<Tuto
     TutorialWithWeekAndPackage findByPackageLanguageAndWeekTitleVideo(
             @Param("packageLanguage") PackageLanguage packageLanguage,
             @Param("weekTitleVideo") WeekTitleVideo weekTitleVideo);
+
+    @Query("SELECT t FROM TutorialWithWeekAndPackage t WHERE t.weekTitle IN :weekTitles AND t.packageLanguage IN :packageLanguages")
+    List<TutorialWithWeekAndPackage> findByWeekTitlesAndPackageLanguages(
+            @Param("weekTitles") List<WeekTitle> weekTitles,
+            @Param("packageLanguages") List<PackageLanguage> packageLanguages);
 
 }

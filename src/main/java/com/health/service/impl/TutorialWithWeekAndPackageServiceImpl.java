@@ -49,4 +49,11 @@ public class TutorialWithWeekAndPackageServiceImpl implements TutorialWithWeekAn
 
     }
 
+    @Override
+    public List<TutorialWithWeekAndPackage> findByWeekTitlesAndPackageLanguages(List<WeekTitle> weekTitles,
+            List<PackageLanguage> packageLanguages) {
+
+        return repo.findByWeekTitlesAndPackageLanguages(weekTitles, packageLanguages);
+    }
+
 }
