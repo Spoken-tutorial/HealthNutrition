@@ -35,7 +35,7 @@ public class PackageContainerServiceImpl implements PackageContainerService {
 
     @Override
     public void save(PackageContainer packageContainer) {
-        repo.save(packageContainer);
+        repo.saveAndFlush(packageContainer);
 
     }
 

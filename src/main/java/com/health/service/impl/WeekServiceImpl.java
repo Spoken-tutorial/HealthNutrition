@@ -22,12 +22,6 @@ public class WeekServiceImpl implements WeekService {
     }
 
     @Override
-    public Week findByWeekName(String weekName) {
-
-        return repo.findByWeekName(weekName);
-    }
-
-    @Override
     public List<Week> findAll() {
 
         return repo.findAll();
@@ -35,7 +29,8 @@ public class WeekServiceImpl implements WeekService {
 
     @Override
     public void save(Week week) {
-        repo.save(week);
+
+        repo.saveAndFlush(week);
 
     }
 

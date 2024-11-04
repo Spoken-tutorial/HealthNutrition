@@ -64,6 +64,8 @@ import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.model.Version;
 import com.health.model.VideoResource;
+import com.health.model.Week;
+import com.health.model.WeekTitleVideo;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -94,6 +96,8 @@ import com.health.service.UserRoleService;
 import com.health.service.UserService;
 import com.health.service.VersionService;
 import com.health.service.VideoResourceService;
+import com.health.service.WeekService;
+import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -126,6 +130,12 @@ public class AjaxController {
 
     @Autowired
     private ResearchPaperService researchPaperService;
+
+    @Autowired
+    private WeekTitleVideoService weekTitleVideoService;
+
+    @Autowired
+    private WeekService weekService;
 
     @Autowired
     private PathofPromoVideoService pathofPromoVideoService;
@@ -983,6 +993,28 @@ public class AjaxController {
         }
 
         return videoName;
+    }
+
+    @RequestMapping("/findTitleByWeekVideoAndLangName")
+    public @ResponseBody HashMap<Integer, String> findTitleByWeekVideoAndLangName(
+            @RequestParam(value = "weekId") int weekId, @RequestParam(value = "VideoId") int videoId,
+            @RequestParam(value = "languageId") int languageId) {
+        HashMap<Integer, String> titleName = new HashMap<>();
+        Language lan = lanService.getById(languageId);
+
+        VideoResource video = videoResourceService.findById(videoId);
+        Week week = weekService.findByWeekId(weekId);
+        logger.info("Variables of getVideoResourceByLanguage weekId :{} videoId : {} languageId : {}", weekId, videoId,
+                languageId);
+
+        String langName = lan.getLangName();
+
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video, langName);
+
+        if (weekTitleVideo != null)
+            titleName.put(weekTitleVideo.getWeekTitleVideoId(), weekTitleVideo.getTitle());
+
+        return titleName;
     }
 
     @RequestMapping("/loadPromoVideoByLanguage")

@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.health.model.PackageLanguage;
 import com.health.model.TutorialWithWeekAndPackage;
+import com.health.model.WeekTitleVideo;
 import com.health.repository.TutorialWithWeekAndPackageRepository;
 import com.health.service.TutorialWithWeekAndPackageService;
 
@@ -22,11 +24,6 @@ public class TutorialWithWeekAndPackageServiceImpl implements TutorialWithWeekAn
     }
 
     @Override
-    public TutorialWithWeekAndPackage findByTitle(String title) {
-        return repo.findByTitle(title);
-    }
-
-    @Override
     public List<TutorialWithWeekAndPackage> findAll() {
 
         return repo.findAll();
@@ -35,6 +32,20 @@ public class TutorialWithWeekAndPackageServiceImpl implements TutorialWithWeekAn
     @Override
     public void saveAll(List<TutorialWithWeekAndPackage> tutorialList) {
         repo.saveAll(tutorialList);
+        repo.flush();
+
+    }
+
+    @Override
+    public TutorialWithWeekAndPackage findByPackageLanguageAndWeektitle(PackageLanguage packageLanguage,
+            WeekTitleVideo weekTitleVideo) {
+
+        return repo.findByPackageLanguageAndWeekTitleVideo(packageLanguage, weekTitleVideo);
+    }
+
+    @Override
+    public void save(TutorialWithWeekAndPackage twp) {
+        repo.save(twp);
 
     }
 

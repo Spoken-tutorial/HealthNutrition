@@ -91,6 +91,9 @@ public class Language implements Comparable<Language>, Serializable {
     @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<VideoResource> videoResources = new HashSet<VideoResource>();
 
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<PackageLanguage> packageLanguages = new HashSet<PackageLanguage>();
+
     public Set<LiveTutorial> getLiveTutorial() {
         return liveTutorial;
     }
@@ -109,6 +112,22 @@ public class Language implements Comparable<Language>, Serializable {
 
     public Set<PathofPromoVideo> getPathofPromoVideo() {
         return pathofPromoVideo;
+    }
+
+    public Set<VideoResource> getVideoResources() {
+        return videoResources;
+    }
+
+    public void setVideoResources(Set<VideoResource> videoResources) {
+        this.videoResources = videoResources;
+    }
+
+    public Set<PackageLanguage> getPackageLanguages() {
+        return packageLanguages;
+    }
+
+    public void setPackageLanguages(Set<PackageLanguage> packageLanguages) {
+        this.packageLanguages = packageLanguages;
     }
 
     public void setPathofPromoVideo(Set<PathofPromoVideo> pathofPromoVideo) {

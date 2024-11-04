@@ -99,6 +99,7 @@ import com.health.model.LiveTutorial;
 import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
 import com.health.model.PackageContainer;
+import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PostQuestionaire;
 import com.health.model.PromoVideo;
@@ -119,6 +120,7 @@ import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
 import com.health.model.VideoResource;
 import com.health.model.Week;
+import com.health.model.WeekTitleVideo;
 import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
@@ -140,6 +142,7 @@ import com.health.service.LiveTutorialService;
 import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
 import com.health.service.PackageContainerService;
+import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
 import com.health.service.PostQuestionaireService;
 import com.health.service.PromoVideoService;
@@ -162,6 +165,7 @@ import com.health.service.UserService;
 import com.health.service.VersionService;
 import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
+import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -233,6 +237,9 @@ public class HomeController {
     private WeekService weekService;
 
     @Autowired
+    private PackageLanguageService packLanService;
+
+    @Autowired
     private TutorialWithWeekAndPackageService tutorialWithWeekAndPackageService;
 
     @Autowired
@@ -240,6 +247,9 @@ public class HomeController {
 
     @Autowired
     private TopicService topicService;
+
+    @Autowired
+    private WeekTitleVideoService weekTitleVideoService;
 
     @Autowired
     private TopicCategoryMappingService topicCatService;
@@ -4385,8 +4395,8 @@ public class HomeController {
      * Assign Tutorial on Week And Package Start
      ********************/
 
-    @GetMapping("/assignTutorial")
-    public String assignTutorialGet(HttpServletRequest req, Principal principal, Model model) {
+    @GetMapping("/createPackage")
+    public String createPackageGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
@@ -4401,37 +4411,51 @@ public class HomeController {
         model.addAttribute("languages", languages);
 
         List<Week> weekList = weekService.findAll();
-        weekList.sort(Comparator.comparing(Week::getWeekName));
 
         List<PackageContainer> packageList = packageContainerService.findAll();
         packageList.sort(Comparator.comparing(PackageContainer::getPackageName));
 
+        List<PackageLanguage> packLanList = packLanService.findAll();
+
         model.addAttribute("weekList", weekList);
         model.addAttribute("packageList", packageList);
-        List<TutorialWithWeekAndPackage> tutorials = tutorialWithWeekAndPackageService.findAll();
+        model.addAttribute("packLanList", packLanList);
+
+        List<TutorialWithWeekAndPackage> tutorialweekpackList = tutorialWithWeekAndPackageService.findAll();
         // Collections.sort(tutorials, TutorialWithWeekAndPackage.SortByUploadTime);
-        model.addAttribute("tutorials", tutorials);
-        return "assignTutorialToWeekAndPack";
+        model.addAttribute("tutorialweekpackList", tutorialweekpackList);
+        return "addPackage";
     }
 
-    @PostMapping("/assignTutorial")
-    public String assignTutorialPost(@RequestParam(name = "packageContainerId") int packageContainerId,
-            @RequestParam(name = "packageName") String packageName, @RequestParam(name = "weekId") int weekId,
-            @RequestParam(name = "weekName") String weekName, @RequestParam(name = "title") String title,
-            @RequestParam(name = "languageId") int languageId,
-            @RequestParam(name = "videoResourceIds") int[] videoResourceIds,
-
-            HttpServletRequest req, Principal principal, Model model) {
+    @PostMapping("/createPackage")
+    public String createPackagePost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "packageContainerId") int packageContainerId,
+            @RequestParam(name = "packageName") String packageName, @RequestParam(name = "languageId") int languageId,
+            @RequestParam("weekName") List<Integer> weekIds, @RequestParam(name = "videoName") List<Integer> videoIds,
+            @RequestParam(name = "title") List<String> titles) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
         PackageContainer packageContainer;
+        boolean viewSection = false;
 
-        if (packageContainerId == 0 || weekId == 0 || languageId == 0) {
-            model.addAttribute("error_msg", "package, week and language should not be null");
-            return assignTutorialGet(req, principal, model);
+        if (packageContainerId == 0 || languageId == 0) {
+            model.addAttribute("error_msg", "Package and language should not be null");
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            return createPackageGet(req, principal, model);
         }
+
+        if (weekIds.isEmpty() || videoIds.isEmpty()) {
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            model.addAttribute("error_msg", "Week and video should not be null");
+            return createPackageGet(req, principal, model);
+        }
+
+        Language lan = lanService.getById(languageId);
+        String langName = lan.getLangName();
 
         if (packageContainerId == -1) {
             packageContainer = packageContainerService.findByPackageName(packageName);
@@ -4439,58 +4463,75 @@ public class HomeController {
             packageContainer = packageContainerService.findByPackageId(packageContainerId);
         }
 
-        if (packageContainer == null) {
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+        if (packageContainer == null && !packageName.isEmpty()) {
             packageContainer = new PackageContainer();
             packageContainer.setPackageName(packageName);
-            packageContainer.setDateAdded(ServiceUtility.getCurrentTime());
+            packageContainer.setDateAdded(dateAdded);
             packageContainerService.save(packageContainer);
         }
 
-        Week week;
-
-        if (weekId == -1) {
-            week = weekService.findByWeekName(weekName);
-        } else {
-            week = weekService.findByWeekId(weekId);
+        PackageLanguage packageLanguage = packLanService.findByPackageContainerAndLan(packageContainer, langName);
+        if (packageLanguage == null) {
+            packageLanguage = new PackageLanguage();
+            packageLanguage.setDateAdded(dateAdded);
+            packageLanguage.setLan(lan);
+            packageLanguage.setPackageContainer(packageContainer);
+            packLanService.save(packageLanguage);
         }
 
-        if (week == null) {
-            week = new Week();
-            week.setWeekName(weekName);
-            week.setDateAdded(ServiceUtility.getCurrentTime());
-            weekService.save(week);
-        }
-
-        if (title == null || title.isEmpty() || videoResourceIds.length == 0) {
-            model.addAttribute("error_msg", "title  and video should not be null");
-            return assignTutorialGet(req, principal, model);
-        }
-
-        Timestamp dateAdded = ServiceUtility.getCurrentTime();
-
-        List<TutorialWithWeekAndPackage> tutorialList = new ArrayList<>();
+        // List<WeekTitleVideo> weekTitles = new ArrayList<>();
+        List<TutorialWithWeekAndPackage> tutorialWithWeekAndPackages = new ArrayList<>();
 
         try {
-            for (int i = 0; i < videoResourceIds.length; i++) {
-                VideoResource videoResource = videoResourceService.findById(videoResourceIds[i]);
-                tutorialList
-                        .add(new TutorialWithWeekAndPackage(title, dateAdded, week, packageContainer, videoResource));
-            }
+            logger.info("WeekIds Size:{} ", weekIds.size());
+            logger.info("VideoIds Size:{}", videoIds.size());
+            logger.info("Title Size:{}", titles.size());
+            for (int i = 0; i < weekIds.size(); i++) {
+                if (i < titles.size())
+                    logger.info("Title: {}", titles.get(i));
+                if (weekIds.get(i) != 0 && videoIds.get(i) != 0 && !titles.get(i).isEmpty()) {
+                    Week week = weekService.findByWeekId(weekIds.get(i));
+                    VideoResource video = videoResourceService.findById(videoIds.get(i));
+                    if (video.getLan().getLangName().equals(langName)) {
+                        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video, langName);
 
-            tutorialWithWeekAndPackageService.saveAll(tutorialList);
+                        if (weekTitleVideo == null) {
+                            weekTitleVideo = new WeekTitleVideo(titles.get(i), dateAdded, week, video);
+
+                            weekTitleVideoService.save(weekTitleVideo); // Save the weekTitle before using it
+                            // weekTitles.add(weekTitle);
+                            logger.info(" iter:{}  WeekTitleVideo :{}", i, weekTitleVideo);
+                        }
+
+                        TutorialWithWeekAndPackage twp = tutorialWithWeekAndPackageService
+                                .findByPackageLanguageAndWeektitle(packageLanguage, weekTitleVideo);
+                        if (twp == null) {
+                            twp = new TutorialWithWeekAndPackage(dateAdded, weekTitleVideo, packageLanguage);
+                            tutorialWithWeekAndPackageService.save(twp);
+                            logger.info("iter:{} TutorialWithWeekAndPackage  :{}", i, twp);
+                            tutorialWithWeekAndPackages.add(twp);
+                        }
+                    }
+
+                }
+            }
+            // weekTitleVideoService.saveAll(weekTitles);
+            // tutorialWithWeekAndPackageService.saveAll(tutorialWithWeekAndPackages);
 
         } catch (Exception e) {
-            model.addAttribute("error_msg", "Some errors occured, Please contact to Admin");
-            return assignTutorialGet(req, principal, model);
+            model.addAttribute("error_msg", "Some errors occurred, please contact the Admin");
+            logger.error("Error:", e);
+            return createPackageGet(req, principal, model);
         }
 
+        model.addAttribute("viewSection", viewSection);
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
-
-        return assignTutorialGet(req, principal, model);
+        return createPackageGet(req, principal, model);
     }
 
     /******************************************
-     * Assign Tutorial on Week And Package End
+     * AssTutorial on Week And Package End
      ********************/
 
     @GetMapping("/category/edit/{catName}")

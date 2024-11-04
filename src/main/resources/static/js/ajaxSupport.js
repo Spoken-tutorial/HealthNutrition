@@ -1876,6 +1876,7 @@ $("#languageIdViewPage").change(function() {
 $("#languageIdforAssignTutorial").change(function() {
 
 						var languageId = $(this).find(":selected").val();
+						var weeksize=$("#lengthofweek").val();
 
 						$.ajax({
 							type : "GET",
@@ -1886,7 +1887,7 @@ $("#languageIdforAssignTutorial").change(function() {
 							contentType : "application/json",
 							success : function(result) {
 
-								var html = '';
+								var html = '<option value="0">Select Video</option>';;
 								var len = result.length;
 	  	  			            $.each(result , function( key, value ) {
 		  	  			        html += '<option value=' + key + '>'
@@ -1894,8 +1895,12 @@ $("#languageIdforAssignTutorial").change(function() {
 		  			               + '</option>';
 		  	  			        })
 	  	  			            html += '</option>';
-								$("#videoResourceIds").prop('disabled',false);
-								$('#videoResourceIds').html(html);
+								
+								
+							for(var i=0; i<=weeksize; i++){
+								$("#videoId"+i).prop('disabled',false);
+								$('#videoId'+i).html(html);
+							}
 
 							},
 
@@ -1908,7 +1913,65 @@ $("#languageIdforAssignTutorial").change(function() {
 
 					});
 
+ $('.video-select').change(function() {
+        var index = $(this).data('index');
+        console.log(index);
+        var weekId = $('#weekId' + index).val();
+         console.log("week", weekId);
+        var videoId = $(this).val();
+         console.log("video", videoId);
+        var languageId = $('#languageIdforAssignTutorial').val();
+         console.log("language", languageId);
 
+        if (weekId != '0' && videoId != '0' && languageId != '0') {
+			  $('.package_input').prop('disabled', true);
+   			  $('.language-input').prop('disabled', true);
+			
+            $.ajax({
+                type: 'GET',
+                url: projectPath + 'findTitleByWeekVideoAndLangName',
+                data: {
+                    weekId: weekId,
+                    VideoId: videoId,
+                    languageId: languageId
+                },
+                contentType: 'application/json',
+                success: function(result) {
+                    var titleInput = $('#titleId' + index);
+                    if (result && Object.keys(result).length > 0) {
+                        var title = result[Object.keys(result)[0]];
+                        console.log(title);
+                        titleInput.val(title);
+                       // titleInput.prop('value', title);
+                         console.log(titleInput.val());
+                       
+                        titleInput.prop('disabled', true);
+                    } else {
+                       // titleInput.val('');
+                       titleInput.prop('disabled', false);
+                    }
+                },
+                error: function(err) {
+                    console.log('Error: ' + JSON.stringify(err));
+                }
+            });
+        } 
+    });
+
+
+
+ $('#inputForm').submit(function(event) {
+    // Enable all disabled  inputs before form submission
+    $('.title-input').prop('disabled', false);
+    $('.package_input').prop('disabled', false);
+    $('.language-input').prop('disabled', false);
+
+    // Optional: Log form data for debugging
+    var formData = $(this).serializeArray();
+    console.log(formData); // Inspect the form data
+
+    
+});
 
 $(document).ready(function () {
             const select = $('#videoResourceIds');
