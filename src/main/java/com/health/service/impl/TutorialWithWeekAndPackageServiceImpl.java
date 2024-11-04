@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.health.model.PackageLanguage;
 import com.health.model.TutorialWithWeekAndPackage;
-import com.health.model.WeekTitle;
+import com.health.model.WeekTitleVideo;
 import com.health.repository.TutorialWithWeekAndPackageRepository;
 import com.health.service.TutorialWithWeekAndPackageService;
 
@@ -38,9 +38,9 @@ public class TutorialWithWeekAndPackageServiceImpl implements TutorialWithWeekAn
 
     @Override
     public TutorialWithWeekAndPackage findByPackageLanguageAndWeektitle(PackageLanguage packageLanguage,
-            WeekTitle weekTitle) {
+            WeekTitleVideo weekTitleVideo) {
 
-        return repo.findByPackageLanguageAndWeektitle(packageLanguage, weekTitle);
+        return repo.findByPackageLanguageAndWeekTitleVideo(packageLanguage, weekTitleVideo);
     }
 
     @Override

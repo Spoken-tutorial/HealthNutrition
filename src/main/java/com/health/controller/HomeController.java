@@ -120,7 +120,7 @@ import com.health.model.UserIndianLanguageMapping;
 import com.health.model.Version;
 import com.health.model.VideoResource;
 import com.health.model.Week;
-import com.health.model.WeekTitle;
+import com.health.model.WeekTitleVideo;
 import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
@@ -165,7 +165,7 @@ import com.health.service.UserService;
 import com.health.service.VersionService;
 import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
-import com.health.service.WeekTitleService;
+import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -249,7 +249,7 @@ public class HomeController {
     private TopicService topicService;
 
     @Autowired
-    private WeekTitleService weekTitleService;
+    private WeekTitleVideoService weekTitleVideoService;
 
     @Autowired
     private TopicCategoryMappingService topicCatService;
@@ -4480,7 +4480,7 @@ public class HomeController {
             packLanService.save(packageLanguage);
         }
 
-        // List<WeekTitle> weekTitles = new ArrayList<>();
+        // List<WeekTitleVideo> weekTitles = new ArrayList<>();
         List<TutorialWithWeekAndPackage> tutorialWithWeekAndPackages = new ArrayList<>();
 
         try {
@@ -4494,20 +4494,20 @@ public class HomeController {
                     Week week = weekService.findByWeekId(weekIds.get(i));
                     VideoResource video = videoResourceService.findById(videoIds.get(i));
                     if (video.getLan().getLangName().equals(langName)) {
-                        WeekTitle weekTitle = weekTitleService.findByWeekVideoResourceAndLan(week, video, langName);
+                        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video, langName);
 
-                        if (weekTitle == null) {
-                            weekTitle = new WeekTitle(titles.get(i), dateAdded, week, video);
+                        if (weekTitleVideo == null) {
+                            weekTitleVideo = new WeekTitleVideo(titles.get(i), dateAdded, week, video);
 
-                            weekTitleService.save(weekTitle); // Save the weekTitle before using it
+                            weekTitleVideoService.save(weekTitleVideo); // Save the weekTitle before using it
                             // weekTitles.add(weekTitle);
-                            logger.info(" iter:{}  WeekTitle :{}", i, weekTitle);
+                            logger.info(" iter:{}  WeekTitleVideo :{}", i, weekTitleVideo);
                         }
 
                         TutorialWithWeekAndPackage twp = tutorialWithWeekAndPackageService
-                                .findByPackageLanguageAndWeektitle(packageLanguage, weekTitle);
+                                .findByPackageLanguageAndWeektitle(packageLanguage, weekTitleVideo);
                         if (twp == null) {
-                            twp = new TutorialWithWeekAndPackage(dateAdded, weekTitle, packageLanguage);
+                            twp = new TutorialWithWeekAndPackage(dateAdded, weekTitleVideo, packageLanguage);
                             tutorialWithWeekAndPackageService.save(twp);
                             logger.info("iter:{} TutorialWithWeekAndPackage  :{}", i, twp);
                             tutorialWithWeekAndPackages.add(twp);
@@ -4516,7 +4516,7 @@ public class HomeController {
 
                 }
             }
-            // weekTitleService.saveAll(weekTitles);
+            // weekTitleVideoService.saveAll(weekTitles);
             // tutorialWithWeekAndPackageService.saveAll(tutorialWithWeekAndPackages);
 
         } catch (Exception e) {

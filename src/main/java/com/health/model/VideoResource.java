@@ -43,7 +43,7 @@ public class VideoResource implements Serializable {
     private Language lan;
 
     @OneToMany(mappedBy = "videoResource", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<WeekTitle> weekTitles = new HashSet<WeekTitle>();
+    private Set<WeekTitleVideo> weekTitleVideos = new HashSet<WeekTitleVideo>();
 
     public int getId() {
         return id;
@@ -90,12 +90,12 @@ public class VideoResource implements Serializable {
 
     }
 
-    public Set<WeekTitle> getWeekTitles() {
-        return weekTitles;
+    public Set<WeekTitleVideo> getWeekTitles() {
+        return weekTitleVideos;
     }
 
-    public void setWeekTitles(Set<WeekTitle> weekTitles) {
-        this.weekTitles = weekTitles;
+    public void setWeekTitles(Set<WeekTitleVideo> weekTitleVideos) {
+        this.weekTitleVideos = weekTitleVideos;
     }
 
     public VideoResource(int id, String fileName, String videoPath, Timestamp dateAdded, Language lan) {

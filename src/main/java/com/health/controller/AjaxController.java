@@ -65,7 +65,7 @@ import com.health.model.User;
 import com.health.model.Version;
 import com.health.model.VideoResource;
 import com.health.model.Week;
-import com.health.model.WeekTitle;
+import com.health.model.WeekTitleVideo;
 import com.health.service.BrouchureService;
 import com.health.service.CarouselService;
 import com.health.service.CategoryService;
@@ -97,7 +97,7 @@ import com.health.service.UserService;
 import com.health.service.VersionService;
 import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
-import com.health.service.WeekTitleService;
+import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -132,7 +132,7 @@ public class AjaxController {
     private ResearchPaperService researchPaperService;
 
     @Autowired
-    private WeekTitleService weekTitleService;
+    private WeekTitleVideoService weekTitleVideoService;
 
     @Autowired
     private WeekService weekService;
@@ -1009,10 +1009,10 @@ public class AjaxController {
 
         String langName = lan.getLangName();
 
-        WeekTitle weekTitle = weekTitleService.findByWeekVideoResourceAndLan(week, video, langName);
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video, langName);
 
-        if (weekTitle != null)
-            titleName.put(weekTitle.getWeekTitleId(), weekTitle.getTitle());
+        if (weekTitleVideo != null)
+            titleName.put(weekTitleVideo.getWeekTitleVideoId(), weekTitleVideo.getTitle());
 
         return titleName;
     }

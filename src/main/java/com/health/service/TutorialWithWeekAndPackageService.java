@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.health.model.PackageLanguage;
 import com.health.model.TutorialWithWeekAndPackage;
-import com.health.model.WeekTitle;
+import com.health.model.WeekTitleVideo;
 
 public interface TutorialWithWeekAndPackageService {
 
@@ -14,7 +14,7 @@ public interface TutorialWithWeekAndPackageService {
 
     void saveAll(List<TutorialWithWeekAndPackage> tutorialList);
 
-    TutorialWithWeekAndPackage findByPackageLanguageAndWeektitle(PackageLanguage packageLanguage, WeekTitle weekTitle);
+    TutorialWithWeekAndPackage findByPackageLanguageAndWeektitle(PackageLanguage packageLanguage, WeekTitleVideo weekTitleVideo);
 
     void save(TutorialWithWeekAndPackage twp);
 }

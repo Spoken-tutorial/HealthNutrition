@@ -31,7 +31,7 @@ public class TutorialWithWeekAndPackage implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "week_title_id", nullable = false)
-    private WeekTitle weekTitle;
+    private WeekTitleVideo weekTitleVideo;
 
     @ManyToOne
     @JoinColumn(name = "package_lan_id", nullable = false)
@@ -45,12 +45,12 @@ public class TutorialWithWeekAndPackage implements Serializable {
         this.id = id;
     }
 
-    public WeekTitle getWeekTitle() {
-        return weekTitle;
+    public WeekTitleVideo getWeekTitle() {
+        return weekTitleVideo;
     }
 
-    public void setWeekTitle(WeekTitle weekTitle) {
-        this.weekTitle = weekTitle;
+    public void setWeekTitle(WeekTitleVideo weekTitleVideo) {
+        this.weekTitleVideo = weekTitleVideo;
     }
 
     public PackageLanguage getPackageLanguage() {
@@ -77,20 +77,20 @@ public class TutorialWithWeekAndPackage implements Serializable {
         this.status = status;
     }
 
-    public TutorialWithWeekAndPackage(Timestamp dateAdded, boolean status, WeekTitle weekTitle,
+    public TutorialWithWeekAndPackage(Timestamp dateAdded, boolean status, WeekTitleVideo weekTitleVideo,
             PackageLanguage packageLanguage) {
         super();
         this.dateAdded = dateAdded;
         this.status = status;
-        this.weekTitle = weekTitle;
+        this.weekTitleVideo = weekTitleVideo;
         this.packageLanguage = packageLanguage;
 
     }
 
-    public TutorialWithWeekAndPackage(Timestamp dateAdded, WeekTitle weekTitle, PackageLanguage packageLanguage) {
+    public TutorialWithWeekAndPackage(Timestamp dateAdded, WeekTitleVideo weekTitleVideo, PackageLanguage packageLanguage) {
         super();
         this.dateAdded = dateAdded;
-        this.weekTitle = weekTitle;
+        this.weekTitleVideo = weekTitleVideo;
         this.packageLanguage = packageLanguage;
 
     }
@@ -101,7 +101,7 @@ public class TutorialWithWeekAndPackage implements Serializable {
 
     @Override
     public String toString() {
-        return "TutorialWithWeekAndPackage [weekTitle=" + weekTitle + ", packageLanguage=" + packageLanguage + "]";
+        return "TutorialWithWeekAndPackage [weekTitleVideo=" + weekTitleVideo + ", packageLanguage=" + packageLanguage + "]";
     }
 
 }

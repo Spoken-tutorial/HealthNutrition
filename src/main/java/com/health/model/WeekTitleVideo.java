@@ -18,14 +18,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
-public class WeekTitle implements Serializable {
+public class WeekTitleVideo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
-    private int weekTitleId;
+    private int weekTitleVideoId;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -44,15 +44,15 @@ public class WeekTitle implements Serializable {
     @JoinColumn(name = "video_resource_id", nullable = false)
     private VideoResource videoResource;
 
-    @OneToMany(mappedBy = "weekTitle", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "weekTitleVideo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<TutorialWithWeekAndPackage> tutorialsWithWeekAndPack = new HashSet<TutorialWithWeekAndPackage>();
 
-    public int getWeekTitleId() {
-        return weekTitleId;
+    public int getWeekTitleVideoId() {
+        return weekTitleVideoId;
     }
 
-    public void setWeekTitleId(int weekTitleId) {
-        this.weekTitleId = weekTitleId;
+    public void setWeekTitleVideoId(int weekTitleVideoId) {
+        this.weekTitleVideoId = weekTitleVideoId;
     }
 
     public String getTitle() {
@@ -95,7 +95,7 @@ public class WeekTitle implements Serializable {
         this.status = status;
     }
 
-    public WeekTitle() {
+    public WeekTitleVideo() {
         super();
 
     }
@@ -108,16 +108,17 @@ public class WeekTitle implements Serializable {
         this.tutorialsWithWeekAndPack = tutorialsWithWeekAndPack;
     }
 
-    public WeekTitle(int weekTitleId, String title, Timestamp dateAdded, Week week, VideoResource videoResource) {
+    public WeekTitleVideo(int weekTitleVideoId, String title, Timestamp dateAdded, Week week,
+            VideoResource videoResource) {
         super();
-        this.weekTitleId = weekTitleId;
+        this.weekTitleVideoId = weekTitleVideoId;
         this.title = title;
         this.dateAdded = dateAdded;
         this.week = week;
         this.videoResource = videoResource;
     }
 
-    public WeekTitle(String title, Timestamp dateAdded, Week week, VideoResource videoResource) {
+    public WeekTitleVideo(String title, Timestamp dateAdded, Week week, VideoResource videoResource) {
         super();
         this.title = title;
         this.dateAdded = dateAdded;
@@ -127,8 +128,8 @@ public class WeekTitle implements Serializable {
 
     @Override
     public String toString() {
-        return "WeekTitle [weekTitleId=" + weekTitleId + ", title=" + title + ", week=" + week + ", videoResource="
-                + videoResource + "]";
+        return "WeekTitleVideo [weekTitleVideoId=" + weekTitleVideoId + ", title=" + title + ", week=" + week
+                + ", videoResource=" + videoResource + "]";
     }
 
 }

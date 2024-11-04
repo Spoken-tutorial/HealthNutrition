@@ -97,13 +97,13 @@ public class PackageLanguage implements Serializable {
 
     }
 
-    public List<WeekTitle> getAllWeekTitle() {
-        Set<WeekTitle> weektitleSet = new HashSet<>();
+    public List<WeekTitleVideo> getAllWeekTitle() {
+        Set<WeekTitleVideo> weektitleSet = new HashSet<>();
         for (TutorialWithWeekAndPackage temp : tutorialsWithWeekAndPack) {
 
             weektitleSet.add(temp.getWeekTitle());
         }
-        return new ArrayList<WeekTitle>(weektitleSet);
+        return new ArrayList<WeekTitleVideo>(weektitleSet);
 
     }
 

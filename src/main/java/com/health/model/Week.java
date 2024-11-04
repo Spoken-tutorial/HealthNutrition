@@ -27,7 +27,7 @@ public class Week implements Serializable {
     private int weekNumber;
 
     @OneToMany(mappedBy = "week", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<WeekTitle> weekTitles = new HashSet<WeekTitle>();
+    private Set<WeekTitleVideo> weekTitleVideos = new HashSet<WeekTitleVideo>();
 
     public int getWeekId() {
         return weekId;
@@ -37,12 +37,12 @@ public class Week implements Serializable {
         return "Week " + weekNumber;
     }
 
-    public Set<WeekTitle> getWeekTitles() {
-        return weekTitles;
+    public Set<WeekTitleVideo> getWeekTitles() {
+        return weekTitleVideos;
     }
 
-    public void setWeekTitles(Set<WeekTitle> weekTitles) {
-        this.weekTitles = weekTitles;
+    public void setWeekTitles(Set<WeekTitleVideo> weekTitleVideos) {
+        this.weekTitleVideos = weekTitleVideos;
     }
 
     public void setWeekId(int weekId) {
