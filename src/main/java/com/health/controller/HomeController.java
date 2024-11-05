@@ -4543,7 +4543,7 @@ public class HomeController {
     }
 
     /******************************************
-     * AssTutorial on Week And Package End
+     * Assign Tutorial on Week And Package End
      ********************/
 
     @GetMapping("/trainingModules")
