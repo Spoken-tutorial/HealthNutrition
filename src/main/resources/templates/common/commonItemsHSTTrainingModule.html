@@ -26,9 +26,14 @@
           
      
     </form>
+    <div id="return_msg" th:if="${return_msg != null}" style="color: orange; font-weight: bold; margin-top: 10px;"> 
+		 <span  th:text="${return_msg}"></span>
+	</div>
+   
     <div id="loadingMessage" style="display: none; color: orange; font-weight: bold; margin-top: 10px;">
-        The zip file is creating, please check back after 30 minutes.
+     
     </div>
+     
 </div>
 
 	

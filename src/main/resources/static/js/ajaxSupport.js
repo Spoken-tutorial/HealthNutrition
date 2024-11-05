@@ -2101,8 +2101,7 @@ $(document).ready(function () {
       
        $(document).ready(function() {
         $('#packageForm').on('submit', function() {
-			console.log("Alok");
-            // Show the loading message when the form is submitted
+			$('#return_msg').hide();
             $('#loadingMessage').show();
         });
     });
