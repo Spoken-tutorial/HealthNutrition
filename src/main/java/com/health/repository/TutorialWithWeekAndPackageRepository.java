@@ -19,9 +19,9 @@ public interface TutorialWithWeekAndPackageRepository extends JpaRepository<Tuto
             @Param("packageLanguage") PackageLanguage packageLanguage,
             @Param("weekTitleVideo") WeekTitleVideo weekTitleVideo);
 
-    @Query("SELECT t FROM TutorialWithWeekAndPackage t WHERE t.weekTitle IN :weekTitles AND t.packageLanguage IN :packageLanguages")
+    @Query("SELECT t FROM TutorialWithWeekAndPackage t WHERE t.weekTitleVideo IN :weekTitles AND t.packageLanguage IN :packageLanguages")
     List<TutorialWithWeekAndPackage> findByWeekTitlesAndPackageLanguages(
-            @Param("weekTitles") List<WeekTitle> weekTitles,
+            @Param("weekTitles") List<WeekTitleVideo> weekTitles,
             @Param("packageLanguages") List<PackageLanguage> packageLanguages);
 
 }

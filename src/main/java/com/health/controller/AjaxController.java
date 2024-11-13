@@ -1086,20 +1086,39 @@ public class AjaxController {
      * Training_Module_View Start
      *********************************/
 
+    private int extractInteger(String str) {
+        // Use regular expression to find all digits in the string
+        String numberStr = str.replaceAll("\\D+", ""); // \\D+ matches all non-digit characters
+        if (!numberStr.isEmpty()) {
+            return Integer.parseInt(numberStr);
+        } else {
+            throw new NumberFormatException("No integer found in the input string");
+        }
+    }
+
     @RequestMapping("/loadLanguageByWeek")
-    public @ResponseBody ArrayList<Map<String, Integer>> getLanguageByWeek(@RequestParam(value = "weekId") int weekId,
-            @RequestParam(value = "languageId") int languageId) {
+    public @ResponseBody ArrayList<Map<String, String>> getLanguageByWeek(@RequestParam(value = "weekId") String weekId,
+            @RequestParam(value = "languageId") String languageId) {
 
-        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+        ArrayList<Map<String, String>> arlist = new ArrayList<>();
 
-        Map<String, Integer> languages = new TreeMap<>();
+        Map<String, String> languages = new TreeMap<>();
 
-        Week week = weekId != 0 ? weekService.findByWeekId(weekId) : null;
+        int intWeekId = 0;
+        if (!weekId.equals("")) {
+            intWeekId = extractInteger(weekId);
+        }
+        int intlanguageId = 0;
+        if (!languageId.equals("")) {
+            intlanguageId = langService.getByLanName(languageId).getLanId();
+        }
 
-        Language language = languageId != 0 ? langService.getById(languageId) : null;
+        Week week = intWeekId != 0 ? weekService.findByWeekId(intWeekId) : null;
 
-        List<WeekTitle> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
-                : weekTitleService.findAll();
+        Language language = intlanguageId != 0 ? langService.getById(intlanguageId) : null;
+
+        List<WeekTitleVideo> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
+                : weekTitleVideoService.findAll();
 
 //        List<PackageLanguage> packlan_list = language != null ? new ArrayList<>(language.getPackageLanguages())
 //                : packLanService.findAll();
@@ -1110,7 +1129,7 @@ public class AjaxController {
                 .findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
         for (TutorialWithWeekAndPackage temp : tutorials) {
             Language lan = temp.getPackageLanguage().getLan();
-            languages.put(lan.getLangName(), lan.getLanId());
+            languages.put(lan.getLangName(), lan.getLangName());
         }
 
         arlist.add(languages);
@@ -1119,21 +1138,30 @@ public class AjaxController {
     }
 
     @RequestMapping("/loadWeekByLanguage")
-    public @ResponseBody ArrayList<Map<String, Integer>> getWeekByLanguage(@RequestParam(value = "weekId") int weekId,
-            @RequestParam(value = "languageId") int languageId) {
+    public @ResponseBody ArrayList<Map<String, String>> getWeekByLanguage(@RequestParam(value = "weekId") String weekId,
+            @RequestParam(value = "languageId") String languageId) {
 
-        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+        ArrayList<Map<String, String>> arlist = new ArrayList<>();
 
-        Map<String, Integer> weeks = new TreeMap<>();
+        Map<String, String> weeks = new TreeMap<>();
 
-        Week week = weekId != 0 ? weekService.findByWeekId(weekId) : null;
+        int intWeekId = 0;
+        if (!weekId.equals("")) {
+            intWeekId = extractInteger(weekId);
+        }
+        int intlanguageId = 0;
+        if (!languageId.equals("")) {
+            intlanguageId = langService.getByLanName(languageId).getLanId();
+        }
 
-        Language language = languageId != 0 ? langService.getById(languageId) : null;
+        Week week = intWeekId != 0 ? weekService.findByWeekId(intWeekId) : null;
+
+        Language language = intlanguageId != 0 ? langService.getById(intlanguageId) : null;
 
 //        List<WeekTitle> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
 //                : weekTitleService.findAll();
 
-        List<WeekTitle> weekTitleList = weekTitleService.findAll();
+        List<WeekTitleVideo> weekTitleList = weekTitleVideoService.findAll();
         List<PackageLanguage> packlan_list = language != null ? new ArrayList<>(language.getPackageLanguages())
                 : packLanService.findAll();
 
@@ -1142,7 +1170,7 @@ public class AjaxController {
                 .findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
         for (TutorialWithWeekAndPackage temp : tutorials) {
             Week weekTemp = temp.getWeekTitle().getWeek();
-            weeks.put(weekTemp.getWeekName(), weekTemp.getWeekId());
+            weeks.put(weekTemp.getWeekName(), weekTemp.getWeekName());
         }
 
         arlist.add(weeks);

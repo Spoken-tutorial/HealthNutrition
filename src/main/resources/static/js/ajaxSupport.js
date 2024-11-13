@@ -2125,7 +2125,7 @@ $(document).ready(function () {
 						
 						console.log(result);
 						var html = '';
-						html += '<option value="0">Select Language</option>';
+						html += '<option value="">Select Language</option>';
 						$.each(result , function( value ,key ) {
 							var selected=(languageId==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
@@ -2134,7 +2134,7 @@ $(document).ready(function () {
 						$('#languageView').html(html);
 						
 						
-						if (weekId != 0) {
+						if (weekId !== "") {
 							$("#weekresetdiv").show();
 						} else {
 						$("#weekresetdiv").hide();
@@ -2159,8 +2159,8 @@ $(document).ready(function () {
 			
 			 $( "#weekreset" ).click(function() {
 			
-				var weekId = 0;
-				$("#weekView").val("0");
+				var weekId = "";
+				$("#weekView").val("");
 				var languageId = $("#languageView").val();
 				
 				loadLanguageByWeek(weekId, languageId);
@@ -2188,7 +2188,7 @@ $(document).ready(function () {
 						
 						console.log(result);
 						var html = '';
-						html += '<option value="0">Select Week</option>';
+						html += '<option value="">Select Week</option>';
 						$.each(result , function( value ,key ) {
 							var selected=(weekId==key)?"selected":"";
 			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
@@ -2197,7 +2197,7 @@ $(document).ready(function () {
 						$('#weekView').html(html);
 						
 						
-						if (languageId != 0) {
+						if (languageId !== "") {
 							$("#languageresetdiv").show();
 						} else {
 						$("#languageresetdiv").hide();
@@ -2222,8 +2222,8 @@ $(document).ready(function () {
 			
 			 $( "#languagereset" ).click(function() {
 			
-				var languageId = 0;
-				$("#languageView").val("0");
+				var languageId = "";
+				$("#languageView").val("");
 				var weekId = $("#weekView").val();
 				
 				loadWeekByLanguage(weekId, languageId);
@@ -2240,10 +2240,10 @@ $(document).ready(function () {
 			$( "#btnClearFormView" ).click(function() {
 				
 				
-				var languageId = 0;
-				$("#languageView").val("0");
-				var weekId =0; 
-				$("#weekView").val("0");
+				var languageId = "";
+				$("#languageView").val("");
+				var weekId =""; 
+				$("#weekView").val("");
 				
 				loadLanguageByWeek(weekId, languageId);
 				loadWeekByLanguage(weekId, languageId);
@@ -2255,8 +2255,110 @@ $(document).ready(function () {
 			
 			
 
-    
-    
+ /*   
+    $(document).ready(function() {
+						var lengthofWeekTitleVideo=$("#lengthofWeekTitleVideo").val();
+		
+						for(var i=0; i<=lengthofWeekTitleVideo; i++){
+							
+						var clipboard = new ClipboardJS('#copyButton'+i, {
+				        text: function(trigger) {
+				            return $('#hstTrainingVideoViewUrl' +i).prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButton'+i);
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+				            button.html(originalHtml);
+				            button.attr('title', originalTitle);
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+								
+							}
+	   
+
+});
+*/
+
+$(document).ready(function() {
+						
+							
+						var clipboard = new ClipboardJS('#copyButtonView', {
+				        text: function(trigger) {
+				            return $('#hstTrainingModuleViewUrl').prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButtonView');
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+				            button.html(originalHtml);
+				            button.attr('title', originalTitle);
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+								
+							
+	   
+
+});
+
+$(document).ready(function() {
+var clipboard = new ClipboardJS('#copyButtonViewPage', {
+				        text: function(trigger) {
+				            return $('#hstTrainingModuleViewPageUrl').prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButtonViewPage');
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+							console.log('Reverting button HTML and title'); 
+				            button.html('Copy <i style="font-size:14px" class="fa">&#xf0c5;</i>');
+				            button.attr('title', 'Copy to clipboard');
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+				
+
+});
+
+
     
 /************************************Assign Video End ********************************************** */
 			
