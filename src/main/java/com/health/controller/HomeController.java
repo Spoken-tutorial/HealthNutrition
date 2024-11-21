@@ -4662,7 +4662,7 @@ public class HomeController {
         }
         model.addAttribute("foundVideo", foundVideo);
 
-        return "TesthstTrainingView";
+        return "relatedHstTrainingTutorialsView";
     }
 
     /********************** Training Modules Download Start **********************/
