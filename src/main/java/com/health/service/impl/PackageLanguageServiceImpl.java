@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.health.model.Language;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.repository.PackageLanguageRepository;
@@ -37,6 +38,18 @@ public class PackageLanguageServiceImpl implements PackageLanguageService {
     public List<PackageLanguage> findAll() {
 
         return repo.findAll();
+    }
+
+    @Override
+    public List<Language> findAllLanguagesByPackageContainer(PackageContainer packageContainer) {
+
+        return repo.findAllLanguagesByPackageContainer(packageContainer);
+    }
+
+    @Override
+    public List<PackageContainer> findAllDistinctPackageContainers() {
+
+        return repo.findAllDistinctPackageContainers();
     }
 
 }

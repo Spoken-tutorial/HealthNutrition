@@ -167,6 +167,7 @@ import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
+import com.health.threadpool.ZipCreationThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -238,6 +239,9 @@ public class HomeController {
 
     @Autowired
     private PackageLanguageService packLanService;
+
+    @Autowired
+    private ZipCreationThreadService zipCreationThreadService;
 
     @Autowired
     private TutorialWithWeekAndPackageService tutorialWithWeekAndPackageService;
@@ -715,6 +719,12 @@ public class HomeController {
         model.addAttribute("localLan", lanId);
         model.addAttribute("query", query);
         model.addAttribute("languageCount", lan.size());
+
+    }
+
+    private void getPackageAndLanguageData(Model model) {
+        List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
+        model.addAttribute("packageList", packageList);
 
     }
 
@@ -4494,7 +4504,8 @@ public class HomeController {
                     Week week = weekService.findByWeekId(weekIds.get(i));
                     VideoResource video = videoResourceService.findById(videoIds.get(i));
                     if (video.getLan().getLangName().equals(langName)) {
-                        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video, langName);
+                        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekVideoResourceAndLan(week, video,
+                                langName);
 
                         if (weekTitleVideo == null) {
                             weekTitleVideo = new WeekTitleVideo(titles.get(i), dateAdded, week, video);
@@ -4524,7 +4535,8 @@ public class HomeController {
             logger.error("Error:", e);
             return createPackageGet(req, principal, model);
         }
-
+        zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(packageContainer.getPackageName(),
+                langName, env);
         model.addAttribute("viewSection", viewSection);
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
         return createPackageGet(req, principal, model);
@@ -4533,6 +4545,65 @@ public class HomeController {
     /******************************************
      * AssTutorial on Week And Package End
      ********************/
+
+    @GetMapping("/trainingModules")
+    public String hstTrainingModules(HttpServletRequest req, Model model, Principal principal) {
+
+        getPackageAndLanguageData(model);
+        return "hstTrainingModule";
+
+    }
+
+    /********************** Training Modules Download Start **********************/
+
+    @PostMapping("/downloadTrainingModules")
+    public String downloadPackagePost(HttpServletRequest req, Principal principal, Model model,
+            @RequestParam(name = "packageDownloadName") String packageId,
+            @RequestParam(name = "languageDownloadName") String lanId) {
+
+        getPackageAndLanguageData(model);
+        boolean downloadSection = false;
+        model.addAttribute("downloadSection", downloadSection);
+
+        PackageContainer packageContainer = packageContainerService.findByPackageId(Integer.parseInt(packageId));
+        if (packageContainer == null) { // throw error
+
+            model.addAttribute("return_msg", "Please Select Package");
+            return "hstTrainingModule";
+        }
+
+        Language lan = lanService.getById(Integer.parseInt(lanId));
+        if (lan == null) { // throw error
+
+            model.addAttribute("return_msg", "Please Select Language");
+            return "hstTrainingModule";
+        }
+
+        String langName = lan.getLangName();
+        String originalPackageName = packageContainer.getPackageName();
+        String zipUrl = zipCreationThreadService.getZipName(originalPackageName, langName, env);
+
+        if (zipUrl == null || zipUrl.isEmpty()) {
+            model.addAttribute("return_msg", "Zip creation in progress.... , please check back after 30 minutes.");
+            return "hstTrainingModule";
+
+        } else if (zipUrl.equals("Error")) {
+            model.addAttribute("return_msg", "No Tutorials are available for selected Package,  and Language");
+            return "hstTrainingModule";
+
+        }
+
+        else {
+            model.addAttribute("zipUrl", zipUrl);
+            model.addAttribute("success_msg",
+                    "Record Submitted Successfully ! Click on the download link to download resources");
+
+            return "downloadTrainingModule";
+        }
+
+    }
+
+    /***************************** Training Modules Download End *****************/
 
     @GetMapping("/category/edit/{catName}")
     public String editCategoryGet(@PathVariable(name = "catName") String catName, HttpServletRequest req, Model model,

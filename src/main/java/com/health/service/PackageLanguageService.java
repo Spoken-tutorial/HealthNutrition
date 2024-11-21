@@ -2,6 +2,7 @@ package com.health.service;
 
 import java.util.List;
 
+import com.health.model.Language;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 
@@ -14,5 +15,9 @@ public interface PackageLanguageService {
     void save(PackageLanguage packageLanguage);
 
     List<PackageLanguage> findAll();
+
+    List<Language> findAllLanguagesByPackageContainer(PackageContainer packageContainer);
+
+    List<PackageContainer> findAllDistinctPackageContainers();
 
 }
