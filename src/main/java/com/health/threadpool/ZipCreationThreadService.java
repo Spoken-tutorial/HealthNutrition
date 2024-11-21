@@ -294,29 +294,20 @@ public class ZipCreationThreadService {
         Map<String, Object> modelAttributes = new HashMap<>();
 
         try {
-            Resource faviconResource = resourceLoader.getResource("classpath:/static/image/favicon.ico");
-            Resource logoResource = resourceLoader.getResource("classpath:/static/image/logo.png");
 
-            Path destinationPathForFavicon = originalPath.resolve("favicon.ico");
-            Path destinationPathForLogo = originalPath.resolve("logo.png");
+            Resource resources_for_zip = resourceLoader.getResource("classpath:/static/resources_for_zip");
+            Path sourcePath = Paths.get(resources_for_zip.getURI());
 
-            if (faviconResource.exists()) {
-                FileUtils.copyInputStreamToFile(faviconResource.getInputStream(), destinationPathForFavicon.toFile());
-            } else {
-                logger.error("Favicon file does not exist.");
-            }
-
-            if (logoResource.exists()) {
-                FileUtils.copyInputStreamToFile(logoResource.getInputStream(), destinationPathForLogo.toFile());
-            } else {
-                logger.error("Logo file does not exist.");
-            }
+            copyFileUsingRsync(sourcePath, originalPath);
 
         } catch (Exception e) {
-            logger.error("Error copying logo or favicon", e);
+            logger.error("Error copying of resource_for_zip", e);
         }
-        modelAttributes.put("favicon", "favicon.ico");
-        modelAttributes.put("logo", "logo.png");
+
+        boolean zipVariable = false;
+
+        modelAttributes.put("rootFolder", "resources_for_zip");
+        modelAttributes.put("zipVariable", zipVariable);
         modelAttributes.put("week", weekName);
         modelAttributes.put("language", langName);
 
