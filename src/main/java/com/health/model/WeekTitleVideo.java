@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 @Entity
 public class WeekTitleVideo implements Serializable {
@@ -29,6 +30,9 @@ public class WeekTitleVideo implements Serializable {
 
     @Column(name = "title", nullable = false)
     private String title;
+
+    @Transient
+    private String indexVideoPath;
 
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
@@ -93,6 +97,14 @@ public class WeekTitleVideo implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getIndexVideoPath() {
+        return indexVideoPath;
+    }
+
+    public void setIndexVideoPath(String indexVideoPath) {
+        this.indexVideoPath = indexVideoPath;
     }
 
     public WeekTitleVideo() {

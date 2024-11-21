@@ -726,8 +726,8 @@ public class HomeController {
         List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
         model.addAttribute("packageList", packageList);
 
-        ArrayList<Map<String, String>> arlist = ajaxController.getLanguageByWeek(weekId, lanId);
-        ArrayList<Map<String, String>> arlist1 = ajaxController.getWeekByLanguage(weekId, lanId);
+        ArrayList<Map<String, String>> arlist = ajaxController.getLanguageByWeek(weekId, lanId, null);
+        ArrayList<Map<String, String>> arlist1 = ajaxController.getWeekByLanguage(weekId, lanId, null);
         Map<String, String> languages = arlist.get(0);
         Map<String, String> weeks = arlist1.get(0);
 
@@ -4640,11 +4640,29 @@ public class HomeController {
         if (weekTitleVideo == null) {
             foundVideo = false;
         } else {
+            Week week = weekTitleVideo.getWeek();
+            Language lan = weekTitleVideo.getVideoResource().getLan();
+
+            List<WeekTitleVideo> relatedweekTitleVideoList = weekTitleVideoService.findByWeekAndLan(week, lan);
+            relatedweekTitleVideoList.remove(weekTitleVideo);
+            int nextWeekId = week.getWeekId() + 1;
+            Week nextweek = weekService.findByWeekId(nextWeekId);
+
+            if (nextweek != null) {
+                List<WeekTitleVideo> nextWeekTitleVideoList = weekTitleVideoService.findByWeekAndLan(nextweek, lan);
+                if (nextWeekTitleVideoList != null && nextWeekTitleVideoList.size() > 0) {
+                    relatedweekTitleVideoList.addAll(nextWeekTitleVideoList);
+                }
+
+            }
+
+            if (relatedweekTitleVideoList != null && relatedweekTitleVideoList.size() > 0)
+                model.addAttribute("relatedweekTitleVideoList", relatedweekTitleVideoList);
             model.addAttribute("weekTitleVideo", weekTitleVideo);
         }
         model.addAttribute("foundVideo", foundVideo);
 
-        return "hstTrainingModuleView";
+        return "TesthstTrainingView";
     }
 
     /********************** Training Modules Download Start **********************/

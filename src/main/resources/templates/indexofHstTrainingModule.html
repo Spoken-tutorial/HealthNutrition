@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://thymeleaf.org">
+<head >
+ <link rel="icon" th:href="@{${favicon}}" />
+<title >HST Training</title>
+
+
+	<meta charset="utf-8"/> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+	<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.css" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/main.css}"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
+</head>
+
+</head>
+  <body>
+   <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+  
+  
+  <header class="mb-5" id="top-fixed-banner">
+	<section th:fragment="header-bar">
+	<div class="px-md-3">
+	<div class="row header-top pt-2">
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+		</div>
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+	<div><p class="d-inline-block"><span class="top-banner">
+		<a sec:authorize="isAnonymous()" th:href="@{/login}" target="_blank">Login | New
+		User</a> <a sec:authorize="isAuthenticated()"
+		th:href="@{/dashBoard}">My Account</a> 
+		</span></p>
+	  <p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p></div>
+	</div>
+	</div>
+	</div>
+	</section>
+	
+  <nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="navbar">
+    <div class="container-fluid">
+        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{${logo}}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">HST Training Modules  </span> </span>
+
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavBar">
+            <div class="navbar-nav ml-auto">
+                <a class="nav-item nav-link active" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
+                <div th:replace="common/commonItemsHSTTrainingModule :: download_package"></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+  </header>
+ 
+  <div class="container">
+<div th:replace="common/commonItemsHSTTrainingModule :: trainingModuleView_bar"></div>
+</div>
+    <main>
+   
+
+<section>
+<div class="container-fluid">
+ <div class="row">
+ <div class="col">	
+<input th:if="${weekTitleVideoList!=null}" type="hidden" id="lengthofWeekTitleVideo" name="lengthofWeekTitleVideo"  th:value="${weekTitleVideoList.size()}"/>
+<table class="table table-striped" id="events_table">
+  <thead>
+    
+      <th>Video</th>
+	 
+  </thead>
+  <tbody>
+    <tr th:each="temp, iter : ${weekTitleVideoList}">
+      <td>
+        <div class="row t-wrapper mt-3">
+          <div class="col-md-6">
+            <div style="width: 100%; margin: auto;">
+              <video th:id="${'storedTutorialId' + temp.getWeekTitleVideoId()}"
+                     controls style="width:100%!important;" class="vid1">
+                <source th:src="@{${temp.getIndexVideoPath()}}" type="video/mp4"></source>
+              </video>
+            </div>
+          </div>
+          <div class="col-md-6">
+			<!--a th:id="${'hstTrainingVideoViewUrl' + iter.index}" th:href="@{'/hstTrainingModuleView/' + ${temp.getWeekTitleVideoId()} + '/'}" style="display: block;" --> 
+            <h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${temp.getWeek().getWeekName()}"></h4>
+            <h6 style="color: #014F7A;font-size: 1rem;">
+              <i><span th:text="'Title: ' + ${temp.getTitle()}"></span></i>
+               
+            </h6>
+            <h6 style="color: #014F7A;font-size: 1rem;">   
+                <span th:text="${temp.getVideoResource().getLan().getLangName()}" class=""></span>
+            </h6>
+             
+			     <!-- /a -->
+			  
+			
+
+          </div>
+        </div>
+      </td>
+      
+        
+      
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+    
+       </main>
+    
+    <footer class="footer">
+    <div class="text-center">	<p>Developed at IIT-Bombay</p>
+    </div>
+	
+    </footer>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+			<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+		    
+		   <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
+		    <script th:src="@{/s/js/main.js}"></script>
+		    
+		    
+		    <script th:src="@{/js/ajaxSupport.js}"></script>
+	
+
+
+<style>
+	
+	
+.share-button {
+            background-color: rgb(255, 255, 255);
+           
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 15px;
+            margin: 2px 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+   
+        }
+        .share-button:hover::after {
+          
+		    position: absolute;
+		    top: -30px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #333;
+		    color: #fff;
+		    padding: 5px 10px;
+		    border-radius: 4px;
+		    white-space: nowrap;
+		    z-index: 1000;
+		    opacity: 0.9;
+		    font-size: 12px;
+		    line-height: 1.2;
+		    pointer-events: none;
+        } 
+	
+	
+  :root {
+  --plyr-color-main: #ff9033;
+   
+}
+  .plyr__controls__item plyr__volume{
+    margin-bottom: 25px;
+    padding-bottom:25px;
+  }
+  
+  
+  
+  .dt-layout-cell {
+    display: flex;
+    flex-direction: row;
+   
+}
+.dt-search{
+	display: none;
+}
+
+.dt-layout-cell td:nth-child(1), 
+.dt-layout-cell td:nth-child(2) {
+    width: 20%; /*Adjust width as needed to fit two lines per row */ 
+    flex:40%;
+} 
+
+</style>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		    	
+	   var table=  $('#events_table').DataTable();
+	   
+	   selectweekLanguage();
+	   
+	       
+	$('#weekView').on('change', selectweekLanguage);
+
+        // Event listener for the language dropdown
+        $('#languageView').on('change',selectweekLanguage);
+        
+       
+        $('#btnClearFormView').on('click', selectweekLanguage);
+        
+        function selectweekLanguage() {
+		 var selectedLanguage = $('#languageView').val();
+		 var selectedWeek = $('#weekView').val();
+		
+		   var hstTrainingModuleViewPageUrl = document.getElementById('hstTrainingModuleViewPageUrl');
+			var newUrl = '/trainingModules?week=' + selectedWeek +   '&lan=' + selectedLanguage ;
+            hstTrainingModuleViewPageUrl.href = newUrl;
+
+ 			if(selectedWeek!=""){
+			    selectedWeek='"' + selectedWeek + '"';
+		     }
+		     
+		   if(selectedLanguage!=""){
+			   selectedLanguage='"' + selectedLanguage + '"';
+		     }
+		     
+            table.search(selectedWeek +" " + selectedLanguage ).draw();
+            
+        }
+        
+        
+	} );
+	
+	
+ 
+
+	</script>
+	
+
+
+<script>
+var projectPath='[(@{/})]';
+		
+		
+  		
+var isPlaying = [];
+				
+				var videos = document.querySelectorAll('video');
+				for(var i=0; i<videos.length; i++){
+				  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+				}
+				
+				
+
+				function pauseAll(elem){
+					var videos2 = document.querySelectorAll('video');
+					for(var i=0; i<videos2.length; i++){
+				                if(videos2[i] == elem) continue;
+				                if(videos2[i].played.length > 0 && !videos2[i].paused){
+				                  videos2[i].pause();
+				                }
+				        }
+				  }
+				
+				
+				
+				
+				   // Functions to play the video with/without sound
+					function playMutedVideoMouseOver(event) {
+						var video = event.target;
+					 	var flag=0;
+					 	for (var j = 0; j < videos.length; j++){
+							 if(!videos[j].paused && !videos[j].muted)
+					 			flag=flag+1;
+						 }
+					 	if(flag==0){
+					 	video.play();
+					 	video.muted = true;
+						}
+					 
+					}
+				   
+
+					function playUnmutedVideoOnClick(event) {
+					 var video = event.target;
+					 video.muted = false;
+					 video.play();
+					}
+					
+					function pauseWithMutedVideoMouseOut(event) {
+						 var video = event.target;
+							if(video.muted){
+								video.pause();
+								//video.muted=!video.muted;
+							}
+						 
+						}
+						
+					
+				
+					 
+					
+					
+		
+		
+		
+		 var controls =
+[
+'play-large', // The large play button in the center
+// 'restart', // Restart playback
+// 'rewind', // Rewind by the seek time (default 10 seconds)
+'play', // Play/pause playback
+//'fast-forward', // Fast forward by the seek time (default 10 seconds)
+'progress', // The progress bar and scrubber for playback and buffering
+'current-time', // The current time of playback
+//'duration', // The full duration of the media
+'mute', // Toggle mute
+'volume', // Volume control
+'captions', // Toggle captions
+'settings', // Settings menu
+'pip', // Picture-in-picture (currently Safari only)
+'airplay', // Airplay (currently Safari only)
+'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+'fullscreen' // Toggle fullscreen
+];
+
+//const player = new Plyr('.vid1',{controls});
+
+//var videos = document.querySelectorAll('video');
+
+for(var i=0; i<videos.length; i++){
+	
+	const player = new Plyr(videos[i],{controls});	
+	
+	
+	   
+}
+		
+
+</script>
+</body>
+</html>

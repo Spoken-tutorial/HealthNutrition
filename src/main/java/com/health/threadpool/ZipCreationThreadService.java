@@ -6,27 +6,42 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
+import com.health.config.ThymeleafService;
+import com.health.controller.AjaxController;
+import com.health.model.Language;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.TutorialWithWeekAndPackage;
 import com.health.model.VideoResource;
+import com.health.model.Week;
 import com.health.model.WeekTitleVideo;
+import com.health.service.LanguageService;
 import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
+import com.health.service.WeekService;
+import com.health.service.WeekTitleVideoService;
 import com.health.utility.CommonData;
 import com.health.utility.ServiceUtility;
 
@@ -40,6 +55,30 @@ public class ZipCreationThreadService {
 
     @Autowired
     private PackageContainerService packageContainerService;
+
+    @Autowired
+    private ThymeleafService thymeleafService;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    @Autowired
+    private WeekService weekService;
+
+    @Autowired
+    private WeekTitleVideoService weekTitleVideoService;
+
+    @Autowired
+    private AjaxController ajaxController;
+
+    @Autowired
+    private LanguageService lanService;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private HttpServletResponse response;
 
     private final ConcurrentHashMap<String, String> ZipNames = new ConcurrentHashMap<>();
 
@@ -73,6 +112,12 @@ public class ZipCreationThreadService {
             logger.error("Exception", e);
         }
 
+    }
+
+    private void generateLocalIndexHtml(String langName, int packageId, String indexPath, Path originalPath) {
+        Map<String, Object> modelAttributes = getTrainingModuleData("", langName, packageId, originalPath);
+        thymeleafService.createHtmlFromTemplate("indexofHstTrainingModule", modelAttributes, indexPath, request,
+                response);
     }
 
     @Async
@@ -115,14 +160,17 @@ public class ZipCreationThreadService {
                 Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                         CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, packageName);
 
+                Path indexHtmlPath = Paths.get(destInationDirectory1.toString(), File.separator, "index.html");
+
                 for (WeekTitleVideo temp : weekTitleList) {
                     String weekName = temp.getWeek().getWeekName().replace(' ', '_');
                     String title = temp.getTitle().replace(' ', '_');
 
                     String tutorialPath = temp.getVideoResource().getVideoPath();
+                    String weekTitleVideoString = Integer.toString(temp.getWeekTitleVideoId());
 
                     Path destInationDirectoryforLanAndWeek = Paths.get(destInationDirectory1.toString(), File.separator,
-                            langName, File.separator, weekName);
+                            langName, File.separator, weekName, File.separator, weekTitleVideoString);
                     try {
                         ServiceUtility.createFolder(destInationDirectoryforLanAndWeek);
                     } catch (IOException e) {
@@ -150,6 +198,8 @@ public class ZipCreationThreadService {
                     }
 
                 }
+                int packageId = packageContainer.getPackageId();
+                generateLocalIndexHtml(langName, packageId, indexHtmlPath.toString(), destInationDirectory1);
                 String temp = destInationDirectory1.toString();
                 int indexToStart = temp.indexOf("Media");
                 document = temp.substring(indexToStart, temp.length());
@@ -207,6 +257,119 @@ public class ZipCreationThreadService {
         } else {
             logger.info(" ZipFile does not exist: {} " + zipFileName);
         }
+    }
+
+    private void getPackageAndLanguageData(Map<String, Object> modelAttributes, String weekId, String lanId,
+            int packageId) {
+        List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
+        modelAttributes.put("packageList", packageList);
+        Optional<Integer> optionalPackageId = Optional.of(packageId);
+        ArrayList<Map<String, String>> arlist = ajaxController.getLanguageByWeek(weekId, lanId, optionalPackageId);
+        ArrayList<Map<String, String>> arlist1 = ajaxController.getWeekByLanguage(weekId, lanId, optionalPackageId);
+        Map<String, String> languages = arlist.get(0);
+        Map<String, String> weeks = arlist1.get(0);
+
+        modelAttributes.put("weekList", weeks);
+        modelAttributes.put("languages", languages);
+        modelAttributes.put("localWeek", weekId);
+
+        modelAttributes.put("localLanguage", lanId);
+
+        modelAttributes.put("languageCount", languages.size());
+
+    }
+
+    private int extractInteger(String str) {
+        // Use regular expression to find all digits in the string
+        String numberStr = str.replaceAll("\\D+", ""); // \\D+ matches all non-digit characters
+        if (!numberStr.isEmpty()) {
+            return Integer.parseInt(numberStr);
+        } else {
+            return 0;
+        }
+    }
+
+    private Map<String, Object> getTrainingModuleData(String weekName, String langName, int packageId,
+            Path originalPath) {
+        Map<String, Object> modelAttributes = new HashMap<>();
+
+        try {
+            Resource faviconResource = resourceLoader.getResource("classpath:/static/image/favicon.ico");
+            Resource logoResource = resourceLoader.getResource("classpath:/static/image/logo.png");
+
+            Path destinationPathForFavicon = originalPath.resolve("favicon.ico");
+            Path destinationPathForLogo = originalPath.resolve("logo.png");
+
+            if (faviconResource.exists()) {
+                FileUtils.copyInputStreamToFile(faviconResource.getInputStream(), destinationPathForFavicon.toFile());
+            } else {
+                logger.error("Favicon file does not exist.");
+            }
+
+            if (logoResource.exists()) {
+                FileUtils.copyInputStreamToFile(logoResource.getInputStream(), destinationPathForLogo.toFile());
+            } else {
+                logger.error("Logo file does not exist.");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error copying logo or favicon", e);
+        }
+        modelAttributes.put("favicon", "favicon.ico");
+        modelAttributes.put("logo", "logo.png");
+        modelAttributes.put("week", weekName);
+        modelAttributes.put("language", langName);
+
+        int intWeekId = 0;
+        if (!weekName.equals("")) {
+            intWeekId = extractInteger(weekName);
+        }
+
+        logger.info("Week:{} ", weekName);
+        logger.info("LangName:{}", langName);
+
+        Week localWeek = weekService.findByWeekId(intWeekId);
+        Language localLan = lanService.getByLanName(langName);
+
+        logger.info("localWeek:{}", localWeek);
+        logger.info("localLan:{}", localLan);
+
+        List<WeekTitleVideo> weekTitleVideoList = new ArrayList<>();
+
+        if (packageId != 0) {
+            PackageContainer packageContainer = packageContainerService.findByPackageId(packageId);
+            PackageLanguage packLan = packLanService.findByPackageContainerAndLan(packageContainer, langName);
+            List<TutorialWithWeekAndPackage> tutWithWeekAndPacagekList = new ArrayList<>(
+                    packLan.getTutorialsWithWeekAndPack());
+            if (tutWithWeekAndPacagekList.size() > 0) {
+                for (TutorialWithWeekAndPackage temp : tutWithWeekAndPacagekList) {
+                    WeekTitleVideo weekTitleVideo = temp.getWeekTitle();
+                    int weekTitleVideoId = weekTitleVideo.getWeekTitleVideoId();
+                    String weekTitleVideoString = Integer.toString(weekTitleVideoId);
+                    String title = weekTitleVideo.getTitle().replace(' ', '_');
+                    String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
+
+                    Path sourcePath = Paths.get(originalPath.toString(), File.separator, langName, File.separator,
+                            weekNameTemp, File.separator, weekTitleVideoString, File.separator, title + ".mp4");
+
+                    String videoPath = sourcePath.toString();
+                    int indexToStart = videoPath.indexOf(langName);
+                    String document = videoPath.substring(indexToStart, videoPath.length());
+                    weekTitleVideo.setIndexVideoPath(document);
+
+                    weekTitleVideoList.add(weekTitleVideo);
+                }
+            }
+
+        } else {
+            weekTitleVideoList = weekTitleVideoService.findAll();
+
+        }
+
+        modelAttributes.put("weekTitleVideoList", weekTitleVideoList);
+
+        getPackageAndLanguageData(modelAttributes, weekName, langName, packageId);
+        return modelAttributes;
     }
 
 }

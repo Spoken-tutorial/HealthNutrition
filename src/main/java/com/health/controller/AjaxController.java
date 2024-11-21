@@ -1098,7 +1098,7 @@ public class AjaxController {
 
     @RequestMapping("/loadLanguageByWeek")
     public @ResponseBody ArrayList<Map<String, String>> getLanguageByWeek(@RequestParam(value = "weekId") String weekId,
-            @RequestParam(value = "languageId") String languageId) {
+            @RequestParam(value = "languageId") String languageId, Optional<Integer> packageId) {
 
         ArrayList<Map<String, String>> arlist = new ArrayList<>();
 
@@ -1116,17 +1116,30 @@ public class AjaxController {
         Week week = intWeekId != 0 ? weekService.findByWeekId(intWeekId) : null;
 
         Language language = intlanguageId != 0 ? langService.getById(intlanguageId) : null;
+        PackageLanguage packLanguage = null;
+        if (packageId != null && packageId.isPresent()) {
+            PackageContainer packageContainer = packageContainerService.findByPackageId(packageId.get());
+            if (packageContainer != null && language != null) {
+                packLanguage = packLanService.findByPackageContainerAndLan(packageContainer, languageId);
+            }
+        }
 
-        List<WeekTitleVideo> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
-                : weekTitleVideoService.findAll();
+        List<TutorialWithWeekAndPackage> tutorials = new ArrayList<>();
 
-//        List<PackageLanguage> packlan_list = language != null ? new ArrayList<>(language.getPackageLanguages())
-//                : packLanService.findAll();
+        if (packLanguage != null) {
 
-        List<PackageLanguage> packlan_list = packLanService.findAll();
-        // To find Languages
-        List<TutorialWithWeekAndPackage> tutorials = tutorialWithPackageAndService
-                .findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
+            tutorials = new ArrayList<>(packLanguage.getTutorialsWithWeekAndPack());
+        }
+
+        else {
+
+            List<WeekTitleVideo> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
+                    : weekTitleVideoService.findAll();
+            List<PackageLanguage> packlan_list = packLanService.findAll();
+
+            tutorials = tutorialWithPackageAndService.findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
+        }
+
         for (TutorialWithWeekAndPackage temp : tutorials) {
             Language lan = temp.getPackageLanguage().getLan();
             languages.put(lan.getLangName(), lan.getLangName());
@@ -1139,7 +1152,7 @@ public class AjaxController {
 
     @RequestMapping("/loadWeekByLanguage")
     public @ResponseBody ArrayList<Map<String, String>> getWeekByLanguage(@RequestParam(value = "weekId") String weekId,
-            @RequestParam(value = "languageId") String languageId) {
+            @RequestParam(value = "languageId") String languageId, Optional<Integer> packageId) {
 
         ArrayList<Map<String, String>> arlist = new ArrayList<>();
 
@@ -1158,16 +1171,31 @@ public class AjaxController {
 
         Language language = intlanguageId != 0 ? langService.getById(intlanguageId) : null;
 
+        PackageLanguage packLanguage = null;
+        if (packageId != null && packageId.isPresent()) {
+            PackageContainer packageContainer = packageContainerService.findByPackageId(packageId.get());
+            if (packageContainer != null && language != null) {
+                packLanguage = packLanService.findByPackageContainerAndLan(packageContainer, languageId);
+            }
+        }
+
 //        List<WeekTitle> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
 //                : weekTitleService.findAll();
 
-        List<WeekTitleVideo> weekTitleList = weekTitleVideoService.findAll();
-        List<PackageLanguage> packlan_list = language != null ? new ArrayList<>(language.getPackageLanguages())
-                : packLanService.findAll();
-
         // To find Weeks
-        List<TutorialWithWeekAndPackage> tutorials = tutorialWithPackageAndService
-                .findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
+
+        List<TutorialWithWeekAndPackage> tutorials = new ArrayList<>();
+        if (packLanguage != null) {
+
+            tutorials = new ArrayList<>(packLanguage.getTutorialsWithWeekAndPack());
+        } else {
+
+            List<WeekTitleVideo> weekTitleList = weekTitleVideoService.findAll();
+            List<PackageLanguage> packlan_list = language != null ? new ArrayList<>(language.getPackageLanguages())
+                    : packLanService.findAll();
+            tutorials = tutorialWithPackageAndService.findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
+        }
+
         for (TutorialWithWeekAndPackage temp : tutorials) {
             Week weekTemp = temp.getWeekTitle().getWeek();
             weeks.put(weekTemp.getWeekName(), weekTemp.getWeekName());
