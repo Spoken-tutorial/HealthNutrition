@@ -86,7 +86,7 @@
           <div class="col-md-6">
             <div style="width: 100%; margin: auto;">
               <video th:id="${'storedTutorialId' + temp.getWeekTitleVideoId()}"
-                     controls style="width:100%!important;" class="vid1">
+                     controls style="width:100%!important;" class="vid1"  th:poster="@{${temp.getIndexThumbnailPath()}}">
                 <source th:src="@{${temp.getIndexVideoPath()}}" type="video/mp4"></source>
               </video>
             </div>

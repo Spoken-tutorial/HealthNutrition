@@ -35,6 +35,9 @@ public class VideoResource implements Serializable {
     @Column(name = "video_path", nullable = false, unique = true)
     private String videoPath;
 
+    @Column(name = "thumbnail_path", nullable = true)
+    private String thumbnailPath;
+
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
@@ -96,6 +99,23 @@ public class VideoResource implements Serializable {
 
     public void setWeekTitles(Set<WeekTitleVideo> weekTitleVideos) {
         this.weekTitleVideos = weekTitleVideos;
+    }
+
+    public String getThumbnailPath() {
+        return thumbnailPath;
+    }
+
+    public void setThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
+    }
+
+    public VideoResource(String fileName, String videoPath, String thumbnailPath, Timestamp dateAdded, Language lan) {
+        super();
+        this.fileName = fileName;
+        this.videoPath = videoPath;
+        this.thumbnailPath = thumbnailPath;
+        this.dateAdded = dateAdded;
+        this.lan = lan;
     }
 
     public VideoResource(int id, String fileName, String videoPath, Timestamp dateAdded, Language lan) {

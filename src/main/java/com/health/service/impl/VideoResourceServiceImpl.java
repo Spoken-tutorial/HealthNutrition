@@ -103,12 +103,17 @@ public class VideoResourceServiceImpl implements VideoResourceService {
 
             String[] header = csvReader.readNext();
             int fileNameColumn = -1;
+            int thumbnailColumn = -1;
+
             int languageColumn = -1;
 
             for (int i = 0; i < header.length; i++) {
                 switch (header[i]) {
                 case "FileName":
                     fileNameColumn = i;
+                    break;
+                case "Thumbnail":
+                    thumbnailColumn = i;
                     break;
                 case "Language":
                     languageColumn = i;
@@ -117,8 +122,9 @@ public class VideoResourceServiceImpl implements VideoResourceService {
                 }
             }
 
-            if (fileNameColumn == -1 || languageColumn == -1) {
-                model.addAttribute("error_msg", "Some Errors Occurred; missing header   FileName , or language");
+            if (fileNameColumn == -1 || languageColumn == -1 || thumbnailColumn == -1) {
+                model.addAttribute("error_msg",
+                        "Some Errors Occurred; missing header   FileName , thumnail,or language");
                 return;
             }
 
@@ -130,13 +136,14 @@ public class VideoResourceServiceImpl implements VideoResourceService {
 
             while ((row = csvReader.readNext()) != null) {
 
-                String fileNameLanguage = row[fileNameColumn] + "-" + row[languageColumn];
+                String fileNameThumbnailLanguage = row[fileNameColumn] + "-" + row[thumbnailColumn] + "-"
+                        + row[languageColumn];
 
-                fileNameLanguageMap.computeIfAbsent(fileNameLanguage, k -> new ArrayList<>()).add(rowIndex);
+                fileNameLanguageMap.computeIfAbsent(fileNameThumbnailLanguage, k -> new ArrayList<>()).add(rowIndex);
 
                 rowIndex++;
 
-                if (!processRow(row, languageColumn, fileNameColumn, model, videoResourceList)) {
+                if (!processRow(row, languageColumn, fileNameColumn, thumbnailColumn, model, videoResourceList)) {
                     continue;
                 }
             }
@@ -161,7 +168,7 @@ public class VideoResourceServiceImpl implements VideoResourceService {
         }
     }
 
-    private boolean processRow(String[] row, int languageColumn, int fileNameColumn, Model model,
+    private boolean processRow(String[] row, int languageColumn, int fileNameColumn, int thumbnailColumn, Model model,
             List<VideoResource> videoResourceList) {
         logger.info("Processing row: {}", Arrays.toString(row));
 
@@ -172,6 +179,7 @@ public class VideoResourceServiceImpl implements VideoResourceService {
         }
         String langName = lan.getLangName();
         String fileName = row[fileNameColumn];
+        String thumbnailName = row[thumbnailColumn];
         Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), CommonData.uploadDirectorySource,
                 langName, fileName);
         String temp = path.toString();
@@ -179,10 +187,21 @@ public class VideoResourceServiceImpl implements VideoResourceService {
         String filePath = temp.substring(indexToStart, temp.length());
         logger.info(filePath);
 
+        Path path1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"), CommonData.uploadDirectorySource,
+                langName, "Thumbnail", thumbnailName);
+        String temp1 = path1.toString();
+        int indexToStart1 = temp1.indexOf("Media");
+        String tempThumbnail = temp1.substring(indexToStart1, temp1.length());
+
+        String thumnailPath = ServiceUtility.convertFilePathToUrl(tempThumbnail);
+        logger.info(thumnailPath);
+
         if (!Files.exists(path)) {
             model.addAttribute("error_msg", "File does not exist; fileName : " + row[fileNameColumn]);
             return false;
         }
+
+        File thumbnailFile = path1.toFile();
 
         VideoResource videoResource = repo.findByVideoPath(filePath);
         if (videoResource == null) {
@@ -191,8 +210,18 @@ public class VideoResourceServiceImpl implements VideoResourceService {
 
             videoResource.setFileName(fileName);
             videoResource.setLan(lan);
+            if (thumbnailFile.exists())
+                videoResource.setThumbnailPath(thumnailPath);
             videoResource.setDateAdded(ServiceUtility.getCurrentTime());
             videoResourceList.add(videoResource);
+        }
+
+        else {
+            if (thumbnailFile.exists()) {
+                videoResource.setThumbnailPath(thumnailPath);
+                videoResource.setDateAdded(ServiceUtility.getCurrentTime());
+                videoResourceList.add(videoResource);
+            }
         }
 
         return true;

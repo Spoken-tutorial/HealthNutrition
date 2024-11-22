@@ -34,6 +34,9 @@ public class WeekTitleVideo implements Serializable {
     @Transient
     private String indexVideoPath;
 
+    @Transient
+    private String indexThumbnailPath;
+
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
@@ -97,6 +100,14 @@ public class WeekTitleVideo implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getIndexThumbnailPath() {
+        return indexThumbnailPath;
+    }
+
+    public void setIndexThumbnailPath(String indexThumbnailPath) {
+        this.indexThumbnailPath = indexThumbnailPath;
     }
 
     public String getIndexVideoPath() {

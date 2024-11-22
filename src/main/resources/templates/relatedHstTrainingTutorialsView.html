@@ -31,7 +31,7 @@
     <div   th:if="${foundVideo }" class="card  pt-3" style="width: 100%;" >
             <div  class="card-image text-center" style="margin-left:15px; margin-right:15px;">
             <div  id="hstTrainingModuleViewSource" style="width:100%;">
-            <video  class="hstTrainingModuleView"  controls="controls" style="width:100%;" >
+            <video  class="hstTrainingModuleView"  controls="controls" style="width:100%;"  th:poster="@{/files/}+@{${weekTitleVideo.getVideoResource().getThumbnailPath()}}" >
 			  <source th:src="@{/files/}+@{${weekTitleVideo.getVideoResource().getVideoPath()}}" type="video/mp4" />
  				Your browser does not support HTML video.
 			</video>

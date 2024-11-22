@@ -167,6 +167,7 @@ public class ZipCreationThreadService {
                     String title = temp.getTitle().replace(' ', '_');
 
                     String tutorialPath = temp.getVideoResource().getVideoPath();
+                    String thumbnailPath = temp.getVideoResource().getThumbnailPath();
                     String weekTitleVideoString = Integer.toString(temp.getWeekTitleVideoId());
 
                     Path destInationDirectoryforLanAndWeek = Paths.get(destInationDirectory1.toString(), File.separator,
@@ -189,6 +190,18 @@ public class ZipCreationThreadService {
 
                             // FileUtils.copyFile(sourceFile, destainationPath.toFile());
                             copyFileUsingRsync(sourcePath, destainationPath);
+
+                        }
+
+                        Path sourcePathforThumbanil = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                thumbnailPath);
+                        Path destainationthumbnailPath = destInationDirectoryforLanAndWeek.resolve("thumbnail.jpg");
+
+                        File sourceFileofThumbnail = sourcePathforThumbanil.toFile();
+                        if (sourceFileofThumbnail.exists()) {
+
+                            // FileUtils.copyFile(sourceFile, destainationPath.toFile());
+                            copyFileUsingRsync(sourcePathforThumbanil, destainationthumbnailPath);
 
                         }
 
@@ -348,7 +361,18 @@ public class ZipCreationThreadService {
                     String document = videoPath.substring(indexToStart, videoPath.length());
                     weekTitleVideo.setIndexVideoPath(document);
 
+                    Path sourcePathforThumbnail = Paths.get(originalPath.toString(), File.separator, langName,
+                            File.separator, weekNameTemp, File.separator, weekTitleVideoString, File.separator,
+                            "thumbnail.jpg");
+
+                    String thumnailPath = sourcePathforThumbnail.toString();
+                    int indexToStart1 = thumnailPath.indexOf(langName);
+                    String tempthumbnail = thumnailPath.substring(indexToStart1, thumnailPath.length());
+                    String thumbnail = ServiceUtility.convertFilePathToUrl(tempthumbnail);
+                    weekTitleVideo.setIndexThumbnailPath(thumbnail);
+
                     weekTitleVideoList.add(weekTitleVideo);
+
                 }
             }
 

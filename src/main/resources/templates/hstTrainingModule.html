@@ -106,7 +106,7 @@ field officers with 10+ years of experience
           <div class="col-md-6">
             <div style="width: 100%; margin: auto;">
               <video th:id="${'storedTutorialId' + temp.getWeekTitleVideoId()}"
-                     controls style="width:100%!important;" class="vid1">
+                     controls style="width:100%!important;" class="vid1" th:poster="@{/files/}+@{${temp.getVideoResource().getThumbnailPath()}}">
                 <source th:src="@{/files/}+@{${temp.getVideoResource().getVideoPath()}}" type="video/mp4"></source>
               </video>
             </div>

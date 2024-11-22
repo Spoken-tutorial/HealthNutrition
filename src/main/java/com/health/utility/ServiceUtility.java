@@ -764,6 +764,11 @@ public class ServiceUtility {
         return new java.sql.Date(dateUtil.getTime());
     }
 
+    public static String convertFilePathToUrl(String thumbnailFile) {
+        String result = thumbnailFile.replace("\\", "/");
+        return result;
+    }
+
     public void sendVerficationEmail(User user, String siteURL)
             throws UnsupportedEncodingException, MessagingException {
         String subject = "Please Verify Your Registration.";
