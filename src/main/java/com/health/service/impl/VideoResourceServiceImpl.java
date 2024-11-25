@@ -180,6 +180,10 @@ public class VideoResourceServiceImpl implements VideoResourceService {
         String langName = lan.getLangName();
         String fileName = row[fileNameColumn];
         String thumbnailName = row[thumbnailColumn];
+        boolean nonEmptyThumbnail = true;
+        if (thumbnailName == null || thumbnailName.isEmpty()) {
+            nonEmptyThumbnail = false;
+        }
         Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), CommonData.uploadDirectorySource,
                 langName, fileName);
         String temp = path.toString();
@@ -210,14 +214,14 @@ public class VideoResourceServiceImpl implements VideoResourceService {
 
             videoResource.setFileName(fileName);
             videoResource.setLan(lan);
-            if (thumbnailFile.exists())
+            if (thumbnailFile.exists() && nonEmptyThumbnail)
                 videoResource.setThumbnailPath(thumnailPath);
             videoResource.setDateAdded(ServiceUtility.getCurrentTime());
             videoResourceList.add(videoResource);
         }
 
         else {
-            if (thumbnailFile.exists()) {
+            if (thumbnailFile.exists() && nonEmptyThumbnail) {
                 videoResource.setThumbnailPath(thumnailPath);
                 videoResource.setDateAdded(ServiceUtility.getCurrentTime());
                 videoResourceList.add(videoResource);
