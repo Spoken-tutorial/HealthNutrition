@@ -63,7 +63,43 @@
   </header>
  
   <div class="container">
-<div th:replace="common/commonItemsHSTTrainingModule :: trainingModuleView_bar"></div>
+
+
+
+<div class="row justify-content-center" style="width: 100%;">
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+            <select class="custom-select d-block form-control selectedValue" id="weekView" name="week">            
+            
+              <option  value="">Select Week</option>
+             
+              <option  th:each="weekTemp : ${weekList}" th:selected="${weekTemp.value==localWeek}" th:value="${weekTemp.value}" th:text="${weekTemp.key}" ></option>
+            </select>
+          
+           
+</div>
+
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+<select class="custom-select d-block form-control" id="languageView" name="lan">
+			 
+              <option value="">Select Language</option>
+              <option th:each="lan : ${languages}"  th:selected="${lan.value==localLanguage}"th:value="${lan.value}" th:text="${lan.key}"></option> 
+            </select>
+             
+            
+</div>
+
+ 
+     <div class="col-md-2 mb-3" style="width: 100%;">
+          <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearFormView" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
+           
+     </div>
+     	
+      
+</div>
+
+          
+
+
 </div>
     <main>
    
@@ -224,10 +260,7 @@
 		 var selectedLanguage = $('#languageView').val();
 		 var selectedWeek = $('#weekView').val();
 		
-		   var hstTrainingModuleViewPageUrl = document.getElementById('hstTrainingModuleViewPageUrl');
-			var newUrl = '/trainingModules?week=' + selectedWeek +   '&lan=' + selectedLanguage ;
-            hstTrainingModuleViewPageUrl.href = newUrl;
-
+		   
  			if(selectedWeek!=""){
 			    selectedWeek='"' + selectedWeek + '"';
 		     }

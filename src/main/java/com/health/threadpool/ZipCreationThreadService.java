@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,14 @@ public class ZipCreationThreadService {
         try {
             zipUrl = ServiceUtility.createFileWithSubDirectoriesforTrainingModule(originalPackageName, langName,
                     document, env);
-            FileUtils.deleteDirectory(Paths.get(document).toFile());
+
+            String packageName = originalPackageName.replace(' ', '_');
+            String rootFolder = packageName + "_" + langName;
+
+            Path oldDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    document.replace(rootFolder, ""));
+
+            FileUtils.deleteDirectory(oldDirectory.toFile());
 
         } catch (IOException e) {
             logger.error("Exception in Zip Creation: ", e);
@@ -157,8 +165,10 @@ public class ZipCreationThreadService {
                 String sdfString = "training_modules-" + sdf.format(new java.util.Date());
 
                 String packageName = originalPackageName.replace(' ', '_');
+                String rootFolder = packageName + "_" + langName;
                 Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, packageName);
+                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder,
+                        File.separator, packageName);
 
                 Path indexHtmlPath = Paths.get(destInationDirectory1.toString(), File.separator, "index.html");
 
@@ -213,7 +223,9 @@ public class ZipCreationThreadService {
                 }
                 int packageId = packageContainer.getPackageId();
                 generateLocalIndexHtml(langName, packageId, indexHtmlPath.toString(), destInationDirectory1);
-                String temp = destInationDirectory1.toString();
+                Path destInationDirectory2 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder);
+                String temp = destInationDirectory2.toString();
                 int indexToStart = temp.indexOf("Media");
                 document = temp.substring(indexToStart, temp.length());
                 createZipforPackageAndLan(originalPackageName, langName, document, env);
@@ -353,27 +365,37 @@ public class ZipCreationThreadService {
                     String title = weekTitleVideo.getTitle().replace(' ', '_');
                     String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
 
-                    Path sourcePath = Paths.get(originalPath.toString(), File.separator, langName, File.separator,
-                            weekNameTemp, File.separator, weekTitleVideoString, File.separator, title + ".mp4");
+                    Path sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator,
+                            weekTitleVideoString, File.separator, title + ".mp4");
 
                     String videoPath = sourcePath.toString();
-                    int indexToStart = videoPath.indexOf(langName);
-                    String document = videoPath.substring(indexToStart, videoPath.length());
-                    weekTitleVideo.setIndexVideoPath(document);
+//                    int indexToStart = videoPath.indexOf(langName);
+//                    String document = videoPath.substring(indexToStart, videoPath.length());
+                    weekTitleVideo.setIndexVideoPath(videoPath);
 
-                    Path sourcePathforThumbnail = Paths.get(originalPath.toString(), File.separator, langName,
-                            File.separator, weekNameTemp, File.separator, weekTitleVideoString, File.separator,
-                            "thumbnail.jpg");
+                    Path sourcePathforThumbnail = Paths.get(langName, File.separator, weekNameTemp, File.separator,
+                            weekTitleVideoString, File.separator, "thumbnail.jpg");
 
                     String thumnailPath = sourcePathforThumbnail.toString();
-                    int indexToStart1 = thumnailPath.indexOf(langName);
-                    String tempthumbnail = thumnailPath.substring(indexToStart1, thumnailPath.length());
-                    String thumbnail = ServiceUtility.convertFilePathToUrl(tempthumbnail);
+//                    int indexToStart1 = thumnailPath.indexOf(langName);
+//                    String tempthumbnail = thumnailPath.substring(indexToStart1, thumnailPath.length());
+                    String thumbnail = ServiceUtility.convertFilePathToUrl(thumnailPath);
                     weekTitleVideo.setIndexThumbnailPath(thumbnail);
 
                     weekTitleVideoList.add(weekTitleVideo);
 
                 }
+
+                weekTitleVideoList.sort(
+                        Comparator.comparingInt((WeekTitleVideo wtv) -> extractInteger(wtv.getWeek().getWeekName()))
+                                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                                .thenComparing(WeekTitleVideo::getTitle));
+
+                for (WeekTitleVideo temp : weekTitleVideoList) {
+                    logger.info(":{} : {} : {}", temp.getWeek().getWeekName(),
+                            temp.getVideoResource().getLan().getLangName(), temp.getTitle());
+                }
+
             }
 
         } else {

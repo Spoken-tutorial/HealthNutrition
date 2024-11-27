@@ -121,7 +121,6 @@ import com.health.model.Version;
 import com.health.model.VideoResource;
 import com.health.model.Week;
 import com.health.model.WeekTitleVideo;
-import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
 import com.health.service.BrouchureService;
@@ -166,6 +165,7 @@ import com.health.service.VersionService;
 import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
+import com.health.threadpool.DownloadService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.threadpool.ZipCreationThreadService;
 import com.health.utility.CommonData;
@@ -199,7 +199,7 @@ public class HomeController {
     private LiveTutorialService liveTutorialService;
 
     @Autowired
-    private LiveTutorialRepository liveTutorialRepo;
+    private DownloadService downloadService;
 
     @Autowired
     private SpokenVideoService spokenVideoService;
@@ -4618,6 +4618,16 @@ public class HomeController {
 
         weekTitleVideoList = weekTitleVideoService.findAll();
 
+        weekTitleVideoList
+                .sort(Comparator.comparingInt((WeekTitleVideo wtv) -> extractInteger(wtv.getWeek().getWeekName()))
+                        .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                        .thenComparing(WeekTitleVideo::getTitle));
+
+        for (WeekTitleVideo temp : weekTitleVideoList) {
+            logger.info(":{} : {} : {}", temp.getWeek().getWeekName(), temp.getVideoResource().getLan().getLangName(),
+                    temp.getTitle());
+        }
+
         model.addAttribute("userInfo", usr);
 
         model.addAttribute("weekTitleVideoList", weekTitleVideoList);
@@ -4709,11 +4719,24 @@ public class HomeController {
         }
 
         else {
+
+            /*
+             * if (!downloadService.acquireDownloadSlot()) {
+             * model.addAttribute("return_msg", "Please try again after 30 minutes.");
+             * return "hstTrainingModule"; }
+             */
+
+            // try {
+
             model.addAttribute("zipUrl", zipUrl);
             model.addAttribute("success_msg",
                     "Record Submitted Successfully ! Click on the download link to download resources");
 
             return "downloadTrainingModule";
+            // } finally {
+            // downloadService.releaseDownloadSlot();
+            // }
+
         }
 
     }
