@@ -55,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/loadTutorialCountByTopics", "/downloadResources", "/citations", "/api/scriptPublished/**",
             "/loadLanguageByPackage/**", "/promoVideoView/**", "/trainingModules/**", "/downloadTrainingModules",
             "/loadMessageByPackageAndLan/**", "/loadLanguageByWeek/**", "/loadWeekByLanguage/**",
-            "/trainingTutorials/**", "/hstTrainingModuleView/**", };
+            "/trainingTutorials/**", "/hstTrainingModuleView/**", "/downloadManager/**" };
 
     /**
      * url matcher for SUPERADMIN

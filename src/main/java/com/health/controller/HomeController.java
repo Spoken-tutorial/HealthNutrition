@@ -1,9 +1,11 @@
 package com.health.controller;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,9 +26,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -52,6 +56,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -165,8 +170,8 @@ import com.health.service.VersionService;
 import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
-import com.health.threadpool.DownloadService;
 import com.health.threadpool.TaskProcessingService;
+import com.health.threadpool.TimeoutOutputStream;
 import com.health.threadpool.ZipCreationThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -189,6 +194,14 @@ public class HomeController {
 
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
+    @Value("${downloadLimit}")
+    private int downloadLimit;
+
+    @Value("${downloadTimeOut}")
+    private long downloadTimeOut;
+
+    private AtomicInteger downloadCount = new AtomicInteger(0);
+
     @Autowired
     private VersionRepository verRepository;
 
@@ -197,9 +210,6 @@ public class HomeController {
 
     @Autowired
     private LiveTutorialService liveTutorialService;
-
-    @Autowired
-    private DownloadService downloadService;
 
     @Autowired
     private SpokenVideoService spokenVideoService;
@@ -4684,6 +4694,10 @@ public class HomeController {
 
         getPackageAndLanguageData(model);
         List<WeekTitleVideo> weekTitleVideoList = weekTitleVideoService.findAll();
+        weekTitleVideoList
+                .sort(Comparator.comparingInt((WeekTitleVideo wtv) -> extractInteger(wtv.getWeek().getWeekName()))
+                        .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                        .thenComparing(WeekTitleVideo::getTitle));
 
         model.addAttribute("weekTitleVideoList", weekTitleVideoList);
         boolean downloadSection = false;
@@ -4712,32 +4726,75 @@ public class HomeController {
             model.addAttribute("return_msg", "Zip creation in progress.... , please check back after 30 minutes.");
             return "hstTrainingModule";
 
-        } else if (zipUrl.equals("Error")) {
+        }
+
+        else if (zipUrl.equals("Error")) {
             model.addAttribute("return_msg", "No Tutorials are available for selected Package,  and Language");
             return "hstTrainingModule";
 
+        } else if (downloadCount.get() == downloadLimit) {
+            model.addAttribute("return_msg", "Please try again after 30 minutes.");
+            return "hstTrainingModule";
         }
 
         else {
-
-            /*
-             * if (!downloadService.acquireDownloadSlot()) {
-             * model.addAttribute("return_msg", "Please try again after 30 minutes.");
-             * return "hstTrainingModule"; }
-             */
-
-            // try {
 
             model.addAttribute("zipUrl", zipUrl);
             model.addAttribute("success_msg",
                     "Record Submitted Successfully ! Click on the download link to download resources");
 
             return "downloadTrainingModule";
-            // } finally {
-            // downloadService.releaseDownloadSlot();
-            // }
 
         }
+
+    }
+
+    String getZipfileName(Path zipUrl) {
+
+        return zipUrl.getFileName().toString();
+    }
+
+    @GetMapping("/downloadManager")
+    public String downloadManager(HttpServletRequest req, Principal principal, Model model,
+            @RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response) {
+        if (downloadCount.get() == downloadLimit) {
+            getPackageAndLanguageData(model);
+
+            model.addAttribute("return_msg", "Please try again after 30 minutes.");
+            return "hstTrainingModule";
+        }
+        downloadCount.incrementAndGet();
+        logger.debug(" Increament downloadCount :{}", downloadCount.get());
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        try (OutputStream os = response.getOutputStream();
+                InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
+
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader("Content-Disposition", "attachment; filename=" + getZipfileName(zipFilePathName));
+            response.setContentLengthLong(Files.size(zipFilePathName));
+
+            byte[] buffer = new byte[16384];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+
+                TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
+                tos.write(buffer, 0, length);
+
+                // os.write(buffer, 0, length);
+
+            }
+            os.flush();
+
+        } catch (Exception e) {
+            logger.error("Exception", e);
+        } finally {
+            downloadCount.decrementAndGet();
+            logger.debug(" Decrement downloadCount :{}", downloadCount.get());
+        }
+
+        return "downloadTrainingModule";
 
     }
 
