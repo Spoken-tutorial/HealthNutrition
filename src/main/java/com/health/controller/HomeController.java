@@ -4767,7 +4767,7 @@ public class HomeController {
         logger.debug(" Increament downloadCount :{}", downloadCount.get());
 
         Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
-        try (OutputStream os = response.getOutputStream();
+        try (OutputStream os = new TimeoutOutputStream(response.getOutputStream(), downloadTimeOut);
                 InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
 
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -4779,22 +4779,22 @@ public class HomeController {
 
             while ((length = is.read(buffer)) > 0) {
 
-                TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
-                tos.write(buffer, 0, length);
+                // TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
+                // tos.write(buffer, 0, length);
 
-                // os.write(buffer, 0, length);
+                os.write(buffer, 0, length);
 
             }
             os.flush();
 
         } catch (Exception e) {
-            logger.error("Exception", e);
+            logger.info("Exception:{}", e.getMessage());
         } finally {
             downloadCount.decrementAndGet();
             logger.debug(" Decrement downloadCount :{}", downloadCount.get());
         }
 
-        return "downloadTrainingModule";
+        return null;
 
     }
 
