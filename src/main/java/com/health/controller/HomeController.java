@@ -4573,16 +4573,6 @@ public class HomeController {
      * Assign Tutorial on Week And Package End
      ********************/
 
-    private int extractInteger(String str) {
-        // Use regular expression to find all digits in the string
-        String numberStr = str.replaceAll("\\D+", ""); // \\D+ matches all non-digit characters
-        if (!numberStr.isEmpty()) {
-            return Integer.parseInt(numberStr);
-        } else {
-            return 0;
-        }
-    }
-
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,
             @RequestParam(name = "lan", required = false, defaultValue = "") String langName, HttpServletRequest req,
@@ -4599,7 +4589,7 @@ public class HomeController {
 
         int intWeekId = 0;
         if (!weekName.equals("")) {
-            intWeekId = extractInteger(weekName);
+            intWeekId = ServiceUtility.extractInteger(weekName);
         }
 
         logger.info("Week:{} ", weekName);
@@ -4613,25 +4603,12 @@ public class HomeController {
 
         List<WeekTitleVideo> weekTitleVideoList = new ArrayList<>();
 
-        /*
-         * if (localWeek != null && localLan != null) { weekTitleVideoList =
-         * weekTitleVideoService.findByWeekAndLan(localWeek, localLan); }
-         * 
-         * else if (localWeek != null) { weekTitleVideoList =
-         * weekTitleVideoService.findByWeek(localWeek); }
-         * 
-         * else if (localLan != null) { weekTitleVideoList =
-         * weekTitleVideoService.findByLan(localLan); }
-         * 
-         * else { weekTitleVideoList = weekTitleVideoService.findAll(); }
-         */
-
         weekTitleVideoList = weekTitleVideoService.findAll();
 
-        weekTitleVideoList
-                .sort(Comparator.comparingInt((WeekTitleVideo wtv) -> extractInteger(wtv.getWeek().getWeekName()))
-                        .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
-                        .thenComparing(WeekTitleVideo::getTitle));
+        weekTitleVideoList.sort(Comparator
+                .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                .thenComparing(WeekTitleVideo::getTitle));
 
         for (WeekTitleVideo temp : weekTitleVideoList) {
             logger.info(":{} : {} : {}", temp.getWeek().getWeekName(), temp.getVideoResource().getLan().getLangName(),
@@ -4694,10 +4671,10 @@ public class HomeController {
 
         getPackageAndLanguageData(model);
         List<WeekTitleVideo> weekTitleVideoList = weekTitleVideoService.findAll();
-        weekTitleVideoList
-                .sort(Comparator.comparingInt((WeekTitleVideo wtv) -> extractInteger(wtv.getWeek().getWeekName()))
-                        .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
-                        .thenComparing(WeekTitleVideo::getTitle));
+        weekTitleVideoList.sort(Comparator
+                .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                .thenComparing(WeekTitleVideo::getTitle));
 
         model.addAttribute("weekTitleVideoList", weekTitleVideoList);
         boolean downloadSection = false;
@@ -4749,11 +4726,6 @@ public class HomeController {
 
     }
 
-    String getZipfileName(Path zipUrl) {
-
-        return zipUrl.getFileName().toString();
-    }
-
     @GetMapping("/downloadManager")
     public String downloadManager(HttpServletRequest req, Principal principal, Model model,
             @RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response) {
@@ -4771,7 +4743,8 @@ public class HomeController {
                 InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
 
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader("Content-Disposition", "attachment; filename=" + getZipfileName(zipFilePathName));
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + ServiceUtility.getZipfileName(zipFilePathName));
             response.setContentLengthLong(Files.size(zipFilePathName));
 
             byte[] buffer = new byte[16384];
@@ -4799,73 +4772,6 @@ public class HomeController {
     }
 
     /***************************** Training Modules Download End *****************/
-
-    /***************************
-     * Training Tutorial View Start
-     **************************/
-    @GetMapping("/trainingTutorials")
-    public String trainingTutorialList(HttpServletRequest req,
-            @RequestParam(name = "weekView", required = false, defaultValue = "0") int week,
-            @RequestParam(name = "lan", required = false, defaultValue = "0") int lan,
-            @RequestParam(name = "page", defaultValue = "0") int page, Principal principal, Model model) {
-
-        User usr = getUser(principal);
-        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
-
-        model.addAttribute("week", week);
-        model.addAttribute("language", lan);
-
-        Week localWeek = null;
-        Language localLan = null;
-
-        Page<WeekTitleVideo> weekTitleVideoPage = null;
-
-        List<WeekTitleVideo> weekTitleVideoView1 = new ArrayList<WeekTitleVideo>();
-
-        model.addAttribute("userInfo", usr);
-
-        Pageable pageable = PageRequest.of(page, 10);
-        /*
-         * getModelData(model, cat, topic, lan, query);
-         * 
-         * if (cat != 0) { localCat = catService.findByid(cat);
-         * model.addAttribute("catforQuery", localCat); } if (topic != 0) { localTopic =
-         * topicService.findById(topic); model.addAttribute("topicforQuery",
-         * localTopic); } if (lan != 0) { localLan = lanService.getById(lan);
-         * model.addAttribute("lanforQuery", localLan); }
-         * 
-         * docSearchPage = searchonElasticSearch(pageable, cat, topic, lan, query,
-         * typeTutorial, typeTimeScript, typeBrochure, typeResearchPaper);
-         * 
-         * for (DocumentSearch temp : docSearchPage) { { docSearchToView1.add(temp); } }
-         * 
-         * logger.info("size of DocumentSearchList on the current page:{}",
-         * docSearchToView1.size());
-         * 
-         * int totalPages = 0;
-         * 
-         * if (docSearchPage != null) { totalPages = docSearchPage.getTotalPages(); }
-         * else { totalPages = 1; }
-         * 
-         * int firstPage = page + 1 > 2 ? page + 1 - 2 : 1; int lastPage = page + 1 <
-         * totalPages - 5 ? page + 1 + 5 : totalPages;
-         * 
-         * model.addAttribute("docSearchList", docSearchToView1);
-         * model.addAttribute("typeTutorial", typeTutorial);
-         * model.addAttribute("typeTimeScript", typeTimeScript);
-         * model.addAttribute("typeBrochure", typeBrochure);
-         * model.addAttribute("typeResearchPaper", typeResearchPaper);
-         * model.addAttribute("currentPage", page); model.addAttribute("firstPage",
-         * firstPage); model.addAttribute("lastPage", lastPage);
-         * model.addAttribute("totalPages", totalPages);
-         */
-
-        return "tutorialList";
-    }
-
-    /********************************
-     * Training Tutorial View End
-     ************************/
 
     @GetMapping("/category/edit/{catName}")
     public String editCategoryGet(@PathVariable(name = "catName") String catName, HttpServletRequest req, Model model,

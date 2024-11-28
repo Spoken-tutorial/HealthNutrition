@@ -1086,16 +1086,6 @@ public class AjaxController {
      * Training_Module_View Start
      *********************************/
 
-    private int extractInteger(String str) {
-        // Use regular expression to find all digits in the string
-        String numberStr = str.replaceAll("\\D+", ""); // \\D+ matches all non-digit characters
-        if (!numberStr.isEmpty()) {
-            return Integer.parseInt(numberStr);
-        } else {
-            throw new NumberFormatException("No integer found in the input string");
-        }
-    }
-
     @RequestMapping("/loadLanguageByWeek")
     public @ResponseBody ArrayList<Map<String, String>> getLanguageByWeek(@RequestParam(value = "weekId") String weekId,
             @RequestParam(value = "languageId") String languageId, Optional<Integer> packageId) {
@@ -1106,7 +1096,7 @@ public class AjaxController {
 
         int intWeekId = 0;
         if (!weekId.equals("")) {
-            intWeekId = extractInteger(weekId);
+            intWeekId = ServiceUtility.extractInteger(weekId);
         }
         int intlanguageId = 0;
         if (!languageId.equals("")) {
@@ -1160,7 +1150,7 @@ public class AjaxController {
 
         int intWeekId = 0;
         if (!weekId.equals("")) {
-            intWeekId = extractInteger(weekId);
+            intWeekId = ServiceUtility.extractInteger(weekId);
         }
         int intlanguageId = 0;
         if (!languageId.equals("")) {
@@ -1178,11 +1168,6 @@ public class AjaxController {
                 packLanguage = packLanService.findByPackageContainerAndLan(packageContainer, languageId);
             }
         }
-
-//        List<WeekTitle> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
-//                : weekTitleService.findAll();
-
-        // To find Weeks
 
         List<TutorialWithWeekAndPackage> tutorials = new ArrayList<>();
         if (packLanguage != null) {

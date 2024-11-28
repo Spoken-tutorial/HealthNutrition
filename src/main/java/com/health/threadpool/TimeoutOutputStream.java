@@ -4,9 +4,6 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Value;
 
 public class TimeoutOutputStream extends FilterOutputStream {
@@ -30,14 +27,4 @@ public class TimeoutOutputStream extends FilterOutputStream {
         }
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        long timeoutMillis = downloadTimeOut; // Set your timeout here
-        OutputStream out = new TimeoutOutputStream(resp.getOutputStream(), timeoutMillis);
-        out.write("Hello, World!".getBytes());
-        out.flush();
-        out.close();
-    }
-
 }
-
-//Usage in a servlet

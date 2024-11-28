@@ -35,20 +35,16 @@
     </div>
      
 </div>
-
-	
 	
 <!---> Package Download End  </-->	
 
 
-
-
 <div th:fragment="trainingModuleView_bar">
 		<section id="trainingModuleView_bar" class="container-lg my-5">
-<!--form th:action="@{/trainingTutorials}" class="form-inline" name="trainingModuleForm" id="trainingModuleForm" style="width:100%;" -->
+
 <script type="text/javascript">
 function resetInput(id) {
-	   //document.getElementById(id).value="";
+	  
 	   console.log(id, 1);
 	   $('#'+id).get(0).selectedIndex = 0;
 	   return false;
@@ -65,11 +61,7 @@ function resetInput(id) {
              
               <option  th:each="weekTemp : ${weekList}" th:selected="${weekTemp.value==localWeek}" th:value="${weekTemp.value}" th:text="${weekTemp.key}" ></option>
             </select>
-            <!--div th:if="${localWeek != null and localWeek != 0}" class="input-group-btn" id="weekresetdiv" style=" padding-top: 4px;"><button  id="weekreset"  style=" background: none;
-            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
-             <div th:unless="${localWeek != null and localWeek != 0}" class="input-group-btn" id="weekresetdiv" style=" padding-top: 4px;  display: none;"><button  id="weekreset"  style=" background: none;
-            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div -->
-           
+                      
 </div>
 
 <div class="col-md-4 mb-3 input-group" style="width:100%;" >
@@ -78,16 +70,9 @@ function resetInput(id) {
               <option value="">Select Language</option>
               <option th:each="lan : ${languages}"  th:selected="${lan.value==localLanguage}"th:value="${lan.value}" th:text="${lan.key}"></option> 
             </select>
-             <!--div th:if="${localLanguage != null and localLanguage != 0}" class="input-group-btn"  id="languageresetdiv" style=" padding-top: 4px;"><button  id="languagereset"  style=" background: none;
-            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
-            <div th:unless="${localLan != null and localLan != 0}" class="input-group-btn"  id="languageresetdiv" style=" padding-top: 4px; display: none;"><button  id="languagereset"  style=" background: none;
-            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div -->
-            
+                       
 </div>
 
- <!--div class="col-md-2  mb-3" style="width:100%;">
-    <button type="submit" class="btn btn-outline-info" id="submitBottonVIew" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
-    </div -->
      <div class="col-md-2 mb-3" style="width: 100%;">
           <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearFormView" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
            
@@ -98,14 +83,9 @@ function resetInput(id) {
 	 </div>	
       
 </div>
-
-<!--/form-->
-          
+        
 </section>
 </div>
 	
-	
-
- 
 </body>
 </html>

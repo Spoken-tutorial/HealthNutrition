@@ -162,6 +162,21 @@ public class ServiceUtility {
         return path;
     }
 
+    public static int extractInteger(String str) {
+
+        String numberStr = str.replaceAll("\\D+", ""); // \\D+ matches all non-digit characters
+        if (!numberStr.isEmpty()) {
+            return Integer.parseInt(numberStr);
+        } else {
+            return 0;
+        }
+    }
+
+    public static String getZipfileName(Path zipUrl) {
+
+        return zipUrl.getFileName().toString();
+    }
+
     public static String uploadMediaFile(MultipartFile file, Environment env, String folder) throws Exception {
 
         String fileName = file.getOriginalFilename();

@@ -54,7 +54,7 @@
         <div class="collapse navbar-collapse" id="mainNavBar">
             <div class="navbar-nav ml-auto">
                 <a class="nav-item nav-link active" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
-                <!--div th:if="${zipVariable}" th:replace="common/commonItemsHSTTrainingModule :: download_package"></div -->
+                
             </div>
         </div>
     </div>
@@ -93,12 +93,8 @@
           <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearFormView" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
            
      </div>
-     	
-      
+     	      
 </div>
-
-          
-
 
 </div>
     <main>
@@ -128,7 +124,7 @@
             </div>
           </div>
           <div class="col-md-6">
-			<!--a th:id="${'hstTrainingVideoViewUrl' + iter.index}" th:href="@{'/hstTrainingModuleView/' + ${temp.getWeekTitleVideoId()} + '/'}" style="display: block;" --> 
+			 
             <h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${temp.getWeek().getWeekName()}"></h4>
             <h6 style="color: #014F7A;font-size: 1rem;">
               <i><span th:text="'Title: ' + ${temp.getTitle()}"></span></i>
@@ -138,16 +134,10 @@
                 <span th:text="${temp.getVideoResource().getLan().getLangName()}" class=""></span>
             </h6>
              
-			     <!-- /a -->
-			  
-			
-
           </div>
         </div>
       </td>
-      
-        
-      
+            
     </tr>
   </tbody>
 </table>
@@ -369,16 +359,12 @@ var isPlaying = [];
 'fullscreen' // Toggle fullscreen
 ];
 
-//const player = new Plyr('.vid1',{controls});
 
-//var videos = document.querySelectorAll('video');
 
 for(var i=0; i<videos.length; i++){
 	
 	const player = new Plyr(videos[i],{controls});	
-	
-	
-	   
+		   
 }
 		
 

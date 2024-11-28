@@ -27,16 +27,13 @@
    <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
   
-  <!--div id="back-to-top">
-  <a href="#top-fixed-banner"><i class="fas fa-chevron-circle-up"></i></a>
-  </div -->
-  <!-- Fixed Header And Menu Bar -->
+  
   <header class="mb-5" id="top-fixed-banner">
 	<section th:fragment="header-bar">
 	<div class="px-md-3">
 	<div class="row header-top pt-2">
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
-	<!-- <div> <a href="tel:1800-267-7782"> <span class="contact-num p-2" style="font-size:1.5rem;"><i class="fas fa-phone-alt mr-2"></i>Helpline : 1800-267-7782</span></a></div> -->
+	
 	</div>
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
 	<div><p class="d-inline-block"><span class="top-banner">
@@ -69,25 +66,13 @@
 </nav>
 
   </header>
-  <!-- Fixed Header And Menu Bar Ends-->
+ 
   <div class="container">
 <div th:replace="common/commonItemsHSTTrainingModule :: trainingModuleView_bar"></div>
 </div>
     <main>
    
-<!--section>
-<div class="container-lg py-3">
-<div class="row">
-<div class="col-12">
-<span style="line-height: 2rem;font-size:1.2rem;">
-Spoken Tutorial Health and Nutrition project, IIT Bombay, offers valuable advice on <span style="border-bottom: 1.5px solid orange;">Maternal Nutrition</span>, <span style="border-bottom: 1.5px solid orange;">Child
-Nutrition</span>, <span style="border-bottom: 1.5px solid orange;">General Nutrition</span> and <span style="border-bottom: 1.5px solid orange;">Covid</span> related information by a team of emminent Doctors, Nutritionists and
-field officers with 10+ years of experience
-</span>
-</div>
-</div>
-</div>
-</section -->
+
 <section>
 <div class="container-fluid">
  <div class="row">
@@ -130,28 +115,7 @@ field officers with 10+ years of experience
         </div>
       </td>
       
-         <!--td th:if="${temp.size()>1}">
-        <div class="row t-wrapper mt-3">
-          <div class="col-md-6">
-            <div style="width: 100%; margin: auto;">
-              <video th:id="${'storedTutorialId' + temp.get(1).getWeekTitleVideoId()}"
-                     controls style="width:100%!important;" class="vid1">
-                <source th:src="@{/files/}+@{${temp.get(1).getVideoResource().getVideoPath()}}" type="video/mp4"></source>
-              </video>
-            </div>
-          </div>
-          <div class="col-md-6">
-             <h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${temp.get(1).getWeek().getWeekName()}"></h4>
-            <h6 style="color: #014F7A;font-size: 1rem;">
-              <i><span th:text="'Title: ' + ${temp.get(1).getTitle()}"></span></i>
-               
-            </h6>
-            <h6 style="color: #014F7A;font-size: 1rem;">   
-                <span th:text="${temp.get(1).getVideoResource().getLan().getLangName()}" class=""></span>
-            </h6>
-          </div>
-        </div>
-      </td -->
+       
       
     </tr>
   </tbody>
@@ -378,9 +342,7 @@ var isPlaying = [];
 'fullscreen' // Toggle fullscreen
 ];
 
-//const player = new Plyr('.vid1',{controls});
 
-//var videos = document.querySelectorAll('video');
 
 for(var i=0; i<videos.length; i++){
 	

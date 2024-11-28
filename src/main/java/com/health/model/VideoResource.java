@@ -118,15 +118,6 @@ public class VideoResource implements Serializable {
         this.lan = lan;
     }
 
-    public VideoResource(int id, String fileName, String videoPath, Timestamp dateAdded, Language lan) {
-        super();
-        this.id = id;
-        this.fileName = fileName;
-        this.videoPath = videoPath;
-        this.dateAdded = dateAdded;
-        this.lan = lan;
-    }
-
     public static Comparator<VideoResource> SortByUploadTime = new Comparator<VideoResource>() {
 
         @Override

@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.WebContext;
@@ -15,6 +17,8 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 
 @Service
 public class ThymeleafService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ThymeleafService.class);
 
     @Autowired
     private SpringTemplateEngine templateEngine;
@@ -29,7 +33,7 @@ public class ThymeleafService {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath))) {
             writer.write(htmlContent);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("IOException", e);
         }
     }
 }

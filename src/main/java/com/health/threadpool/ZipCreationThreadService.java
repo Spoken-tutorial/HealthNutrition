@@ -304,16 +304,6 @@ public class ZipCreationThreadService {
 
     }
 
-    private int extractInteger(String str) {
-        // Use regular expression to find all digits in the string
-        String numberStr = str.replaceAll("\\D+", ""); // \\D+ matches all non-digit characters
-        if (!numberStr.isEmpty()) {
-            return Integer.parseInt(numberStr);
-        } else {
-            return 0;
-        }
-    }
-
     private Map<String, Object> getTrainingModuleData(String weekName, String langName, int packageId,
             Path originalPath) {
         Map<String, Object> modelAttributes = new HashMap<>();
@@ -338,7 +328,7 @@ public class ZipCreationThreadService {
 
         int intWeekId = 0;
         if (!weekName.equals("")) {
-            intWeekId = extractInteger(weekName);
+            intWeekId = ServiceUtility.extractInteger(weekName);
         }
 
         logger.info("Week:{} ", weekName);
@@ -369,16 +359,12 @@ public class ZipCreationThreadService {
                             weekTitleVideoString, File.separator, title + ".mp4");
 
                     String videoPath = sourcePath.toString();
-//                    int indexToStart = videoPath.indexOf(langName);
-//                    String document = videoPath.substring(indexToStart, videoPath.length());
                     weekTitleVideo.setIndexVideoPath(videoPath);
 
                     Path sourcePathforThumbnail = Paths.get(langName, File.separator, weekNameTemp, File.separator,
                             weekTitleVideoString, File.separator, "thumbnail.jpg");
 
                     String thumnailPath = sourcePathforThumbnail.toString();
-//                    int indexToStart1 = thumnailPath.indexOf(langName);
-//                    String tempthumbnail = thumnailPath.substring(indexToStart1, thumnailPath.length());
                     String thumbnail = ServiceUtility.convertFilePathToUrl(thumnailPath);
                     weekTitleVideo.setIndexThumbnailPath(thumbnail);
 
@@ -386,10 +372,11 @@ public class ZipCreationThreadService {
 
                 }
 
-                weekTitleVideoList.sort(
-                        Comparator.comparingInt((WeekTitleVideo wtv) -> extractInteger(wtv.getWeek().getWeekName()))
-                                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
-                                .thenComparing(WeekTitleVideo::getTitle));
+                weekTitleVideoList.sort(Comparator
+                        .comparingInt(
+                                (WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                        .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                        .thenComparing(WeekTitleVideo::getTitle));
 
                 for (WeekTitleVideo temp : weekTitleVideoList) {
                     logger.info(":{} : {} : {}", temp.getWeek().getWeekName(),
