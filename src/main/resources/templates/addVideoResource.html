@@ -12,8 +12,17 @@ font-size:0.9rem;
 color: #044F7A!important;
 font-weight:bold!important;
 }
+ :root {
+  --plyr-color-main: #ff9033;
+   
+}
+  .plyr__controls__item plyr__volume{
+    margin-bottom: 25px;
+    padding-bottom:25px;
+  }
 </style>
 <body>
+	 <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
 	<div th:replace="common/sidebar :: top_header"></div>
 	<div class="container-fluid">
 		<div class="row">
@@ -102,6 +111,7 @@ font-weight:bold!important;
 									<th scope="col">FileName</th>
 									<th scope="col">Language</th>
 									<th scope="col">Video</th>
+									<th scope="col">Thumbnail</th>
 									 
 								</tr>
 							</thead>
@@ -113,11 +123,20 @@ font-weight:bold!important;
 							      <td>
 							      	<div th:if="${videoResource.getVideoPath() != 'null'}"
 												style="width: 400px;">
-												<video controls="controls" style="width: 100%;">
+												<video controls="controls" style="width: 100%;" th:poster="@{/files/}+@{${videoResource.getThumbnailPath()}}">
 													<source th:src="@{/files/}+@{${videoResource.getVideoPath()}}"
 														type="video/mp4" />
 													Your browser does not support HTML video.
 												</video>
+											</div>
+								  </td>
+								  
+								  <td>
+							      	<div th:if="${videoResource.getThumbnailPath() != 'null'}"
+												style="width: 300px;">
+										<img id="imagesource1" th:src="@{/files/}+@{${videoResource.getThumbnailPath()}}"
+										style="width: 200px; height: 200px" />
+												
 											</div>
 								  </td>
 								  
@@ -149,6 +168,101 @@ $(document).ready( function () {
 	<script th:inline="javascript">
 	
 		var projectPath='[(@{/})]';
+		  		
+var isPlaying = [];
+				
+				var videos = document.querySelectorAll('video');
+				for(var i=0; i<videos.length; i++){
+				  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+				}
+				
+				
+
+				function pauseAll(elem){
+					var videos2 = document.querySelectorAll('video');
+					for(var i=0; i<videos2.length; i++){
+				                if(videos2[i] == elem) continue;
+				                if(videos2[i].played.length > 0 && !videos2[i].paused){
+				                  videos2[i].pause();
+				                }
+				        }
+				  }
+				
+				
+				
+				
+				   // Functions to play the video with/without sound
+					function playMutedVideoMouseOver(event) {
+						var video = event.target;
+					 	var flag=0;
+					 	for (var j = 0; j < videos.length; j++){
+							 if(!videos[j].paused && !videos[j].muted)
+					 			flag=flag+1;
+						 }
+					 	if(flag==0){
+					 	video.play();
+					 	video.muted = true;
+						}
+					 
+					}
+				   
+
+					function playUnmutedVideoOnClick(event) {
+					 var video = event.target;
+					 video.muted = false;
+					 video.play();
+					}
+					
+					function pauseWithMutedVideoMouseOut(event) {
+						 var video = event.target;
+							if(video.muted){
+								video.pause();
+								//video.muted=!video.muted;
+							}
+						 
+						}
+						
+					
+				
+					 
+					
+					
+		
+		
+		
+		 var controls =
+[
+'play-large', // The large play button in the center
+// 'restart', // Restart playback
+// 'rewind', // Rewind by the seek time (default 10 seconds)
+'play', // Play/pause playback
+//'fast-forward', // Fast forward by the seek time (default 10 seconds)
+'progress', // The progress bar and scrubber for playback and buffering
+'current-time', // The current time of playback
+//'duration', // The full duration of the media
+'mute', // Toggle mute
+'volume', // Volume control
+'captions', // Toggle captions
+'settings', // Settings menu
+'pip', // Picture-in-picture (currently Safari only)
+'airplay', // Airplay (currently Safari only)
+'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+'fullscreen' // Toggle fullscreen
+];
+
+//const player = new Plyr('.vid1',{controls});
+
+//var videos = document.querySelectorAll('video');
+
+for(var i=0; i<videos.length; i++){
+	
+	const player = new Plyr(videos[i],{controls});	
+	
+	
+	   
+}
+		
+
 	</script>
 </body>
 

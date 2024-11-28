@@ -14,7 +14,12 @@ public interface TutorialWithWeekAndPackageService {
 
     void saveAll(List<TutorialWithWeekAndPackage> tutorialList);
 
-    TutorialWithWeekAndPackage findByPackageLanguageAndWeektitle(PackageLanguage packageLanguage, WeekTitleVideo weekTitleVideo);
+    TutorialWithWeekAndPackage findByPackageLanguageAndWeektitle(PackageLanguage packageLanguage,
+            WeekTitleVideo weekTitleVideo);
+
+    List<TutorialWithWeekAndPackage> findByWeekTitlesAndPackageLanguages(List<WeekTitleVideo> weekTitles,
+            List<PackageLanguage> packageLanguages);
 
     void save(TutorialWithWeekAndPackage twp);
+
 }

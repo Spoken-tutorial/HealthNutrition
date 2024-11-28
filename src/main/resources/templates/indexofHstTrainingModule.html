@@ -2,30 +2,26 @@
 
 <html xmlns:th="https://thymeleaf.org">
 <head >
- <link rel="icon" th:href="@{/image/favicon.ico}" />
+ <link rel="icon" th:href="@{${rootFolder + '/favicon.ico'}}" />
 <title >HST Training</title>
 
 
 	<meta charset="utf-8"/> 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
-	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
-	crossorigin="anonymous" />
+	th:href="@{${rootFolder + '/mannual_downloads/all.min.css'}}"/>
 	<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-	crossorigin="anonymous">
-    <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.css" rel="stylesheet">
-	<link rel="stylesheet" th:href="@{/css/main.css}"/>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
+	th:href="@{${rootFolder + '/mannual_downloads/bootstrap.min.css'}}">
+    <link th:href="@{${rootFolder + '/DataTables/datatables.min.css'}}" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{${rootFolder + '/css/main.css'}}"/>
+	<link rel="stylesheet" th:href="@{${rootFolder + '/mannual_downloads/font-awesome.min.css'}}">
+	<link rel="stylesheet" th:href="@{${rootFolder + '/mannual_downloads/plyr.css'}}" />
 </head>
 
 </head>
   <body>
-   <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+   <script th:src="@{${rootFolder + '/mannual_downloads/plyr.js'}}"></script>
+   <script th:src="@{${rootFolder + '/mannual_downloads/clipboard.min.js'}}"></script>
   
   
   <header class="mb-5" id="top-fixed-banner">
@@ -33,11 +29,10 @@
 	<div class="px-md-3">
 	<div class="row header-top pt-2">
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
-	
-	</div>
+		</div>
 	<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
-	<div><p class="d-inline-block"><span class="top-banner">
-		<a sec:authorize="isAnonymous()" th:href="@{/login}" target="_blank">Login | New
+	<div th:if="${zipVariable}"><p class="d-inline-block"><span class="top-banner">
+		<a  th:if="${zipVariable}" sec:authorize="isAnonymous()" th:href="@{/login}" target="_blank">Login | New
 		User</a> <a sec:authorize="isAuthenticated()"
 		th:href="@{/dashBoard}">My Account</a> 
 		</span></p>
@@ -49,7 +44,7 @@
 	
   <nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="navbar">
     <div class="container-fluid">
-        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{${rootFolder + '/logo.png'}}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
 								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">HST Training Modules  </span> </span>
 
         
@@ -59,7 +54,7 @@
         <div class="collapse navbar-collapse" id="mainNavBar">
             <div class="navbar-nav ml-auto">
                 <a class="nav-item nav-link active" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
-                <div th:replace="common/commonItemsHSTTrainingModule :: download_package"></div>
+                
             </div>
         </div>
     </div>
@@ -68,7 +63,39 @@
   </header>
  
   <div class="container">
-<div th:replace="common/commonItemsHSTTrainingModule :: trainingModuleView_bar"></div>
+
+
+
+<div class="row justify-content-center" style="width: 100%;">
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+            <select class="custom-select d-block form-control selectedValue" id="weekView" name="week">            
+            
+              <option  value="">Select Week</option>
+             
+              <option  th:each="weekTemp : ${weekList}" th:selected="${weekTemp.value==localWeek}" th:value="${weekTemp.value}" th:text="${weekTemp.key}" ></option>
+            </select>
+          
+           
+</div>
+
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+<select class="custom-select d-block form-control" id="languageView" name="lan">
+			 
+              <option value="">Select Language</option>
+              <option th:each="lan : ${languages}"  th:selected="${lan.value==localLanguage}"th:value="${lan.value}" th:text="${lan.key}"></option> 
+            </select>
+             
+            
+</div>
+
+ 
+     <div class="col-md-2 mb-3" style="width: 100%;">
+          <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearFormView" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
+           
+     </div>
+     	      
+</div>
+
 </div>
     <main>
    
@@ -91,13 +118,13 @@
           <div class="col-md-6">
             <div style="width: 100%; margin: auto;">
               <video th:id="${'storedTutorialId' + temp.getWeekTitleVideoId()}"
-                     controls style="width:100%!important;" class="vid1" th:poster="@{/files/}+@{${temp.getVideoResource().getThumbnailPath()}}">
-                <source th:src="@{/files/}+@{${temp.getVideoResource().getVideoPath()}}" type="video/mp4"></source>
+                     controls style="width:100%!important;" class="vid1"  th:poster="@{${temp.getIndexThumbnailPath()}}">
+                <source th:src="@{${temp.getIndexVideoPath()}}" type="video/mp4"></source>
               </video>
             </div>
           </div>
           <div class="col-md-6">
-			<a th:id="${'hstTrainingVideoViewUrl' + iter.index}" th:href="@{'/hstTrainingModuleView/' + ${temp.getWeekTitleVideoId()} + '/'}" style="display: block;"> 
+			 
             <h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${temp.getWeek().getWeekName()}"></h4>
             <h6 style="color: #014F7A;font-size: 1rem;">
               <i><span th:text="'Title: ' + ${temp.getTitle()}"></span></i>
@@ -107,16 +134,10 @@
                 <span th:text="${temp.getVideoResource().getLan().getLangName()}" class=""></span>
             </h6>
              
-			     </a>
-			  
-			
-
           </div>
         </div>
       </td>
-      
-       
-      
+            
     </tr>
   </tbody>
 </table>
@@ -132,15 +153,15 @@
     </div>
 	
     </footer>
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-			<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script th:src="@{${rootFolder + '/mannual_downloads/jquery-3.5.1.min.js'}}" ></script>
+			<script th:src="@{${rootFolder + '/mannual_downloads/popper.min.js'}}" ></script>
+			<script th:src="@{${rootFolder + '/mannual_downloads/bootstrap.min.js'}}" ></script>
 		    
-		   <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
-		    <script th:src="@{/s/js/main.js}"></script>
+		   <script th:src="@{${rootFolder + '/DataTables/datatables.min.js'}}"></script>
+		    <script th:src="@{${rootFolder + '/js/main.js'}}"></script>
 		    
 		    
-		    <script th:src="@{/js/ajaxSupport.js}"></script>
+		    <script th:src="@{${rootFolder +'/js/ajaxSupport.js' }}"></script>
 	
 
 
@@ -214,7 +235,6 @@
 		    	
 	   var table=  $('#events_table').DataTable({ "ordering": false});
 	   
-	   
 	   selectweekLanguage();
 	   
 	       
@@ -230,10 +250,7 @@
 		 var selectedLanguage = $('#languageView').val();
 		 var selectedWeek = $('#weekView').val();
 		
-		   var hstTrainingModuleViewPageUrl = document.getElementById('hstTrainingModuleViewPageUrl');
-			var newUrl = '/trainingModules?week=' + selectedWeek +   '&lan=' + selectedLanguage ;
-            hstTrainingModuleViewPageUrl.href = newUrl;
-
+		   
  			if(selectedWeek!=""){
 			    selectedWeek='"' + selectedWeek + '"';
 		     }
@@ -347,9 +364,7 @@ var isPlaying = [];
 for(var i=0; i<videos.length; i++){
 	
 	const player = new Plyr(videos[i],{controls});	
-	
-	
-	   
+		   
 }
 		
 

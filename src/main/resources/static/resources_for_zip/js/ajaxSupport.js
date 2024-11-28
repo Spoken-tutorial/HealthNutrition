@@ -2255,6 +2255,44 @@ $(document).ready(function () {
 			
 			
 
+ /*   
+    $(document).ready(function() {
+						var lengthofWeekTitleVideo=$("#lengthofWeekTitleVideo").val();
+		
+						for(var i=0; i<=lengthofWeekTitleVideo; i++){
+							
+						var clipboard = new ClipboardJS('#copyButton'+i, {
+				        text: function(trigger) {
+				            return $('#hstTrainingVideoViewUrl' +i).prop('href');
+				        }
+				    });
+				
+				    clipboard.on('success', function(e) {
+				        var button = $('#copyButton'+i);
+				        var originalHtml = button.html();
+				        var originalTitle = button.attr('title');
+				        
+				        button.html('<p>&#x2705;</p>'); // Check mark symbol
+				        button.attr('title', 'Copied to clipboard');
+				        
+				        setTimeout(function() {
+				            button.html(originalHtml);
+				            button.attr('title', originalTitle);
+				        }, 5000); // 5 seconds
+				        
+				        e.clearSelection();
+				    });
+				
+				    clipboard.on('error', function(e) {
+				        alert('Failed to copy link.');
+				    });
+								
+							}
+	   
+
+});
+*/
+
 $(document).ready(function() {
 						
 							

@@ -1,9 +1,11 @@
 package com.health.controller;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,9 +26,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -52,6 +56,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -121,7 +126,6 @@ import com.health.model.Version;
 import com.health.model.VideoResource;
 import com.health.model.Week;
 import com.health.model.WeekTitleVideo;
-import com.health.repository.LiveTutorialRepository;
 import com.health.repository.TopicCategoryMappingRepository;
 import com.health.repository.VersionRepository;
 import com.health.service.BrouchureService;
@@ -167,6 +171,7 @@ import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
+import com.health.threadpool.TimeoutOutputStream;
 import com.health.threadpool.ZipCreationThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
@@ -189,6 +194,14 @@ public class HomeController {
 
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
+    @Value("${downloadLimit}")
+    private int downloadLimit;
+
+    @Value("${downloadTimeOut}")
+    private long downloadTimeOut;
+
+    private AtomicInteger downloadCount = new AtomicInteger(0);
+
     @Autowired
     private VersionRepository verRepository;
 
@@ -197,9 +210,6 @@ public class HomeController {
 
     @Autowired
     private LiveTutorialService liveTutorialService;
-
-    @Autowired
-    private LiveTutorialRepository liveTutorialRepo;
 
     @Autowired
     private SpokenVideoService spokenVideoService;
@@ -722,10 +732,27 @@ public class HomeController {
 
     }
 
-    private void getPackageAndLanguageData(Model model) {
+    private void getPackageAndLanguageData(Model model, String weekId, String lanId) {
         List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
         model.addAttribute("packageList", packageList);
 
+        ArrayList<Map<String, String>> arlist = ajaxController.getLanguageByWeek(weekId, lanId, null);
+        ArrayList<Map<String, String>> arlist1 = ajaxController.getWeekByLanguage(weekId, lanId, null);
+        Map<String, String> languages = arlist.get(0);
+        Map<String, String> weeks = arlist1.get(0);
+
+        model.addAttribute("weekList", weeks);
+        model.addAttribute("languages", languages);
+        model.addAttribute("localWeek", weekId);
+
+        model.addAttribute("localLanguage", lanId);
+
+        model.addAttribute("languageCount", languages.size());
+
+    }
+
+    private void getPackageAndLanguageData(Model model) {
+        getPackageAndLanguageData(model, "", "");
     }
 
     @RequestMapping("/")
@@ -4543,15 +4570,96 @@ public class HomeController {
     }
 
     /******************************************
-     * AssTutorial on Week And Package End
+     * Assign Tutorial on Week And Package End
      ********************/
 
     @GetMapping("/trainingModules")
-    public String hstTrainingModules(HttpServletRequest req, Model model, Principal principal) {
+    public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,
+            @RequestParam(name = "lan", required = false, defaultValue = "") String langName, HttpServletRequest req,
+            Model model, Principal principal) {
 
-        getPackageAndLanguageData(model);
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        getPackageAndLanguageData(model, weekName, langName);
+
+        model.addAttribute("week", weekName);
+        model.addAttribute("language", langName);
+
+        int intWeekId = 0;
+        if (!weekName.equals("")) {
+            intWeekId = ServiceUtility.extractInteger(weekName);
+        }
+
+        logger.info("Week:{} ", weekName);
+        logger.info("LangName:{}", langName);
+
+        Week localWeek = weekService.findByWeekId(intWeekId);
+        Language localLan = lanService.getByLanName(langName);
+
+        logger.info("localWeek:{}", localWeek);
+        logger.info("localLan:{}", localLan);
+
+        List<WeekTitleVideo> weekTitleVideoList = new ArrayList<>();
+
+        weekTitleVideoList = weekTitleVideoService.findAll();
+
+        weekTitleVideoList.sort(Comparator
+                .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                .thenComparing(WeekTitleVideo::getTitle));
+
+        for (WeekTitleVideo temp : weekTitleVideoList) {
+            logger.info(":{} : {} : {}", temp.getWeek().getWeekName(), temp.getVideoResource().getLan().getLangName(),
+                    temp.getTitle());
+        }
+
+        model.addAttribute("userInfo", usr);
+
+        model.addAttribute("weekTitleVideoList", weekTitleVideoList);
+
         return "hstTrainingModule";
 
+    }
+
+    @GetMapping("/hstTrainingModuleView/{weekTitleVideoId}")
+    public String hstTrainingModuleView(@PathVariable(name = "weekTitleVideoId") int weekTitleVideoId,
+            HttpServletRequest req, Model model, Principal principal) {
+
+        getPackageAndLanguageData(model);
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        boolean foundVideo = true;
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekTitleVideoId(weekTitleVideoId);
+        if (weekTitleVideo == null) {
+            foundVideo = false;
+        } else {
+            Week week = weekTitleVideo.getWeek();
+            Language lan = weekTitleVideo.getVideoResource().getLan();
+
+            List<WeekTitleVideo> relatedweekTitleVideoList = weekTitleVideoService.findByWeekAndLan(week, lan);
+            relatedweekTitleVideoList.remove(weekTitleVideo);
+            int nextWeekId = week.getWeekId() + 1;
+            Week nextweek = weekService.findByWeekId(nextWeekId);
+
+            if (nextweek != null) {
+                List<WeekTitleVideo> nextWeekTitleVideoList = weekTitleVideoService.findByWeekAndLan(nextweek, lan);
+                if (nextWeekTitleVideoList != null && nextWeekTitleVideoList.size() > 0) {
+                    relatedweekTitleVideoList.addAll(nextWeekTitleVideoList);
+                }
+
+            }
+
+            if (relatedweekTitleVideoList != null && relatedweekTitleVideoList.size() > 0)
+                model.addAttribute("relatedweekTitleVideoList", relatedweekTitleVideoList);
+            model.addAttribute("weekTitleVideo", weekTitleVideo);
+        }
+        model.addAttribute("foundVideo", foundVideo);
+
+        return "relatedHstTrainingTutorialsView";
     }
 
     /********************** Training Modules Download Start **********************/
@@ -4562,7 +4670,15 @@ public class HomeController {
             @RequestParam(name = "languageDownloadName") String lanId) {
 
         getPackageAndLanguageData(model);
+        List<WeekTitleVideo> weekTitleVideoList = weekTitleVideoService.findAll();
+        weekTitleVideoList.sort(Comparator
+                .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                .thenComparing(WeekTitleVideo::getTitle));
+
+        model.addAttribute("weekTitleVideoList", weekTitleVideoList);
         boolean downloadSection = false;
+
         model.addAttribute("downloadSection", downloadSection);
 
         PackageContainer packageContainer = packageContainerService.findByPackageId(Integer.parseInt(packageId));
@@ -4587,19 +4703,71 @@ public class HomeController {
             model.addAttribute("return_msg", "Zip creation in progress.... , please check back after 30 minutes.");
             return "hstTrainingModule";
 
-        } else if (zipUrl.equals("Error")) {
+        }
+
+        else if (zipUrl.equals("Error")) {
             model.addAttribute("return_msg", "No Tutorials are available for selected Package,  and Language");
             return "hstTrainingModule";
 
+        } else if (downloadCount.get() == downloadLimit) {
+            model.addAttribute("return_msg", "Please try again after 30 minutes.");
+            return "hstTrainingModule";
         }
 
         else {
+
             model.addAttribute("zipUrl", zipUrl);
             model.addAttribute("success_msg",
                     "Record Submitted Successfully ! Click on the download link to download resources");
 
             return "downloadTrainingModule";
+
         }
+
+    }
+
+    @GetMapping("/downloadManager")
+    public String downloadManager(HttpServletRequest req, Principal principal, Model model,
+            @RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response) {
+        if (downloadCount.get() == downloadLimit) {
+            getPackageAndLanguageData(model);
+
+            model.addAttribute("return_msg", "Please try again after 30 minutes.");
+            return "hstTrainingModule";
+        }
+        downloadCount.incrementAndGet();
+        logger.debug(" Increament downloadCount :{}", downloadCount.get());
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        try (OutputStream os = new TimeoutOutputStream(response.getOutputStream(), downloadTimeOut);
+                InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
+
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + ServiceUtility.getZipfileName(zipFilePathName));
+            response.setContentLengthLong(Files.size(zipFilePathName));
+
+            byte[] buffer = new byte[16384];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+
+                // TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
+                // tos.write(buffer, 0, length);
+
+                os.write(buffer, 0, length);
+
+            }
+            os.flush();
+
+        } catch (Exception e) {
+            logger.info("Exception:{}", e.getMessage());
+        } finally {
+            downloadCount.decrementAndGet();
+            logger.debug(" Decrement downloadCount :{}", downloadCount.get());
+        }
+
+        return null;
 
     }
 

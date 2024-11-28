@@ -51,6 +51,7 @@ import com.health.model.FilesofBrouchure;
 import com.health.model.Language;
 import com.health.model.LogManegement;
 import com.health.model.PackageContainer;
+import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PromoVideo;
 import com.health.model.ResearchPaper;
@@ -62,6 +63,7 @@ import com.health.model.TraineeInformation;
 import com.health.model.TrainingInformation;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
+import com.health.model.TutorialWithWeekAndPackage;
 import com.health.model.User;
 import com.health.model.Version;
 import com.health.model.VideoResource;
@@ -1079,6 +1081,119 @@ public class AjaxController {
 
         return titleName;
     }
+
+    /*********************************
+     * Training_Module_View Start
+     *********************************/
+
+    @RequestMapping("/loadLanguageByWeek")
+    public @ResponseBody ArrayList<Map<String, String>> getLanguageByWeek(@RequestParam(value = "weekId") String weekId,
+            @RequestParam(value = "languageId") String languageId, Optional<Integer> packageId) {
+
+        ArrayList<Map<String, String>> arlist = new ArrayList<>();
+
+        Map<String, String> languages = new TreeMap<>();
+
+        int intWeekId = 0;
+        if (!weekId.equals("")) {
+            intWeekId = ServiceUtility.extractInteger(weekId);
+        }
+        int intlanguageId = 0;
+        if (!languageId.equals("")) {
+            intlanguageId = langService.getByLanName(languageId).getLanId();
+        }
+
+        Week week = intWeekId != 0 ? weekService.findByWeekId(intWeekId) : null;
+
+        Language language = intlanguageId != 0 ? langService.getById(intlanguageId) : null;
+        PackageLanguage packLanguage = null;
+        if (packageId != null && packageId.isPresent()) {
+            PackageContainer packageContainer = packageContainerService.findByPackageId(packageId.get());
+            if (packageContainer != null && language != null) {
+                packLanguage = packLanService.findByPackageContainerAndLan(packageContainer, languageId);
+            }
+        }
+
+        List<TutorialWithWeekAndPackage> tutorials = new ArrayList<>();
+
+        if (packLanguage != null) {
+
+            tutorials = new ArrayList<>(packLanguage.getTutorialsWithWeekAndPack());
+        }
+
+        else {
+
+            List<WeekTitleVideo> weekTitleList = week != null ? new ArrayList<>(week.getWeekTitles())
+                    : weekTitleVideoService.findAll();
+            List<PackageLanguage> packlan_list = packLanService.findAll();
+
+            tutorials = tutorialWithPackageAndService.findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
+        }
+
+        for (TutorialWithWeekAndPackage temp : tutorials) {
+            Language lan = temp.getPackageLanguage().getLan();
+            languages.put(lan.getLangName(), lan.getLangName());
+        }
+
+        arlist.add(languages);
+        return arlist;
+
+    }
+
+    @RequestMapping("/loadWeekByLanguage")
+    public @ResponseBody ArrayList<Map<String, String>> getWeekByLanguage(@RequestParam(value = "weekId") String weekId,
+            @RequestParam(value = "languageId") String languageId, Optional<Integer> packageId) {
+
+        ArrayList<Map<String, String>> arlist = new ArrayList<>();
+
+        Map<String, String> weeks = new TreeMap<>();
+
+        int intWeekId = 0;
+        if (!weekId.equals("")) {
+            intWeekId = ServiceUtility.extractInteger(weekId);
+        }
+        int intlanguageId = 0;
+        if (!languageId.equals("")) {
+            intlanguageId = langService.getByLanName(languageId).getLanId();
+        }
+
+        Week week = intWeekId != 0 ? weekService.findByWeekId(intWeekId) : null;
+
+        Language language = intlanguageId != 0 ? langService.getById(intlanguageId) : null;
+
+        PackageLanguage packLanguage = null;
+        if (packageId != null && packageId.isPresent()) {
+            PackageContainer packageContainer = packageContainerService.findByPackageId(packageId.get());
+            if (packageContainer != null && language != null) {
+                packLanguage = packLanService.findByPackageContainerAndLan(packageContainer, languageId);
+            }
+        }
+
+        List<TutorialWithWeekAndPackage> tutorials = new ArrayList<>();
+        if (packLanguage != null) {
+
+            tutorials = new ArrayList<>(packLanguage.getTutorialsWithWeekAndPack());
+        } else {
+
+            List<WeekTitleVideo> weekTitleList = weekTitleVideoService.findAll();
+            List<PackageLanguage> packlan_list = language != null ? new ArrayList<>(language.getPackageLanguages())
+                    : packLanService.findAll();
+            tutorials = tutorialWithPackageAndService.findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
+        }
+
+        for (TutorialWithWeekAndPackage temp : tutorials) {
+            Week weekTemp = temp.getWeekTitle().getWeek();
+            weeks.put(weekTemp.getWeekName(), weekTemp.getWeekName());
+        }
+
+        arlist.add(weeks);
+        return arlist;
+
+    }
+
+    /*********************************
+     * Training_Module_View End
+     **********************************/
 
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,
