@@ -589,6 +589,54 @@ public class AjaxController {
 
     }
 
+    @GetMapping("/enableDisablePacakgeAndPackLan")
+    public @ResponseBody boolean enableDisablePacakgeAndPackLan(int packLanId) {
+        PackageLanguage packLan = packLanService.findBypackageLanId(packLanId);
+
+        try {
+            if (packLan.isStatus()) {
+                packLan.setStatus(false);
+                packLanService.save(packLan);
+
+            } else {
+                packLan.setStatus(true);
+                packLanService.save(packLan);
+
+            }
+
+            PackageContainer packContainer = packLan.getPackageContainer();
+            Set<PackageLanguage> packLanList = packContainer.getPackageLanguages();
+
+            boolean flag = false;
+
+            for (PackageLanguage temp : packLanList) {
+                if (temp.getPackageLanId() == packLan.getPackageLanId()) {
+                    if (packLan.isStatus()) {
+                        flag = true;
+                    }
+                } else if (temp.isStatus()) {
+                    flag = true;
+                }
+            }
+
+            if (flag) {
+                packContainer.setStatus(true);
+            } else {
+                packContainer.setStatus(false);
+            }
+
+            packageContainerService.save(packContainer);
+
+            return true;
+
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale PacakgeAndPackLan: {}", packLan, e);
+            return false;
+        }
+
+    }
+
     @GetMapping("/enableDisableResearchPaper")
     public @ResponseBody boolean enableDisableResearchPaper(int id) {
         ResearchPaper res = researchPaperService.findById(id);

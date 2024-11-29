@@ -24,4 +24,9 @@ public interface PackageLanguageRepository extends JpaRepository<PackageLanguage
     @Query("SELECT DISTINCT pl.packageContainer FROM PackageLanguage pl")
     List<PackageContainer> findAllDistinctPackageContainers();
 
+    @Query("SELECT DISTINCT pl.packageContainer FROM PackageLanguage pl where pl.packageContainer.status=:value")
+    List<PackageContainer> findAllDistinctPackageContainersByStatus(boolean value);
+
+    List<PackageLanguage> findAllByStatus(boolean value);
+
 }

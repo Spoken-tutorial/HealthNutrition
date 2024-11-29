@@ -199,6 +199,7 @@ font-weight:bold!important;
 									<th scope="col">Date Added</th>
 									<th scope="col">Package</th>
 									<th scope="col">Language</th>
+									<th scope="col">Enable/Disable</th>
 									<th scope="col">WeekTitleVideo</th>
 									
 									 
@@ -209,6 +210,17 @@ font-weight:bold!important;
 								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
 								 <td><span th:text = "${temp.getPackageContainer().getPackageName()}"></span></td>
 							      <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
+							       <td>
+	  		
+						   			<div th:if="${temp.isStatus()}">
+						   				<a class="disablePackageLanguage" th:value="${temp.getPackageLanId()}" title="Click to Disable Package-Language"><i class="fas fa-times-circle" th:id="${temp.getPackageLanId()}" style="color:red"></i></a>
+						   			</div>
+						   			<div th:unless="${temp.isStatus()}">
+						   				<a class="enablePackageLanguage" th:value="${temp.getPackageLanId()}" title="Click to Enable Package-Language"><i class="fas fa-check-circle" th:id="${temp.getPackageLanId()}" style="color:green"></i> </a>
+						   			</div>
+						   		
+						  			</td>
+							
 							      <td>
 									    <div th:if="${temp.getAllWeekTitle() != null}">
 						                    <table class="table table-striped weekTitleTable" th:id="${'weekTitleTable' + temp.getPackageLanId() }">

@@ -733,7 +733,7 @@ public class HomeController {
     }
 
     private void getPackageAndLanguageData(Model model, String weekId, String lanId) {
-        List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
+        List<PackageContainer> packageList = packLanService.findAllDistinctEnabledPackageContainers();
         model.addAttribute("packageList", packageList);
 
         ArrayList<Map<String, String>> arlist = ajaxController.getLanguageByWeek(weekId, lanId, null);

@@ -14,4 +14,6 @@ public interface PackageContainerService {
 
     void save(PackageContainer packageContainer);
 
+    List<PackageContainer> findAllByStatus(boolean value);
+
 }

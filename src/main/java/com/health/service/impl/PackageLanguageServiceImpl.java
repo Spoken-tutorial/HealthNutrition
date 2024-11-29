@@ -52,4 +52,17 @@ public class PackageLanguageServiceImpl implements PackageLanguageService {
         return repo.findAllDistinctPackageContainers();
     }
 
+    @Override
+    public List<PackageLanguage> findAllByStatus(boolean value) {
+
+        return repo.findAllByStatus(value);
+    }
+
+    @Override
+    public List<PackageContainer> findAllDistinctEnabledPackageContainers() {
+        List<PackageContainer> packageList = repo.findAllDistinctPackageContainersByStatus(true);
+
+        return packageList;
+    }
+
 }
