@@ -12,6 +12,24 @@ font-size:0.9rem;
 color: #044F7A!important;
 font-weight:bold!important;
 }
+
+ .weekTitleTable {
+        background-color: #f8f9fa; /* Light gray background */
+        color: #333; /* Dark text color */
+    }
+
+    .weekTitleTable th {
+        background-color: #007bff; /* Blue header background */
+        color: white; /* White header text */
+    }
+
+    .weekTitleTable td {
+        background-color: #ffffff; /* White cell background */
+    }
+
+    .weekTitleTable tr:nth-child(even) td {
+        background-color: #f2f2f2; /* Light gray for even rows */
+    }
 </style>
 <body>
 	<div th:replace="common/sidebar :: top_header"></div>
@@ -193,7 +211,7 @@ font-weight:bold!important;
 							      <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
 							      <td>
 									    <div th:if="${temp.getAllWeekTitle() != null}">
-						                    <table class="table table-striped" id="weekTitleTable">
+						                    <table class="table table-striped weekTitleTable" th:id="${'weekTitleTable' + temp.getPackageLanId() }">
 												<thead>
 													<tr>
 														<th scope="col">Week </th>
@@ -235,7 +253,9 @@ font-weight:bold!important;
 	<script type="text/javascript">
 $(document).ready( function () {
     $('#myTable').DataTable();
-    $('#weekTitleTable').DataTable();
+    $('.weekTitleTable').each(function() {
+				$(this).DataTable();
+			});
      $('#enterNewPackageContainerName').hide();
       $('#enterNewWeekName').hide();
    

@@ -1146,7 +1146,11 @@ public class AjaxController {
 
         ArrayList<Map<String, String>> arlist = new ArrayList<>();
 
-        Map<String, String> weeks = new TreeMap<>();
+        Map<String, String> weeks = new TreeMap<>((w1, w2) -> {
+            int num1 = ServiceUtility.extractInteger(w1);
+            int num2 = ServiceUtility.extractInteger(w2);
+            return Integer.compare(num1, num2);
+        });
 
         int intWeekId = 0;
         if (!weekId.equals("")) {
