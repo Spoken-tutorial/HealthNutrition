@@ -30,6 +30,24 @@ font-weight:bold!important;
     .weekTitleTable tr:nth-child(even) td {
         background-color: #f2f2f2; /* Light gray for even rows */
     }
+    
+    .tutorialTopicTable {
+        background-color: #f8f9fa; /* Light gray background */
+        color: #333; /* Dark text color */
+    }
+
+    .tutorialTopicTable th {
+        background-color: #007bff; /* Blue header background */
+        color: white; /* White header text */
+    }
+
+    .tutorialTopicTable td {
+        background-color: #ffffff; /* White cell background */
+    }
+
+    .tutorialTopicTable tr:nth-child(even) td {
+        background-color: #f2f2f2; /* Light gray for even rows */
+    }
 </style>
 <body>
 	<div th:replace="common/sidebar :: top_header"></div>
@@ -62,7 +80,11 @@ font-weight:bold!important;
 						aria-selected="true">Add</a></li>
 					<li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="profile-tab"
 						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
-						aria-selected="false">View</a></li>
+						aria-selected="false">Training Modules View</a></li>
+						
+					 <li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="topicView-tab" data-toggle="tab" 
+					 href="#hstview" role="tab" aria-controls="hstview" aria-selected="false">Health Spoken View</a></li>
+   
 
 
 				</ul>
@@ -125,6 +147,41 @@ font-weight:bold!important;
 													</select>
 
 											</div>
+											<div class="container">
+											<div class="row">
+											<div class="col-md-4">
+											<div class="form-group">
+											<label for="categoryforPackage">Select Category * </label> <select
+												id="categoryforPackage" class="form-control"
+												name="categoryforPackage" required="required" >
+	
+												<option value="0">Select any one category</option>
+												
+													<option 
+													th:each="category: ${categories}"
+													th:value="${category.getCategoryId()}" th:text="${category.getCatName()}">
+															</option>
+											
+										   </select>
+										   </div>
+										   </div>
+											
+											<div class="col-md-8">
+											<div class="form-group">
+											<span>To select all topics press ctrl + A keys. </span>
+											<br>
+											<label for="tutorialforPackage">Select Topic * </label> 
+											<select
+												id="tutorialforPackage" class="form-control" name="tutorialforPackage"
+												required="required" size="15" multiple="multiple">
+												
+										   </select>
+										   </div>
+												
+										  </div>
+											
+										</div>
+										</div>
 					
 											
 										 <input type="hidden" id="lengthofweek" name="lengthofweek"  th:value="${weekList.size()}"/>	
@@ -132,6 +189,7 @@ font-weight:bold!important;
 									<div th:each="week,iter: ${weekList}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
 									
 									<div class="container">
+										
 								        <div class="row">
 								            <div class="col-md-4">
 								              
@@ -249,6 +307,56 @@ font-weight:bold!important;
 							</tbody>
 						</table >
 						</div>
+						
+						<div class="tab-pane fade py-3" id="hstview" role="tabpanel" aria-labelledby="topicView-tab">
+						<table class="table table-striped" id="TutorialTable"  data-order='[[ 0, "desc" ]]'>
+						
+							
+							<thead>
+								<tr>
+									<th scope="col">Date Added</th>
+									<th scope="col">Package</th>
+									<th scope="col">Language</th>
+									
+									<th scope="col">Tutorial</th>
+									
+									 
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="temp : ${packLanList}">
+								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
+								 <td><span th:text = "${temp.getPackageContainer().getPackageName()}"></span></td>
+							      <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
+							      
+							
+							      <td>
+									    <div th:if="${temp.getPackLanTutorialResource() != null}">
+						                    <table class="table table-striped tutorialTopicTable" th:id="${'tutorialtable' + temp.getPackageLanId() }">
+												<thead>
+													<tr>
+														
+														<th scope="col">Topic</th>
+														
+													</tr>
+												</thead>
+												<tbody>
+						                        <tr th:each="tempTutorial : ${temp.getPackLanTutorialResource()}">
+						                            
+						                            <td><span th:text="${tempTutorial.getTutorial().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></td>
+						                        </tr>
+						                        </tbody>
+						                    </table>
+						                </div>
+								  </td>
+							     
+								  
+							    </tr>
+
+							</tbody>
+						</table >
+						</div>
+						
 					</div>
 
 
@@ -270,6 +378,12 @@ $(document).ready( function () {
 			});
      $('#enterNewPackageContainerName').hide();
       $('#enterNewWeekName').hide();
+      
+     
+      $('#TutorialTable').DataTable();
+       $('.tutorialTopicTable').each(function() {
+				$(this).DataTable();
+			});
    
 } );
 

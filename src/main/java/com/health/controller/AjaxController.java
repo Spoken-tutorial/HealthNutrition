@@ -1130,6 +1130,28 @@ public class AjaxController {
         return titleName;
     }
 
+    @RequestMapping("/loadTopicByCategoryAndLanguageforPackage")
+    public @ResponseBody TreeMap<String, Integer> loadTopicByCategoryAndLanguageforPackage(
+            @RequestParam(value = "catId") int catId, @RequestParam(value = "lanId") int lanId) {
+        TreeMap<String, Integer> tutorialName = new TreeMap<>();
+
+        Category cat = catService.findByid(catId);
+        Language lan = lanService.getById(lanId);
+        List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+        List<ContributorAssignedTutorial> con = conService.findAllByTopicCatAndLan(tcm, lan);
+
+        List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(con);
+
+        for (Tutorial temp : tutorials) {
+
+            Topic topic = temp.getConAssignedTutorial().getTopicCatId().getTopic();
+            tutorialName.put(topic.getTopicName(), temp.getTutorialId());
+
+        }
+
+        return tutorialName;
+    }
+
     /*********************************
      * Training_Module_View Start
      *********************************/

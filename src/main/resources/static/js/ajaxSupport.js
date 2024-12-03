@@ -2400,6 +2400,70 @@ var clipboard = new ClipboardJS('#copyButtonViewPage', {
 });
 
 
+
+	$("#categoryforPackage").change(function() {
+
+						var catgoryId = $(this).find(":selected").val();
+						var lanId = $("#languageIdforAssignTutorial").find(":selected").val();
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryAndLanguageforPackage",
+							data : {
+								"catId" : catgoryId,
+								"lanId" : lanId,
+								
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + value + '>'
+		  			               + key
+		  			               + '</option>';
+		  	  			        })
+	  	  			            html += '</option>';
+								$("#tutorialforPackage").prop('disabled',false);
+								$('#tutorialforPackage').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+
+
+ $(document).ready(function () {
+            const select = $('#tutorialforPackage');
+
+            // Handle clicks on options to toggle selection without Ctrl key
+            select.on('mousedown', 'option', function (e) {
+                e.preventDefault();
+                const option = $(this);
+                option.prop('selected', !option.prop('selected'));
+            });
+
+            // Handle Ctrl+A for selecting/deselecting all options
+            $(document).keydown(function (e) {
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    const allOptions = select.find('option');
+                    const allSelected = allOptions.length === allOptions.filter(':selected').length;
+
+                    allOptions.prop('selected', !allSelected);
+                }
+            });
+        });
+
     
 /************************************Assign Video End ********************************************** */
 			
