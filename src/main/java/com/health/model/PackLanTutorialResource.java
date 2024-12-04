@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 
@@ -24,6 +25,9 @@ public class PackLanTutorialResource implements Serializable {
 
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
+
+    @Transient
+    private String indexVideoPath;
 
     @Column(name = "status", nullable = false)
     private boolean status = true;
@@ -54,6 +58,14 @@ public class PackLanTutorialResource implements Serializable {
 
     public Tutorial getTutorial() {
         return tutorial;
+    }
+
+    public String getIndexVideoPath() {
+        return indexVideoPath;
+    }
+
+    public void setIndexVideoPath(String indexVideoPath) {
+        this.indexVideoPath = indexVideoPath;
     }
 
     public void setTutorial(Tutorial tutorial) {
