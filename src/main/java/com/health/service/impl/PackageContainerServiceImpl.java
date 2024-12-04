@@ -39,4 +39,10 @@ public class PackageContainerServiceImpl implements PackageContainerService {
 
     }
 
+    @Override
+    public List<PackageContainer> findAllByStatus(boolean value) {
+
+        return repo.findAllByStatus(value);
+    }
+
 }

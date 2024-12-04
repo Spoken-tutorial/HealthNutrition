@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -165,6 +166,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_preRequistic")
     private User preRequiticUser;
+
+    @OneToMany(mappedBy = "tutorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<PackLanTutorialResource> PackLanTutorialResource = new HashSet<PackLanTutorialResource>();
 
     public User getPreRequiticUser() {
         return preRequiticUser;

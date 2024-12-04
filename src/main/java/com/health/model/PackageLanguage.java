@@ -45,6 +45,9 @@ public class PackageLanguage implements Serializable {
     @OneToMany(mappedBy = "packageLanguage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<TutorialWithWeekAndPackage> tutorialsWithWeekAndPack = new HashSet<TutorialWithWeekAndPackage>();
 
+    @OneToMany(mappedBy = "packageLanguage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<PackLanTutorialResource> PackLanTutorialResource = new HashSet<PackLanTutorialResource>();
+
     public Timestamp getDateAdded() {
         return dateAdded;
     }
@@ -105,6 +108,14 @@ public class PackageLanguage implements Serializable {
         }
         return new ArrayList<WeekTitleVideo>(weektitleSet);
 
+    }
+
+    public Set<PackLanTutorialResource> getPackLanTutorialResource() {
+        return PackLanTutorialResource;
+    }
+
+    public void setPackLanTutorialResource(Set<PackLanTutorialResource> packLanTutorialResource) {
+        PackLanTutorialResource = packLanTutorialResource;
     }
 
     public PackageLanguage(Timestamp dateAdded, PackageContainer packageContainer, Language lan) {

@@ -31,9 +31,12 @@ import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.health.config.ThymeleafService;
 import com.health.controller.AjaxController;
+import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Language;
+import com.health.model.PackLanTutorialResource;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
+import com.health.model.Topic;
 import com.health.model.TutorialWithWeekAndPackage;
 import com.health.model.VideoResource;
 import com.health.model.Week;
@@ -134,13 +137,16 @@ public class ZipCreationThreadService {
         List<WeekTitleVideo> weekTitleList = new ArrayList<>();
         List<VideoResource> videoResourceList = new ArrayList<>();
         List<TutorialWithWeekAndPackage> tutWithWeekAndPacagekList = new ArrayList<>();
+        List<PackLanTutorialResource> packLanTutorialResourceList = new ArrayList<>();
 
         PackageContainer packageContainer = packageContainerService.findByPackageName(originalPackageName);
 
         PackageLanguage packLan = packLanService.findByPackageContainerAndLan(packageContainer, langName);
         tutWithWeekAndPacagekList = new ArrayList<>(packLan.getTutorialsWithWeekAndPack());
+        packLanTutorialResourceList = new ArrayList<>(packLan.getPackLanTutorialResource());
 
         if (ServiceUtility.IsPackageAndLanZipExist(originalPackageName, langName, env)) {
+            logger.info("Zip Url Exist");
             zipUrl = ServiceUtility.getPackageAndLanZipPath(originalPackageName, langName, env);
 
         }
@@ -155,7 +161,8 @@ public class ZipCreationThreadService {
             }
 
             int countTutorial = videoResourceList.size();
-            if (countTutorial == 0) {
+            int countHealthTutorial = packLanTutorialResourceList.size();
+            if (countTutorial == 0 && countHealthTutorial == 0) {
                 zipUrl = "Error";
             }
 
@@ -212,6 +219,45 @@ public class ZipCreationThreadService {
 
                             // FileUtils.copyFile(sourceFile, destainationPath.toFile());
                             copyFileUsingRsync(sourcePathforThumbanil, destainationthumbnailPath);
+
+                        }
+
+                    } catch (Exception e) {
+
+                        logger.error("Exception: ", e);
+                    }
+
+                }
+                for (PackLanTutorialResource tempTutorial : packLanTutorialResourceList) {
+
+                    ContributorAssignedTutorial con = tempTutorial.getTutorial().getConAssignedTutorial();
+                    Topic topic = con.getTopicCatId().getTopic();
+                    String originalTopicName = topic.getTopicName();
+                    String topicName = originalTopicName.replace(' ', '_');
+                    int tutorialId = tempTutorial.getTutorial().getTutorialId();
+                    String tutorialIdString = Integer.toString(tutorialId);
+
+                    String tutorialPath1 = tempTutorial.getTutorial().getVideo();
+
+                    Path destInationDirectoryforTutorial = Paths.get(destInationDirectory1.toString(), File.separator,
+                            langName, File.separator, "Health Spoken", topicName, File.separator, tutorialIdString);
+                    try {
+                        ServiceUtility.createFolder(destInationDirectoryforTutorial);
+                    } catch (IOException e) {
+
+                        logger.error("Exception: ", e);
+                    }
+
+                    try {
+
+                        Path sourcePathofTutorial = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                tutorialPath1);
+                        Path destainationPath1 = destInationDirectoryforTutorial.resolve(topicName + ".mp4");
+
+                        File sourceFile1 = sourcePathofTutorial.toFile();
+                        if (sourceFile1.exists()) {
+
+                            copyFileUsingRsync(sourcePathofTutorial, destainationPath1);
 
                         }
 
@@ -341,6 +387,8 @@ public class ZipCreationThreadService {
         logger.info("localLan:{}", localLan);
 
         List<WeekTitleVideo> weekTitleVideoList = new ArrayList<>();
+        List<PackLanTutorialResource> packLanTutorialResourceList = new ArrayList<>();
+        List<Topic> topics = new ArrayList<>();
 
         if (packageId != 0) {
             PackageContainer packageContainer = packageContainerService.findByPackageId(packageId);
@@ -378,12 +426,29 @@ public class ZipCreationThreadService {
                         .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
                         .thenComparing(WeekTitleVideo::getTitle));
 
-                for (WeekTitleVideo temp : weekTitleVideoList) {
-                    logger.info(":{} : {} : {}", temp.getWeek().getWeekName(),
-                            temp.getVideoResource().getLan().getLangName(), temp.getTitle());
-                }
-
             }
+
+            List<PackLanTutorialResource> tempPackLanTutorialResourceList = new ArrayList<>(
+                    packLan.getPackLanTutorialResource());
+            for (PackLanTutorialResource tempTutorial : tempPackLanTutorialResourceList) {
+                ContributorAssignedTutorial con = tempTutorial.getTutorial().getConAssignedTutorial();
+                Topic topic = con.getTopicCatId().getTopic();
+                String originalTopicName = topic.getTopicName();
+                String topicName = originalTopicName.replace(' ', '_');
+                int tutorialId = tempTutorial.getTutorial().getTutorialId();
+                String tutorialIdString = Integer.toString(tutorialId);
+                Path sourcePathofTutorial = Paths.get(langName, File.separator, "Health Spoken", File.separator,
+                        topicName, File.separator, tutorialIdString, File.separator, topicName + ".mp4");
+
+                String videoPathofTutorial = sourcePathofTutorial.toString();
+                tempTutorial.setIndexVideoPath(videoPathofTutorial);
+                packLanTutorialResourceList.add(tempTutorial);
+                topics.add(topic);
+            }
+
+            packLanTutorialResourceList.sort(Comparator.comparing(tempTutorial -> tempTutorial.getTutorial()
+                    .getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+            topics.sort(Comparator.comparing(Topic::getTopicName));
 
         } else {
             weekTitleVideoList = weekTitleVideoService.findAll();
@@ -391,6 +456,9 @@ public class ZipCreationThreadService {
         }
 
         modelAttributes.put("weekTitleVideoList", weekTitleVideoList);
+        modelAttributes.put("packLanTutorialResourceList", packLanTutorialResourceList);
+        modelAttributes.put("topics", topics);
+        modelAttributes.put("languageForHealth", localLan);
 
         getPackageAndLanguageData(modelAttributes, weekName, langName, packageId);
         return modelAttributes;

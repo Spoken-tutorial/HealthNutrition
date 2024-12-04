@@ -589,6 +589,54 @@ public class AjaxController {
 
     }
 
+    @GetMapping("/enableDisablePacakgeAndPackLan")
+    public @ResponseBody boolean enableDisablePacakgeAndPackLan(int packLanId) {
+        PackageLanguage packLan = packLanService.findBypackageLanId(packLanId);
+
+        try {
+            if (packLan.isStatus()) {
+                packLan.setStatus(false);
+                packLanService.save(packLan);
+
+            } else {
+                packLan.setStatus(true);
+                packLanService.save(packLan);
+
+            }
+
+            PackageContainer packContainer = packLan.getPackageContainer();
+            Set<PackageLanguage> packLanList = packContainer.getPackageLanguages();
+
+            boolean flag = false;
+
+            for (PackageLanguage temp : packLanList) {
+                if (temp.getPackageLanId() == packLan.getPackageLanId()) {
+                    if (packLan.isStatus()) {
+                        flag = true;
+                    }
+                } else if (temp.isStatus()) {
+                    flag = true;
+                }
+            }
+
+            if (flag) {
+                packContainer.setStatus(true);
+            } else {
+                packContainer.setStatus(false);
+            }
+
+            packageContainerService.save(packContainer);
+
+            return true;
+
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale PacakgeAndPackLan: {}", packLan, e);
+            return false;
+        }
+
+    }
+
     @GetMapping("/enableDisableResearchPaper")
     public @ResponseBody boolean enableDisableResearchPaper(int id) {
         ResearchPaper res = researchPaperService.findById(id);
@@ -1080,6 +1128,28 @@ public class AjaxController {
             titleName.put(weekTitleVideo.getWeekTitleVideoId(), weekTitleVideo.getTitle());
 
         return titleName;
+    }
+
+    @RequestMapping("/loadTopicByCategoryAndLanguageforPackage")
+    public @ResponseBody TreeMap<String, Integer> loadTopicByCategoryAndLanguageforPackage(
+            @RequestParam(value = "catId") int catId, @RequestParam(value = "lanId") int lanId) {
+        TreeMap<String, Integer> tutorialName = new TreeMap<>();
+
+        Category cat = catService.findByid(catId);
+        Language lan = lanService.getById(lanId);
+        List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+        List<ContributorAssignedTutorial> con = conService.findAllByTopicCatAndLan(tcm, lan);
+
+        List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(con);
+
+        for (Tutorial temp : tutorials) {
+
+            Topic topic = temp.getConAssignedTutorial().getTopicCatId().getTopic();
+            tutorialName.put(topic.getTopicName(), temp.getTutorialId());
+
+        }
+
+        return tutorialName;
     }
 
     /*********************************

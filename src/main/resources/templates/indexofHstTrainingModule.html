@@ -61,6 +61,25 @@
 </nav>
 
   </header>
+  
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+	  
+	  				<li class="nav-item" th:if="${weekTitleVideoList != null}"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="home"
+						aria-selected="true">Training Module View</a></li>
+					
+					
+						
+					 <li class="nav-item" th:if="${packLanTutorialResourceList != null}"><a th:if="${viewSection !=false}" class="nav-link" id="topicView-tab" data-toggle="tab" 
+					 href="#hstview" role="tab" aria-controls="hstview" aria-selected="false">Health Spoken View</a></li>
+   
+
+
+				</ul>
+	
+	<div class="tab-content" id="myTabContent">	
+	<div class="tab-pane fade show active py-3" id="view"
+						role="tabpanel" aria-labelledby="home-tab" th:if="${weekTitleVideoList != null}">
  
   <div class="container">
 
@@ -108,7 +127,7 @@
 <table class="table table-striped" id="events_table">
   <thead>
     
-      <th>Video</th>
+      <th>Videos</th>
 	 
   </thead>
   <tbody>
@@ -147,6 +166,95 @@
 </section>
     
        </main>
+       
+	</div> 
+	
+	<div class="tab-pane fade py-3" id="hstview" role="tabpanel" aria-labelledby="topicView-tab" th:if="${packLanTutorialResourceList != null}">
+		
+		 <div class="container">
+
+
+
+<div class="row justify-content-center" style="width: 100%;">
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+            <select class="custom-select d-block form-control selectedValue" id="topicView" name="topic">            
+            
+              <option  value="">Select Topic</option>
+             
+              <option  th:each="topic : ${topics}"  th:value="${topic.getTopicName()}" th:text="${topic.getTopicName()}" ></option>
+            </select>
+          
+           
+</div>
+
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+<select class="custom-select d-block form-control" id="languageViewforHealth" name="languageViewforHealth">
+			 
+               <option value="">Select Language</option>
+              <option th:each="lan : ${languageForHealth}"  th:value="${lan.getLangName()}" th:text="${lan.getLangName()}"></option> 
+            </select>
+             
+            
+</div>
+
+ 
+     <div class="col-md-2 mb-3" style="width: 100%;">
+          <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearFormViewforHealth" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
+           
+     </div>
+     	      
+</div>
+
+</div>
+		
+<section>
+<div class="container-fluid">
+ <div class="row">
+ <div class="col">	
+
+<table class="table table-striped" id="health_table">
+  <thead>
+    
+      <th>Videos</th>
+	 
+  </thead>
+  <tbody>
+    <tr th:each="tempTutorial, iter1 : ${packLanTutorialResourceList}">
+      <td>
+        <div class="row t-wrapper mt-3">
+          <div class="col-md-6">
+            <div style="width: 100%; margin: auto;">
+              <video th:id="${'healthTutorialId' + tempTutorial.getTutorial().getTutorialId()}"
+                     controls style="width:100%!important;" class="vid1">
+                <source th:src="@{${tempTutorial.getIndexVideoPath()}}" type="video/mp4"></source>
+              </video>
+            </div>
+          </div>
+          <div class="col-md-6">
+			 
+            <h4 style="color: #014F7A;font-size: 1rem;" th:text="${tempTutorial.getTutorial().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
+           
+            <h6 style="color: #014F7A;font-size: 1rem;">   
+                <span th:text="${tempTutorial.getPackageLanguage().getLan().getLangName()}" class=""></span>
+            </h6>
+             
+          </div>
+        </div>
+      </td>
+            
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+    
+
+		
+	</div>
+       
+	</div>   
     
     <footer class="footer">
     <div class="text-center">	<p>Developed at IIT-Bombay</p>
@@ -232,6 +340,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+	var healthTable=$('#health_table').DataTable({ "ordering": false});
 		    	
 	   var table=  $('#events_table').DataTable({ "ordering": false});
 	   
@@ -262,6 +371,41 @@
             table.search(selectedWeek +" " + selectedLanguage ).draw();
             
         }
+        
+        
+        
+        $('#topicView').on('change', selectTopicLanguage);
+
+        
+        $('#languageViewforHealth').on('change',selectTopicLanguage);
+        
+       
+        $('#btnClearFormViewforHealth').on('click', function() {
+        clearFormViewforHealth();
+        selectTopicLanguage();
+    });
+        
+         function selectTopicLanguage() {
+		 var selectedLanguage = $('#languageViewforHealth').val();
+		 var selectedtopic = $('#topicView').val();
+		
+		   
+ 			if(selectedtopic!=""){
+			    selectedtopic='"' + selectedtopic + '"';
+		     }
+		     
+		   if(selectedLanguage!=""){
+			   selectedLanguage='"' + selectedLanguage + '"';
+		     }
+		     
+            healthTable.search(selectedtopic +" " + selectedLanguage ).draw();
+            
+        }
+        
+      function clearFormViewforHealth() {
+        $('#topicView').val('');
+        $('#languageViewforHealth').val('');
+    }
         
         
 	} );

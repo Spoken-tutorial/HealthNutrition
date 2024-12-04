@@ -103,6 +103,7 @@ import com.health.model.Language;
 import com.health.model.LiveTutorial;
 import com.health.model.LogManegement;
 import com.health.model.OrganizationRole;
+import com.health.model.PackLanTutorialResource;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
@@ -145,6 +146,7 @@ import com.health.service.LanguageService;
 import com.health.service.LiveTutorialService;
 import com.health.service.LogMangementService;
 import com.health.service.OrganizationRoleService;
+import com.health.service.PackLanTutorialResourceService;
 import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
@@ -213,6 +215,9 @@ public class HomeController {
 
     @Autowired
     private SpokenVideoService spokenVideoService;
+
+    @Autowired
+    private PackLanTutorialResourceService packLanTutorialResourceService;
 
     @Autowired
     private AjaxController ajaxController;
@@ -733,7 +738,7 @@ public class HomeController {
     }
 
     private void getPackageAndLanguageData(Model model, String weekId, String lanId) {
-        List<PackageContainer> packageList = packLanService.findAllDistinctPackageContainers();
+        List<PackageContainer> packageList = packLanService.findAllDistinctEnabledPackageContainers();
         model.addAttribute("packageList", packageList);
 
         ArrayList<Map<String, String>> arlist = ajaxController.getLanguageByWeek(weekId, lanId, null);
@@ -4438,10 +4443,13 @@ public class HomeController {
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
-        List<VideoResource> videoList = videoResourceService.findAll();
+        // List<VideoResource> videoList = videoResourceService.findAll();
 
-        List<Language> languages = videoList.stream().map(VideoResource::getLan).collect(Collectors.toSet()).stream()
-                .collect(Collectors.toList());
+        // List<Language> languages =
+        // videoList.stream().map(VideoResource::getLan).collect(Collectors.toSet()).stream()
+        // .collect(Collectors.toList());
+
+        List<Language> languages = getLanguages();
 
         languages.sort(Comparator.comparing(Language::getLangName));
 
@@ -4453,7 +4461,8 @@ public class HomeController {
         packageList.sort(Comparator.comparing(PackageContainer::getPackageName));
 
         List<PackageLanguage> packLanList = packLanService.findAll();
-
+        List<Category> categories = getCategories();
+        model.addAttribute("categories", categories);
         model.addAttribute("weekList", weekList);
         model.addAttribute("packageList", packageList);
         model.addAttribute("packLanList", packLanList);
@@ -4468,6 +4477,7 @@ public class HomeController {
     public String createPackagePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "packageContainerId") int packageContainerId,
             @RequestParam(name = "packageName") String packageName, @RequestParam(name = "languageId") int languageId,
+            @RequestParam(name = "tutorialforPackage") int[] tutorialIds,
             @RequestParam("weekName") List<Integer> weekIds, @RequestParam(name = "videoName") List<Integer> videoIds,
             @RequestParam(name = "title") List<String> titles) {
 
@@ -4557,6 +4567,17 @@ public class HomeController {
             // weekTitleVideoService.saveAll(weekTitles);
             // tutorialWithWeekAndPackageService.saveAll(tutorialWithWeekAndPackages);
 
+            List<PackLanTutorialResource> packLanTutorialResourceList = new ArrayList<>();
+            for (int j = 0; j < tutorialIds.length; j++) {
+                Tutorial tutorial = tutService.findByTutorialId(tutorialIds[j]);
+                PackLanTutorialResource temp = new PackLanTutorialResource(dateAdded, tutorial, packageLanguage);
+
+                packLanTutorialResourceList.add(temp);
+            }
+
+            if (packLanTutorialResourceList.size() > 0)
+                packLanTutorialResourceService.saveAll(packLanTutorialResourceList);
+
         } catch (Exception e) {
             model.addAttribute("error_msg", "Some errors occurred, please contact the Admin");
             logger.error("Error:", e);
@@ -4609,11 +4630,6 @@ public class HomeController {
                 .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
                 .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
                 .thenComparing(WeekTitleVideo::getTitle));
-
-        for (WeekTitleVideo temp : weekTitleVideoList) {
-            logger.info(":{} : {} : {}", temp.getWeek().getWeekName(), temp.getVideoResource().getLan().getLangName(),
-                    temp.getTitle());
-        }
 
         model.addAttribute("userInfo", usr);
 
