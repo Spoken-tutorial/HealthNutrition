@@ -98,7 +98,10 @@
           </div>
           <div class="col-md-6">
 			<a th:id="${'hstTrainingVideoViewUrl' + iter.index}" th:href="@{'/hstTrainingModuleView/' + ${temp.getWeekTitleVideoId()} + '/'}" style="display: block;"> 
-            <h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${temp.getWeek().getWeekName()}"></h4>
+            <h4 >
+				<span style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${temp.getWeek().getWeekName() +':'}"></span> 
+				<span th:if="${temp.getVideoResource().getSessionName()!=null}" style="color: #014F7A;font-size: 1rem;" th:text="${ temp.getVideoResource().getSessionName()}"></span>
+			</h4>
             <h6 style="color: #014F7A;font-size: 1rem;">
               <i><span th:text="'Title: ' + ${temp.getTitle()}"></span></i>
                
