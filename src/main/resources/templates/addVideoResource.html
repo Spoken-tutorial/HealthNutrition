@@ -109,6 +109,7 @@ font-weight:bold!important;
 								<tr>
 									<th scope="col">Date Added</th>
 									<th scope="col">FileName</th>
+									<th scope="col">Session</th>
 									<th scope="col">Language</th>
 									<th scope="col">Video</th>
 									<th scope="col">Thumbnail</th>
@@ -119,6 +120,7 @@ font-weight:bold!important;
 								<tr th:each="videoResource : ${videoResourceList}">
 								 <td scope="row"><span th:text = "${videoResource.getDateAdded()}"></span></td>
 								 <td><span th:text = "${videoResource.getFileName()}"></span></td>
+								  <td><span th:text = "${videoResource.getSessionName()}"></span></td>
 							     <td><span th:text = "${videoResource.getLan().getLangName()}"></span></td>
 							      <td>
 							      	<div th:if="${videoResource.getVideoPath() != 'null'}"
