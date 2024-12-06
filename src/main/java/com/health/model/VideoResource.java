@@ -32,6 +32,9 @@ public class VideoResource implements Serializable {
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
+    @Column(name = "session_name")
+    private String SessionName;
+
     @Column(name = "video_path", nullable = false, unique = true)
     private String videoPath;
 
@@ -82,6 +85,14 @@ public class VideoResource implements Serializable {
 
     public Language getLan() {
         return lan;
+    }
+
+    public String getSessionName() {
+        return SessionName;
+    }
+
+    public void setSessionName(String sessionName) {
+        SessionName = sessionName;
     }
 
     public void setLan(Language lan) {

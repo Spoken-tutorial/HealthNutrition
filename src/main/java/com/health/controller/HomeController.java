@@ -4724,6 +4724,7 @@ public class HomeController {
 
                         if (weekTitleVideo == null) {
                             weekTitleVideo = new WeekTitleVideo(titles.get(i), dateAdded, week, video);
+                            weekTitleVideo.setUser(usr);
 
                             weekTitleVideoService.save(weekTitleVideo); // Save the weekTitle before using it
                             // weekTitles.add(weekTitle);
@@ -4869,6 +4870,8 @@ public class HomeController {
         weekTitleVideoList.sort(Comparator
                 .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
                 .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                .thenComparing(Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
+                        Comparator.nullsLast(Comparator.naturalOrder())))
                 .thenComparing(WeekTitleVideo::getTitle));
 
         model.addAttribute("userInfo", usr);

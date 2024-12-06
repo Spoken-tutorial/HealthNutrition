@@ -424,6 +424,9 @@ public class ZipCreationThreadService {
                         .comparingInt(
                                 (WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
                         .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                        .thenComparing(
+                                Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
+                                        Comparator.nullsLast(Comparator.naturalOrder())))
                         .thenComparing(WeekTitleVideo::getTitle));
 
             }
