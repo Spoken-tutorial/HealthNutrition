@@ -16,7 +16,7 @@
 			<div class="my-2 title">
 				<h1 th:if="${foundVideo }">
 					<span
-						th:text="${weekTitleVideo.getWeek().getWeekName()}">
+						th:text="${weekTitleVideo.getWeek().getWeekName()+': '+ weekTitleVideo.getVideoResource().getSessionName()}">
 					</span> &nbsp; <span
 						th:text="'Title: ' + ${weekTitleVideo.getTitle()}"
 						style="color: black;"> (Title)</span>&nbsp; <span
@@ -77,7 +77,7 @@
 							
 								<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >
 								
-								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${temp.getWeek().getWeekName()}"> </span> &nbsp; <span th:text="'Title: ' + ${temp.getTitle()}"></span> &nbsp; <span th:text="${temp.getVideoResource().getLan().getLangName()}" class=""></span> </span></h4>
+								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span style="color: #014F7A;" th:text="${temp.getWeek().getWeekName() + ': ' + temp.getVideoResource().getSessionName()}"> </span> &nbsp; <span th:text="'Title: ' + ${temp.getTitle()}"></span> &nbsp; <span th:text="${temp.getVideoResource().getLan().getLangName()}" class=""></span> </span></h4>
 								
 							</div>
 					</a>
@@ -104,7 +104,7 @@
 							
 							<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >
 								
-								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span th:text="${temp.getWeek().getWeekName()}"></span> &nbsp;<span th:text="'Title: ' + ${temp.getTitle()}"></span> &nbsp;<span th:text="${temp.getVideoResource().getLan().getLangName()}" class=""></span> </span></h4>
+								<h4 style="width:100%;"><span ><i class="far fa-play-circle mr-3" style="color:#1C7871; "></i><span style="color: #014F7A;" th:text="${temp.getWeek().getWeekName()+ ': ' + temp.getVideoResource().getSessionName()}"></span> &nbsp;<span th:text="'Title: ' + ${temp.getTitle()}"></span> &nbsp;<span th:text="${temp.getVideoResource().getLan().getLangName()}" class=""></span> </span></h4>
 								
 							</div>
 					</a>

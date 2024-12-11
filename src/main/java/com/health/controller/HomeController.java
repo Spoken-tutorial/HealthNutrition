@@ -4912,8 +4912,18 @@ public class HomeController {
 
             }
 
-            if (relatedweekTitleVideoList != null && relatedweekTitleVideoList.size() > 0)
+            if (relatedweekTitleVideoList != null && relatedweekTitleVideoList.size() > 0) {
+                relatedweekTitleVideoList.sort(Comparator
+                        .comparingInt(
+                                (WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                        .thenComparing(
+                                Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
+                                        Comparator.nullsLast(Comparator.naturalOrder())))
+                        .thenComparing(WeekTitleVideo::getTitle));
+
                 model.addAttribute("relatedweekTitleVideoList", relatedweekTitleVideoList);
+            }
+
             model.addAttribute("weekTitleVideo", weekTitleVideo);
         }
         model.addAttribute("foundVideo", foundVideo);
