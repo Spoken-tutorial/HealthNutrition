@@ -177,6 +177,10 @@ public class User implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
+    private Set<WeekTitleVideo> weekTitleVideos = new HashSet<WeekTitleVideo>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Topic> topics = new HashSet<Topic>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -258,6 +262,14 @@ public class User implements UserDetails, Serializable {
 
     public void setSpokenvideos(Set<SpokenVideo> spokenvideos) {
         this.spokenvideos = spokenvideos;
+    }
+
+    public Set<WeekTitleVideo> getWeekTitleVideos() {
+        return weekTitleVideos;
+    }
+
+    public void setWeekTitleVideos(Set<WeekTitleVideo> weekTitleVideos) {
+        this.weekTitleVideos = weekTitleVideos;
     }
 
     @Override

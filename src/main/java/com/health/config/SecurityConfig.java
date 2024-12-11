@@ -90,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addPreRequisticWhenNotRequired/**", "/addPreRequistic/**", "/addVideo/**", "/addSlide/**",
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
-            "/createPackage",
+            "/createPackage", "/packageName/edit/**", "/updatePackageName",
 
     };
 
@@ -149,9 +149,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/addBrochure/**", "/addCarousel/**", "/addConsultant/**", "/addEvent/**",
                         "/addTestimonial/**", "/addPromoVideo/**", "/addResearchPaper/**", "/brochure/edit/**",
                         "/promoVideo/edit/**", "/carousel/edit/**", "/event/edit/**", "/testimonial/edit/**",
-
-                        "/researchPaper/edit/**", "/enableDisableBrouchure/**", "/enableDisableConsultant/**",
-                        "/enableDisableTestimonial/**", "/addCitation/**", "/citation/edit/**")
+                        "/createPackage", "/packageName/edit/**", "/updatePackageName", "/researchPaper/edit/**",
+                        "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**",
+                        "/addCitation/**", "/citation/edit/**")
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
 

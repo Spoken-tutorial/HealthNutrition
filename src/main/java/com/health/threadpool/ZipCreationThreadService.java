@@ -185,10 +185,10 @@ public class ZipCreationThreadService {
 
                     String tutorialPath = temp.getVideoResource().getVideoPath();
                     String thumbnailPath = temp.getVideoResource().getThumbnailPath();
-                    String weekTitleVideoString = Integer.toString(temp.getWeekTitleVideoId());
+                    String sessionName = temp.getVideoResource().getSessionName();
 
                     Path destInationDirectoryforLanAndWeek = Paths.get(destInationDirectory1.toString(), File.separator,
-                            langName, File.separator, weekName, File.separator, weekTitleVideoString);
+                            langName, File.separator, weekName, File.separator, sessionName);
                     try {
                         ServiceUtility.createFolder(destInationDirectoryforLanAndWeek);
                     } catch (IOException e) {
@@ -398,19 +398,19 @@ public class ZipCreationThreadService {
             if (tutWithWeekAndPacagekList.size() > 0) {
                 for (TutorialWithWeekAndPackage temp : tutWithWeekAndPacagekList) {
                     WeekTitleVideo weekTitleVideo = temp.getWeekTitle();
-                    int weekTitleVideoId = weekTitleVideo.getWeekTitleVideoId();
-                    String weekTitleVideoString = Integer.toString(weekTitleVideoId);
+
+                    String sessionName = weekTitleVideo.getVideoResource().getSessionName();
                     String title = weekTitleVideo.getTitle().replace(' ', '_');
                     String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
 
-                    Path sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator,
-                            weekTitleVideoString, File.separator, title + ".mp4");
+                    Path sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator, sessionName,
+                            File.separator, title + ".mp4");
 
                     String videoPath = sourcePath.toString();
                     weekTitleVideo.setIndexVideoPath(videoPath);
 
                     Path sourcePathforThumbnail = Paths.get(langName, File.separator, weekNameTemp, File.separator,
-                            weekTitleVideoString, File.separator, "thumbnail.jpg");
+                            sessionName, File.separator, "thumbnail.jpg");
 
                     String thumnailPath = sourcePathforThumbnail.toString();
                     String thumbnail = ServiceUtility.convertFilePathToUrl(thumnailPath);
@@ -424,6 +424,9 @@ public class ZipCreationThreadService {
                         .comparingInt(
                                 (WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
                         .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                        .thenComparing(
+                                Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
+                                        Comparator.nullsLast(Comparator.naturalOrder())))
                         .thenComparing(WeekTitleVideo::getTitle));
 
             }

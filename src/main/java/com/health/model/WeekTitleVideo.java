@@ -48,6 +48,10 @@ public class WeekTitleVideo implements Serializable {
     private Week week;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne
     @JoinColumn(name = "video_resource_id", nullable = false)
     private VideoResource videoResource;
 
@@ -121,6 +125,14 @@ public class WeekTitleVideo implements Serializable {
     public WeekTitleVideo() {
         super();
 
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Set<TutorialWithWeekAndPackage> getTutorialsWithWeekAndPack() {

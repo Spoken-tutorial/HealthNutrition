@@ -256,6 +256,7 @@ font-weight:bold!important;
 								<tr>
 									<th scope="col">Date Added</th>
 									<th scope="col">Package</th>
+									<th scope="col">Action</th>
 									<th scope="col">Language</th>
 									<th scope="col">Enable/Disable</th>
 									<th scope="col">WeekTitleVideo</th>
@@ -267,6 +268,7 @@ font-weight:bold!important;
 								<tr th:each="temp : ${packLanList}">
 								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
 								 <td><span th:text = "${temp.getPackageContainer().getPackageName()}"></span></td>
+								  <td><a th:href="@{${'/packageName/edit/' + temp.getPackageContainer().getPackageId()}}">Edit</a></td>
 							      <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
 							       <td>
 	  		
@@ -316,6 +318,7 @@ font-weight:bold!important;
 								<tr>
 									<th scope="col">Date Added</th>
 									<th scope="col">Package</th>
+									<th scope="col">Action</th>
 									<th scope="col">Language</th>
 									
 									<th scope="col">Tutorial</th>
@@ -327,6 +330,7 @@ font-weight:bold!important;
 								<tr th:each="temp : ${packLanList}">
 								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
 								 <td><span th:text = "${temp.getPackageContainer().getPackageName()}"></span></td>
+								   <td><a th:href="@{${'/packageName/edit/' + temp.getPackageContainer().getPackageId()}}">Edit</a></td>
 							      <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
 							      
 							
