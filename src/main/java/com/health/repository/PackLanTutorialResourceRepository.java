@@ -21,4 +21,6 @@ public interface PackLanTutorialResourceRepository extends JpaRepository<PackLan
     @Query("SELECT ptr FROM PackLanTutorialResource ptr WHERE ptr.packageLanguage = :packageLanguage")
     List<PackLanTutorialResource> findByPackageLanguage(@Param("packageLanguage") PackageLanguage packageLanguage);
 
+    List<PackLanTutorialResource> findByTutorialAndPackageLanguage(Tutorial tutorial, PackageLanguage packageLanguage);
+
 }

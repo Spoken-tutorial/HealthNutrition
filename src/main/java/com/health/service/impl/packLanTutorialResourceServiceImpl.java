@@ -48,4 +48,10 @@ public class packLanTutorialResourceServiceImpl implements PackLanTutorialResour
 
     }
 
+    @Override
+    public List<PackLanTutorialResource> findResourcesByTutorialAndPackageLanguage(Tutorial tutorial,
+            PackageLanguage packageLanguage) {
+        return repo.findByTutorialAndPackageLanguage(tutorial, packageLanguage);
+    }
+
 }

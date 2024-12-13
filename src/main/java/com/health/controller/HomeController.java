@@ -4655,7 +4655,7 @@ public class HomeController {
     public String createPackagePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "packageContainerId") int packageContainerId,
             @RequestParam(name = "packageName") String packageName, @RequestParam(name = "languageId") int languageId,
-            @RequestParam(name = "tutorialforPackage") int[] tutorialIds,
+            @RequestParam(name = "tutorialforPackage") Optional<int[]> tutorialIds,
             @RequestParam("weekName") List<Integer> weekIds, @RequestParam(name = "videoName") List<Integer> videoIds,
             @RequestParam(name = "title") List<String> titles) {
 
@@ -4709,9 +4709,7 @@ public class HomeController {
         List<TutorialWithWeekAndPackage> tutorialWithWeekAndPackages = new ArrayList<>();
 
         try {
-            logger.info("WeekIds Size:{} ", weekIds.size());
-            logger.info("VideoIds Size:{}", videoIds.size());
-            logger.info("Title Size:{}", titles.size());
+
             for (int i = 0; i < weekIds.size(); i++) {
                 if (i < titles.size())
                     logger.info("Title: {}", titles.get(i));
@@ -4743,15 +4741,22 @@ public class HomeController {
 
                 }
             }
-            // weekTitleVideoService.saveAll(weekTitles);
-            // tutorialWithWeekAndPackageService.saveAll(tutorialWithWeekAndPackages);
 
             List<PackLanTutorialResource> packLanTutorialResourceList = new ArrayList<>();
-            for (int j = 0; j < tutorialIds.length; j++) {
-                Tutorial tutorial = tutService.findByTutorialId(tutorialIds[j]);
-                PackLanTutorialResource temp = new PackLanTutorialResource(dateAdded, tutorial, packageLanguage);
+            if (tutorialIds != null && tutorialIds.isPresent() && tutorialIds.get().length > 0) {
+                for (int j = 0; j < tutorialIds.get().length; j++) {
+                    Tutorial tutorial = tutService.findByTutorialId(tutorialIds.get()[j]);
+                    List<PackLanTutorialResource> existingTutorials = packLanTutorialResourceService
+                            .findResourcesByTutorialAndPackageLanguage(tutorial, packageLanguage);
 
-                packLanTutorialResourceList.add(temp);
+                    if (existingTutorials == null || existingTutorials.size() < 1) {
+                        PackLanTutorialResource temp = new PackLanTutorialResource(dateAdded, tutorial,
+                                packageLanguage);
+
+                        packLanTutorialResourceList.add(temp);
+                    }
+
+                }
             }
 
             if (packLanTutorialResourceList.size() > 0)

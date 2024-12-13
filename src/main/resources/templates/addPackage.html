@@ -151,9 +151,9 @@ font-weight:bold!important;
 											<div class="row">
 											<div class="col-md-4">
 											<div class="form-group">
-											<label for="categoryforPackage">Select Category * </label> <select
+											<label for="categoryforPackage">Select Category </label> <select
 												id="categoryforPackage" class="form-control"
-												name="categoryforPackage" required="required" >
+												name="categoryforPackage" >
 	
 												<option value="0">Select any one category</option>
 												
@@ -170,10 +170,10 @@ font-weight:bold!important;
 											<div class="form-group">
 											<span>To select all topics press ctrl + A keys. </span>
 											<br>
-											<label for="tutorialforPackage">Select Topic * </label> 
+											<label for="tutorialforPackage">Select Topic  </label> 
 											<select
 												id="tutorialforPackage" class="form-control" name="tutorialforPackage"
-												required="required" size="15" multiple="multiple">
+												 size="15" multiple="multiple">
 												
 										   </select>
 										   </div>
@@ -206,7 +206,7 @@ font-weight:bold!important;
 								            <div class="col-md-4">
 										      
 										        <div class="form-group">
-												<label th:if="${iter.index == 0}"  th:for="${'video' + iter.index}">Video*  </label>
+												<label th:if="${iter.index == 0}"  th:for="${'video' + iter.index}">Video  </label>
 												<select th:id="${'videoId' + iter.index}" class="form-control video-select" name="videoName"  th:data-index="${iter.index}">
 												 <option value="0">Select Video</option>	</select>
 												</div>

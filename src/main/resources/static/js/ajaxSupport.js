@@ -317,7 +317,7 @@ $(document).ready(function() {
 			
 				$.ajax({
 					type : "GET",
-					url : projectPath+"enableDisablePacakgeAndPackLan",
+					url : projectPath+"enableDisablePacakgeLanguage",
 					data : {
 						"packLanId" : test_id
 					},
@@ -352,7 +352,7 @@ $(document).ready(function() {
 			
 				$.ajax({
 					type : "GET",
-					url : projectPath+"enableDisablePacakgeAndPackLan",
+					url : projectPath+"enableDisablePacakgeLanguage",
 					data : {
 						"packLanId" : test_id
 					},

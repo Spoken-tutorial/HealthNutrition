@@ -24,4 +24,6 @@ public interface PackageLanguageService {
 
     List<PackageLanguage> findAllByStatus(boolean value);
 
+    List<Language> findAllEnabledLanguagesByPackageContainer(PackageContainer packageContainer);
+
 }
