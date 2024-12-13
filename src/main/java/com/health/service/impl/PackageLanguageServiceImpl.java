@@ -65,4 +65,10 @@ public class PackageLanguageServiceImpl implements PackageLanguageService {
         return packageList;
     }
 
+    @Override
+    public List<Language> findAllEnabledLanguagesByPackageContainer(PackageContainer packageContainer) {
+
+        return repo.findAllEnabledLanguagesByPackageContainer(packageContainer);
+    }
+
 }

@@ -589,7 +589,7 @@ public class AjaxController {
 
     }
 
-    @GetMapping("/enableDisablePacakgeAndPackLan")
+    @GetMapping("/enableDisablePacakgeLanguage")
     public @ResponseBody boolean enableDisablePacakgeAndPackLan(int packLanId) {
         PackageLanguage packLan = packLanService.findBypackageLanId(packLanId);
 
@@ -597,37 +597,14 @@ public class AjaxController {
             if (packLan.isStatus()) {
                 packLan.setStatus(false);
                 packLanService.save(packLan);
+                return true;
 
             } else {
                 packLan.setStatus(true);
                 packLanService.save(packLan);
+                return true;
 
             }
-
-            PackageContainer packContainer = packLan.getPackageContainer();
-            Set<PackageLanguage> packLanList = packContainer.getPackageLanguages();
-
-            boolean flag = false;
-
-            for (PackageLanguage temp : packLanList) {
-                if (temp.getPackageLanId() == packLan.getPackageLanId()) {
-                    if (packLan.isStatus()) {
-                        flag = true;
-                    }
-                } else if (temp.isStatus()) {
-                    flag = true;
-                }
-            }
-
-            if (flag) {
-                packContainer.setStatus(true);
-            } else {
-                packContainer.setStatus(false);
-            }
-
-            packageContainerService.save(packContainer);
-
-            return true;
 
         } catch (Exception e) {
 
@@ -1066,12 +1043,12 @@ public class AjaxController {
         PackageContainer packageContainer = packageContainerService.findByPackageId(packageId);
         List<Language> languages = new ArrayList<>();
         if (packageContainer != null) {
-            languages = packLanService.findAllLanguagesByPackageContainer(packageContainer);
+            languages = packLanService.findAllEnabledLanguagesByPackageContainer(packageContainer);
         }
 
         if (languages.size() > 0) {
             for (Language lan : languages) {
-                logger.info("lan:{}", lan.getLangName());
+
                 langName.put(lan.getLanId(), lan.getLangName());
 
             }
