@@ -112,7 +112,7 @@
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
 			
 			
-					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()} + '/' + ${category} +'/' + ${topic} +'/' + ${language} +'/' + 'q' +'/'} " class="col-12">
+					<a th:href="@{'/tutorial_view/'  +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}   +'/' + ${tutorial.getTutorialId()} +'/' + 'q' +'/'} " class="col-12">
 						
 							
 							
@@ -131,9 +131,9 @@
 				</div>
 			</div>
 		</section>
-		<section th:if="${tutorial.getPreRequistic() != null}"><p>Watch pre-requisite : <a th:href="@{'/tutorialView/'+ ${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getPreRequistic().getConAssignedTutorial().getLan().getLangName()}+ '/' +${query} +'/'}">
-		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span> :
-		<span th:text="${tutorial.getPreRequistic().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span>
+		<section th:if="${preRequisticTutrial != null }"><p>Watch pre-requisite : <a th:href="@{'/tutorial_view/'  +${preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${preRequisticTutrial.getConAssignedTutorial().getLan().getLangName()}+ '/' +${preRequisticTutrial.getTutorialId()} + '/' + 'q' +'/'}">
+		<span th:text="${preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span> :
+		<span th:text="${preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span>
 		</a></p></section>
 		<section><p> User Visit : <span th:text="${tutorial.getUserVisit()}"/></p></section>
 		<section><div class="col-md-8" id="scrolling-captions" style="max-height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #ccc;"></div>
@@ -222,7 +222,7 @@
 				<h5 class="main-color">Related Videos (<span th:text="${tutorial.getConAssignedTutorial().getLan().getLangName()}"/>)</h5>
 					<div class="t-related">
 					<div class="row rel-vid-b mb-2" th:each="tutorial : ${tutorials}" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
-					<a th:href="@{'/tutorialView/'+ ${tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()} + '/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}  +'/'+ ${category} +'/' + ${topic} +'/' + ${language} +'/' + 'q' +'/'}" class="col-12">
+					<a th:href="@{'/tutorial_view/' +${tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${tutorial.getConAssignedTutorial().getLan().getLangName()}  +'/' + ${tutorial.getTutorialId()} +'/' + 'q' +'/'}" class="col-12">
 						
 							
 							<div class="col-md-12" style="padding-top:6px; padding-left:0px; padding-right:0px;" >

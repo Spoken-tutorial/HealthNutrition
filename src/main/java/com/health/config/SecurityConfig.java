@@ -43,19 +43,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/showListTutorial", "/viewVideo/view/{id}", "viewVideoList/view/{id}", "/showListConsultants",
             "/categories", "/showEvent", "/eventDetails", "/listTopicsByCategory", "/listLangByCategoryTopic",
             "/testimonialList", "/brochures", "/researchPapers", "/fonts/**", "/eventDetails/**", "/tutorialView/**",
-            "/getConsultantDetails/**", "/reset/**", "/resetPassword/**", "/getCatAndLan/**", "/getTopicOnCatAndLan/**",
-            "/getRolesOnCatLanUser/**", "/getTutorial/**", "/statistics", "/statistics/**", "/tutCountOnCat/**",
-            "/tutCountOnLan/**", "/cdContentInfo/**", "/getContributorByTutLanUser/**", "/showConsultant/**",
-            "/showLanguages/**", "/unpublishTutorial/**", "/loadTopicByCategory/**", "/loadLanguageByCategoryTopic/**",
-            "/loadTopicAndLanguageByCategory/**", "/loadCategoryAndLanguageByTopic/**",
-            "/loadCategoryAndTopicByLanguage/**", "/tutorialsSearch/**", "/tutorialsSearch1/**", "/checkTutorial/**",
-            "/Slide/**", "/TimeScript/**", "/OriginalScript/**", "/Brochure-English/**", "/Brochure/**",
-            "/ResearchPaper/**", "/downloads", "/loadLanguageByCategoryResource", "/autosuggest/**",
-            "/loadLanguageAndTopicByCategoryResource", "/loadTutorialCountByTopicAndLanguage",
-            "/loadTutorialCountByTopics", "/downloadResources", "/citations", "/api/scriptPublished/**",
-            "/loadLanguageByPackage/**", "/promoVideoView/**", "/trainingModules/**", "/downloadTrainingModules",
-            "/loadMessageByPackageAndLan/**", "/loadLanguageByWeek/**", "/loadWeekByLanguage/**",
-            "/trainingTutorials/**", "/hstTrainingModuleView/**", "/downloadManager/**" };
+            "/tutorial_view/**", "/getConsultantDetails/**", "/reset/**", "/resetPassword/**", "/getCatAndLan/**",
+            "/getTopicOnCatAndLan/**", "/getRolesOnCatLanUser/**", "/getTutorial/**", "/statistics", "/statistics/**",
+            "/tutCountOnCat/**", "/tutCountOnLan/**", "/cdContentInfo/**", "/getContributorByTutLanUser/**",
+            "/showConsultant/**", "/showLanguages/**", "/unpublishTutorial/**", "/loadTopicByCategory/**",
+            "/loadLanguageByCategoryTopic/**", "/loadTopicAndLanguageByCategory/**",
+            "/loadCategoryAndLanguageByTopic/**", "/loadCategoryAndTopicByLanguage/**", "/tutorialsSearch/**",
+            "/tutorialsSearch1/**", "/checkTutorial/**", "/Slide/**", "/TimeScript/**", "/OriginalScript/**",
+            "/Brochure-English/**", "/Brochure/**", "/ResearchPaper/**", "/downloads",
+            "/loadLanguageByCategoryResource", "/autosuggest/**", "/loadLanguageAndTopicByCategoryResource",
+            "/loadTutorialCountByTopicAndLanguage", "/loadTutorialCountByTopics", "/downloadResources", "/citations",
+            "/api/scriptPublished/**", "/loadLanguageByPackage/**", "/promoVideoView/**", "/trainingModules/**",
+            "/downloadTrainingModules", "/loadMessageByPackageAndLan/**", "/loadLanguageByWeek/**",
+            "/loadWeekByLanguage/**", "/trainingTutorials/**", "/hstTrainingModuleView/**", "/downloadManager/**" };
 
     /**
      * url matcher for SUPERADMIN

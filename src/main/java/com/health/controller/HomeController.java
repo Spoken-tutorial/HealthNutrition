@@ -1644,6 +1644,184 @@ public class HomeController {
         return "tutorial";
     }
 
+    @GetMapping("/tutorial_view/{topicName}/{language}/{tutId}/{query}/")
+    public String viewTutorialByTutorialId(HttpServletRequest req, @PathVariable(name = "topicName") String topic,
+            @PathVariable(name = "language") String lan,
+
+            @PathVariable(name = "tutId") int tutId,
+
+            @PathVariable(name = "query") String query, Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        if (query.equals("q")) {
+            query = "";
+        }
+        logger.info("Tutorial Id:{}", tutId);
+        Tutorial tutorial = tutService.findByTutorialId(tutId);
+
+        List<Tutorial> relatedTutorial = new ArrayList<>();
+
+        if (tutorial == null || tutorial.isStatus() == false) {
+            logger.info("Tutorial:{}", tutorial);
+            if (tutorial != null)
+                logger.info("Tutorial Status:{}", tutorial.isStatus());
+
+            return "redirect:/";
+        }
+
+        tutorial.setUserVisit(tutorial.getUserVisit() + 1);
+        tutService.save(tutorial);
+        // Caption Start
+        ContributorAssignedTutorial con = tutorial.getConAssignedTutorial();
+        TopicCategoryMapping tcm = con.getTopicCatId();
+        Language language = con.getLan();
+        int lanId = language.getLanId();
+        String langName = language.getLangName();
+        Category cat = tcm.getCat();
+        int catId = cat.getCategoryId();
+        Topic topic1 = tcm.getTopic();
+        int topicId = topic1.getTopicId();
+        model.addAttribute("category", catId);
+        model.addAttribute("language", lanId);
+        model.addAttribute("topic", topicId);
+        model.addAttribute("tutorialId", tutId);
+
+        if (!langName.equals("English")) {
+
+            Language lanEnglish = lanService.getByLanName("English");
+
+            ContributorAssignedTutorial conTutforEnglish = conService.findByTopicCatAndLanViewPart(tcm, lanEnglish);
+
+            List<Tutorial> tempTutorialsforEnglish = tutService
+                    .findAllByContributorAssignedTutorialEnabled(conTutforEnglish);
+            if (tempTutorialsforEnglish == null || tempTutorialsforEnglish.size() == 0) {
+                return "redirect:/";
+
+            }
+
+            Tutorial tutorialforEnglish = tempTutorialsforEnglish.get(0);
+            Path vttPathforEnglish = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                    CommonData.uploadDirectoryTimeScriptvttFile, tutorialforEnglish.getTutorialId() + ".vtt");
+            String tempStringEnglish = vttPathforEnglish.toString();
+            int indexToStart1 = tempStringEnglish.indexOf("Media");
+
+            String vttFileforEnglish = tempStringEnglish.substring(indexToStart1, tempStringEnglish.length());
+            logger.info("vttFileforEnglish:{}", vttFileforEnglish);
+            model.addAttribute("vttFileforEnglish", vttFileforEnglish);
+            model.addAttribute("labelforEnglish", "English");
+
+            String languageCodeforEnglish = getLanguageCode("English");
+            model.addAttribute("srclangforEnglish", languageCodeforEnglish);
+
+        }
+        Path srtPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryTimeScriptvttFile, tutorial.getTutorialId() + ".vtt");
+        String tempString = srtPath.toString();
+        int indexToStart = tempString.indexOf("Media");
+
+        String vttFile = tempString.substring(indexToStart, tempString.length());
+        logger.info("vttFile:{}", vttFile);
+        model.addAttribute("vttFile", vttFile);
+        model.addAttribute("label", lan);
+
+        String languageCode = getLanguageCode(lan);
+        model.addAttribute("srclang", languageCode);
+        model.addAttribute("languageCheck", lan);
+
+        // Caption End
+
+        Tutorial preRequisticTutrial = tutorial.getPreRequistic();
+        if (preRequisticTutrial != null && preRequisticTutrial.isStatus()) {
+            Category catPreReqistic = preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getCat();
+            if (catPreReqistic.isStatus()) {
+                model.addAttribute("preRequisticTutrial", preRequisticTutrial);
+            }
+
+        }
+
+        model.addAttribute("tutorial", tutorial);
+
+        if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
+            model.addAttribute("relatedContent", tutorial.getRelatedVideo());
+
+        }
+
+        Category category = catService
+                .findByid(tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId());
+        List<TopicCategoryMapping> topicCatMapping = topicCatService.findAllByCategory(category);
+        List<ContributorAssignedTutorial> contriAssignedTut = conService.findAllByTopicCat(topicCatMapping);
+        List<Tutorial> tutorials = tutService.findAllByContributorAssignedTutorialList1(contriAssignedTut);
+
+        for (Tutorial x : tutorials) {
+            if (x == tutorial) {
+                continue;
+            }
+
+            if (x.getConAssignedTutorial().getLan().getLangName()
+                    .equalsIgnoreCase(tutorial.getConAssignedTutorial().getLan().getLangName())) {
+                relatedTutorial.add(x);
+            }
+
+        }
+
+        Collections.sort(relatedTutorial, Tutorial.UserVisitComp);
+
+        model.addAttribute("tutorials", relatedTutorial);
+
+        Set<String> catTemp = new HashSet<String>();
+        Set<String> topicTemp = new HashSet<String>();
+        Set<String> lanTemp = new HashSet<String>();
+
+        List<Tutorial> tutorialse = tutService.findAllByStatus(true);
+        for (Tutorial temp : tutorialse) {
+            ContributorAssignedTutorial conAssignedTutorial = temp.getConAssignedTutorial();
+            catTemp.add(conAssignedTutorial.getTopicCatId().getCat().getCatName());
+            lanTemp.add(conAssignedTutorial.getLan().getLangName());
+            topicTemp.add(conAssignedTutorial.getTopicCatId().getTopic().getTopicName());
+        }
+
+        getModelData(model, catId, topicId, lanId, query);
+        List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
+                tutorial.getTutorialId(), language.getLanId());
+        String sm_url = "";
+        String sm_url2 = "";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(scriptmanager_url);
+        sb.append(scriptmanager_path);
+        sb.append(String.valueOf(category.getCategoryId()));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getTutorialId()));
+        sb.append("/");
+        sb.append(String.valueOf(language.getLanId()));
+        sb.append("/");
+        sb.append(String.valueOf(tutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+        sb.append("/");
+        if (scriptVerList != null && scriptVerList.size() > 0) {
+
+            StringBuilder sb2 = new StringBuilder(sb);
+            sb2.append(scriptVerList.get(0));
+            sm_url = sb2.toString();
+        }
+
+        if (principal != null) {
+
+            boolean flag = checkRole(usr, category, language);
+            if (flag) {
+                StringBuilder sb1 = new StringBuilder(sb);
+                sb1.append('2');
+                sm_url2 = sb1.toString();
+
+            }
+        }
+
+        model.addAttribute("sm_url", sm_url);
+        model.addAttribute("sm_url2", sm_url2);
+        return "tutorial";
+    }
+
     @GetMapping("/promoVideoView/{langName}/")
     public String promoVideoView(HttpServletRequest req, @PathVariable(name = "langName") String langName,
             Principal principal, Model model) {

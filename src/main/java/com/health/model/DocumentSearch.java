@@ -129,6 +129,17 @@ public class DocumentSearch {
         return language;
     }
 
+    public int getTutorialId() {
+
+        try {
+            String tutorialIdString = getDocumentId().replaceAll("[^0-9]", "");
+            return Integer.parseInt(tutorialIdString);
+        } catch (NumberFormatException e) {
+
+            return -1;
+        }
+    }
+
     public void setLanguage(String language) {
         this.language = language;
     }
