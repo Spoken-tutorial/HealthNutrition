@@ -79,6 +79,9 @@ public class Category implements Comparable<Category>, Serializable {
     @OneToMany(mappedBy = "cat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<UserRole> userRoles = new HashSet<UserRole>();
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<SubCategory> subCategoriess = new HashSet<SubCategory>();
+
     @OneToMany(mappedBy = "catId", cascade = CascadeType.ALL)
     private Set<Brouchure> brochures = new HashSet<Brouchure>();
 
@@ -104,6 +107,14 @@ public class Category implements Comparable<Category>, Serializable {
 
     public void setCatName(String catName) {
         this.catName = catName;
+    }
+
+    public Set<SubCategory> getSubCategoriess() {
+        return subCategoriess;
+    }
+
+    public void setSubCategoriess(Set<SubCategory> subCategoriess) {
+        this.subCategoriess = subCategoriess;
     }
 
     public Timestamp getDateAdded() {
