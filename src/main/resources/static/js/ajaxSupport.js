@@ -317,7 +317,7 @@ $(document).ready(function() {
 			
 				$.ajax({
 					type : "GET",
-					url : projectPath+"enableDisablePacakgeAndPackLan",
+					url : projectPath+"enableDisablePacakgeLanguage",
 					data : {
 						"packLanId" : test_id
 					},
@@ -352,7 +352,7 @@ $(document).ready(function() {
 			
 				$.ajax({
 					type : "GET",
-					url : projectPath+"enableDisablePacakgeAndPackLan",
+					url : projectPath+"enableDisablePacakgeLanguage",
 					data : {
 						"packLanId" : test_id
 					},
@@ -4923,8 +4923,8 @@ $('#resourceCategoryId').on('change',function() {
 			$(".logoToUpload").on('change', function() {
 
 				var fileSize = this.files[0].size;
-				if(fileSize > 500000){
-					alert("File size should be less than 5kB");
+				if(fileSize > 10000000){
+					alert("File size should be less than 10 MB");
 					this.value="";
 					return false;
 				}

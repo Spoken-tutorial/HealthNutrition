@@ -18,4 +18,7 @@ public interface PackLanTutorialResourceService {
 
     void saveAll(List<PackLanTutorialResource> packLanTutorialResourceList);
 
+    List<PackLanTutorialResource> findResourcesByTutorialAndPackageLanguage(Tutorial tutorial,
+            PackageLanguage packageLanguage);
+
 }

@@ -4655,7 +4655,7 @@ public class HomeController {
     public String createPackagePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "packageContainerId") int packageContainerId,
             @RequestParam(name = "packageName") String packageName, @RequestParam(name = "languageId") int languageId,
-            @RequestParam(name = "tutorialforPackage") int[] tutorialIds,
+            @RequestParam(name = "tutorialforPackage") Optional<int[]> tutorialIds,
             @RequestParam("weekName") List<Integer> weekIds, @RequestParam(name = "videoName") List<Integer> videoIds,
             @RequestParam(name = "title") List<String> titles) {
 
@@ -4709,9 +4709,7 @@ public class HomeController {
         List<TutorialWithWeekAndPackage> tutorialWithWeekAndPackages = new ArrayList<>();
 
         try {
-            logger.info("WeekIds Size:{} ", weekIds.size());
-            logger.info("VideoIds Size:{}", videoIds.size());
-            logger.info("Title Size:{}", titles.size());
+
             for (int i = 0; i < weekIds.size(); i++) {
                 if (i < titles.size())
                     logger.info("Title: {}", titles.get(i));
@@ -4724,6 +4722,7 @@ public class HomeController {
 
                         if (weekTitleVideo == null) {
                             weekTitleVideo = new WeekTitleVideo(titles.get(i), dateAdded, week, video);
+                            weekTitleVideo.setUser(usr);
 
                             weekTitleVideoService.save(weekTitleVideo); // Save the weekTitle before using it
                             // weekTitles.add(weekTitle);
@@ -4742,15 +4741,22 @@ public class HomeController {
 
                 }
             }
-            // weekTitleVideoService.saveAll(weekTitles);
-            // tutorialWithWeekAndPackageService.saveAll(tutorialWithWeekAndPackages);
 
             List<PackLanTutorialResource> packLanTutorialResourceList = new ArrayList<>();
-            for (int j = 0; j < tutorialIds.length; j++) {
-                Tutorial tutorial = tutService.findByTutorialId(tutorialIds[j]);
-                PackLanTutorialResource temp = new PackLanTutorialResource(dateAdded, tutorial, packageLanguage);
+            if (tutorialIds != null && tutorialIds.isPresent() && tutorialIds.get().length > 0) {
+                for (int j = 0; j < tutorialIds.get().length; j++) {
+                    Tutorial tutorial = tutService.findByTutorialId(tutorialIds.get()[j]);
+                    List<PackLanTutorialResource> existingTutorials = packLanTutorialResourceService
+                            .findResourcesByTutorialAndPackageLanguage(tutorial, packageLanguage);
 
-                packLanTutorialResourceList.add(temp);
+                    if (existingTutorials == null || existingTutorials.size() < 1) {
+                        PackLanTutorialResource temp = new PackLanTutorialResource(dateAdded, tutorial,
+                                packageLanguage);
+
+                        packLanTutorialResourceList.add(temp);
+                    }
+
+                }
             }
 
             if (packLanTutorialResourceList.size() > 0)
@@ -4766,6 +4772,68 @@ public class HomeController {
         model.addAttribute("viewSection", viewSection);
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
         return createPackageGet(req, principal, model);
+    }
+
+    @GetMapping("/packageName/edit/{id}")
+    public String editPackageNameGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        PackageContainer packageContainer = packageContainerService.findByPackageId(id);
+
+        if (packageContainer == null) {
+
+            return "redirect:/createPackage";
+        }
+
+        model.addAttribute("packageContainer", packageContainer);
+
+        return "updatePackageName";
+    }
+
+    @PostMapping("/updatePackageName")
+    public String updatePackageNamePost(HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String packageId = req.getParameter("packageId");
+        String packageName = req.getParameter("packageName");
+
+        PackageContainer packageContainer = packageContainerService.findByPackageId(Integer.parseInt(packageId));
+
+        model.addAttribute("packageContainer", packageContainer);
+        if (packageContainer == null) {
+            model.addAttribute("error_msg", "Package doesn't exist");
+            return "updatePackageName";
+        }
+
+        try {
+            List<PackageLanguage> packagelanguageList = new ArrayList<>(packageContainer.getPackageLanguages());
+            for (PackageLanguage temp : packagelanguageList) {
+                String langName = temp.getLan().getLangName();
+                zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                        packageContainer.getPackageName(), langName, env);
+            }
+
+            packageContainer.setPackageName(packageName);
+            packageContainerService.save(packageContainer);
+
+        } catch (Exception e) {
+
+            model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+            model.addAttribute("packageContainer", packageContainer);
+            return "updatePackageName";
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+        model.addAttribute("packageContainer", packageContainer);
+
+        return "updatePackageName";
     }
 
     /******************************************
@@ -4807,6 +4875,8 @@ public class HomeController {
         weekTitleVideoList.sort(Comparator
                 .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
                 .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                .thenComparing(Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
+                        Comparator.nullsLast(Comparator.naturalOrder())))
                 .thenComparing(WeekTitleVideo::getTitle));
 
         model.addAttribute("userInfo", usr);
@@ -4847,8 +4917,18 @@ public class HomeController {
 
             }
 
-            if (relatedweekTitleVideoList != null && relatedweekTitleVideoList.size() > 0)
+            if (relatedweekTitleVideoList != null && relatedweekTitleVideoList.size() > 0) {
+                relatedweekTitleVideoList.sort(Comparator
+                        .comparingInt(
+                                (WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                        .thenComparing(
+                                Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
+                                        Comparator.nullsLast(Comparator.naturalOrder())))
+                        .thenComparing(WeekTitleVideo::getTitle));
+
                 model.addAttribute("relatedweekTitleVideoList", relatedweekTitleVideoList);
+            }
+
             model.addAttribute("weekTitleVideo", weekTitleVideo);
         }
         model.addAttribute("foundVideo", foundVideo);

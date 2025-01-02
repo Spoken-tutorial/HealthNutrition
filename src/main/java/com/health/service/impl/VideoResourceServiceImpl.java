@@ -104,6 +104,7 @@ public class VideoResourceServiceImpl implements VideoResourceService {
             String[] header = csvReader.readNext();
             int fileNameColumn = -1;
             int thumbnailColumn = -1;
+            int sessionColumn = -1;
 
             int languageColumn = -1;
 
@@ -119,10 +120,15 @@ public class VideoResourceServiceImpl implements VideoResourceService {
                     languageColumn = i;
                     break;
 
+                case "Session":
+                    sessionColumn = i;
+                    break;
+
                 }
+
             }
 
-            if (fileNameColumn == -1 || languageColumn == -1 || thumbnailColumn == -1) {
+            if (fileNameColumn == -1 || languageColumn == -1 || thumbnailColumn == -1 || sessionColumn == -1) {
                 model.addAttribute("error_msg",
                         "Some Errors Occurred; missing header   FileName , thumnail,or language");
                 return;
@@ -143,7 +149,8 @@ public class VideoResourceServiceImpl implements VideoResourceService {
 
                 rowIndex++;
 
-                if (!processRow(row, languageColumn, fileNameColumn, thumbnailColumn, model, videoResourceList)) {
+                if (!processRow(row, languageColumn, fileNameColumn, thumbnailColumn, sessionColumn, model,
+                        videoResourceList)) {
                     continue;
                 }
             }
@@ -168,8 +175,8 @@ public class VideoResourceServiceImpl implements VideoResourceService {
         }
     }
 
-    private boolean processRow(String[] row, int languageColumn, int fileNameColumn, int thumbnailColumn, Model model,
-            List<VideoResource> videoResourceList) {
+    private boolean processRow(String[] row, int languageColumn, int fileNameColumn, int thumbnailColumn,
+            int sessionColumn, Model model, List<VideoResource> videoResourceList) {
         logger.info("Processing row: {}", Arrays.toString(row));
 
         Language lan = lanService.getByLanName(row[languageColumn]);
@@ -180,6 +187,7 @@ public class VideoResourceServiceImpl implements VideoResourceService {
         String langName = lan.getLangName();
         String fileName = row[fileNameColumn];
         String thumbnailName = row[thumbnailColumn];
+        String sessionName = row[sessionColumn];
         boolean nonEmptyThumbnail = true;
         if (thumbnailName == null || thumbnailName.isEmpty()) {
             nonEmptyThumbnail = false;
@@ -217,12 +225,16 @@ public class VideoResourceServiceImpl implements VideoResourceService {
             if (thumbnailFile.exists() && nonEmptyThumbnail)
                 videoResource.setThumbnailPath(thumnailPath);
             videoResource.setDateAdded(ServiceUtility.getCurrentTime());
+            if (!sessionName.isEmpty())
+                videoResource.setSessionName(sessionName);
             videoResourceList.add(videoResource);
         }
 
         else {
             if (thumbnailFile.exists() && nonEmptyThumbnail) {
                 videoResource.setThumbnailPath(thumnailPath);
+                if (!sessionName.isEmpty())
+                    videoResource.setSessionName(sessionName);
                 videoResource.setDateAdded(ServiceUtility.getCurrentTime());
                 videoResourceList.add(videoResource);
             }
