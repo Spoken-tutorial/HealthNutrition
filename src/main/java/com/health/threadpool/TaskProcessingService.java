@@ -10,9 +10,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.http.HttpResponse;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.Brouchure;
+import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.FilesofBrouchure;
 import com.health.model.QueueManagement;
@@ -46,9 +49,12 @@ import com.health.repository.QueueManagementRepository;
 import com.health.repository.TutorialRepository;
 import com.health.repository.VersionRepository;
 import com.health.service.BrouchureService;
+import com.health.service.CategoryService;
+import com.health.service.ContributorAssignedTutorialService;
 import com.health.service.FilesofBrouchureService;
 import com.health.service.QueueManagementService;
 import com.health.service.ResearchPaperService;
+import com.health.service.TopicCategoryMappingService;
 import com.health.service.TutorialService;
 import com.health.utility.CommonData;
 import com.health.utility.ServiceUtility;
@@ -75,6 +81,15 @@ public class TaskProcessingService {
 
     @Autowired
     private QueueManagementService queueService;
+
+    @Autowired
+    private TopicCategoryMappingService tcmService;
+
+    @Autowired
+    private CategoryService catService;
+
+    @Autowired
+    private ContributorAssignedTutorialService conService;
 
     @Autowired
     private QueueManagementRepository queueRepo;
@@ -549,6 +564,36 @@ public class TaskProcessingService {
         for (Tutorial tutorial : tutorialList) {
             try {
                 addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
+                newtTutorials.add(tutorial);
+            } catch (Exception e) {
+                logger.error("Exception of addAllTuttorialsToQueue: {}", tutorial, e);
+
+            }
+
+        }
+        tutRepo.saveAll(newtTutorials);
+    }
+
+    public void updateNewCategoryofTuttorialsToQueue() {
+
+        Category cat1 = catService.findByid(35);
+        Category cat2 = catService.findByid(36);
+        Set<TopicCategoryMapping> tcmSet = new HashSet<>(tcmService.findAllByCategory(cat1));
+        tcmSet.addAll(tcmService.findAllByCategory(cat2));
+
+        List<TopicCategoryMapping> tcmList = new ArrayList<>(tcmSet);
+
+        Set<ContributorAssignedTutorial> conSet = new HashSet<>(conService.findAllByTopicCat(tcmList));
+
+        List<ContributorAssignedTutorial> conList = new ArrayList<>(conSet);
+
+        List<Tutorial> tutorialList = tutRepo.findAllByconAssignedTutorialAndStatus(conList);
+
+        logger.info("tutorial size:{}", tutorialList.size());
+        List<Tutorial> newtTutorials = new ArrayList<>();
+        for (Tutorial tutorial : tutorialList) {
+            try {
+                addUpdateDeleteTutorial(tutorial, CommonData.UPDATE_DOCUMENT);
                 newtTutorials.add(tutorial);
             } catch (Exception e) {
                 logger.error("Exception of addAllTuttorialsToQueue: {}", tutorial, e);
