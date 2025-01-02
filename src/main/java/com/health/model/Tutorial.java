@@ -170,6 +170,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @OneToMany(mappedBy = "tutorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<PackLanTutorialResource> PackLanTutorialResource = new HashSet<PackLanTutorialResource>();
 
+    @OneToMany(mappedBy = "tutorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<HistoricalData> historicalData = new HashSet<HistoricalData>();
+
     public User getPreRequiticUser() {
         return preRequiticUser;
     }
@@ -262,6 +265,14 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     public boolean isAddedQueue() {
         return addedQueue;
+    }
+
+    public Set<HistoricalData> getHistoricalData() {
+        return historicalData;
+    }
+
+    public void setHistoricalData(Set<HistoricalData> historicalData) {
+        this.historicalData = historicalData;
     }
 
     public void setAddedQueue(boolean addedQueue) {
