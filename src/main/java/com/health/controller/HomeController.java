@@ -4708,6 +4708,8 @@ public class HomeController {
 
         List<Week> weekList = weekService.findAll();
 
+        List<WeekTitleVideo> weekTitleVideoList = weekTitleVideoService.findAll();
+
         List<PackageContainer> packageList = packageContainerService.findAll();
         packageList.sort(Comparator.comparing(PackageContainer::getPackageName));
 
@@ -4717,6 +4719,7 @@ public class HomeController {
         model.addAttribute("weekList", weekList);
         model.addAttribute("packageList", packageList);
         model.addAttribute("packLanList", packLanList);
+        model.addAttribute("weekTitleVideoList", weekTitleVideoList);
 
         List<TutorialWithWeekAndPackage> tutorialweekpackList = tutorialWithWeekAndPackageService.findAll();
         // Collections.sort(tutorials, TutorialWithWeekAndPackage.SortByUploadTime);
