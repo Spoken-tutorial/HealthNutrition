@@ -1408,7 +1408,7 @@ public class AjaxController {
             @RequestParam(value = "languageId") int languageId) {
         ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
 
-        Map<String, Integer> cats = new TreeMap<>();
+        Map<String, Integer> cats = new LinkedHashMap<>();
         Map<String, Integer> languages = new TreeMap<>();
 
         Category cat = catId != 0 ? catService.findByid(catId) : null;
@@ -1425,12 +1425,21 @@ public class AjaxController {
 
         List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(topic_list);
 
+        List<Category> catList = new ArrayList<>();
+
         for (Tutorial t : tutorials) {
             Category cat2 = t.getConAssignedTutorial().getTopicCatId().getCat();
             if (cat2.isStatus()) {
-                cats.put(cat2.getCatName(), cat2.getCategoryId());
+                catList.add(cat2);
+
             }
 
+        }
+
+        Collections.sort(catList, Category.SortByOrderValue);
+
+        for (Category tempCat : catList) {
+            cats.put(tempCat.getCatName(), tempCat.getCategoryId());
         }
 
         arlist.add(cats);
@@ -1481,7 +1490,7 @@ public class AjaxController {
             @RequestParam(value = "languageId") int languageId) {
 
         ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
-        Map<String, Integer> cats = new TreeMap<>();
+        Map<String, Integer> cats = new LinkedHashMap<>();
         Map<String, Integer> topics = new LinkedHashMap<>();
 
         Category cat = catId != 0 ? catService.findByid(catId) : null;
@@ -1498,13 +1507,20 @@ public class AjaxController {
                 : conService.findAllByTopicCat(local);
 
         List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(lang_list);
+        List<Category> catList = new ArrayList<>();
 
         for (Tutorial t : tutorials) {
             Category cat2 = t.getConAssignedTutorial().getTopicCatId().getCat();
             if (cat2.isStatus()) {
-                cats.put(cat2.getCatName(), cat2.getCategoryId());
+                catList.add(cat2);
             }
 
+        }
+
+        Collections.sort(catList, Category.SortByOrderValue);
+
+        for (Category tempCat : catList) {
+            cats.put(tempCat.getCatName(), tempCat.getCategoryId());
         }
 
         arlist.add(cats);

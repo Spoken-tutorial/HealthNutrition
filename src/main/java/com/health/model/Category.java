@@ -2,6 +2,7 @@ package com.health.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,6 +42,9 @@ public class Category implements Comparable<Category>, Serializable {
      */
     @Column(name = "category_name", nullable = false)
     private String catName;
+
+    @Column(name = "orderValue", nullable = false)
+    private int order = 0;
 
     /**
      * Timestamp on added
@@ -106,6 +110,14 @@ public class Category implements Comparable<Category>, Serializable {
         this.catName = catName;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
     public Timestamp getDateAdded() {
         return dateAdded;
     }
@@ -169,6 +181,25 @@ public class Category implements Comparable<Category>, Serializable {
         return this.getCatName().compareTo(o.getCatName());
 
     }
+
+    public static Comparator<Category> SortByOrderValue = new Comparator<Category>() {
+
+        // Method
+        @Override
+        public int compare(Category c1, Category c2) {
+
+            if (c1.getOrder() == c2.getOrder()) {
+                return c1.getCatName().compareTo(c2.getCatName());
+            }
+
+            else if (c1.getOrder() > c2.getOrder()) {
+                return 1;
+            } else {
+                return -1;
+            }
+
+        }
+    };
 
     @Override
     public String toString() {
