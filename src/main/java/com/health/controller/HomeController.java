@@ -5012,6 +5012,87 @@ public class HomeController {
         return "relatedHstTrainingTutorialsView";
     }
 
+    /************************
+     * WeekTitleVideo Edit Start
+     ************************************/
+    @GetMapping("/weekTitleVideo/edit/{id}")
+    public String editWeekTitleVideoGet(@PathVariable int id, HttpServletRequest req, Model model,
+            Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekTitleVideoId(id);
+
+        if (weekTitleVideo == null) {
+
+            return "redirect:/createPackage";
+        }
+
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+
+        return "updateWeekTitleVideo";
+    }
+
+    @PostMapping("/updateTitle")
+    public String updateWeekTitleVideoPost(HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String weekTitleVideoId = req.getParameter("weekTitleVideoId");
+        String title = req.getParameter("title");
+
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService
+                .findByWeekTitleVideoId(Integer.parseInt(weekTitleVideoId));
+
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+        if (weekTitleVideo == null) {
+            model.addAttribute("error_msg", "Week Title Video doesn't exist");
+            return "updateWeekTitleVideo";
+        }
+
+        try {
+
+            List<TutorialWithWeekAndPackage> tutorialWithWeekAndPackageList = weekTitleVideo
+                    .getTutorialsWithWeekAndPack() != null
+                            ? new ArrayList<>(weekTitleVideo.getTutorialsWithWeekAndPack())
+                            : new ArrayList<>();
+
+            for (TutorialWithWeekAndPackage temp : tutorialWithWeekAndPackageList) {
+                PackageLanguage packageLanguage = temp.getPackageLanguage();
+                PackageContainer packageContainer = packageLanguage.getPackageContainer();
+
+                String langName = packageLanguage.getLan().getLangName();
+                zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                        packageContainer.getPackageName(), langName, env);
+
+            }
+
+            weekTitleVideo.setTitle(title);
+            weekTitleVideo.setUser(usr);
+            weekTitleVideoService.save(weekTitleVideo);
+
+        } catch (Exception e) {
+
+            model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+            model.addAttribute("weekTitleVideo", weekTitleVideo);
+            return "updateWeekTitleVideo";
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+
+        return "updateWeekTitleVideo";
+    }
+
+    /*************************
+     * WeekTitleVideo Edit End
+     **************************************/
+
     /********************** Training Modules Download Start **********************/
 
     @PostMapping("/downloadTrainingModules")
