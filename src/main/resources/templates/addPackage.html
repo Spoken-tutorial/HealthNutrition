@@ -377,7 +377,8 @@ font-weight:bold!important;
 									<th scope="col">Language</th>
 									<th scope="col">File Name</th>
 									<th scope="col">Title</th>
-									<th scope="col">Action</th>
+									<th scope="col">Update Title</th>
+									<th scope="col">Update Week</th>
 									
 									 
 								</tr>
@@ -388,7 +389,8 @@ font-weight:bold!important;
 								 <td><span th:text = "${tempVariable.getVideoResource().getLan().getLangName()}"></span></td>
 								 <td><span th:text = "${tempVariable.getVideoResource().getFileName()}"></span></td>
 								 <td><span th:text = "${tempVariable.getTitle()}"></span></td>
-								 <td><a th:href="@{${'/weekTitleVideo/edit/' + tempVariable.getWeekTitleVideoId()}}">Edit Title</a></td>
+								 <td><a th:href="@{${'/weekTitleVideo/editTitle/' + tempVariable.getWeekTitleVideoId()}}">Edit Title</a></td>
+								 <td><a th:href="@{${'/weekTitleVideo/editWeek/' + tempVariable.getWeekTitleVideoId()}}">Edit Week</a></td>
 							      
 							    </tr>
 
