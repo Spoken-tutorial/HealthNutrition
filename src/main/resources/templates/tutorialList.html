@@ -21,15 +21,15 @@
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <a class="dropdown-item" th:href="@{/#about}">About</a>
-    <a class="dropdown-item" th:href="@{/#consultants}">Consultants</a>
-    <a class="dropdown-item" th:href="@{/#events}">Events</a>
-    <a class="dropdown-item" th:href="@{/#promoVideo}">Promo Videos</a>
-    <a class="dropdown-item" th:href="@{/#testimonial}">Testimonials</a>
-    <a class="dropdown-item" th:href="@{/#researchPaper}">Research Papers</a>
-    <a class="dropdown-item" th:href="@{/#brochure}">Promotional-Materials</a>
-    <a class="dropdown-item" th:href="@{/citations}">Citations</a>
-    <a class="dropdown-item" th:href="@{/trainingModules}">HST Training Modules</a>
-    <a class="dropdown-item" th:href="@{/downloads}">Downloads</a>
+    <a th:if="${consultFlag}" class="dropdown-item" th:href="@{/#consultants}">Consultants</a>
+    <a th:if="${eventFlag}" class="dropdown-item" th:href="@{/#events}">Events</a>
+    <a th:if="${promoVideoFlag}" class="dropdown-item" th:href="@{/#promoVideo}">Promo Videos</a>
+    <a th:if="${testimonialFlag}" class="dropdown-item" th:href="@{/#testimonial}">Testimonials</a>
+    <a th:if="${researchPaperFlag}" class="dropdown-item" th:href="@{/#researchPaper}">Research Papers</a>
+    <a th:if="${brochureFlag}" class="dropdown-item" th:href="@{/#brochure}">Promotional-Materials</a>
+    <a th:if="${citationFlag}" class="dropdown-item" th:href="@{/citations}">Citations</a>
+    <a th:if="${traininngModuleFlag}" class="dropdown-item" th:href="@{/trainingModules}">HST Training Modules</a>
+    <a  class="dropdown-item" th:href="@{/downloads}">Downloads</a>
   </div>
 </div>
       <a class="nav-item nav-link " href="#contact" tabindex="-1">Contact Us</a>

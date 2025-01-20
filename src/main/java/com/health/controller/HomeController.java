@@ -714,6 +714,65 @@ public class HomeController {
         return topicTempSorted;
     }
 
+    private void navigationLinkCheck(Model model) {
+        boolean eventFlag = true;
+        boolean testimonialFlag = true;
+        boolean consultFlag = true;
+        boolean brochureFlag = true;
+        boolean promoVideoFlag = true;
+        boolean reserachPaperFlag = true;
+        boolean traininngModuleFlag = true;
+        boolean citationFlag = true;
+        List<Event> eventList = eventservice.findAllEnabledEventForCache();
+
+        if (eventList.isEmpty()) {
+            eventFlag = false;
+        }
+        List<Testimonial> testimonialList = testService.findAllTestimonialByapprovedForCache();
+
+        if (testimonialList.isEmpty()) {
+            testimonialFlag = false;
+        }
+        List<Consultant> consultsList = consultService.findAllConsultHomeTrueForCache();
+        if (consultsList.isEmpty()) {
+            consultFlag = false;
+        }
+        List<Brouchure> brochuresList = broService.findAllBrouchuresForCache();
+        if (brochuresList.isEmpty()) {
+            brochureFlag = false;
+        }
+
+        List<PromoVideo> promoVideosList = promoVideoService.findAllByShowOnHomePage();
+        if (promoVideosList.isEmpty()) {
+            promoVideoFlag = false;
+        }
+
+        List<ResearchPaper> researchPapersList = researchPaperService.findAllByShowOnHomePage();
+        if (researchPapersList.isEmpty()) {
+            reserachPaperFlag = false;
+        }
+
+        List<TutorialWithWeekAndPackage> trainingModuleTutorialList = tutorialWithWeekAndPackageService.findAll();
+        if (trainingModuleTutorialList.isEmpty()) {
+            traininngModuleFlag = false;
+        }
+
+        List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        if (citationTuorials.isEmpty()) {
+            citationFlag = false;
+        }
+
+        model.addAttribute("testimonialFlag", testimonialFlag);
+        model.addAttribute("eventFlag", eventFlag);
+        model.addAttribute("consultFlag", consultFlag);
+        model.addAttribute("brochureFlag", brochureFlag);
+        model.addAttribute("promoVideoFlag", promoVideoFlag);
+        model.addAttribute("reserachPaperFlag", reserachPaperFlag);
+        model.addAttribute("traininngModuleFlag", traininngModuleFlag);
+        model.addAttribute("citationFlag", citationFlag);
+
+    }
+
     private void getModelData(Model model) {
         getModelData(model, 0, 0, 0, "");
 
@@ -754,6 +813,13 @@ public class HomeController {
 
         model.addAttribute("languageCount", languages.size());
 
+        boolean downloadPackageFlag = true;
+        if (packageList.isEmpty()) {
+            downloadPackageFlag = false;
+        }
+
+        model.addAttribute("downloadPackageFlag", downloadPackageFlag);
+
     }
 
     private void getPackageAndLanguageData(Model model) {
@@ -793,6 +859,62 @@ public class HomeController {
         Collections.sort(versions, Version.SortByBroVersionTime);
 
         getModelData(model);
+
+        /****** Navigation Link Check Separate Code Start ********/
+
+        boolean eventFlag = true;
+        boolean testimonialFlag = true;
+        boolean consultFlag = true;
+        boolean brochureFlag = true;
+        boolean promoVideoFlag = true;
+        boolean reserachPaperFlag = true;
+        boolean traininngModuleFlag = true;
+        boolean citationFlag = true;
+
+        if (events.isEmpty()) {
+            eventFlag = false;
+        }
+
+        if (testi.isEmpty()) {
+            testimonialFlag = false;
+        }
+
+        if (consults.isEmpty()) {
+            consultFlag = false;
+        }
+
+        if (brochures.isEmpty()) {
+            brochureFlag = false;
+        }
+
+        if (promoVideos.isEmpty()) {
+            promoVideoFlag = false;
+        }
+
+        if (researchPapers.isEmpty()) {
+            reserachPaperFlag = false;
+        }
+
+        List<TutorialWithWeekAndPackage> trainingModuleTutorialList = tutorialWithWeekAndPackageService.findAll();
+        if (trainingModuleTutorialList.isEmpty()) {
+            traininngModuleFlag = false;
+        }
+
+        List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        if (citationTuorials.isEmpty()) {
+            citationFlag = false;
+        }
+
+        model.addAttribute("testimonialFlag", testimonialFlag);
+        model.addAttribute("eventFlag", eventFlag);
+        model.addAttribute("consultFlag", consultFlag);
+        model.addAttribute("brochureFlag", brochureFlag);
+        model.addAttribute("promoVideoFlag", promoVideoFlag);
+        model.addAttribute("reserachPaperFlag", reserachPaperFlag);
+        model.addAttribute("traininngModuleFlag", traininngModuleFlag);
+        model.addAttribute("citationFlag", citationFlag);
+
+        /************ Navigation Link Check Separate Code End ********/
 
         int upperlimit = 0;
 
@@ -1073,6 +1195,7 @@ public class HomeController {
 
         Pageable pageable = PageRequest.of(page, 10);
         getModelData(model, cat, topic, lan, query);
+        navigationLinkCheck(model);
 
         if (cat != 0) {
             localCat = catService.findByid(cat);
@@ -1182,6 +1305,7 @@ public class HomeController {
         model.addAttribute("categories", categories);
         boolean downloadSection = false;
         model.addAttribute("downloadSection", downloadSection);
+        navigationLinkCheck(model);
 
         try {
             ServiceUtility.deleteFilesOlderThanNDays(1, env, CommonData.uploadDirectoryScriptZipFiles);
@@ -1605,6 +1729,7 @@ public class HomeController {
         }
 
         getModelData(model, catId, topicId, lanId, query);
+        navigationLinkCheck(model);
         List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
                 tutorial.getTutorialId(), lanName.getLanId());
         String sm_url = "";
@@ -1783,6 +1908,7 @@ public class HomeController {
         }
 
         getModelData(model, catId, topicId, lanId, query);
+        navigationLinkCheck(model);
         List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
                 tutorial.getTutorialId(), language.getLanId());
         String sm_url = "";
@@ -1828,6 +1954,7 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
         boolean enabledPromoVideo = true;
         boolean foundVideo = true;
         List<PromoVideo> promoVideos = promoVideoService.findAllByShowOnHomePage();
@@ -1899,6 +2026,7 @@ public class HomeController {
     @GetMapping("/showEvent")
     public String showEventGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);
+        navigationLinkCheck(model);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Event> events = eventservice.findAllEnabledEventForCache();
 
@@ -1912,6 +2040,8 @@ public class HomeController {
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Consultant> consults = consultService.findAll();
         model.addAttribute("listConsultant", consults);
+
+        navigationLinkCheck(model);
 
         HashMap<Integer, String> map = new HashMap<>();
 
@@ -1943,6 +2073,7 @@ public class HomeController {
     public String showLanguagesGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
         HashMap<String, Integer> map = new HashMap<>();
         List<Language> langs = getLanguages();
         for (Language lang : langs) {
@@ -1969,6 +2100,7 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
         List<Testimonial> testi = testService.findByApproved(true);
         model.addAttribute("Testimonials", testi);
         return "signup";
@@ -2284,6 +2416,7 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
 
         List<Category> categories = getCategories();
         model.addAttribute("categories", categories);
@@ -2294,6 +2427,7 @@ public class HomeController {
     public String showResearchPapersGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
         List<ResearchPaper> researchPapers = researchPaperService.findAllByShowOnHomePage();
 
         model.addAttribute("researchPapers", researchPapers);
@@ -3129,6 +3263,7 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
 
         List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
         model.addAttribute("citationTuorials", citationTuorials);
@@ -5140,7 +5275,7 @@ public class HomeController {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-
+        navigationLinkCheck(model);
         Event event = eventservice.findById(id);
 
         if (event == null) {
@@ -6177,6 +6312,7 @@ public class HomeController {
     public String viewtestimonialListGet(HttpServletRequest req, Model model, Principal principal) {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
         List<Testimonial> test = new ArrayList<>();
         List<Testimonial> test1 = testService.findAll();
         for (Testimonial temp : test1) {
@@ -8373,6 +8509,7 @@ public class HomeController {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
+        navigationLinkCheck(model);
 
         List<Brouchure> brouchures = broService.findAllBrouchuresForCache();
         List<Language> languages = lanService.getAllLanguages();
@@ -8642,6 +8779,7 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        navigationLinkCheck(model);
         model.addAttribute("userInfo", usr);
 
         List<Category> cat = getCategories();
