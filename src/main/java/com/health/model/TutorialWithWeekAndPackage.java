@@ -87,7 +87,8 @@ public class TutorialWithWeekAndPackage implements Serializable {
 
     }
 
-    public TutorialWithWeekAndPackage(Timestamp dateAdded, WeekTitleVideo weekTitleVideo, PackageLanguage packageLanguage) {
+    public TutorialWithWeekAndPackage(Timestamp dateAdded, WeekTitleVideo weekTitleVideo,
+            PackageLanguage packageLanguage) {
         super();
         this.dateAdded = dateAdded;
         this.weekTitleVideo = weekTitleVideo;
@@ -101,7 +102,8 @@ public class TutorialWithWeekAndPackage implements Serializable {
 
     @Override
     public String toString() {
-        return "TutorialWithWeekAndPackage [weekTitleVideo=" + weekTitleVideo + ", packageLanguage=" + packageLanguage + "]";
+        return "TutorialWithWeekAndPackage [weekTitleVideo=" + weekTitleVideo + ", packageLanguage=" + packageLanguage
+                + "]";
     }
 
 }

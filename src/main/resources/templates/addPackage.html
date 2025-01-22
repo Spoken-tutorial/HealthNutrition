@@ -84,6 +84,10 @@ font-weight:bold!important;
 						
 					 <li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="topicView-tab" data-toggle="tab" 
 					 href="#hstview" role="tab" aria-controls="hstview" aria-selected="false">Health Spoken View</a></li>
+					 
+					 <li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="weekTitleVideoView-tab" data-toggle="tab" 
+					 href="#weekTitleVideoView" role="tab" aria-controls="weekTitleVideoView" aria-selected="false">Week Title View & Edit</a></li>
+   
    
 
 
@@ -361,6 +365,40 @@ font-weight:bold!important;
 						</table >
 						</div>
 						
+						
+						<div class="tab-pane fade py-3" id="weekTitleVideoView" role="tabpanel" aria-labelledby="weekTitleVideoView-tab">
+						<table class="table table-striped" id="weekTitleVideoTable">
+						
+							
+							<thead>
+								<tr>
+									
+									<th scope="col">Week</th>
+									<th scope="col">Language</th>
+									<th scope="col">File Name</th>
+									<th scope="col">Title</th>
+									<th scope="col">Update Title</th>
+									<th scope="col">Update Week</th>
+									
+									 
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="tempVariable : ${weekTitleVideoList}">
+								 <td scope="row"><span th:text = "${tempVariable.getWeek().getWeekName()}"></span></td>
+								 <td><span th:text = "${tempVariable.getVideoResource().getLan().getLangName()}"></span></td>
+								 <td><span th:text = "${tempVariable.getVideoResource().getFileName()}"></span></td>
+								 <td><span th:text = "${tempVariable.getTitle()}"></span></td>
+								 <td><a th:href="@{${'/weekTitleVideo/editTitle/' + tempVariable.getWeekTitleVideoId()}}">Edit Title</a></td>
+								 <td><a th:href="@{${'/weekTitleVideo/editWeek/' + tempVariable.getWeekTitleVideoId()}}">Edit Week</a></td>
+							      
+							    </tr>
+
+							</tbody>
+						</table >
+						</div>
+
+						
 					</div>
 
 
@@ -376,6 +414,7 @@ font-weight:bold!important;
 	<div th:replace="common/trail :: body-bottom-scripts"></div>
 	<script type="text/javascript">
 $(document).ready( function () {
+	$('#weekTitleVideoTable').DataTable();
     $('#myTable').DataTable();
     $('.weekTitleTable').each(function() {
 				$(this).DataTable();

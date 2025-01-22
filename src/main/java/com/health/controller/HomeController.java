@@ -4708,6 +4708,9 @@ public class HomeController {
 
         List<Week> weekList = weekService.findAll();
 
+        List<WeekTitleVideo> weekTitleVideoList = tutorialWithWeekAndPackageService.findAll().stream()
+                .map(TutorialWithWeekAndPackage::getWeekTitle).distinct().collect(Collectors.toList());
+
         List<PackageContainer> packageList = packageContainerService.findAll();
         packageList.sort(Comparator.comparing(PackageContainer::getPackageName));
 
@@ -4717,6 +4720,7 @@ public class HomeController {
         model.addAttribute("weekList", weekList);
         model.addAttribute("packageList", packageList);
         model.addAttribute("packLanList", packLanList);
+        model.addAttribute("weekTitleVideoList", weekTitleVideoList);
 
         List<TutorialWithWeekAndPackage> tutorialweekpackList = tutorialWithWeekAndPackageService.findAll();
         // Collections.sort(tutorials, TutorialWithWeekAndPackage.SortByUploadTime);
@@ -4943,7 +4947,8 @@ public class HomeController {
 
         List<WeekTitleVideo> weekTitleVideoList = new ArrayList<>();
 
-        weekTitleVideoList = weekTitleVideoService.findAll();
+        weekTitleVideoList = tutorialWithWeekAndPackageService.findAll().stream()
+                .map(TutorialWithWeekAndPackage::getWeekTitle).distinct().collect(Collectors.toList());
 
         weekTitleVideoList.sort(Comparator
                 .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
@@ -5009,6 +5014,196 @@ public class HomeController {
         return "relatedHstTrainingTutorialsView";
     }
 
+    /************************
+     * WeekTitleVideo Edit Start
+     ************************************/
+    @GetMapping("/weekTitleVideo/editTitle/{id}")
+    public String editWeekTitleVideoGet(@PathVariable int id, HttpServletRequest req, Model model,
+            Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekTitleVideoId(id);
+
+        if (weekTitleVideo == null) {
+
+            return "redirect:/createPackage";
+        }
+
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+
+        return "updateTitleofWeekTitleVideo";
+    }
+
+    @PostMapping("/updateTitle")
+    public String updateWeekTitleVideoPost(HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String weekTitleVideoId = req.getParameter("weekTitleVideoId");
+        String title = req.getParameter("title");
+
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService
+                .findByWeekTitleVideoId(Integer.parseInt(weekTitleVideoId));
+
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+        if (weekTitleVideo == null) {
+            model.addAttribute("error_msg", "Week Title Video doesn't exist");
+            return "updateTitleofWeekTitleVideo";
+        }
+
+        try {
+
+            List<TutorialWithWeekAndPackage> tutorialWithWeekAndPackageList = weekTitleVideo
+                    .getTutorialsWithWeekAndPack() != null
+                            ? new ArrayList<>(weekTitleVideo.getTutorialsWithWeekAndPack())
+                            : new ArrayList<>();
+
+            for (TutorialWithWeekAndPackage temp : tutorialWithWeekAndPackageList) {
+                PackageLanguage packageLanguage = temp.getPackageLanguage();
+                PackageContainer packageContainer = packageLanguage.getPackageContainer();
+
+                String langName = packageLanguage.getLan().getLangName();
+                zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                        packageContainer.getPackageName(), langName, env);
+
+            }
+
+            weekTitleVideo.setTitle(title);
+            weekTitleVideo.setUser(usr);
+            weekTitleVideoService.save(weekTitleVideo);
+
+        } catch (Exception e) {
+
+            model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+            model.addAttribute("weekTitleVideo", weekTitleVideo);
+            return "updateTitleofWeekTitleVideo";
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+
+        return "updateTitleofWeekTitleVideo";
+    }
+
+    /*************************
+     * WeekTitleVideo Edit End
+     **************************************/
+
+    /************* Week Edit Start *****************/
+
+    @GetMapping("/weekTitleVideo/editWeek/{id}")
+    public String editWeekofWeeekTitleVideoGet(@PathVariable int id, HttpServletRequest req, Model model,
+            Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekTitleVideoId(id);
+
+        Map<String, Integer> weeks = new LinkedHashMap<>();
+        List<Week> weekList = weekService.findAll();
+        for (Week tempWeek : weekList) {
+            weeks.put(tempWeek.getWeekName(), tempWeek.getWeekId());
+        }
+        model.addAttribute("weeks", weeks);
+
+        if (weekTitleVideo == null) {
+
+            return "redirect:/createPackage";
+        }
+
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+
+        return "updateWeekofWeekTitleVideo";
+    }
+
+    @PostMapping("/updateWeek")
+    public String updateWeekofWeekTitleVideoPost(HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+        Map<String, Integer> weeks = new LinkedHashMap<>();
+        List<Week> weekList = weekService.findAll();
+        for (Week tempWeek : weekList) {
+            weeks.put(tempWeek.getWeekName(), tempWeek.getWeekId());
+        }
+        model.addAttribute("weeks", weeks);
+
+        String weekTitleVideoId = req.getParameter("weekTitleVideoId1");
+        String weekIdString = req.getParameter("weekId");
+        int weekId = Integer.parseInt(weekIdString);
+
+        WeekTitleVideo weekTitleVideo = weekTitleVideoService
+                .findByWeekTitleVideoId(Integer.parseInt(weekTitleVideoId));
+
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+        if (weekTitleVideo == null) {
+            model.addAttribute("error_msg", "Week Title Video doesn't exist");
+            return "updateWeekofWeekTitleVideo";
+        }
+
+        try {
+
+            if (weekId != 0) {
+
+                List<TutorialWithWeekAndPackage> relatedTutorialWithWeekAndPackages = weekTitleVideo
+                        .getTutorialsWithWeekAndPack() != null
+                                ? new ArrayList<>(weekTitleVideo.getTutorialsWithWeekAndPack())
+                                : new ArrayList<>();
+
+                Week week = weekService.findByWeekId(weekId);
+                VideoResource videoResource = weekTitleVideo.getVideoResource();
+                String langName = videoResource.getLan().getLangName();
+                WeekTitleVideo weekTitleVideoTemp = weekTitleVideoService.findByWeekVideoResourceAndLan(week,
+                        videoResource, langName);
+
+                if (weekTitleVideoTemp != null) {
+                    for (TutorialWithWeekAndPackage tempTutorial : relatedTutorialWithWeekAndPackages) {
+                        tempTutorial.setWeekTitle(weekTitleVideoTemp);
+                        tutorialWithWeekAndPackageService.save(tempTutorial);
+                    }
+                } else {
+                    weekTitleVideo.setWeek(week);
+                    weekTitleVideo.setUser(usr);
+                    weekTitleVideoService.save(weekTitleVideo);
+                }
+
+                for (TutorialWithWeekAndPackage temp : relatedTutorialWithWeekAndPackages) {
+                    PackageLanguage packageLanguage = temp.getPackageLanguage();
+                    PackageContainer packageContainer = packageLanguage.getPackageContainer();
+
+                    String langNameofPackage = packageLanguage.getLan().getLangName();
+                    zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                            packageContainer.getPackageName(), langNameofPackage, env);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+
+            model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+            model.addAttribute("weekTitleVideo", weekTitleVideo);
+            return "updateWeekofWeekTitleVideo";
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+        model.addAttribute("weekTitleVideo", weekTitleVideo);
+
+        return "updateWeekofWeekTitleVideo";
+    }
+
+    /*************** Week Edit End **************/
+
     /********************** Training Modules Download Start **********************/
 
     @PostMapping("/downloadTrainingModules")
@@ -5017,7 +5212,9 @@ public class HomeController {
             @RequestParam(name = "languageDownloadName") String lanId) {
 
         getPackageAndLanguageData(model);
-        List<WeekTitleVideo> weekTitleVideoList = weekTitleVideoService.findAll();
+        List<WeekTitleVideo> weekTitleVideoList = tutorialWithWeekAndPackageService.findAll().stream()
+                .map(TutorialWithWeekAndPackage::getWeekTitle).distinct().collect(Collectors.toList());
+
         weekTitleVideoList.sort(Comparator
                 .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
                 .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
