@@ -715,52 +715,24 @@ public class HomeController {
     }
 
     private void navigationLinkCheck(Model model) {
-        boolean eventFlag = true;
-        boolean testimonialFlag = true;
-        boolean consultFlag = true;
-        boolean brochureFlag = true;
-        boolean promoVideoFlag = true;
-        boolean reserachPaperFlag = true;
-        boolean traininngModuleFlag = true;
-        boolean citationFlag = true;
+
         List<Event> eventList = eventservice.findAllEnabledEventForCache();
-
-        if (eventList.isEmpty()) {
-            eventFlag = false;
-        }
         List<Testimonial> testimonialList = testService.findAllTestimonialByapprovedForCache();
-
-        if (testimonialList.isEmpty()) {
-            testimonialFlag = false;
-        }
         List<Consultant> consultsList = consultService.findAllConsultHomeTrueForCache();
-        if (consultsList.isEmpty()) {
-            consultFlag = false;
-        }
         List<Brouchure> brochuresList = broService.findAllBrouchuresForCache();
-        if (brochuresList.isEmpty()) {
-            brochureFlag = false;
-        }
-
         List<PromoVideo> promoVideosList = promoVideoService.findAllByShowOnHomePage();
-        if (promoVideosList.isEmpty()) {
-            promoVideoFlag = false;
-        }
-
         List<ResearchPaper> researchPapersList = researchPaperService.findAllByShowOnHomePage();
-        if (researchPapersList.isEmpty()) {
-            reserachPaperFlag = false;
-        }
-
         List<TutorialWithWeekAndPackage> trainingModuleTutorialList = tutorialWithWeekAndPackageService.findAll();
-        if (trainingModuleTutorialList.isEmpty()) {
-            traininngModuleFlag = false;
-        }
-
         List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
-        if (citationTuorials.isEmpty()) {
-            citationFlag = false;
-        }
+
+        boolean eventFlag = !eventList.isEmpty();
+        boolean testimonialFlag = !testimonialList.isEmpty();
+        boolean consultFlag = !consultsList.isEmpty();
+        boolean brochureFlag = !brochuresList.isEmpty();
+        boolean promoVideoFlag = !promoVideosList.isEmpty();
+        boolean reserachPaperFlag = !researchPapersList.isEmpty();
+        boolean traininngModuleFlag = !trainingModuleTutorialList.isEmpty();
+        boolean citationFlag = !citationTuorials.isEmpty();
 
         model.addAttribute("testimonialFlag", testimonialFlag);
         model.addAttribute("eventFlag", eventFlag);
@@ -813,10 +785,7 @@ public class HomeController {
 
         model.addAttribute("languageCount", languages.size());
 
-        boolean downloadPackageFlag = true;
-        if (packageList.isEmpty()) {
-            downloadPackageFlag = false;
-        }
+        boolean downloadPackageFlag = !packageList.isEmpty();
 
         model.addAttribute("downloadPackageFlag", downloadPackageFlag);
 
@@ -862,48 +831,17 @@ public class HomeController {
 
         /****** Navigation Link Check Separate Code Start ********/
 
-        boolean eventFlag = true;
-        boolean testimonialFlag = true;
-        boolean consultFlag = true;
-        boolean brochureFlag = true;
-        boolean promoVideoFlag = true;
-        boolean reserachPaperFlag = true;
-        boolean traininngModuleFlag = true;
-        boolean citationFlag = true;
-
-        if (events.isEmpty()) {
-            eventFlag = false;
-        }
-
-        if (testi.isEmpty()) {
-            testimonialFlag = false;
-        }
-
-        if (consults.isEmpty()) {
-            consultFlag = false;
-        }
-
-        if (brochures.isEmpty()) {
-            brochureFlag = false;
-        }
-
-        if (promoVideos.isEmpty()) {
-            promoVideoFlag = false;
-        }
-
-        if (researchPapers.isEmpty()) {
-            reserachPaperFlag = false;
-        }
-
         List<TutorialWithWeekAndPackage> trainingModuleTutorialList = tutorialWithWeekAndPackageService.findAll();
-        if (trainingModuleTutorialList.isEmpty()) {
-            traininngModuleFlag = false;
-        }
-
         List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
-        if (citationTuorials.isEmpty()) {
-            citationFlag = false;
-        }
+
+        boolean eventFlag = !events.isEmpty();
+        boolean testimonialFlag = !testi.isEmpty();
+        boolean consultFlag = !consults.isEmpty();
+        boolean brochureFlag = !brochures.isEmpty();
+        boolean promoVideoFlag = !promoVideos.isEmpty();
+        boolean reserachPaperFlag = !researchPapers.isEmpty();
+        boolean traininngModuleFlag = !trainingModuleTutorialList.isEmpty();
+        boolean citationFlag = !citationTuorials.isEmpty();
 
         model.addAttribute("testimonialFlag", testimonialFlag);
         model.addAttribute("eventFlag", eventFlag);
