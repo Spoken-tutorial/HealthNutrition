@@ -8,7 +8,7 @@
 <!---> Package Download Start </-->		
 
 <div th:fragment="download_package">
-    <form th:action="@{/downloadTrainingModules}" method="post" class="form-inline my-2 my-lg-0" name="selectOption" id="packageForm" style="width: 100%;">
+    <form th:if="${downloadPackageFlag}" th:action="@{/downloadTrainingModules}" method="post" class="form-inline my-2 my-lg-0" name="selectOption" id="packageForm" style="width: 100%;">
         
             
                 <select class="custom-select form-control mr-sm-2 mb-2 mb-md-0" id="packageDownloadName" name="packageDownloadName">
