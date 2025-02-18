@@ -46,7 +46,7 @@
 		<div style="width: 100%; margin: auto;">
 			<video  th:id="${'storedVideoId' + docSearch.getDocumentId()}" 
 				  controls style="width:100%!important;" class="vid1">
-				<source th:src="@{/files/}+@{${docSearch.getVideoPath()}}" type="video/mp4"></source>
+				<source th:src="@{/files/{video}(video=${docSearch.getVideoPath()})}" type="video/mp4"></source>
 			</video>
 			</div>
 		</div>

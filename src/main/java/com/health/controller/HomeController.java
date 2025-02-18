@@ -730,7 +730,7 @@ public class HomeController {
         boolean consultFlag = !consultsList.isEmpty();
         boolean brochureFlag = !brochuresList.isEmpty();
         boolean promoVideoFlag = !promoVideosList.isEmpty();
-        boolean reserachPaperFlag = !researchPapersList.isEmpty();
+        boolean researchPaperFlag = !researchPapersList.isEmpty();
         boolean traininngModuleFlag = !trainingModuleTutorialList.isEmpty();
         boolean citationFlag = !citationTuorials.isEmpty();
 
@@ -739,7 +739,7 @@ public class HomeController {
         model.addAttribute("consultFlag", consultFlag);
         model.addAttribute("brochureFlag", brochureFlag);
         model.addAttribute("promoVideoFlag", promoVideoFlag);
-        model.addAttribute("reserachPaperFlag", reserachPaperFlag);
+        model.addAttribute("researchPaperFlag", researchPaperFlag);
         model.addAttribute("traininngModuleFlag", traininngModuleFlag);
         model.addAttribute("citationFlag", citationFlag);
 
@@ -839,7 +839,7 @@ public class HomeController {
         boolean consultFlag = !consults.isEmpty();
         boolean brochureFlag = !brochures.isEmpty();
         boolean promoVideoFlag = !promoVideos.isEmpty();
-        boolean reserachPaperFlag = !researchPapers.isEmpty();
+        boolean researchPaperFlag = !researchPapers.isEmpty();
         boolean traininngModuleFlag = !trainingModuleTutorialList.isEmpty();
         boolean citationFlag = !citationTuorials.isEmpty();
 
@@ -848,7 +848,7 @@ public class HomeController {
         model.addAttribute("consultFlag", consultFlag);
         model.addAttribute("brochureFlag", brochureFlag);
         model.addAttribute("promoVideoFlag", promoVideoFlag);
-        model.addAttribute("reserachPaperFlag", reserachPaperFlag);
+        model.addAttribute("researchPaperFlag", researchPaperFlag);
         model.addAttribute("traininngModuleFlag", traininngModuleFlag);
         model.addAttribute("citationFlag", citationFlag);
 
