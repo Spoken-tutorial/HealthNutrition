@@ -402,7 +402,8 @@ public class AjaxController {
             String document = getDocument(tut, videoFile, "Video");
 
             if (document != "") {
-                tut.setVideo(document);
+                String documentUrl = ServiceUtility.convertFilePathToUrl(document);
+                tut.setVideo(documentUrl);
                 tut.setVideoStatus(CommonData.ADMIN_STATUS);
                 tut.setVideoUser(usr);
                 tutService.save(tut);
