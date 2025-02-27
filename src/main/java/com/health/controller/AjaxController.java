@@ -17,14 +17,17 @@ import java.util.TreeMap;
 //import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +53,7 @@ import com.health.model.FeedbackForm;
 import com.health.model.FilesofBrouchure;
 import com.health.model.Language;
 import com.health.model.LogManegement;
+import com.health.model.PackLanTutorialResource;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
@@ -83,6 +87,7 @@ import com.health.service.FeedbackService;
 import com.health.service.FilesofBrouchureService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
+import com.health.service.PackLanTutorialResourceService;
 import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
@@ -139,6 +144,9 @@ public class AjaxController {
 
     @Autowired
     private PackageLanguageService packLanService;
+
+    @Autowired
+    private PackLanTutorialResourceService packLanTutorialResourceService;
 
     @Autowired
     private TutorialWithWeekAndPackageService tutorialWithPackageAndService;
@@ -1246,6 +1254,38 @@ public class AjaxController {
     /*********************************
      * Training_Module_View End
      **********************************/
+
+    /*********************
+     * Delete Tutorial of Training Module and HST Start
+     **************************/
+
+    @DeleteMapping("/delete-hstTutorial")
+    public ResponseEntity<String> deleteTutorial(@RequestParam(value = "packageLanId") String packageLanId,
+            @RequestParam(value = "packLanTutResId") String packLanTutResId,
+            @RequestParam(value = "tutorialId") String tutorialId) {
+
+        int packageLanId_int = Integer.parseInt(packageLanId);
+        int packLanTutResId_int = Integer.parseInt(packLanTutResId);
+        int tutorialId_int = Integer.parseInt(tutorialId);
+
+        try {
+            PackageLanguage packLanguage = packLanService.findBypackageLanId(packageLanId_int);
+            PackLanTutorialResource packLanTutorialResource = packLanTutorialResourceService
+                    .findById(packLanTutResId_int);
+            Tutorial tutorial = tutService.findByTutorialId(tutorialId_int);
+            if (packLanTutorialResource != null) {
+                packLanTutorialResourceService.delete(packLanTutorialResource);
+            }
+
+            return ResponseEntity.ok("Tutorial deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
+        }
+    }
+
+    /*********************
+     * Delete Tutorial of Training Module and HST End
+     *****************************/
 
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,

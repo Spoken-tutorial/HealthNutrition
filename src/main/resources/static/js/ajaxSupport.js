@@ -2464,6 +2464,50 @@ var clipboard = new ClipboardJS('#copyButtonViewPage', {
             });
         });
 
+
+
+
+ $(".deletHstTutorial-btn").click(function(){
+    var row = $(this).closest("tr");
+    var packageLanId = $(this).data("packagelanid"); 
+    var packLanTutResId = $(this).data("packlantutresid");
+    var tutorialId = $(this).data("tutorialid");
+    var packageName = $(this).data("packagename");
+    var language = $(this).data("language");
+    var topic = $(this).data("topic");
+
+    Swal.fire({
+        title: "Are you sure?",
+        html: "<b>Do you want to delete this tutorial?</b><br><br>" +
+              "<b>Package:</b> " + packageName + "<br>" +
+              "<b>Language:</b> " + language + "<br>" +
+              "<b>Topic:</b> " + topic,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        dangerMode: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/delete-hstTutorial/",
+                data: {
+                    "packageLanId": packageLanId,
+                    "packLanTutResId": packLanTutResId,
+                    "tutorialId": tutorialId
+                },
+                type: "DELETE",
+                success: function(result) {
+                    Swal.fire("Deleted!", "Tutorial deleted successfully!", "success");
+                    row.remove(); // Remove row after successful deletion
+                },
+                error: function(err) {
+                    Swal.fire("Error!", "Error deleting tutorial!", "error");
+                }
+            });
+        }
+    });
+});
     
 /************************************Assign Video End ********************************************** */
 			
