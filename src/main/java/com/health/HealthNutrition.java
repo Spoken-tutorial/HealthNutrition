@@ -1,7 +1,5 @@
 package com.health;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.health.threadpool.TaskProcessingService;
-import com.health.utility.CommonData;
+import com.health.utility.ServiceUtility;
 
 @ServletComponentScan
 @SpringBootApplication
@@ -66,17 +64,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
 
             logger.error("Exception: ", e);
         }
-
-        String baseDir = env.getProperty("spring.applicationexternalPath.name");
-        new File(baseDir + CommonData.uploadDirectoryCategory).mkdirs();
-        new File(baseDir + CommonData.uploadDirectoryQuestion).mkdirs();
-        new File(baseDir + CommonData.uploadDirectoryTutorial).mkdirs();
-        new File(baseDir + CommonData.uploadUserImage).mkdirs();
-        new File(baseDir + CommonData.uploadDirectoryTestimonial).mkdirs();
-        new File(baseDir + CommonData.uploadDirectoryMasterTrainer).mkdirs();
-        new File(baseDir + CommonData.uploadDirectoryEvent).mkdirs();
-        new File(baseDir + CommonData.uploadDirectoryMasterTrainerFeedback).mkdirs();
-        new File(baseDir + CommonData.uploadLiveTutorial).mkdirs();
+        ServiceUtility.createDirectoriesWithPermissions(env);
 
     }
 

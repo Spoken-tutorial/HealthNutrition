@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -25,6 +27,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.health.utility.CommonData;
+import com.health.utility.ServiceUtility;
 
 /**
  * Tutorial object
@@ -334,15 +337,19 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     public void saveOutline(String mediaRoot, String outline) throws IOException {
         Path path = Paths.get(mediaRoot, CommonData.uploadDirectoryOutline);
-
-        Files.createDirectories(path);
+        FileAttribute<Set<PosixFilePermission>> directoryAttribute = ServiceUtility.directoryAttributes();
+        if (directoryAttribute != null) {
+            Files.createDirectories(path, directoryAttribute);
+        } else {
+            Files.createDirectories(path);
+        }
 
         Path filePath = Paths.get(mediaRoot, CommonData.uploadDirectoryOutline, getTutorialId() + ".txt");
         if (outline == null) {
             outline = "";
 
         }
-        Files.write(filePath, outline.getBytes(StandardCharsets.UTF_8));
+        ServiceUtility.writeFileWithPermissions(filePath, outline.getBytes(StandardCharsets.UTF_8));
         String temp = filePath.toString();
 
         int indexToStart = temp.indexOf("Media");

@@ -10,7 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -102,23 +106,87 @@ public class ServiceUtility {
      * @return
      * @throws IOException
      */
+
+    public static void createDirectoriesWithPermissions(Environment env) throws IOException {
+        String baseDir = env.getProperty("spring.applicationexternalPath.name");
+
+        // List of directories to create
+        String[] directories = { CommonData.uploadDirectoryCategory, CommonData.uploadDirectoryQuestion,
+                CommonData.uploadDirectoryTutorial, CommonData.uploadUserImage, CommonData.uploadDirectoryTestimonial,
+                CommonData.uploadDirectoryMasterTrainer, CommonData.uploadDirectoryEvent,
+                CommonData.uploadDirectoryMasterTrainerFeedback, CommonData.uploadLiveTutorial };
+
+        for (String dir : directories) {
+            Path dirPath = Paths.get(baseDir + dir);
+            Files.createDirectories(dirPath); // Ensure the directory exists
+
+            // Set permissions only on Linux/macOS
+            if (!isWindows()) {
+                Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-xr-x"); // 755
+                Files.setPosixFilePermissions(dirPath, permissions);
+            }
+        }
+    }
+
+    public static FileAttribute<Set<PosixFilePermission>> directoryAttributes() {
+        if (!isWindows()) { // Apply only if not Windows
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-xr-x");
+            return PosixFilePermissions.asFileAttribute(permissions);
+        }
+        return null; // Return null for Windows (handle this while creating the directory)
+    }
+
+    public static void writeFileWithPermissions(Path filePath, byte[] fileBytes) throws IOException {
+        // Write file content
+        Files.write(filePath, fileBytes);
+
+        // Apply POSIX permissions only on non-Windows OS
+        if (!isWindows()) {
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rw-r--r--");
+            Files.setPosixFilePermissions(filePath, permissions);
+        }
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
+
     public static boolean createFolder(String file) throws IOException { // check for existence of path
         boolean status = false;
         Path path = Paths.get(file);
-        if (Files.createDirectories(path) != null) {
-            status = true;
+        FileAttribute<Set<PosixFilePermission>> directoryAttribute = directoryAttributes();
+
+        if (directoryAttribute != null) {
+            if (Files.createDirectories(path, directoryAttribute) != null) {
+                status = true;
+            }
+        } else {
+            if (Files.createDirectories(path) != null) {
+                status = true;
+            }
         }
+
         return status;
 
     }
 
     public static boolean createFolder(Path path) throws IOException { // check for existence of path
         boolean status = false;
+
         if (Files.exists(path))
             return status;
-        if (Files.createDirectories(path) != null) {
-            status = true;
+
+        FileAttribute<Set<PosixFilePermission>> directoryAttribute = directoryAttributes();
+        if (directoryAttribute != null) {
+            if (Files.createDirectories(path, directoryAttribute) != null) {
+                status = true;
+            }
+        } else {
+            if (Files.createDirectories(path) != null) {
+                status = true;
+            }
         }
+
         return status;
 
     }
@@ -155,7 +223,8 @@ public class ServiceUtility {
 
         Path fileNameAndPath = Paths.get(pathToUpload, uploadFile.getOriginalFilename());
 
-        Files.write(fileNameAndPath, uploadFile.getBytes());
+        writeFileWithPermissions(fileNameAndPath, uploadFile.getBytes());
+
         logger.info("File Name Path1: {} ", fileNameAndPath.toString());
         path = fileNameAndPath.toString();
 
@@ -269,7 +338,7 @@ public class ServiceUtility {
 
         Path fileNameAndPath = Paths.get(pathToUpload, file.getOriginalFilename());
 
-        Files.write(fileNameAndPath, file.getBytes());
+        writeFileWithPermissions(fileNameAndPath, file.getBytes());
         logger.info("File Name And Path: {}", fileNameAndPath.toString());
         path = fileNameAndPath.toString();
 
@@ -470,8 +539,12 @@ public class ServiceUtility {
         String document = "";
         Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                 CommonData.uploadDirectoryScriptZipFiles);
-
-        Files.createDirectories(zipFilePathDirectory);
+        FileAttribute<Set<PosixFilePermission>> directoryAttribute = directoryAttributes();
+        if (directoryAttribute != null) {
+            Files.createDirectories(zipFilePathDirectory, directoryAttribute);
+        } else {
+            Files.createDirectories(zipFilePathDirectory);
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
         String zipFileName = "scripts-" + sdf.format(new Date()) + ".zip";
@@ -560,8 +633,14 @@ public class ServiceUtility {
         String document = "";
         Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                 CommonData.uploadDirectoryScriptZipFiles);
+        FileAttribute<Set<PosixFilePermission>> directoryAttribute = directoryAttributes();
+        if (directoryAttribute != null) {
+            Files.createDirectories(zipFilePathDirectory, directoryAttribute);
 
-        Files.createDirectories(zipFilePathDirectory);
+        } else {
+            Files.createDirectories(zipFilePathDirectory);
+
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
         String zipFileName = "scripts-" + sdf.format(new Date()) + ".zip";
@@ -595,8 +674,14 @@ public class ServiceUtility {
         String document = "";
         Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                 CommonData.uploadDirectoryTrainingModuleZipFiles);
+        FileAttribute<Set<PosixFilePermission>> directoryAttribute = directoryAttributes();
+        if (directoryAttribute != null) {
+            Files.createDirectories(zipFilePathDirectory, directoryAttribute);
 
-        Files.createDirectories(zipFilePathDirectory);
+        } else {
+            Files.createDirectories(zipFilePathDirectory);
+
+        }
 
         // SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
         String zipFileName = packageName + "_" + langName + ".zip";
