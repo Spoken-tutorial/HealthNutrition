@@ -364,10 +364,8 @@ font-weight:bold!important;
 						                        <tr th:each="tempTutorial : ${temp.getPackLanTutorialResource()}">
 						                            
 						                            <td><span th:text="${tempTutorial.getTutorial().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span></td>
-						                         	<td><button class="delete-btn btn-outline-danger deletHstTutorial-btn"
-						                         	th:data-packageLanId="${ temp.getPackageLanId()}"
-						                         	th:data-packLanTutResId="${ tempTutorial.getId()}"
-						                         	th:data-tutorialId="${ tempTutorial.getTutorial().getTutorialId()}"
+						                         	<td><button class="delete-btn btn-outline-danger deletHstTutorial-btn"						                       
+						                         	th:data-packLanTutResId="${ tempTutorial.getId()}"						                         	
 						                         	th:data-packageName="${ temp.getPackageContainer().getPackageName()}"
 						                         	th:data-language="${ temp.getLan().getLangName()}"
 						                         	th:data-topic="${ tempTutorial.getTutorial().getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"

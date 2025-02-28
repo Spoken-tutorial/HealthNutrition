@@ -1259,22 +1259,42 @@ public class AjaxController {
      * Delete Tutorial of Training Module and HST Start
      **************************/
 
-    @DeleteMapping("/delete-hstTutorial")
-    public ResponseEntity<String> deleteTutorial(@RequestParam(value = "packageLanId") String packageLanId,
-            @RequestParam(value = "packLanTutResId") String packLanTutResId,
-            @RequestParam(value = "tutorialId") String tutorialId) {
+    @DeleteMapping("/delete-hstTutorialFromPackage")
+    public ResponseEntity<String> deletehstTutorialFromPackage(
+            @RequestParam(value = "packLanTutResId") String packLanTutResId) {
+
+        int packLanTutResId_int = Integer.parseInt(packLanTutResId);
+
+        try {
+
+            PackLanTutorialResource packLanTutorialResource = packLanTutorialResourceService
+                    .findById(packLanTutResId_int);
+
+            if (packLanTutorialResource != null) {
+                packLanTutorialResourceService.delete(packLanTutorialResource);
+            }
+
+            return ResponseEntity.ok("Tutorial deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
+        }
+    }
+
+    @DeleteMapping("/delete-trainingTutorialfromPackage")
+    public ResponseEntity<String> deleteTrainingTutorialFromPackage(
+            @RequestParam(value = "packageLanId") String packageLanId,
+            @RequestParam(value = "weekTitleVideoId") String weekTitleVideoId) {
 
         int packageLanId_int = Integer.parseInt(packageLanId);
-        int packLanTutResId_int = Integer.parseInt(packLanTutResId);
-        int tutorialId_int = Integer.parseInt(tutorialId);
+        int weekTitleVideoId_int = Integer.parseInt(weekTitleVideoId);
 
         try {
             PackageLanguage packLanguage = packLanService.findBypackageLanId(packageLanId_int);
-            PackLanTutorialResource packLanTutorialResource = packLanTutorialResourceService
-                    .findById(packLanTutResId_int);
-            Tutorial tutorial = tutService.findByTutorialId(tutorialId_int);
-            if (packLanTutorialResource != null) {
-                packLanTutorialResourceService.delete(packLanTutorialResource);
+            WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekTitleVideoId(weekTitleVideoId_int);
+            TutorialWithWeekAndPackage twp = tutorialWithPackageAndService
+                    .findByPackageLanguageAndWeektitle(packLanguage, weekTitleVideo);
+            if (twp != null) {
+                tutorialWithPackageAndService.delete(twp);
             }
 
             return ResponseEntity.ok("Tutorial deleted successfully");

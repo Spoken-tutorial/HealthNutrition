@@ -2469,9 +2469,7 @@ var clipboard = new ClipboardJS('#copyButtonViewPage', {
 
  $(".deletHstTutorial-btn").click(function(){
     var row = $(this).closest("tr");
-    var packageLanId = $(this).data("packagelanid"); 
     var packLanTutResId = $(this).data("packlantutresid");
-    var tutorialId = $(this).data("tutorialid");
     var packageName = $(this).data("packagename");
     var language = $(this).data("language");
     var topic = $(this).data("topic");
@@ -2490,11 +2488,11 @@ var clipboard = new ClipboardJS('#copyButtonViewPage', {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: "/delete-hstTutorial/",
+                url: "/delete-hstTutorialFromPackage/",
                 data: {
-                    "packageLanId": packageLanId,
-                    "packLanTutResId": packLanTutResId,
-                    "tutorialId": tutorialId
+                    
+                    "packLanTutResId": packLanTutResId
+                   
                 },
                 type: "DELETE",
                 success: function(result) {
@@ -2508,6 +2506,54 @@ var clipboard = new ClipboardJS('#copyButtonViewPage', {
         }
     });
 });
+
+$(".deleteTrainingModuleTutorial-btn").click(function(){
+    var row = $(this).closest("tr");
+    var packageLanId = $(this).data("packagelanid"); 
+    var weekTitleVideoId = $(this).data("weektitlevideoid");
+    var packageName = $(this).data("packagename");
+    var language = $(this).data("language");
+    var week = $(this).data("week");
+    var fileName = $(this).data("filename");
+    var title = $(this).data("title");
+
+    Swal.fire({
+        title: "Are you sure?",
+        html: "<b>Do you want to delete this tutorial?</b><br><br>" +
+              "<b>Package:</b> " + packageName + "<br>" +
+              "<b>Language:</b> " + language + "<br>" +
+              "<b>Week:</b> " + week + "<br>" +
+              "<b>fileName:</b> " + fileName  + "<br>" +
+              "<b>title:</b> " + title,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        dangerMode: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/delete-trainingTutorialfromPackage/",
+                data: {
+                   
+                   
+                    "packageLanId": packageLanId,
+                    "weekTitleVideoId": weekTitleVideoId
+                },
+                type: "DELETE",
+                success: function(result) {
+                    Swal.fire("Deleted!", "Tutorial deleted successfully!", "success");
+                    row.remove(); // Remove row after successful deletion
+                },
+                error: function(err) {
+                    Swal.fire("Error!", "Error deleting tutorial!", "error");
+                }
+            });
+        }
+    });
+});
+    
+
     
 /************************************Assign Video End ********************************************** */
 			
