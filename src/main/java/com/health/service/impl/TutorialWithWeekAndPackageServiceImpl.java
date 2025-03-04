@@ -50,6 +50,12 @@ public class TutorialWithWeekAndPackageServiceImpl implements TutorialWithWeekAn
     }
 
     @Override
+    public void delete(TutorialWithWeekAndPackage twp) {
+        repo.delete(twp);
+
+    }
+
+    @Override
     public List<TutorialWithWeekAndPackage> findByWeekTitlesAndPackageLanguages(List<WeekTitleVideo> weekTitles,
             List<PackageLanguage> packageLanguages) {
 
