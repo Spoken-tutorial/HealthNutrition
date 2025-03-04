@@ -1264,6 +1264,7 @@ public class AjaxController {
             @RequestParam(value = "packLanTutResId") String packLanTutResId) {
 
         int packLanTutResId_int = Integer.parseInt(packLanTutResId);
+        logger.info("packLanTutResId_int in delete-hstTutorialFromPackage:{} ", packLanTutResId_int);
 
         try {
 
@@ -1276,6 +1277,7 @@ public class AjaxController {
 
             return ResponseEntity.ok("Tutorial deleted successfully");
         } catch (Exception e) {
+            logger.error("Error in Deleting delete-hstTutorialFromPackage", e);
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
         }
     }
@@ -1287,6 +1289,8 @@ public class AjaxController {
 
         int packageLanId_int = Integer.parseInt(packageLanId);
         int weekTitleVideoId_int = Integer.parseInt(weekTitleVideoId);
+        logger.info("In delete-trainingTutorialfromPackage packageLanId_int : {} weekTitleVideoId_int: {} ",
+                packageLanId_int, weekTitleVideoId_int);
 
         try {
             PackageLanguage packLanguage = packLanService.findBypackageLanId(packageLanId_int);
@@ -1299,6 +1303,7 @@ public class AjaxController {
 
             return ResponseEntity.ok("Tutorial deleted successfully");
         } catch (Exception e) {
+            logger.error("Error in Deleting delete-trainingTutorialfromPackage", e);
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
         }
     }
