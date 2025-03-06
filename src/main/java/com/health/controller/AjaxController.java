@@ -110,6 +110,7 @@ import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
+import com.health.threadpool.ZipCreationThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -138,6 +139,9 @@ public class AjaxController {
 
     @Autowired
     private VideoResourceService videoResourceService;
+
+    @Autowired
+    private ZipCreationThreadService zipCreationThreadService;
 
     @Autowired
     private PackageContainerService packageContainerService;
@@ -1272,6 +1276,13 @@ public class AjaxController {
                     .findById(packLanTutResId_int);
 
             if (packLanTutorialResource != null) {
+
+                PackageLanguage packLanguage = packLanTutorialResource.getPackageLanguage();
+                PackageContainer packageContainer = packLanguage.getPackageContainer();
+                String langName = packLanguage.getLan().getLangName();
+                zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                        packageContainer.getPackageName(), langName, env);
+
                 packLanTutorialResourceService.delete(packLanTutorialResource);
             }
 
@@ -1298,6 +1309,12 @@ public class AjaxController {
             TutorialWithWeekAndPackage twp = tutorialWithPackageAndService
                     .findByPackageLanguageAndWeektitle(packLanguage, weekTitleVideo);
             if (twp != null) {
+
+                PackageContainer packageContainer = packLanguage.getPackageContainer();
+                String langName = packLanguage.getLan().getLangName();
+                zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                        packageContainer.getPackageName(), langName, env);
+
                 tutorialWithPackageAndService.delete(twp);
             }
 
