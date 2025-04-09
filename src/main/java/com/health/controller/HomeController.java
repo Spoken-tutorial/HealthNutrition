@@ -72,6 +72,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
@@ -757,6 +758,57 @@ public class HomeController {
         Map<String, Integer> cat = arlist1.get(0);
         Map<String, Integer> lan = arlist1.get(1);
         Map<String, Integer> topic = arlist.get(0);
+
+        Category catforAutoPlay = catService.findByid(catId);
+        Language lanforAutoPlay = null;
+        if (lanId != 0) {
+            lanforAutoPlay = lanService.getById(lanId);
+        } else {
+            lanforAutoPlay = lanService.getById(22);
+        }
+
+        Tutorial autoPlayTutorial = null;
+        List<Integer> topicIds = new ArrayList<>(topic.values());
+
+        for (int i = 0; i < topicIds.size(); i++) {
+            if (topicIds.get(i) == topicId && i + 1 < topicIds.size()) {
+
+                int nextTopicId = topicIds.get(i + 1);
+
+                Topic nextTopic = topicService.findById(nextTopicId);
+                TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(catforAutoPlay, nextTopic);
+
+                if (tcm != null) {
+                    ContributorAssignedTutorial con = conService.findByTopicCatAndLanViewPart(tcm, lanforAutoPlay);
+                    List<Tutorial> tempTutorials = tutService.findAllByContributorAssignedTutorialEnabled(con);
+
+                    if (!tempTutorials.isEmpty()) {
+                        autoPlayTutorial = tempTutorials.get(0);
+                    }
+                }
+                break;
+            }
+        }
+        if (autoPlayTutorial != null) {
+            Map<String, Object> tutorialData = new HashMap<>();
+            tutorialData.put("topicName",
+                    autoPlayTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+            tutorialData.put("langName", autoPlayTutorial.getConAssignedTutorial().getLan().getLangName());
+            tutorialData.put("tutorialId", autoPlayTutorial.getTutorialId());
+            tutorialData.put("catName",
+                    autoPlayTutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonTutorialData;
+            try {
+                jsonTutorialData = objectMapper.writeValueAsString(tutorialData);
+                model.addAttribute("nextTutorialJson", jsonTutorialData);
+            } catch (JsonProcessingException e) {
+                logger.error("Exception Error in JsonTutorialData", e);
+            }
+
+        }
+        model.addAttribute("autoPlayTutorial", autoPlayTutorial);
         model.addAttribute("categories", cat);
         model.addAttribute("languages", lan);
         model.addAttribute("topics", topic);
@@ -1713,7 +1765,12 @@ public class HomeController {
 
             @PathVariable(name = "tutId") int tutId,
 
-            @PathVariable(name = "query") String query, Principal principal, Model model) {
+            @PathVariable(name = "query") String query,
+
+            @RequestParam(name = "autoplay", required = false, defaultValue = "0") int autoplay,
+            @RequestParam(name = "fullscreen", required = false, defaultValue = "0") int fullscreen,
+
+            Principal principal, Model model) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
@@ -1750,6 +1807,8 @@ public class HomeController {
         model.addAttribute("language", lanId);
         model.addAttribute("topic", topicId);
         model.addAttribute("tutorialId", tutId);
+        model.addAttribute("autoplayChecked", autoplay == 1);
+        model.addAttribute("fullscreenMode", fullscreen == 1);
 
         if (!langName.equals("English")) {
 

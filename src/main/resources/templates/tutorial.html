@@ -8,7 +8,7 @@
 </head>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
-	<section>
+	<section  id="loginSectionofTutorial">
 		<div class="px-md-3">
 			<div class="row header-top pt-2">
 				<div
@@ -38,8 +38,8 @@
 		</div>
 	</section>
 	<nav th:replace="index.html :: navbar"></nav>
-	<div class="container">
-	<div th:replace="common/commonElements :: search_bar"></div> 
+	<div id="searchbarDivofTutorialContainer" class="container">
+	<div  th:replace="common/commonElements :: search_bar"></div> 
 	<!-- <section id="search-bar" class="container-lg my-5">
 <form th:action="@{/tutorials}" class="form-inline" style="width:100%;">
 <div class="row" style="width: 100%;">
@@ -91,7 +91,7 @@
 			<div class="row">
 				<div class="col-md-8 p-2">
 											
-			<video id="storedVideoId" style="  top: 0; left: 0; width: 100%; height: 100%;" class="video-fluid z-depth-1 vid1"  controls autoplay >
+			<video id="storedVideoId" style="  top: 0; left: 0; width: 100%; height: 100%;" class="video-fluid z-depth-1 vid1" playsinline  controls autoplay >
   			<source th:src="@{/files/{video}(video=${tutorial.getVideo()})}" type="video/mp4" />
   			
   			 <!-- Condition for English tutorial -->
@@ -135,7 +135,18 @@
 		<span th:text="${preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span> :
 		<span th:text="${preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></span>
 		</a></p></section>
-		<section><p> User Visit : <span th:text="${tutorial.getUserVisit()}"/></p></section>
+		<section class="row">
+    <div class="col-md-8 d-flex justify-content-between align-items-center p-2">
+        <p class="mb-0">
+            User Visit: <span th:text="${tutorial.getUserVisit()}"></span>
+        </p>
+
+        <label class="d-flex align-items-center mb-0">
+            <input type="checkbox" id="autoPlayCheckbox" name="autoPlayCheckbox" th:checked="${autoplayChecked}">
+            <span class="ms-2"> Auto play next video</span>
+        </label>
+    </div>
+</section>
 		<section><div class="col-md-8" id="scrolling-captions" style="max-height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #ccc;"></div>
 		<div class="col-md-4"></div>
 </section>
@@ -243,6 +254,7 @@
 	</main>
 	 <br><br>
 	 
+	 
 	  <footer class="footer" style="margin-bottom:0px;">
 	  <div class="container" >
 	  
@@ -283,6 +295,40 @@
 	  </div>
 	
     </footer>
+    
+		   <div id="videoPreloaderOverlay" style="
+	    display: none;
+	    position: fixed;
+	    top: 0; left: 0;
+	    width: 100%; height: 100%;
+	    background: rgba(0,0,0,0.85);
+	    z-index: 10000;
+	    align-items: center;
+	    justify-content: center;
+	    color: white;
+	    font-size: 18px;
+	    text-align: center;
+	    flex-direction: column;
+	">
+	    <div class="loader" style="
+	        border: 4px solid rgba(255,255,255,0.3);
+	        border-top: 4px solid white;
+	        border-radius: 50%;
+	        width: 40px;
+	        height: 40px;
+	        animation: spin 1s linear infinite;
+	        margin-bottom: 16px;
+	    "></div>
+	    <div>Loading next video...</div>
+	</div>
+	
+	<style>
+	@keyframes spin {
+	    0% { transform: rotate(0deg); }
+	    100% { transform: rotate(360deg); }
+	}
+	</style>
+
  
 	<div th:replace="common/trail :: body-bottom-scripts"></div>
 	
@@ -298,6 +344,107 @@
  
 
  </style>
+ 
+ <script th:inline="javascript">
+	 
+    const autoplayFlag = /*[[${autoplayFlag}]]*/ 0;
+    const fullscreenFlag = /*[[${fullscreenFlag}]]*/ 0;
+    
+    
+    let nextTutorial = null;
+    let nextUrl=null;
+    try {
+        nextTutorial = JSON.parse(/*[[${nextTutorialJson}]]*/ '{}');
+    } catch (e) {
+        console.error("Error parsing next tutorial JSON:", e);
+    }
+	if(nextTutorial){
+		 nextUrl = `/tutorial_view/${nextTutorial.topicName}/${nextTutorial.langName}/${nextTutorial.tutorialId}/q/`;
+	}
+     
+	console.log("nextUrl:" + nextUrl);
+	document.addEventListener('DOMContentLoaded', function () {
+    const video = document.getElementById('storedVideoId');
+    const autoPlayCheckbox = document.getElementById('autoPlayCheckbox');
+
+  
+
+    // Check if the browser is in fullscreen mode
+    function isFullScreen() {
+        return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+    }
+
+    // Open video in fullscreen
+    function openFullScreen(videoElement) {
+        if (videoElement.requestFullscreen) {
+            videoElement.requestFullscreen();
+        } else if (videoElement.webkitRequestFullscreen) {
+            videoElement.webkitRequestFullscreen();
+        } else if (videoElement.mozRequestFullScreen) {
+            videoElement.mozRequestFullScreen();
+        } else if (videoElement.msRequestFullscreen) {
+            videoElement.msRequestFullscreen();
+        }
+    }
+
+   video.addEventListener('ended', function () {
+    if (autoPlayCheckbox.checked && nextUrl !== null && nextUrl !== 'null') {
+        const wasInFullScreen = !!isFullScreen();
+        let autoPlay = 1;
+        let fullScreen = wasInFullScreen ? 1 : 0;
+        let finalUrl = nextUrl + `?autoplay=${autoPlay}&fullscreen=${fullScreen}`;
+
+        const topicName = nextTutorial.topicName || 'Unknown Topic';
+        const langName = nextTutorial.langName || 'Unknown Language';
+
+        // Show toast
+        toast.textContent = `🎬 Up next: ${topicName} in ${langName}`;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.opacity = '1';
+        }, 10);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                toast.style.display = 'none';
+
+                if (wasInFullScreen) {
+                    sessionStorage.setItem("reenterFullscreen", "true");
+                }
+
+                // Show preloader
+                const preloader = document.getElementById("videoPreloaderOverlay");
+                preloader.style.display = "flex";
+
+                // Give time for preloader to show
+                setTimeout(() => {
+                    window.location.href = finalUrl;
+                }, 600); // slight delay before navigating
+            }, 500);
+        }, 3000);
+    }
+});
+
+
+    // On page load of new video page, re-enter fullscreen if needed
+			if (sessionStorage.getItem("reenterFullscreen") === "true") {
+			    sessionStorage.removeItem("reenterFullscreen");
+			    
+			    // Wait until Plyr is fully ready
+			    setTimeout(() => {
+			        if (player && player.fullscreen && typeof player.fullscreen.enter === 'function') {
+			            player.fullscreen.enter();
+			        } else {
+			            openFullScreen(video); // fallback
+			        }
+			    }, 500); // give it half a second to settle
+			}
+});
+
+</script>
+ 
+ 
 <script>
 		var projectPath='[(@{/})]';		
 		//var videos = document.querySelectorAll('video');
@@ -324,12 +471,39 @@
 ];
 
   const player = new Plyr('.vid1',{controls});
+  
+	  // Add toast element after Plyr initializes
+	const wrapper = document.querySelector('.plyr__video-wrapper');
+	const toast = document.createElement('div');
+	toast.id = 'nextVideoToast';
+	toast.style.cssText = `
+	    display: none;
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    background-color: rgba(0, 0, 0, 0.8);
+	    color: #fff;
+	    padding: 16px 24px;
+	    border-radius: 10px;
+	    font-size: 18px;
+	    text-align: center;
+	    z-index: 9999;
+	    opacity: 0;
+	    transition: opacity 0.5s ease;
+	    pointer-events: none;
+	    max-width: 80%;
+	`;
+	wrapper.appendChild(toast);
+
 			
 	</script>
 	
 	
 	<!-- JavaScript for scrolling captions -->
 <script th:inline="javascript">
+	
+	
     document.addEventListener('DOMContentLoaded', function () {
         const video = document.getElementById('storedVideoId');
          video.muted = false;
