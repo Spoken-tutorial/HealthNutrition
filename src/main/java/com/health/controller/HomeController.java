@@ -747,11 +747,11 @@ public class HomeController {
     }
 
     private void getModelData(Model model) {
-        getModelData(model, 0, 0, 0, "");
+        getModelData(model, 0, 0, 0, "", false);
 
     }
 
-    private void getModelData(Model model, int catId, int topicId, int lanId, String query) {
+    private void getModelData(Model model, int catId, int topicId, int lanId, String query, boolean nextVideoFlag) {
 
         ArrayList<Map<String, Integer>> arlist = ajaxController.getTopicAndLanguageByCategory(catId, topicId, lanId);
         ArrayList<Map<String, Integer>> arlist1 = ajaxController.getCategoryAndLanguageByTopic(catId, topicId, lanId);
@@ -759,56 +759,60 @@ public class HomeController {
         Map<String, Integer> lan = arlist1.get(1);
         Map<String, Integer> topic = arlist.get(0);
 
-        Category catforAutoPlay = catService.findByid(catId);
-        Language lanforAutoPlay = null;
-        if (lanId != 0) {
-            lanforAutoPlay = lanService.getById(lanId);
-        } else {
-            lanforAutoPlay = lanService.getById(22);
-        }
+        if (nextVideoFlag) {
+            Category catforAutoPlay = catService.findByid(catId);
+            Language lanforAutoPlay = null;
+            if (lanId != 0) {
+                lanforAutoPlay = lanService.getById(lanId);
+            } else {
+                lanforAutoPlay = lanService.getById(22);
+            }
 
-        Tutorial autoPlayTutorial = null;
-        List<Integer> topicIds = new ArrayList<>(topic.values());
+            Tutorial autoPlayTutorial = null;
+            List<Integer> topicIds = new ArrayList<>(topic.values());
 
-        for (int i = 0; i < topicIds.size(); i++) {
-            if (topicIds.get(i) == topicId && i + 1 < topicIds.size()) {
+            for (int i = 0; i < topicIds.size(); i++) {
+                if (topicIds.get(i) == topicId && i + 1 < topicIds.size()) {
 
-                int nextTopicId = topicIds.get(i + 1);
+                    int nextTopicId = topicIds.get(i + 1);
 
-                Topic nextTopic = topicService.findById(nextTopicId);
-                TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(catforAutoPlay, nextTopic);
+                    Topic nextTopic = topicService.findById(nextTopicId);
+                    TopicCategoryMapping tcm = topicCatService.findAllByCategoryAndTopic(catforAutoPlay, nextTopic);
 
-                if (tcm != null) {
-                    ContributorAssignedTutorial con = conService.findByTopicCatAndLanViewPart(tcm, lanforAutoPlay);
-                    List<Tutorial> tempTutorials = tutService.findAllByContributorAssignedTutorialEnabled(con);
+                    if (tcm != null) {
+                        ContributorAssignedTutorial con = conService.findByTopicCatAndLanViewPart(tcm, lanforAutoPlay);
+                        List<Tutorial> tempTutorials = tutService.findAllByContributorAssignedTutorialEnabled(con);
 
-                    if (!tempTutorials.isEmpty()) {
-                        autoPlayTutorial = tempTutorials.get(0);
+                        if (!tempTutorials.isEmpty()) {
+                            autoPlayTutorial = tempTutorials.get(0);
+                        }
                     }
+                    break;
                 }
-                break;
             }
-        }
-        if (autoPlayTutorial != null) {
-            Map<String, Object> tutorialData = new HashMap<>();
-            tutorialData.put("topicName",
-                    autoPlayTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
-            tutorialData.put("langName", autoPlayTutorial.getConAssignedTutorial().getLan().getLangName());
-            tutorialData.put("tutorialId", autoPlayTutorial.getTutorialId());
-            tutorialData.put("catName",
-                    autoPlayTutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
+            if (autoPlayTutorial != null) {
+                Map<String, Object> tutorialData = new HashMap<>();
+                tutorialData.put("topicName",
+                        autoPlayTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName());
+                tutorialData.put("langName", autoPlayTutorial.getConAssignedTutorial().getLan().getLangName());
+                tutorialData.put("tutorialId", autoPlayTutorial.getTutorialId());
+                tutorialData.put("catName",
+                        autoPlayTutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName());
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonTutorialData;
-            try {
-                jsonTutorialData = objectMapper.writeValueAsString(tutorialData);
-                model.addAttribute("nextTutorialJson", jsonTutorialData);
-            } catch (JsonProcessingException e) {
-                logger.error("Exception Error in JsonTutorialData", e);
+                ObjectMapper objectMapper = new ObjectMapper();
+                String jsonTutorialData;
+                try {
+                    jsonTutorialData = objectMapper.writeValueAsString(tutorialData);
+                    model.addAttribute("nextTutorialJson", jsonTutorialData);
+                } catch (JsonProcessingException e) {
+                    logger.error("Exception Error in JsonTutorialData", e);
+                }
+
             }
+            model.addAttribute("autoPlayTutorial", autoPlayTutorial);
 
         }
-        model.addAttribute("autoPlayTutorial", autoPlayTutorial);
+
         model.addAttribute("categories", cat);
         model.addAttribute("languages", lan);
         model.addAttribute("topics", topic);
@@ -1184,7 +1188,7 @@ public class HomeController {
         model.addAttribute("userInfo", usr);
 
         Pageable pageable = PageRequest.of(page, 10);
-        getModelData(model, cat, topic, lan, query);
+        getModelData(model, cat, topic, lan, query, false);
         navigationLinkCheck(model);
 
         if (cat != 0) {
@@ -1718,7 +1722,7 @@ public class HomeController {
             topicTemp.add(conAssignedTutorial.getTopicCatId().getTopic().getTopicName());
         }
 
-        getModelData(model, catId, topicId, lanId, query);
+        getModelData(model, catId, topicId, lanId, query, true);
         navigationLinkCheck(model);
         List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
                 tutorial.getTutorialId(), lanName.getLanId());
@@ -1904,7 +1908,7 @@ public class HomeController {
             topicTemp.add(conAssignedTutorial.getTopicCatId().getTopic().getTopicName());
         }
 
-        getModelData(model, catId, topicId, lanId, query);
+        getModelData(model, catId, topicId, lanId, query, true);
         navigationLinkCheck(model);
         List<Integer> scriptVerList = getApiVersion(scriptmanager_api, category.getCategoryId(),
                 tutorial.getTutorialId(), language.getLanId());
