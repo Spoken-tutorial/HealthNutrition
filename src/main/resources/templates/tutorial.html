@@ -88,9 +88,12 @@
 						style="color: black;"> (Language)</span>
 				</h1>
 			</div>
-			<div class="row">
-				<div class="col-md-8 p-2">
-											
+			
+			
+			
+			<div class="row" id="OriginalMaodeRow">
+			<div class="col-md-8 p-2">
+									
 			<video id="storedVideoId" style="  top: 0; left: 0; width: 100%; height: 100%;" class="video-fluid z-depth-1 vid1" playsinline  controls autoplay >
   			<source th:src="@{/files/{video}(video=${tutorial.getVideo()})}" type="video/mp4" />
   			
@@ -100,7 +103,6 @@
 			 <!-- Condition for non-English tutorial -->
    			 <track kind="captions" th:unless="${languageCheck == 'English'}" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
    			 <track kind="captions" th:unless="${languageCheck == 'English'}" th:label="${labelforEnglish}" th:src="@{/files/} + @{${vttFileforEnglish}}" th:srclang="${srclangforEnglish}" />
-
 
 			</video>
 			
@@ -130,6 +132,15 @@
 					</div>
 				</div>
 			</div>
+			<!-- Stop Theatre Mode Button - fixed on screen -->
+			<button id="stopTheatreModeBtn"
+		        class="btn btn-danger"
+		        style="position: fixed; top: 10px; right: 10px; z-index: 11000; display: none; transform: scale(0.9); transform-origin: top right;">
+		    	Stop Theatre Mode
+			</button>
+
+
+
 		</section>
 		<section th:if="${preRequisticTutrial != null }"><p>Watch pre-requisite : <a th:href="@{'/tutorial_view/'  +${preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()} +'/'+${preRequisticTutrial.getConAssignedTutorial().getLan().getLangName()}+ '/' +${preRequisticTutrial.getTutorialId()} + '/' + 'q' +'/'}">
 		<span th:text="${preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}"></span> :
@@ -327,6 +338,8 @@
 	    0% { transform: rotate(0deg); }
 	    100% { transform: rotate(360deg); }
 	}
+		
+
 	</style>
 
  
@@ -347,8 +360,8 @@
  
  <script th:inline="javascript">
 	 
-    const autoplayFlag = /*[[${autoplayFlag}]]*/ 0;
-    const fullscreenFlag = /*[[${fullscreenFlag}]]*/ 0;
+    const autoplayFlag = /*[[${autoplayChecked}]]*/ 0;
+    //const fullscreenFlag = /*[[${fullscreenMode}]]*/ 0;
     
     
     let nextTutorial = null;
@@ -366,6 +379,71 @@
 	document.addEventListener('DOMContentLoaded', function () {
     const video = document.getElementById('storedVideoId');
     const autoPlayCheckbox = document.getElementById('autoPlayCheckbox');
+	const fullscreenFlag = /*[[${fullscreenMode}]]*/ false;
+
+    const mainCol = document.querySelector('#OriginalMaodeRow .col-md-8');
+    const sideCol = document.querySelector('#OriginalMaodeRow .col-md-4');
+    const stopBtn = document.getElementById('stopTheatreModeBtn');
+    let theatreFlag = false; 
+
+    function applyTheatreMode() {
+		theatreFlag = true; 
+        // Set to full width
+        mainCol.classList.remove('col-md-8');
+        mainCol.classList.add('col-md-12');
+
+        // Hide side column
+        sideCol.style.display = 'none';
+
+        // Add fixed styling
+        mainCol.style.position = 'fixed';
+        mainCol.style.top = '0';
+        mainCol.style.left = '0';
+        mainCol.style.width = '100vw';
+        mainCol.style.height = '100vh';
+        mainCol.style.zIndex = '9999';
+        mainCol.style.background = 'black';
+        if (stopBtn) {
+    stopBtn.style.display = 'block';
+}
+
+        
+    }
+
+    function exitTheatreMode() {
+		theatreFlag = false; 
+        // Revert width
+        mainCol.classList.remove('col-md-12');
+        mainCol.classList.add('col-md-8');
+
+        // Show side column
+        sideCol.style.display = 'block';
+
+        // Remove fixed styling
+        mainCol.style.position = '';
+        mainCol.style.top = '';
+        mainCol.style.left = '';
+        mainCol.style.width = '';
+        mainCol.style.height = '';
+        mainCol.style.zIndex = '';
+        mainCol.style.background = '';
+        if (stopBtn) {
+        stopBtn.style.display = 'none';
+    }
+    }
+
+    // If fullscreen mode is enabled on page load
+    if (fullscreenFlag) {
+        applyTheatreMode();
+    }
+
+    // Handle button click
+    if (stopBtn) {
+        stopBtn.addEventListener('click', () => {
+            exitTheatreMode();
+        });
+    }
+    
 
   
 
@@ -391,7 +469,9 @@
     if (autoPlayCheckbox.checked && nextUrl !== null && nextUrl !== 'null') {
         const wasInFullScreen = !!isFullScreen();
         let autoPlay = 1;
-        let fullScreen = wasInFullScreen ? 1 : 0;
+        //let fullScreen = wasInFullScreen ? 1 : 0;
+        // Update fullscreen value based on theatreFlag
+        let fullScreen = theatreFlag ? 1 : (wasInFullScreen ? 1 : 0);
         let finalUrl = nextUrl + `?autoplay=${autoPlay}&fullscreen=${fullScreen}`;
 
         const topicName = nextTutorial.topicName || 'Unknown Topic';
@@ -428,6 +508,8 @@
 
 
     // On page load of new video page, re-enter fullscreen if needed
+			
+		/*
 			if (sessionStorage.getItem("reenterFullscreen") === "true") {
 			    sessionStorage.removeItem("reenterFullscreen");
 			    
@@ -440,6 +522,8 @@
 			        }
 			    }, 500); // give it half a second to settle
 			}
+			
+			*/
 });
 
 </script>
