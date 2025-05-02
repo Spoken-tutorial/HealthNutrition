@@ -13,23 +13,7 @@ color: #044F7A!important;
 font-weight:bold!important;
 }
 
- .trainingResourceTable {
-        background-color: #f8f9fa; /* Light gray background */
-        color: #333; /* Dark text color */
-    }
 
-    .trainingResourceTable th {
-        background-color: #007bff; /* Blue header background */
-        color: white; /* White header text */
-    }
-
-    .trainingResourceTable td {
-        background-color: #ffffff; /* White cell background */
-    }
-
-    .trainingResourceTable tr:nth-child(even) td {
-        background-color: #f2f2f2; /* Light gray for even rows */
-    }
     
    
 </style>
@@ -133,7 +117,7 @@ font-weight:bold!important;
 								            <div class="form-group">
 
 												<label th:if="${iter.index == 0}" th:for="${'file' + iter.index}">Upload File</label> 
-												<input type="file" class="form-control" th:id="${'fileId' + iter.index}" name="file" th:data-index="${iter.index}" accept=".jpeg,.jpg,.png,.pdf,.doc,.xlsx,.csv,.zip"  onchange="validate_file_size(this,734003200)"/>
+												<input type="file" class="form-control" th:id="${'fileId' + iter.index}" name="file" th:data-index="${iter.index}" accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.odt,.xlsx,.csv,.zip"  onchange="validate_file_size(this,734003200)"/>
 												<small> (.jpg or .png or .pdf or .docx or .odt or .xlsx or .csv  or .zip Only)</small> 
 												<small>Max file size : 700 MB</small>
 
@@ -173,59 +157,182 @@ font-weight:bold!important;
 								<tr>
 									<th scope="col">Date Added</th>
 									<th scope="col">Topic</th>
-									
 									<th scope="col">Language</th>
 									<th scope="col">Enable/Disable</th>
-									<th scope="col">Files</th>
+									<th scope="col">Pdf File</th>
+									<th scope="col">Doc File</th>
+									<th scope="col">Excel File</th>
+									<th scope="col">Image File</th>
 									
 									 
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:each="temp : ${topicLanList}">
+								<tr th:each="temp : ${trainingResourceList}">
 								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
-								 <td><span th:text = "${temp.getTopic().getTopicName()}"></span></td>
-								  <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
+								 <td><span th:text = "${temp.getTopicLanMapping().getTopic().getTopicName()}"></span></td>
+								  <td><span th:text = "${temp.getTopicLanMapping().getLan().getLangName()}"></span></td>
 							      <td>
 	  		
 						   			<div th:if="${temp.isStatus()}">
-						   				<a class="disableTopicLanguage" th:value="${temp.getTopicLanId()}" title="Click to Disable Topic-Language"><i class="fas fa-times-circle" th:id="${temp.getTopicLanId()}" style="color:red"></i></a>
+						   				<a class="disableTopicLanguage" th:value="${temp.getTrainingResourceId()}" title="Click to Disable Training Resource "><i class="fas fa-times-circle" th:id="${temp.getTrainingResourceId()}" style="color:red"></i></a>
 						   			</div>
 						   			<div th:unless="${temp.isStatus()}">
-						   				<a class="enableTopicLanguage" th:value="${temp.getTopicLanId()}" title="Click to Enable Topic-Language"><i class="fas fa-check-circle" th:id="${temp.getTopicLanId()}" style="color:green"></i> </a>
+						   				<a class="enableTopicLanguage" th:value="${temp.getTrainingResourceId()}" title="Click to Enable Training Resource"><i class="fas fa-check-circle" th:id="${temp.getTrainingResourceId()}" style="color:green"></i> </a>
 						   			</div>
 						   		
 						  			</td>
+						  				
+						  			<td>
+									    <div>
+									        <span th:text="${temp.getPdfFileNameWithorWitoutZip()}"></span><br>
+									
+									        <!-- Actions if PDF exists -->
+									        <div th:if="${temp.getPdfFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{'/trainingReource/view/PdfZip/' + ${temp.getTrainingResourceId()}}" 
+									               title="View PDF">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/trainingReource/edit/PdfZip/' + ${temp.getTrainingResourceId()}}" 
+									               title="Edit Zip">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
+									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
+									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-fileName="${temp.getPdfFileNameWithorWitoutZip()}"
+									                    title="Delete">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no PDF -->
+									        <div th:if="${temp.getPdfFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Pdf available
+									        </div>
+									    </div>
+									</td>
+
+									
+									<td>
+										
+										 <div>
+									        <span th:text="${temp.getDocFileNameWithorWitoutZip()}"></span><br>
+									
+									        <!-- Actions if Doc exists -->
+									        <div th:if="${temp.getDocFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{${'/trainingReource/view/DocZip/' + temp.getTrainingResourceId()}}" 
+									               title="View Doc">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/trainingReource/edit/DocZip/' + ${temp.getTrainingResourceId()}}" 
+									               title="Edit Zip">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
+									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
+									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-fileName="${temp.getDocFileNameWithorWitoutZip()}"
+									                    title="Delete">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no Doc -->
+									        <div th:if="${temp.getDocFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Doc available
+									        </div>
+									    </div>
+						                 
+									</td>
+									
+									<td>
+										
+										 <div>
+									        <span th:text="${temp.getExcelFileNameWithorWitoutZip()}"></span><br>
+									
+									        <!-- Actions if Excel exists -->
+									        <div th:if="${temp.getExcelFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{${'/trainingReource/view/ExcelZip/' + temp.getTrainingResourceId()}}" 
+									               title="View Excel">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/trainingReource/edit/ExcelZip/' + ${temp.getTrainingResourceId()}}" 
+									               title="Edit Zip">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
+									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
+									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-fileName="${temp.getExcelFileNameWithorWitoutZip()}"
+									                    title="Delete">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no Excel-->
+									        <div th:if="${temp.getExcelFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Excel available
+									        </div>
+									    </div>
+						            
+						                 
+									</td>
+									
+									<td>
+										<div>
+									        <span th:text="${temp.getImageFileNameWithorWitoutZip()}"></span><br>
+									
+									
+									        <!-- Actions if Image exists -->
+									        <div th:if="${temp.getImageFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{${'/trainingReource/view/ImageZip/' + temp.getTrainingResourceId()}}" 
+									               title="View Image">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/trainingReource/edit/ImageZip/' + ${temp.getTrainingResourceId()}}" 
+									               title="Edit Zip">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
+									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
+									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-fileName="${temp.getImageFileNameWithorWitoutZip()}"
+									                    title="Delete">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no Image-->
+									        <div th:if="${temp.getImageFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Image available
+									        </div>
+									    </div>
+						            
+						                
+									</td>
 							
-							      <td>
-									    <div th:if="${temp.getAllTrainingResourceFile() != null}">
-						                    <table class="table table-striped weekTitleTable" th:id="${'trainingResourceTable' + temp.getTopicLanId() }">
-												<thead>
-													<tr>
-														<th scope="col"> </th>
-														<th scope="col">PNG File</th>
-														<th scope="col">PDF File</th>
-														<th scope="col">DOC File</th>
-														<th scope="col">Excel File</th>
-														
-														
-													</tr>
-												</thead>
-												<tbody>
-						                        <tr th:each="tempTrainingReaiurce : ${temp.getAllTrainingResourceFile()}">
-						                            <td><span th:text="${tempTrainingReaiurce.PngFile()}"></span>
-						                            <a th:href="@{${'/trainingReource/edit/Png/' + temp.getTrainingResourceId()}}">Edit</a></td>
-						                            <td><span th:text="${tempTrainingReaiurce.getPdfFile()}"></span>
-						                             <a th:href="@{${'/trainingReource/edit/Pdf/' + temp.getTrainingResourceId()}}">Edit</a></td>
-						                            <td><span th:text="${tempTrainingReaiurce.getDocFile()}"></span></td>
-						                             <a th:href="@{${'/trainingReource/edit/Doc/' + temp.getTrainingResourceId()}}">Edit</a>
-						                            <td><span th:text="${tempTrainingReaiurce.getExcelFile()}"></span></td>
-						                             <a th:href="@{${'/trainingReource/edit/Excel/' + temp.getTrainingResourceId()}}">Edit</a>
-						                        </tr>
-						                        </tbody>
-						                    </table>
-						                </div>
-								  </td>
+							   
 							     
 								  
 							    </tr>
@@ -253,11 +360,8 @@ font-weight:bold!important;
 	<div th:replace="common/trail :: body-bottom-scripts"></div>
 	<script type="text/javascript">
 $(document).ready( function () {
-	$('#trainingResourceTable').DataTable();
+	
     $('#myTable').DataTable();
-    $('.trainingResourceTable').each(function() {
-				$(this).DataTable();
-			});
     
      
     
