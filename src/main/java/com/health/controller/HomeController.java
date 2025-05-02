@@ -5323,7 +5323,9 @@ public class HomeController {
         model.addAttribute("languages", languages);
 
         List<Topic> topics = getTopics();
+        List<TrainingResource> trainingResourceList = trainingResourceService.findAll();
         model.addAttribute("topics", topics);
+        model.addAttribute("trainingResourceList", trainingResourceList);
 
         return "addTrainingResource";
     }
@@ -5353,21 +5355,9 @@ public class HomeController {
             return addTrainingResourceGet(req, principal, model);
         }
 
-//        for (MultipartFile uniquefile : files) {
-//            if (!uniquefile.isEmpty()) {
-//                if (!ServiceUtility.checkFileExtensionZip(uniquefile)) {
-//                    model.addAttribute("error_msg", "Only zip files are supported");
-//                    return addTrainingResourceGet(req, principal, model);
-//                }
-//            }
-//
-//        }
-
         Topic topic = topicService.findById(topicId);
 
         Timestamp dateAdded = ServiceUtility.getCurrentTime();
-
-        List<TrainingResource> trainingResources = new ArrayList<>();
 
         Set<Language> addedLan = new HashSet<>();
 
@@ -5391,12 +5381,6 @@ public class HomeController {
                             topicLanMapiingService.save(topicLanMapping);
                             logger.info(" iter:{}  TopicLanMapping :{}", i, topicLanMapping);
                         }
-
-                        // String zipOriginalFilename = zipFile.getOriginalFilename();
-
-                        // Save the zip file temporarily to extract contents
-                        // Path tempZipPath = Files.createTempFile("uploaded-", ".zip");
-                        // Files.write(tempZipPath, zipFile.getBytes());
 
                         List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(topicLanMapping);
                         TrainingResource tr = null;
@@ -5452,7 +5436,7 @@ public class HomeController {
                         }
 
                         if (fileExtention.equals(CommonData.ZIP_EXTENSION)) {
-                            // ZipFile zip=new ZipFile(file.getOriginalFilename());
+
                             extentions = ServiceUtility.checkFileExtentionsInZip(file);
                             if (extentions.size() == 1) {
                                 for (String ext : extentions) {
@@ -5500,16 +5484,14 @@ public class HomeController {
 
                         tr.setDateAdded(dateAdded);
                         tr.setTopicLanMapping(topicLanMapping);
-                        trainingResources.add(tr);
-                        // Files.deleteIfExists(tempZipPath);
+
+                        trainingResourceService.save(tr);
 
                     }
 
                 }
 
             }
-
-            trainingResourceService.saveAll(trainingResources);
 
         } catch (Exception e) {
             model.addAttribute("error_msg", "Some errors occurred, please contact the Admin");

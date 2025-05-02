@@ -1,6 +1,7 @@
 package com.health.model;
 
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -99,6 +100,38 @@ public class TrainingResource implements Serializable {
 
     public void setImgPath(String imgPath) {
         this.imgPath = imgPath;
+    }
+
+    public String getPdfFileNameWithorWitoutZip() {
+        if (pdfPath == null || pdfPath.trim().isEmpty()) {
+            return "NA";
+        }
+        String fileName = Paths.get(pdfPath).getFileName().toString();
+        return fileName;
+    }
+
+    public String getDocFileNameWithorWitoutZip() {
+        if (docPath == null || docPath.trim().isEmpty()) {
+            return "NA";
+        }
+        String fileName = Paths.get(docPath).getFileName().toString();
+        return fileName;
+    }
+
+    public String getExcelFileNameWithorWitoutZip() {
+        if (excelPath == null || excelPath.trim().isEmpty()) {
+            return "NA";
+        }
+        String fileName = Paths.get(excelPath).getFileName().toString();
+        return fileName;
+    }
+
+    public String getImageFileNameWithorWitoutZip() {
+        if (imgPath == null || imgPath.trim().isEmpty()) {
+            return "NA";
+        }
+        String fileName = Paths.get(imgPath).getFileName().toString();
+        return fileName;
     }
 
     public Timestamp getDateAdded() {
