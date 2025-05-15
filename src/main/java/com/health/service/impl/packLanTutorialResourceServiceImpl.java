@@ -54,4 +54,10 @@ public class packLanTutorialResourceServiceImpl implements PackLanTutorialResour
         return repo.findByTutorialAndPackageLanguage(tutorial, packageLanguage);
     }
 
+    @Override
+    public void delete(PackLanTutorialResource packLanTutorialResource) {
+        repo.delete(packLanTutorialResource);
+
+    }
+
 }

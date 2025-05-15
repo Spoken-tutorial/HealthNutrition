@@ -844,7 +844,8 @@ public class TaskProcessingService {
 
                                     JsonNode publishedArray = jsonNode.get("status");
                                     if (publishedArray != null
-                                            && publishedArray.asText().equals(CommonData.STATUS_DONE)) {
+                                            && (publishedArray.asText().equals(CommonData.STATUS_DONE)
+                                                    || publishedArray.asText().equals(CommonData.STATUS_NOTFOUND))) {
                                         queueRepo.delete(queue);
                                         logger.info("respondId: {}  publishedArray: {}", respondId,
                                                 publishedArray.asText());
