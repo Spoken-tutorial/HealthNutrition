@@ -17,14 +17,17 @@ import java.util.TreeMap;
 //import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +53,7 @@ import com.health.model.FeedbackForm;
 import com.health.model.FilesofBrouchure;
 import com.health.model.Language;
 import com.health.model.LogManegement;
+import com.health.model.PackLanTutorialResource;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
@@ -83,6 +87,7 @@ import com.health.service.FeedbackService;
 import com.health.service.FilesofBrouchureService;
 import com.health.service.LanguageService;
 import com.health.service.LogMangementService;
+import com.health.service.PackLanTutorialResourceService;
 import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
@@ -105,6 +110,7 @@ import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
+import com.health.threadpool.ZipCreationThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -135,10 +141,16 @@ public class AjaxController {
     private VideoResourceService videoResourceService;
 
     @Autowired
+    private ZipCreationThreadService zipCreationThreadService;
+
+    @Autowired
     private PackageContainerService packageContainerService;
 
     @Autowired
     private PackageLanguageService packLanService;
+
+    @Autowired
+    private PackLanTutorialResourceService packLanTutorialResourceService;
 
     @Autowired
     private TutorialWithWeekAndPackageService tutorialWithPackageAndService;
@@ -1246,6 +1258,76 @@ public class AjaxController {
     /*********************************
      * Training_Module_View End
      **********************************/
+
+    /*********************
+     * Delete Tutorial of Training Module and HST Start
+     **************************/
+
+    @DeleteMapping("/delete-hstTutorialFromPackage")
+    public ResponseEntity<String> deletehstTutorialFromPackage(
+            @RequestParam(value = "packLanTutResId") String packLanTutResId) {
+
+        int packLanTutResId_int = Integer.parseInt(packLanTutResId);
+        logger.info("packLanTutResId_int in delete-hstTutorialFromPackage:{} ", packLanTutResId_int);
+
+        try {
+
+            PackLanTutorialResource packLanTutorialResource = packLanTutorialResourceService
+                    .findById(packLanTutResId_int);
+
+            if (packLanTutorialResource != null) {
+
+                PackageLanguage packLanguage = packLanTutorialResource.getPackageLanguage();
+                PackageContainer packageContainer = packLanguage.getPackageContainer();
+                String langName = packLanguage.getLan().getLangName();
+                zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                        packageContainer.getPackageName(), langName, env);
+
+                packLanTutorialResourceService.delete(packLanTutorialResource);
+            }
+
+            return ResponseEntity.ok("Tutorial deleted successfully");
+        } catch (Exception e) {
+            logger.error("Error in Deleting delete-hstTutorialFromPackage", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
+        }
+    }
+
+    @DeleteMapping("/delete-trainingTutorialfromPackage")
+    public ResponseEntity<String> deleteTrainingTutorialFromPackage(
+            @RequestParam(value = "packageLanId") String packageLanId,
+            @RequestParam(value = "weekTitleVideoId") String weekTitleVideoId) {
+
+        int packageLanId_int = Integer.parseInt(packageLanId);
+        int weekTitleVideoId_int = Integer.parseInt(weekTitleVideoId);
+        logger.info("In delete-trainingTutorialfromPackage packageLanId_int : {} weekTitleVideoId_int: {} ",
+                packageLanId_int, weekTitleVideoId_int);
+
+        try {
+            PackageLanguage packLanguage = packLanService.findBypackageLanId(packageLanId_int);
+            WeekTitleVideo weekTitleVideo = weekTitleVideoService.findByWeekTitleVideoId(weekTitleVideoId_int);
+            TutorialWithWeekAndPackage twp = tutorialWithPackageAndService
+                    .findByPackageLanguageAndWeektitle(packLanguage, weekTitleVideo);
+            if (twp != null) {
+
+                PackageContainer packageContainer = packLanguage.getPackageContainer();
+                String langName = packLanguage.getLan().getLangName();
+                zipCreationThreadService.deleteKeyFromZipNamesAndPackageAndLanZipIfExists(
+                        packageContainer.getPackageName(), langName, env);
+
+                tutorialWithPackageAndService.delete(twp);
+            }
+
+            return ResponseEntity.ok("Tutorial deleted successfully");
+        } catch (Exception e) {
+            logger.error("Error in Deleting delete-trainingTutorialfromPackage", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
+        }
+    }
+
+    /*********************
+     * Delete Tutorial of Training Module and HST End
+     *****************************/
 
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,

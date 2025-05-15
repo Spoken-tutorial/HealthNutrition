@@ -22,4 +22,6 @@ public interface TutorialWithWeekAndPackageService {
 
     void save(TutorialWithWeekAndPackage twp);
 
+    void delete(TutorialWithWeekAndPackage twp);
+
 }
