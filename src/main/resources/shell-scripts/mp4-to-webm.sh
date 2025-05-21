@@ -10,14 +10,14 @@ FFMPEG_GLOBAL_OPTIONS="
 
 # Custom ffmpeg options
 FFMPEG_OPTIONS="
--ac 1
--c:a libopus
--b:a 64k
--c:v libvpx-vp9
--b:v 500k
+-c:a libvorbis
+-b:a 96k
+-c:v libvpx
+-b:v 1M
 -crf 30
--r 12
+-r 8
 "
+
 
 oninterrupt() {
     rm -f "$eachWebmFile"
