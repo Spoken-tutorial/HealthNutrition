@@ -92,7 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
             "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
             "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/addTrainingResource",
-            "/trainingReource/view/**",
+            "/trainingReourceAdminView/**",
 
     };
 
