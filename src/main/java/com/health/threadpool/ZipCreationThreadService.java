@@ -108,6 +108,13 @@ public class ZipCreationThreadService {
         return zipUrl;
     }
 
+    private Path replaceExtension(Path path, String newExtension) {
+        String filename = path.getFileName().toString();
+        int dotIndex = filename.lastIndexOf(".");
+        String newFilename = (dotIndex != -1 ? filename.substring(0, dotIndex) : filename) + newExtension;
+        return path.getParent().resolve(newFilename);
+    }
+
     private void copyFileUsingRsync(Path source, Path destination) {
         RSync rsync = new RSync().source(source.toString()).destination(destination.toString()).archive(true)
                 .delete(true);
@@ -125,8 +132,9 @@ public class ZipCreationThreadService {
 
     }
 
-    private void generateLocalIndexHtml(String langName, int packageId, String indexPath, Path originalPath) {
-        Map<String, Object> modelAttributes = getTrainingModuleData("", langName, packageId, originalPath);
+    private void generateLocalIndexHtml(String langName, int packageId, String indexPath, Path originalPath,
+            Environment env) {
+        Map<String, Object> modelAttributes = getTrainingModuleData("", langName, packageId, originalPath, env);
         thymeleafService.createHtmlFromTemplate("indexofHstTrainingModule", modelAttributes, indexPath, request,
                 response);
     }
@@ -198,16 +206,26 @@ public class ZipCreationThreadService {
 
                     try {
 
-                        Path sourcePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                                tutorialPath);
-                        Path destainationPath = destInationDirectoryforLanAndWeek.resolve(title + ".mp4");
+                        Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), tutorialPath);
 
+                        String titleWithExtension;
+                        Path sourcePath;
+
+                        Path webmSourcePath = replaceExtension(basePath, ".webm");
+                        if (webmSourcePath.toFile().exists()) {
+                            sourcePath = webmSourcePath;
+                            titleWithExtension = title + ".webm";
+                        } else {
+                            sourcePath = basePath; // replaceExtension(basePath, ".mp4");
+                            titleWithExtension = title + ".mp4";
+                        }
+
+                        Path destinationPath = destInationDirectoryforLanAndWeek.resolve(titleWithExtension);
                         File sourceFile = sourcePath.toFile();
+
                         if (sourceFile.exists()) {
 
-                            // FileUtils.copyFile(sourceFile, destainationPath.toFile());
-                            copyFileUsingRsync(sourcePath, destainationPath);
-
+                            copyFileUsingRsync(sourcePath, destinationPath);
                         }
 
                         Path sourcePathforThumbanil = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
@@ -268,7 +286,7 @@ public class ZipCreationThreadService {
 
                 }
                 int packageId = packageContainer.getPackageId();
-                generateLocalIndexHtml(langName, packageId, indexHtmlPath.toString(), destInationDirectory1);
+                generateLocalIndexHtml(langName, packageId, indexHtmlPath.toString(), destInationDirectory1, env);
                 Path destInationDirectory2 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                         CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder);
                 String temp = destInationDirectory2.toString();
@@ -351,7 +369,7 @@ public class ZipCreationThreadService {
     }
 
     private Map<String, Object> getTrainingModuleData(String weekName, String langName, int packageId,
-            Path originalPath) {
+            Path originalPath, Environment env) {
         Map<String, Object> modelAttributes = new HashMap<>();
 
         try {
@@ -402,9 +420,23 @@ public class ZipCreationThreadService {
                     String sessionName = weekTitleVideo.getVideoResource().getSessionName();
                     String title = weekTitleVideo.getTitle().replace(' ', '_');
                     String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
+                    String tempTutorialPath = weekTitleVideo.getVideoResource().getVideoPath();
 
-                    Path sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator, sessionName,
-                            File.separator, title + ".mp4");
+                    Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), tempTutorialPath);
+
+                    Path sourcePath;
+
+                    Path webmSourcePath = replaceExtension(basePath, ".webm");
+                    if (webmSourcePath.toFile().exists()) {
+                        sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator, sessionName,
+                                File.separator, title + ".webm");
+                        ;
+
+                    } else {
+                        sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator, sessionName,
+                                File.separator, title + ".mp4");
+
+                    }
 
                     String videoPath = sourcePath.toString();
                     weekTitleVideo.setIndexVideoPath(videoPath);
