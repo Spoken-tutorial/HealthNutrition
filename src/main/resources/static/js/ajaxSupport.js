@@ -2732,6 +2732,37 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
 					*/
 
 			
+			//Hide the Search bar of tutorial view page when autoPalybox checked
+					 $(document).ready(function () {
+		        // Initial check on page load
+		        toggleSearchbar();
+		
+		        // On checkbox change
+		        $('#autoPlayCheckbox').change(function () {
+		            toggleSearchbar();
+		        });
+		
+		        function toggleSearchbar() {
+		            if ($('#autoPlayCheckbox').is(':checked')) {
+						
+		                $('#searchbarDivofTutorialContainer').hide();
+		                $('#loginSectionofTutorial').hide();
+		                
+		                
+		            } else {
+		                $('#searchbarDivofTutorialContainer').show();
+		                 $('#loginSectionofTutorial').show();
+			                
+		                
+		            }
+		            
+		            console.log("Search bar div found?", $('#searchbarDivofTutorialContainer').length);
+					console.log("Autoplay checkbox state:", $('#autoPlayCheckbox').is(':checked'));
+		        }
+		    });
+			
+			
+			
 			$('#fetch_questions').click(
 			function() {
 			$('#questionnaire').tab('show');
