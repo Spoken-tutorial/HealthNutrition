@@ -182,6 +182,7 @@ import com.health.threadpool.TaskProcessingService;
 import com.health.threadpool.ZipCreationThreadService;
 import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
+import com.health.utility.FileConversionUtility;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
@@ -215,6 +216,9 @@ public class HomeController {
 
     @Autowired
     private CommonData commonData;
+
+    @Autowired
+    private FileConversionUtility fileConversionUtility;
 
     @Autowired
     private LiveTutorialService liveTutorialService;
@@ -392,6 +396,9 @@ public class HomeController {
 
     @Value("${scriptmanager_path}")
     private String scriptmanager_path;
+
+    @Value("${doc_to_pdf.command}")
+    private String doctoPdfCommand;
 
     private static YouTube youtube;
 
@@ -5558,8 +5565,52 @@ public class HomeController {
 
         }
 
+        // Conversion of doc/excel to pdf and pdf to thumbnails.
+        List<String> finalFilePath = new ArrayList<>();
+
+        if (!fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+                for (String str : filePaths) {
+
+                    /*
+                     * Here we check png beacuse parent folder may have alreday created thumnails
+                     * and their paths have been added in filePaths from extractZipIfNeeded function
+                     * if zip is alreday extracted then that folder is used for pdf and thumnails
+                     * too.
+                     * 
+                     */
+                    if (!str.endsWith(".png")) {
+                        finalFilePath.add(str);
+                        fileConversionUtility.generateThumbnailFromPdfAndSave(str);
+                    }
+
+                }
+            }
+
+            else {
+                // Intially we convert both doc and excel using same libreoffice cmd
+                for (String str : filePaths) {
+                    /*
+                     * Here we check png and pdf beacuse parent folder may have alreday created
+                     * thumnails and pdfs and their respective paths have been added in filePaths
+                     * from extractZipIfNeeded function if zip is alreday extracted then that folder
+                     * is used for pdf and thumnails too.
+                     * 
+                     */
+                    if (!str.endsWith(".png") && !str.endsWith(".pdf")) {
+                        finalFilePath.add(str);
+                        String pdfPath = fileConversionUtility.convertDoctoPdf(str, doctoPdfCommand);
+                        fileConversionUtility.generateThumbnailFromPdfAndSave(pdfPath);
+                    }
+
+                }
+            }
+        } else {
+            finalFilePath.addAll(filePaths);
+        }
+
         model.addAttribute("trainingResource", tr);
-        model.addAttribute("filePaths", filePaths);
+        model.addAttribute("filePaths", finalFilePath);
         logger.info("Alok Kumar");
         for (String str : filePaths) {
             logger.info("file Path :{}", str);

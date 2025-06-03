@@ -65,7 +65,7 @@
 								
 								<div th:unless="${fileType == 'Image'}">
 								<div class="row">
-							    <div class="col-md-6 mb-4" th:each="path : ${filePaths}">
+							    <div class="col-md-3 mb-4" th:each="path : ${filePaths}">
 							       
 							            <!-- ✅ PDF: Preview + File Name + Download -->
 							            <div th:if="${fileType == 'Pdf'}">
@@ -73,8 +73,10 @@
 							                    <!-- File Name -->
 							                    <h6 class="mb-2" th:text="${#strings.substring(path, path.lastIndexOf('/') + 1)}"></h6>
 							
-							                    <!-- Preview -->
-							                    <iframe th:src="@{/files/}+@{${path}}" width="100%" height="400px" frameborder="0"></iframe>
+							                    <!-- Thumbnail Preview -->
+												<img th:src="@{'/files/' + ${#strings.concat(#strings.substring(path, 0, path.lastIndexOf('.')), '.png')}}" 
+     											 alt="Thumbnail" />
+	
 							
 							                    <!-- Download -->
 							                    <a th:href="@{/files/}+@{${path}}" download class="btn btn-sm btn-outline-danger mt-3">
@@ -87,6 +89,9 @@
 							            <div th:if="${fileType == 'Doc'}">
 							                <div class="card p-3 d-flex align-items-start">
 							                    <h6 th:text="${#strings.substring(path, path.lastIndexOf('/') + 1)}"></h6>
+							                    <!-- Thumbnail Preview -->
+												<img th:src="@{'/files/' + ${#strings.concat(#strings.substring(path, 0, path.lastIndexOf('.')), '.png')}}" 
+     											class="card-img-top img-fluid" alt="Thumbnail" />
 							                    <i class="fas fa-file-word fa-3x text-primary mb-2"></i>
 							                    <a th:href="@{/files/}+@{${path}}" download class="btn btn-sm btn-outline-primary mt-2">
 							                        <i class="fas fa-download"></i> Download Word
@@ -98,6 +103,9 @@
 							            <div th:if="${fileType == 'Excel'}">
 							                <div class="card p-3 d-flex align-items-start">
 							                    <h6 th:text="${#strings.substring(path, path.lastIndexOf('/') + 1)}"></h6>
+							                    <!-- Thumbnail Preview -->
+												<img th:src="@{'/files/' + ${#strings.concat(#strings.substring(path, 0, path.lastIndexOf('.')), '.png')}}" 
+     											class="card-img-top img-fluid" alt="Thumbnail"/>
 							                    <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
 							                    <a th:href="@{/files/}+@{${path}}" download class="btn btn-sm btn-outline-success mt-2">
 							                        <i class="fas fa-download"></i> Download Excel
