@@ -94,6 +94,17 @@ public class Language implements Comparable<Language>, Serializable {
     @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<PackageLanguage> packageLanguages = new HashSet<PackageLanguage>();
 
+    @OneToMany(mappedBy = "lan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<TopicLanMapping> topicLanMappings = new HashSet<TopicLanMapping>();
+
+    public Set<TopicLanMapping> getTopicLanMappings() {
+        return topicLanMappings;
+    }
+
+    public void setTopicLanMappings(Set<TopicLanMapping> topicLanMappings) {
+        this.topicLanMappings = topicLanMappings;
+    }
+
     public Set<LiveTutorial> getLiveTutorial() {
         return liveTutorial;
     }
