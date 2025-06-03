@@ -330,6 +330,7 @@ public class CommonData {
     public static final Long TASK_SLEEP_TIME = 10L * 1000;
     public static final Long NO_TASK_SLEEP_TIME_FOR_DELETE = 60L * 1000 * 60;
     public static final Long TASK_SLEEP_TIME_FOR_DELETE = 60L * 1000 * 60;
+    public static final int TIME_UNIT_FOR_WAIT = 60;
 
 //	public static String SCRIPT_MANAGER_VIEW= "view/healthnutrition";
 
