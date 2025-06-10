@@ -21,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -221,6 +222,9 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
     @Column(name = "video", length = 1000)
     private String video;
 
+    @Transient
+    private String indexVideoPath;
+
     @Column(name = "outlinePath", length = 1000)
     private String outlinePath;
 
@@ -289,6 +293,14 @@ public class Tutorial implements Comparable<Tutorial>, Serializable {
 
     public void setTutorialId(int tutorialId) {
         this.tutorialId = tutorialId;
+    }
+
+    public String getIndexVideoPath() {
+        return indexVideoPath;
+    }
+
+    public void setIndexVideoPath(String indexVideoPath) {
+        this.indexVideoPath = indexVideoPath;
     }
 
     public String getCitation() {

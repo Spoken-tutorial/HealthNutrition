@@ -675,6 +675,94 @@ public class ServiceUtility {
         }
     }
 
+    public static String createFileWithSubDirectoriesforHealthTutorial(String originalcatName, String langName,
+            String sourceDirurl, Environment env) throws IOException {
+
+        String catName = originalcatName.replace(' ', '_');
+
+        String document = "";
+        Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles);
+
+        Files.createDirectories(zipFilePathDirectory);
+
+        // SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        String zipFileName = catName + "_" + langName + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+
+        Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
+
+        try (OutputStream fos = Files.newOutputStream(zipFilePathName);
+                ZipOutputStream zos = new ZipOutputStream(fos)) {
+            File filetoZip = new File(sourceDirlName.toString());
+            zipFile(filetoZip, filetoZip.getName(), zos);
+
+            String temp = zipFilePathName.toString();
+            int indexToStart = temp.indexOf("Media");
+            document = temp.substring(indexToStart, temp.length());
+
+        } catch (IOException e) {
+            logger.error("Exception Error  ", e);
+        }
+
+        return document;
+    }
+
+    public static boolean IsCategoryAndLanZipExist(String originalCategoryName, String langName, Environment env) {
+        String catName = originalCategoryName.replace(' ', '_');
+
+        String zipFileName = catName + "_" + langName + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+
+        File file = zipFilePathName.toFile();
+
+        return file.exists();
+
+    }
+
+    public static String getCategoryAndLanZipPath(String originalCategoryName, String langName, Environment env) {
+        String catName = originalCategoryName.replace(' ', '_');
+
+        String zipFileName = catName + "_" + langName + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+
+        String temp = zipFilePathName.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        return document;
+
+    }
+
+    public static void deleteCategoryAndLanZipIfExists(String originalCategoryName, String langName, Environment env) {
+        String catName = originalCategoryName.replace(' ', '_');
+
+        String zipFileName = catName + "_" + langName + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+
+        File file = zipFilePathName.toFile();
+
+        if (file.exists()) {
+
+            boolean isDeleted = file.delete();
+
+            if (isDeleted) {
+                logger.info("Zip File deleted successfully: {} " + zipFileName);
+            } else {
+                logger.info("Failed to delete the zip file: {} " + zipFileName);
+            }
+        } else {
+            logger.info(" ZipFile does not exist: {} " + zipFileName);
+        }
+    }
+
     /**
      * File Info
      * 
