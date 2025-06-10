@@ -111,6 +111,7 @@ import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.threadpool.ZipCreationThreadService;
+import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -139,6 +140,9 @@ public class AjaxController {
 
     @Autowired
     private VideoResourceService videoResourceService;
+
+    @Autowired
+    private ZipHealthTutorialThreadService zipHealthTutorialThreadService;
 
     @Autowired
     private ZipCreationThreadService zipCreationThreadService;
@@ -3312,6 +3316,8 @@ public class AjaxController {
             res.put(CommonData.KEYWORD, CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
             res.put(CommonData.VIDEO, CommonData.tutorialStatus[tutorial.getVideoStatus()]);
             res.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndCategoryAndLanZipIfExists(cat_.getCatName(),
+                    lang.getLangName(), env);
         } else {
             res.put("response", "0");
         }

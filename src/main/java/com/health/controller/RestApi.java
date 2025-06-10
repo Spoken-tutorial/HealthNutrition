@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +31,9 @@ import com.health.service.TopicCategoryMappingService;
 import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
+import com.health.utility.ServiceUtility;
 
 /**
  * Rest APi class return data in JSON format
@@ -60,6 +65,23 @@ public class RestApi {
 
     @Autowired
     private UserRoleService usrRoleService;
+
+    @Autowired
+    private ZipHealthTutorialThreadService zipHealthTutorialThreadService;
+
+    @Autowired
+    private Environment env;
+
+    @Value("${downloadLimit}")
+    private int downloadLimit;
+
+    @Value("${downloadTimeOut}")
+    private long downloadTimeOut;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    private AtomicInteger downloadCount = new AtomicInteger(0);
 
     /**
      * This url fetches all the category and language available in the system
@@ -304,4 +326,37 @@ public class RestApi {
 
     }
 
+    @GetMapping("/downloadHealthTutorials/{catId}/{lanId}")
+    public ResponseEntity<Map<Integer, String>> getZipUrlOfHealthTutorial(@PathVariable("catId") int catId,
+            @PathVariable("lanId") int lanId) {
+
+        Map<Integer, String> resultMap = new HashMap<>();
+
+        Category cat = catService.findByid(catId);
+        Language lan = lanService.getById(lanId);
+
+        if (cat == null || lan == null) {
+            resultMap.put(0, "Either category or language does not exist");
+            return ResponseEntity.ok(resultMap);
+        }
+
+        String catName = cat.getCatName();
+        String langName = lan.getLangName();
+
+        String zipUrl = zipHealthTutorialThreadService.getZipName(catName, langName, env);
+
+        if (zipUrl == null || zipUrl.isEmpty()) {
+            resultMap.put(0, "Zip creation in progress... Please check back after 30 minutes.");
+        } else if ("Error".equals(zipUrl)) {
+            resultMap.put(0, "No tutorials are available for the selected category and language.");
+        } else if (downloadCount.get() == downloadLimit) {
+            resultMap.put(0, "Download limit reached. Please try again after 30 minutes.");
+        } else {
+            String resultantzipUrl = ServiceUtility.convertFilePathToUrl(zipUrl);
+            resultMap.put(1, baseUrl + "/downloadManager?zipUrl=" + resultantzipUrl);
+
+        }
+
+        return ResponseEntity.ok(resultMap);
+    }
 }
