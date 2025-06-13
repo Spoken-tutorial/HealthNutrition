@@ -352,7 +352,7 @@ public class RestApi {
 
         Map<Integer, String> resultMap = new HashMap<>();
 
-        if (courseName.isEmpty() || courseName.isBlank()) {
+        if (courseName == null || courseName.trim().isEmpty()) {
             resultMap.put(0, "No CourseName  is available in url");
             return ResponseEntity.ok(resultMap);
         }
