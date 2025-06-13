@@ -3,14 +3,18 @@ package com.health.threadpool;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +31,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.health.config.ThymeleafService;
@@ -82,18 +87,15 @@ public class ZipHealthTutorialThreadService {
 
     private final ConcurrentHashMap<String, String> ZipNames = new ConcurrentHashMap<>();
 
-    private String createZipforHealthTutorial(String originalCategoryName, String langName, String document,
-            Environment env) {
+    private String createZipforHealthTutorial(String parentZipFolderName, String zipNameWithoutExtention,
+            String document, Environment env) {
         String zipUrl = "";
         try {
-            zipUrl = ServiceUtility.createFileWithSubDirectoriesforHealthTutorial(originalCategoryName, langName,
-                    document, env);
-
-            String catName = originalCategoryName.replace(' ', '_');
-            String rootFolder = catName + "_" + langName;
+            zipUrl = ServiceUtility.createFileWithSubDirectoriesforHealthTutorial(parentZipFolderName,
+                    zipNameWithoutExtention, document, env);
 
             Path oldDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                    document.replace(rootFolder, ""));
+                    document.replace(zipNameWithoutExtention, ""));
 
             FileUtils.deleteDirectory(oldDirectory.toFile());
 
@@ -128,31 +130,60 @@ public class ZipHealthTutorialThreadService {
 
     }
 
-    private void generateLocalIndexHtml(String langName, int catId, String indexPath, Path originalPath,
+    private void generateLocalIndexHtml(Set<Integer> catIds, Set<Integer> lanIds, String indexPath, Path originalPath,
             Environment env) {
-        Map<String, Object> modelAttributes = getHealthTutorialData(langName, catId, originalPath, env);
+        Map<String, Object> modelAttributes = getHealthTutorialData(catIds, lanIds, originalPath, env);
         thymeleafService.createHtmlFromTemplate("indexofHealthTutorial", modelAttributes, indexPath, request, response);
     }
 
     @Async
-    private CompletableFuture<String> createZip(String originalCategoryName, String langName, Environment env) {
+    private CompletableFuture<String> createZip(String courseName, Set<Integer> catIds, Set<Integer> lanIds,
+            Environment env) {
         String zipUrl = "";
 
-        Category category = catService.findBycategoryname(originalCategoryName);
-        Language lan = lanService.getByLanName(langName);
-        List<TopicCategoryMapping> tcmList = topicCatMappingService.findAllByCategory(category);
-        List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
-        List<Tutorial> tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+        List<Category> catList = new ArrayList<>();
+        List<Language> lanList = new ArrayList<>();
+        Set<Tutorial> uniqueTutorials = new LinkedHashSet<>();
+        StringBuilder tempCatIdFolder = new StringBuilder();
+        StringBuilder tempLanIdFolder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        boolean flag = true;
 
-        if (ServiceUtility.IsCategoryAndLanZipExist(originalCategoryName, langName, env)) {
+        for (int catId : catIds) {
+            tempCatIdFolder.append("cat").append(catId).append("_");
+            Category cat = catService.findByid(catId);
+            catList.add(cat);
+
+            for (int lanId : lanIds) {
+
+                Language lan = lanService.getById(lanId);
+                if (flag) {
+                    lanList.add(lan);
+                    tempLanIdFolder.append("lan").append(lanId).append("_");
+                    sb.append(lan.getLangName().replace(' ', '_')).append("_");
+                }
+
+                List<TopicCategoryMapping> tcmList = topicCatMappingService.findAllByCategory(cat);
+                List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
+                List<Tutorial> tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+                uniqueTutorials.addAll(tutorials);
+
+            }
+            flag = false;
+
+        }
+        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString();
+        String zipNameWithoutExtentions = courseName.replace(' ', '_') + "_" + sb.toString();
+
+        if (ServiceUtility.IsCourseNameAndLanZipExist(parentZipfolder, zipNameWithoutExtentions, env)) {
             logger.info("Zip Url Exist");
-            zipUrl = ServiceUtility.getCategoryAndLanZipPath(originalCategoryName, langName, env);
+            zipUrl = ServiceUtility.getCourseNameAndLanZipPath(parentZipfolder, zipNameWithoutExtentions, env);
 
         }
 
         else {
 
-            int countHealthTutorial = tutorials.size();
+            int countHealthTutorial = uniqueTutorials.size();
             if (countHealthTutorial == 0) {
                 zipUrl = "Error";
             }
@@ -162,20 +193,23 @@ public class ZipHealthTutorialThreadService {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
                 String sdfString = "health_tutorials-" + sdf.format(new java.util.Date());
 
-                String catName = originalCategoryName.replace(' ', '_');
-                String rootFolder = catName + "_" + langName;
+                // String catName = originalCategoryName.replace(' ', '_');
+                String rootFolder = zipNameWithoutExtentions;
                 Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                        CommonData.uploadDirectoryHealthTutorialZipFiles, sdfString, File.separator, rootFolder,
-                        File.separator, catName);
+                        CommonData.uploadDirectoryHealthTutorialZipFiles, sdfString, File.separator, rootFolder);
 
                 Path indexHtmlPath = Paths.get(destInationDirectory1.toString(), File.separator, "index.html");
 
-                for (Tutorial tempTutorial : tutorials) {
+                for (Tutorial tempTutorial : uniqueTutorials) {
 
                     ContributorAssignedTutorial con = tempTutorial.getConAssignedTutorial();
                     Topic topic = con.getTopicCatId().getTopic();
                     String originalTopicName = topic.getTopicName();
                     String topicName = originalTopicName.replace(' ', '_');
+                    Category category = con.getTopicCatId().getCat();
+                    String catName = category.getCatName().replace(' ', '_');
+                    Language lan = con.getLan();
+                    String langName = lan.getLangName().replace(' ', '_');
                     int tutorialId = tempTutorial.getTutorialId();
                     String tutorialIdString = Integer.toString(tutorialId);
                     String slide = "";
@@ -197,7 +231,7 @@ public class ZipHealthTutorialThreadService {
 //                    Path destainationPath = destInationDirectoryforTopiccAndLan.resolve(topicName + ".odt");
 
                     Path destInationDirectoryforTutorial = Paths.get(destInationDirectory1.toString(), File.separator,
-                            langName, File.separator, topicName);
+                            catName, File.separator, langName, File.separator, topicName);
                     try {
                         ServiceUtility.createFolder(destInationDirectoryforTutorial);
                     } catch (IOException e) {
@@ -281,31 +315,45 @@ public class ZipHealthTutorialThreadService {
                     }
 
                 }
-                int catId = category.getCategoryId();
-                generateLocalIndexHtml(langName, catId, indexHtmlPath.toString(), destInationDirectory1, env);
+
+                generateLocalIndexHtml(catIds, lanIds, indexHtmlPath.toString(), destInationDirectory1, env);
                 Path destInationDirectory2 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                         CommonData.uploadDirectoryHealthTutorialZipFiles, sdfString, File.separator, rootFolder);
                 String temp = destInationDirectory2.toString();
                 int indexToStart = temp.indexOf("Media");
                 document = temp.substring(indexToStart, temp.length());
-                createZipforHealthTutorial(originalCategoryName, langName, document, env);
-                zipUrl = ServiceUtility.getCategoryAndLanZipPath(originalCategoryName, langName, env);
+                createZipforHealthTutorial(parentZipfolder, zipNameWithoutExtentions, document, env);
+                zipUrl = ServiceUtility.getCourseNameAndLanZipPath(parentZipfolder, zipNameWithoutExtentions, env);
 
             }
 
         }
-        String key = originalCategoryName + "_" + langName;
+        String key = parentZipfolder;
 
         ZipNames.put(key, zipUrl);
         return CompletableFuture.completedFuture(zipUrl);
     }
 
-    public String getZipName(String originalCategoryName, String langName, Environment env) {
-        String key = originalCategoryName + "_" + langName;
+    public String getZipName(String courseName, Set<Integer> catIds, Set<Integer> lanIds, Environment env) {
+
+        StringBuilder tempCatIdFolder = new StringBuilder();
+        StringBuilder tempLanIdFolder = new StringBuilder();
+
+        for (int catId : catIds) {
+            tempCatIdFolder.append("cat").append(catId).append("_");
+        }
+        for (int lanId : lanIds) {
+            Language lan = lanService.getById(lanId);
+            tempLanIdFolder.append("lan").append(lanId).append("_");
+
+        }
+
+        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString();
+        String key = parentZipfolder;
         String zipName = ZipNames.putIfAbsent(key, "");
         if (zipName == null) {
             // Call the Async method
-            createZip(originalCategoryName, langName, env);
+            createZip(courseName, catIds, lanIds, env);
             return null;
         }
         if (zipName.isEmpty()) {
@@ -317,34 +365,54 @@ public class ZipHealthTutorialThreadService {
         return zipName;
     }
 
-    public void deleteKeyFromZipNamesAndCategoryAndLanZipIfExists(String originalCategoryName, String langName,
-            Environment env) {
-        String catName = originalCategoryName.replace(' ', '_');
+    public void deleteKeyFromZipNamesAndHealthTutorialZipIfExists(int catId, int lanId, Environment env) {
+        // Construct identifiers to match in folder names
+        String catIdentifier = "cat" + catId;
+        String lanIdentifier = "lan" + lanId;
 
-        String zipFileName = catName + "_" + langName + ".zip";
-        String key = originalCategoryName + "_" + langName;
+        // Resolve the main directory path
+        Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles);
 
-        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+        File baseDir = basePath.toFile();
 
-        File file = zipFilePathName.toFile();
+        if (!baseDir.exists() || !baseDir.isDirectory()) {
+            logger.warn("HealthTutorialZipFiles directory does not exist or is not a directory: {}", basePath);
+            return;
+        }
 
-        if (file.exists()) {
+        // Loop through all subfolders
+        File[] subFolders = baseDir.listFiles(File::isDirectory);
+        if (subFolders == null)
+            return;
 
-            boolean isDeleted = file.delete();
+        for (File subFolder : subFolders) {
+            String folderName = subFolder.getName();
 
-            if (isDeleted) {
-                ZipNames.remove(key);
-                logger.info("Zip File deleted successfully: {} " + zipFileName);
-            } else {
-                logger.info("Failed to delete the zip file: {} " + zipFileName);
+            // Check if the folder name contains both catId and lanId
+            if (folderName.contains(catIdentifier) && folderName.contains(lanIdentifier)) {
+                // Delete the folder and its contents recursively
+                try {
+                    deleteFolderRecursively(subFolder.toPath());
+                    logger.info("Deleted folder and zip: {}", folderName);
+
+                    // Remove the key from ZipNames map
+                    ZipNames.remove(folderName);
+                    logger.info("Removed key from ZipNames: {}", folderName);
+
+                } catch (IOException e) {
+                    logger.error("Failed to delete folder: " + folderName, e);
+                }
             }
-        } else {
-            logger.info(" ZipFile does not exist: {} " + zipFileName);
         }
     }
 
-    private Map<String, Object> getHealthTutorialData(String langName, int catId, Path originalPath, Environment env) {
+    private void deleteFolderRecursively(Path folderPath) throws IOException {
+        Files.walk(folderPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+    }
+
+    private Map<String, Object> getHealthTutorialData(Set<Integer> catIds, Set<Integer> lanIds, Path originalPath,
+            Environment env) {
         Map<String, Object> modelAttributes = new HashMap<>();
 
         try {
@@ -363,54 +431,137 @@ public class ZipHealthTutorialThreadService {
         modelAttributes.put("rootFolder", "resources_for_zip");
         modelAttributes.put("zipVariable", zipVariable);
 
-        modelAttributes.put("language", langName);
-
-        logger.info("LangName:{}", langName);
-
-        Language localLan = lanService.getByLanName(langName);
-
-        logger.info("localLan:{}", localLan);
-
+        List<Category> catList = new ArrayList<>();
+        List<Language> lanList = new ArrayList<>();
         List<Topic> topics = new ArrayList<>();
+        Set<Tutorial> uniqueTutorials = new LinkedHashSet<>();
+        Set<Category> uniqueCategories = new LinkedHashSet<>();
+        Set<Topic> uniqueTopics = new LinkedHashSet<>();
+        Set<Language> uniqueLanguage = new LinkedHashSet<>();
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String, String>> tutorialJsonList = new ArrayList<>();
+
+        for (int catId : catIds) {
+            Category cat = catService.findByid(catId);
+            for (int lanId : lanIds) {
+                Language lan = lanService.getById(lanId);
+
+                List<TopicCategoryMapping> tcmList = topicCatMappingService.findAllByCategory(cat);
+                List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
+                List<Tutorial> tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+                uniqueTutorials.addAll(tutorials);
+
+            }
+
+        }
+
         List<Tutorial> tutorialList = new ArrayList<>();
-        if (catId != 0) {
-            Category category = catService.findByid(catId);
 
-            Language lan = lanService.getByLanName(langName);
-            List<TopicCategoryMapping> tcmList = topicCatMappingService.findAllByCategory(category);
-            List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
-            List<Tutorial> tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+        if (!uniqueTutorials.isEmpty()) {
 
-            for (Tutorial tempTutorial : tutorials) {
+            for (Tutorial tempTutorial : uniqueTutorials) {
                 ContributorAssignedTutorial con = tempTutorial.getConAssignedTutorial();
+                Category cat = con.getTopicCatId().getCat();
+                String catName = cat.getCatName().replace(' ', '_');
+                Language lan = con.getLan();
+                String langName = lan.getLangName().replace(' ', '_');
                 Topic topic = con.getTopicCatId().getTopic();
                 String originalTopicName = topic.getTopicName();
                 String topicName = originalTopicName.replace(' ', '_');
+
                 int tutorialId = tempTutorial.getTutorialId();
                 // String tutorialIdString = Integer.toString(tutorialId);
-                Path sourcePathofTutorial = Paths.get(langName, File.separator, topicName, File.separator,
-                        topicName + ".mp4");
+                Path sourcePathofTutorial = Paths.get(catName, File.separator, langName, File.separator, topicName,
+                        File.separator, topicName + ".mp4");
 
                 String videoPathofTutorial = sourcePathofTutorial.toString();
                 tempTutorial.setIndexVideoPath(videoPathofTutorial);
                 tutorialList.add(tempTutorial);
-                topics.add(topic);
+                uniqueTopics.add(topic);
+                uniqueCategories.add(cat);
+                uniqueLanguage.add(lan);
+
+                Map<String, String> tutorialData = new HashMap<>();
+                tutorialData.put("category", cat.getCatName());
+                tutorialData.put("topic", topic.getTopicName());
+                tutorialData.put("language", lan.getLangName());
+
+                tutorialJsonList.add(tutorialData);
+
             }
 
+            // Convert to JSON string and add to model
+            try {
+                String tutorialJsonString = mapper.writeValueAsString(tutorialJsonList);
+                modelAttributes.put("tutorialJson", tutorialJsonString);
+            } catch (Exception e) {
+                logger.error("Failed to convert tutorial data to JSON", e);
+            }
+
+            catList.addAll(uniqueCategories);
+            topics.addAll(uniqueTopics);
+            lanList.addAll(uniqueLanguage);
             tutorialList.sort(Comparator.comparing(
                     tempTutorial -> tempTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
             topics.sort(Comparator.comparing(Topic::getTopicName));
 
-            modelAttributes.put("catName", category.getCatName());
+            tutorialList.sort(Comparator.comparing(
+                    tempTutorial -> tempTutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()));
+            catList.sort(Comparator.comparing(Category::getCatName));
+
+            tutorialList.sort(
+                    Comparator.comparing(tempTutorial -> tempTutorial.getConAssignedTutorial().getLan().getLangName()));
+            lanList.sort(Comparator.comparing(Language::getLangName));
 
         }
 
         modelAttributes.put("tutorialList", tutorialList);
-
+        modelAttributes.put("categories", catList);
         modelAttributes.put("topics", topics);
-        modelAttributes.put("languageForHealth", localLan);
-
+        modelAttributes.put("languages", lanList);
+        modelAttributes.put("languageCount", lanList.size());
+        // getModelData(modelAttributes, catIds, lanIds, 0);
         return modelAttributes;
+    }
+
+    private void getModelData(Map<String, Object> modelAttributes, Set<Integer> catIds, Set<Integer> lanIds,
+            int topicId) {
+
+        Map<String, Integer> cat = new LinkedHashMap<>();
+        Map<String, Integer> lan = new LinkedHashMap<>();
+        Map<String, Integer> topic = new LinkedHashMap<>();
+
+        for (int catId : catIds) {
+            for (int lanId : lanIds) {
+                ArrayList<Map<String, Integer>> arlist = ajaxController.getTopicAndLanguageByCategory(catId, topicId,
+                        lanId);
+                ArrayList<Map<String, Integer>> arlist1 = ajaxController.getCategoryAndLanguageByTopic(catId, topicId,
+                        lanId);
+
+                // Merge category and language maps
+                if (arlist1 != null && arlist1.size() >= 2) {
+                    Map<String, Integer> catTemp = arlist1.get(0);
+                    Map<String, Integer> lanTemp = arlist1.get(1);
+
+                    if (catTemp != null)
+                        cat.putAll(catTemp);
+                    if (lanTemp != null)
+                        lan.putAll(lanTemp);
+                }
+
+                // Merge topic map
+                if (arlist != null && arlist.size() >= 1) {
+                    Map<String, Integer> topicTemp = arlist.get(0);
+                    if (topicTemp != null)
+                        topic.putAll(topicTemp);
+                }
+            }
+        }
+
+        modelAttributes.put("categories", cat);
+        modelAttributes.put("languages", lan);
+        modelAttributes.put("topics", topic);
+        modelAttributes.put("languageCount", lan.size());
     }
 
 }

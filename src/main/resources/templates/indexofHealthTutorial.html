@@ -66,29 +66,43 @@
 
 
 <div class="row justify-content-center" style="width: 100%;">
-<div class="col-md-4 mb-3 input-group" style="width:100%;" >
-            <select class="custom-select d-block form-control selectedValue" id="topicView" name="topic">            
+<div class="col-md-3 mb-3 input-group" style="width:100%;" >
+            <select class="custom-select d-block form-control selectedValue" id="categoryname" name="categoryName">
             
-              <option  value="">Select Topic</option>
+            
+              <option  value="">Select Category</option>
              
-              <option  th:each="topic : ${topics}"  th:value="${topic.getTopicName()}" th:text="${topic.getTopicName()}" ></option>
+              <option  th:each="cat : ${categories}"  th:value="${cat.getCatName()}" th:text="${cat.getCatName()}" ></option>
             </select>
-          
            
 </div>
 
-<div class="col-md-4 mb-3 input-group" style="width:100%;" >
-<select class="custom-select d-block form-control" id="languageViewforHealth" name="languageViewforHealth">
+
+<div class="col-md-3 mb-3 input-group" style="width:100%;">
+<select class="custom-select d-block form-control" id="inputTopicName" name="topic">
 			 
-               <option value="">Select Language</option>
-              <option th:each="lan : ${languageForHealth}"  th:value="${lan.getLangName()}" th:text="${lan.getLangName()}"></option> 
+              <option value="">Select Topic</option>
+              <option th:each="topic : ${topics}"  th:value="${topic.getTopicName()}" span th:text="${topic.getTopicName()}"></option>
             </select>
-             
             
 </div>
 
+
+
+<div class="col-md-3 mb-3 input-group" style="width:100%;" >
+<select class="custom-select d-block form-control" id="inputLanguage" name="lan">
+			 
+              <option value="">Select Language</option>
+              <option th:each="lan : ${languages}"  th:value="${lan.getLangName()}" th:text="${lan.getLangName()}"></option> 
+            </select>
+           
+            
+</div>
+
+
+
  
-     <div class="col-md-2 mb-3" style="width: 100%;">
+     <div class="col-md-3 mb-3" style="width: 100%;">
           <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearFormViewforHealth" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
            
      </div>
@@ -101,9 +115,7 @@
 <div class="container-fluid">
  <div class="row">
  <div class="col">	
-<h5>
-	<span>Category: </span><span th:text="${catName}"></span>
-</h5>
+
 
 <table class="table table-striped" id="health_table">
   <thead>
@@ -124,9 +136,11 @@
             </div>
           </div>
           <div class="col-md-6">
-			 
-            <h4 style="color: #014F7A;font-size: 1rem;" th:text="${tempTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
-           
+			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tempTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
+			
+           <h5 style="color: #014F7A;font-size: 1rem;">   
+                <span th:text="${tempTutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}" class=""></span>
+            </h5>
             <h6 style="color: #014F7A;font-size: 1rem;">   
                 <span th:text="${tempTutorial.getConAssignedTutorial().getLan().getLangName()}" class=""></span>
             </h6>
@@ -231,59 +245,139 @@
 
 </style>
 
+<script th:inline="javascript">
+  const jsontutorials = /*[[${tutorialJson}]]*/ [];
+   
+</script>
 <script type="text/javascript">
-	$(document).ready(function() {
-	var healthTable=$('#health_table').DataTable({ "ordering": false});
-		    	
-	   //var table=  $('#events_table').DataTable({ "ordering": false});
-	   
-	  
-        
-        
-        
-        
-        $('#topicView').on('change', selectTopicLanguage);
+  function loadTopicAndLanguageByCategory(category, topic, language) {
+    const parsedTutorials = JSON.parse(jsontutorials);
+    const filtered = (category === "") ? parsedTutorials : parsedTutorials.filter(item => item.category === category);
 
-        
-        $('#languageViewforHealth').on('change',selectTopicLanguage);
-        
-       
-        $('#btnClearFormViewforHealth').on('click', function() {
-        clearFormViewforHealth();
-        selectTopicLanguage();
+    const uniqueTopics = [...new Set(filtered.map(item => item.topic))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+    const uniqueLanguages = [...new Set(filtered.map(item => item.language))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+
+    let topicOptions = '<option value="">Select Topic</option>';
+    $.each(uniqueTopics, (i, val) => {
+      topicOptions += `<option value="${val}" ${val === topic ? "selected" : ""}>${val}</option>`;
     });
-        
-         function selectTopicLanguage() {
-		 var selectedLanguage = $('#languageViewforHealth').val();
-		 var selectedtopic = $('#topicView').val();
-		
-		   
- 			if(selectedtopic!=""){
-			    selectedtopic='"' + selectedtopic + '"';
-		     }
-		     
-		   if(selectedLanguage!=""){
-			   selectedLanguage='"' + selectedLanguage + '"';
-		     }
-		     
-            healthTable.search(selectedtopic +" " + selectedLanguage ).draw();
-            
-        }
-        
-      function clearFormViewforHealth() {
-        $('#topicView').val('');
-        $('#languageViewforHealth').val('');
-    }
-        
-        
-	} );
-	
-	
- 
+    $("#inputTopicName").prop('disabled', false).html(topicOptions);
 
-	</script>
-	
+    let langOptions = '<option value="">Select Language</option>';
+    $.each(uniqueLanguages, (i, val) => {
+      langOptions += `<option value="${val}" ${val === language ? "selected" : ""}>${val}</option>`;
+    });
+    $("#inputLanguage").prop('disabled', false).html(langOptions);
+  }
 
+  function loadCategoryAndTopicByLanguage(category, topic, language) {
+    const parsedTutorials = JSON.parse(jsontutorials);
+    const filtered = (language === "") ? parsedTutorials : parsedTutorials.filter(item => item.language === language);
+
+    const uniqueTopics = [...new Set(filtered.map(item => item.topic))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+    const uniqueCategories = [...new Set(filtered.map(item => item.category))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+
+    let topicOptions = '<option value="">Select Topic</option>';
+    $.each(uniqueTopics, (i, val) => {
+      topicOptions += `<option value="${val}" ${val === topic ? "selected" : ""}>${val}</option>`;
+    });
+    $("#inputTopicName").prop('disabled', false).html(topicOptions);
+
+    let catOptions = '<option value="">Select Category</option>';
+    $.each(uniqueCategories, (i, val) => {
+      catOptions += `<option value="${val}" ${val === category ? "selected" : ""}>${val}</option>`;
+    });
+    $("#categoryname").prop('disabled', false).html(catOptions);
+  }
+
+  function loadCategoryAndLanguageByTopic(category, topic, language) {
+    const parsedTutorials = JSON.parse(jsontutorials);
+
+    console.log("Selected Topic:", topic);
+    
+    const filtered = (topic === "") 
+        ? parsedTutorials 
+        : parsedTutorials.filter(item => item.topic.trim() === topic.trim());
+
+    console.log("Filtered tutorials by topic:", filtered);
+
+    const uniqueLanguages = [...new Set(filtered.map(item => item.language))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+    const uniqueCategories = [...new Set(filtered.map(item => item.category))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+
+    // Load Language options
+    let langOptions = '<option value="">Select Language</option>';
+    $.each(uniqueLanguages, (i, val) => {
+        langOptions += `<option value="${val}" ${val === language ? "selected" : ""}>${val}</option>`;
+    });
+    $("#inputLanguage").prop('disabled', false).html(langOptions);
+
+    // Load Category options
+    let catOptions = '<option value="">Select Category</option>';
+    $.each(uniqueCategories, (i, val) => {
+        console.log(`load Category : ${val}`);
+        catOptions += `<option value="${val}" ${val === category ? "selected" : ""}>${val}</option>`;
+    });
+    $("#categoryname").prop('disabled', false).html(catOptions);
+}
+
+
+  function clearFormViewforHealth() {
+    $('#categoryname, #inputTopicName, #inputLanguage').val('');
+  }
+
+  function selectCategoryTopicLanguage() {
+    const selectedcategory = $('#categoryname').val();
+    const selectedtopic = $('#inputTopicName').val();
+    const selectedLanguage = $('#inputLanguage').val();
+
+   // console.log("Selected Category: " + selectedcategory);
+    //console.log("Selected Topic: " + selectedtopic);
+    //console.log("Selected Language: " + selectedLanguage);
+
+    const cat = selectedcategory ? `"${selectedcategory}"` : "";
+    const top = selectedtopic ? `"${selectedtopic}"` : "";
+    const lan = selectedLanguage ? `"${selectedLanguage}"` : "";
+
+    $('#health_table').DataTable().search(cat + " " + top + " " + lan).draw();
+  }
+
+  $(document).ready(function () {
+    const healthTable = $('#health_table').DataTable({ "ordering": false });
+
+    $('#categoryname').change(function () {
+      const category = $(this).val();
+      const topic = $('#inputTopicName').val();
+      const language = $('#inputLanguage').val();
+      loadTopicAndLanguageByCategory(category, topic, language);
+      selectCategoryTopicLanguage();
+    });
+
+    $('#inputLanguage').change(function () {
+      const language = $(this).val();
+      const category = $('#categoryname').val();
+      const topic = $('#inputTopicName').val();
+      loadCategoryAndTopicByLanguage(category, topic, language);
+      selectCategoryTopicLanguage();
+    });
+
+    $('#inputTopicName').change(function () {
+      const topic = $(this).val();
+      const category = $('#categoryname').val();
+      const language = $('#inputLanguage').val();
+      loadCategoryAndLanguageByTopic(category, topic, language);
+      selectCategoryTopicLanguage();
+    });
+
+    $('#btnClearFormViewforHealth').click(function () {
+      clearFormViewforHealth();
+      loadTopicAndLanguageByCategory("", "", "");
+      loadCategoryAndTopicByLanguage("", "", "");
+      loadCategoryAndLanguageByTopic("", "", "");
+      selectCategoryTopicLanguage();
+      return false;
+    });
+  });
+</script>
 
 <script>
 var projectPath='[(@{/})]';

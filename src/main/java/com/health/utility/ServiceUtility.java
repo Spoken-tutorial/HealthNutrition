@@ -675,22 +675,19 @@ public class ServiceUtility {
         }
     }
 
-    public static String createFileWithSubDirectoriesforHealthTutorial(String originalcatName, String langName,
-            String sourceDirurl, Environment env) throws IOException {
-
-        String catName = originalcatName.replace(' ', '_');
+    public static String createFileWithSubDirectoriesforHealthTutorial(String parentFolderName,
+            String zipfileNameWithouExtention, String sourceDirurl, Environment env) throws IOException {
 
         String document = "";
         Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadDirectoryHealthTutorialZipFiles);
+                CommonData.uploadDirectoryHealthTutorialZipFiles, parentFolderName);
 
         Files.createDirectories(zipFilePathDirectory);
 
         // SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
-        String zipFileName = catName + "_" + langName + ".zip";
+        String zipFileName = zipfileNameWithouExtention + ".zip";
 
-        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+        Path zipFilePathName = Paths.get(zipFilePathDirectory.toString(), zipFileName);
 
         Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
 
@@ -710,13 +707,13 @@ public class ServiceUtility {
         return document;
     }
 
-    public static boolean IsCategoryAndLanZipExist(String originalCategoryName, String langName, Environment env) {
-        String catName = originalCategoryName.replace(' ', '_');
+    public static boolean IsCourseNameAndLanZipExist(String parentZipfolder, String zipNameWithoutExtention,
+            Environment env) {
 
-        String zipFileName = catName + "_" + langName + ".zip";
+        String zipFileName = zipNameWithoutExtention + ".zip";
 
         Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+                CommonData.uploadDirectoryHealthTutorialZipFiles, parentZipfolder, zipFileName);
 
         File file = zipFilePathName.toFile();
 
@@ -724,13 +721,14 @@ public class ServiceUtility {
 
     }
 
-    public static String getCategoryAndLanZipPath(String originalCategoryName, String langName, Environment env) {
-        String catName = originalCategoryName.replace(' ', '_');
+    public static String getCourseNameAndLanZipPath(String parentZipfolder, String zipNameWithoutExtention,
+            Environment env) {
+        // String catName = originalCategoryName.replace(' ', '_');
 
-        String zipFileName = catName + "_" + langName + ".zip";
+        String zipFileName = zipNameWithoutExtention + ".zip";
 
         Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+                CommonData.uploadDirectoryHealthTutorialZipFiles, parentZipfolder, zipFileName);
 
         String temp = zipFilePathName.toString();
         int indexToStart = temp.indexOf("Media");

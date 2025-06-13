@@ -3316,8 +3316,8 @@ public class AjaxController {
             res.put(CommonData.KEYWORD, CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
             res.put(CommonData.VIDEO, CommonData.tutorialStatus[tutorial.getVideoStatus()]);
             res.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
-            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndCategoryAndLanZipIfExists(cat_.getCatName(),
-                    lang.getLangName(), env);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(cat_.getCategoryId(),
+                    lang.getLanId(), env);
         } else {
             res.put("response", "0");
         }

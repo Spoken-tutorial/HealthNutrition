@@ -7953,10 +7953,9 @@ public class HomeController {
         tutorial.setVideoStatus(CommonData.PUBLISH_STATUS);
         tutorial.setStatus(true);
 
-        String catNameTemp = tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName();
-        String langNameTemp = tutorial.getConAssignedTutorial().getLan().getLangName();
-        zipHealthTutorialThreadService.deleteKeyFromZipNamesAndCategoryAndLanZipIfExists(catNameTemp, langNameTemp,
-                env);
+        int catId = tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
+        int lanId = tutorial.getConAssignedTutorial().getLan().getLanId();
+        zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
         taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
@@ -8852,19 +8851,17 @@ public class HomeController {
         List<Tutorial> tutorials;
 
         Tutorial tut = tutService.getById(id);
-        String catNameTemp = tut.getConAssignedTutorial().getTopicCatId().getCat().getCatName();
-        String langNameTemp = tut.getConAssignedTutorial().getLan().getLangName();
+        int catId = tut.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
+        int lanId = tut.getConAssignedTutorial().getLan().getLanId();
 
         if (tut.isStatus()) {
             tut.setStatus(false);
-            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndCategoryAndLanZipIfExists(catNameTemp, langNameTemp,
-                    env);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.DELETE_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
-            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndCategoryAndLanZipIfExists(catNameTemp, langNameTemp,
-                    env);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }
