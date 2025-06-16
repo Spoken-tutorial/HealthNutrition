@@ -8,9 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -461,13 +461,16 @@ public class ZipHealthTutorialThreadService {
 
             for (Tutorial tempTutorial : uniqueTutorials) {
                 ContributorAssignedTutorial con = tempTutorial.getConAssignedTutorial();
-                Category cat = con.getTopicCatId().getCat();
+                TopicCategoryMapping tcm = con.getTopicCatId();
+                Category cat = tcm.getCat();
                 String catName = cat.getCatName().replace(' ', '_');
                 Language lan = con.getLan();
                 String langName = lan.getLangName().replace(' ', '_');
-                Topic topic = con.getTopicCatId().getTopic();
+                Topic topic = tcm.getTopic();
                 String originalTopicName = topic.getTopicName();
                 String topicName = originalTopicName.replace(' ', '_');
+                int topicOrder = tcm.getOrder();
+                int catOrder = cat.getOrder();
 
                 int tutorialId = tempTutorial.getTutorialId();
                 // String tutorialIdString = Integer.toString(tutorialId);
@@ -485,6 +488,8 @@ public class ZipHealthTutorialThreadService {
                 tutorialData.put("category", cat.getCatName());
                 tutorialData.put("topic", topic.getTopicName());
                 tutorialData.put("language", lan.getLangName());
+                tutorialData.put("cat_order", String.valueOf(catOrder));
+                tutorialData.put("topic_order", String.valueOf(topicOrder));
 
                 tutorialJsonList.add(tutorialData);
 
@@ -501,16 +506,20 @@ public class ZipHealthTutorialThreadService {
             catList.addAll(uniqueCategories);
             topics.addAll(uniqueTopics);
             lanList.addAll(uniqueLanguage);
+
             tutorialList.sort(Comparator.comparing(
                     tempTutorial -> tempTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
+
             topics.sort(Comparator.comparing(Topic::getTopicName));
 
             tutorialList.sort(Comparator.comparing(
                     tempTutorial -> tempTutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()));
-            catList.sort(Comparator.comparing(Category::getCatName));
+
+            Collections.sort(catList, Category.SortByOrderValue);
 
             tutorialList.sort(
                     Comparator.comparing(tempTutorial -> tempTutorial.getConAssignedTutorial().getLan().getLangName()));
+
             lanList.sort(Comparator.comparing(Language::getLangName));
 
         }
@@ -522,46 +531,6 @@ public class ZipHealthTutorialThreadService {
         modelAttributes.put("languageCount", lanList.size());
         // getModelData(modelAttributes, catIds, lanIds, 0);
         return modelAttributes;
-    }
-
-    private void getModelData(Map<String, Object> modelAttributes, Set<Integer> catIds, Set<Integer> lanIds,
-            int topicId) {
-
-        Map<String, Integer> cat = new LinkedHashMap<>();
-        Map<String, Integer> lan = new LinkedHashMap<>();
-        Map<String, Integer> topic = new LinkedHashMap<>();
-
-        for (int catId : catIds) {
-            for (int lanId : lanIds) {
-                ArrayList<Map<String, Integer>> arlist = ajaxController.getTopicAndLanguageByCategory(catId, topicId,
-                        lanId);
-                ArrayList<Map<String, Integer>> arlist1 = ajaxController.getCategoryAndLanguageByTopic(catId, topicId,
-                        lanId);
-
-                // Merge category and language maps
-                if (arlist1 != null && arlist1.size() >= 2) {
-                    Map<String, Integer> catTemp = arlist1.get(0);
-                    Map<String, Integer> lanTemp = arlist1.get(1);
-
-                    if (catTemp != null)
-                        cat.putAll(catTemp);
-                    if (lanTemp != null)
-                        lan.putAll(lanTemp);
-                }
-
-                // Merge topic map
-                if (arlist != null && arlist.size() >= 1) {
-                    Map<String, Integer> topicTemp = arlist.get(0);
-                    if (topicTemp != null)
-                        topic.putAll(topicTemp);
-                }
-            }
-        }
-
-        modelAttributes.put("categories", cat);
-        modelAttributes.put("languages", lan);
-        modelAttributes.put("topics", topic);
-        modelAttributes.put("languageCount", lan.size());
     }
 
 }

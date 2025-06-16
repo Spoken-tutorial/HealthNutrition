@@ -250,45 +250,141 @@
    
 </script>
 <script type="text/javascript">
+	
   function loadTopicAndLanguageByCategory(category, topic, language) {
     const parsedTutorials = JSON.parse(jsontutorials);
     const filtered = (category === "") ? parsedTutorials : parsedTutorials.filter(item => item.category === category);
+    let topicFiltered=filtered;
+    if (language !== "") {
+     topicFiltered = filtered.filter(item => item.language === language);
+  }
 
-    const uniqueTopics = [...new Set(filtered.map(item => item.topic))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+    let uniqueTopics = [];
+    
+	  if (category !== "") {
+	    // Sort by topic_order (converted to int), and keep topic names unique
+	    const sortedByOrder = topicFiltered
+	      .filter(item => item.topic_order !== undefined)
+	      .sort((a, b) => parseInt(a.topic_order) - parseInt(b.topic_order));
+	
+	    const seenTopics = new Set();
+	    sortedByOrder.forEach(item => {
+	      if (!seenTopics.has(item.topic)) {
+	        seenTopics.add(item.topic);
+	        uniqueTopics.push({ name: item.topic, order: parseInt(item.topic_order) });
+	      }
+	    });
+	  } else {
+	    // Just get unique topics and sort alphabetically (case-insensitive)
+	    const topicNames = [...new Set(topicFiltered.map(item => item.topic))];
+	    uniqueTopics = topicNames
+	      .map(name => ({ name }))
+	      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+	  }
+
     const uniqueLanguages = [...new Set(filtered.map(item => item.language))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
 
-    let topicOptions = '<option value="">Select Topic</option>';
-    $.each(uniqueTopics, (i, val) => {
-      topicOptions += `<option value="${val}" ${val === topic ? "selected" : ""}>${val}</option>`;
-    });
-    $("#inputTopicName").prop('disabled', false).html(topicOptions);
+    // Build topic dropdown with numbering
+		let topicOptions = '<option value="">Select Topic</option>';
+		uniqueTopics.forEach((item, index) => {
+		 const val = item.name;
+		 const selected = (val === topic) ? "selected" : "";
+		
+		  // If category is selected, show numbered topic names, else just show name
+		 const displayText = (category !== "") ? `${index + 1}. ${val}` : val;
+		
+		 topicOptions += `<option value="${val}" ${selected}>${displayText}</option>`;
+		});
+		$("#inputTopicName").prop('disabled', false).html(topicOptions);
 
-    let langOptions = '<option value="">Select Language</option>';
-    $.each(uniqueLanguages, (i, val) => {
-      langOptions += `<option value="${val}" ${val === language ? "selected" : ""}>${val}</option>`;
-    });
-    $("#inputLanguage").prop('disabled', false).html(langOptions);
+	 // Build Language dropdown 
+	    let langOptions = '<option value="">Select Language</option>';
+	    $.each(uniqueLanguages, (i, val) => {
+	      langOptions += `<option value="${val}" ${val === language ? "selected" : ""}>${val}</option>`;
+	    });
+	    $("#inputLanguage").prop('disabled', false).html(langOptions);
   }
+  
+  
 
   function loadCategoryAndTopicByLanguage(category, topic, language) {
     const parsedTutorials = JSON.parse(jsontutorials);
     const filtered = (language === "") ? parsedTutorials : parsedTutorials.filter(item => item.language === language);
 
-    const uniqueTopics = [...new Set(filtered.map(item => item.topic))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
-    const uniqueCategories = [...new Set(filtered.map(item => item.category))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+     let uniqueTopics = [];
+	
+	if (category !== "") {
+	  // 🔥 Filter both by language AND selected category
+	  let categoryFiltered = filtered.filter(item => item.category === category);
+	
+	  // 🔢 Sort by topic_order
+	  const sortedByOrder = categoryFiltered
+	    .filter(item => item.topic_order !== undefined)
+	    .sort((a, b) => parseInt(a.topic_order) - parseInt(b.topic_order));
+	
+	  // 🚫 Remove duplicates
+	  const seenTopics = new Set();
+	  sortedByOrder.forEach(item => {
+	    if (!seenTopics.has(item.topic)) {
+	      seenTopics.add(item.topic);
+	      uniqueTopics.push({ name: item.topic, order: parseInt(item.topic_order) });
+	    }
+	  });
+	
+	} else {
+	  // 🧠 All topics for selected language, sorted alphabetically
+	  const topicNames = [...new Set(filtered.map(item => item.topic))];
+	  uniqueTopics = topicNames
+	    .map(name => ({ name }))
+	    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+	}
 
-    let topicOptions = '<option value="">Select Topic</option>';
-    $.each(uniqueTopics, (i, val) => {
-      topicOptions += `<option value="${val}" ${val === topic ? "selected" : ""}>${val}</option>`;
-    });
-    $("#inputTopicName").prop('disabled', false).html(topicOptions);
 
+    // ---------- Category Sorting By cat Order----------
+	  let uniqueCategories = [];
+	  let topicFilterd=filtered;
+	  if((topic !== "")){
+		  topicFilterd =filtered.filter(item => item.topic === topic);
+	  }
+	  
+	  const sortedCatByOrder = topicFilterd
+	    .filter(item => item.cat_order !== undefined)
+	    .sort((a, b) => parseInt(a.cat_order) - parseInt(b.cat_order));
+	
+	  const seenCats = new Set();
+	  sortedCatByOrder.forEach(item => {
+	    if (!seenCats.has(item.category)) {
+	      seenCats.add(item.category);
+	      uniqueCategories.push({ name: item.category, order: parseInt(item.cat_order) });
+	    }
+	  });
+
+   // Build topic dropdown with numbering
+	let topicOptions = '<option value="">Select Topic</option>';
+	uniqueTopics.forEach((item, index) => {
+	  const val = item.name;
+	  const selected = (val === topic) ? "selected" : "";
+	
+	  // If category is selected, show numbered topic names, else just show name
+	  const displayText = (category !== "") ? `${index + 1}. ${val}` : val;
+	
+	  topicOptions += `<option value="${val}" ${selected}>${displayText}</option>`;
+	});
+	$("#inputTopicName").prop('disabled', false).html(topicOptions);
+	
+
+     // Build  Category dropdown
     let catOptions = '<option value="">Select Category</option>';
-    $.each(uniqueCategories, (i, val) => {
-      catOptions += `<option value="${val}" ${val === category ? "selected" : ""}>${val}</option>`;
-    });
-    $("#categoryname").prop('disabled', false).html(catOptions);
+	uniqueCategories.forEach((item) => {
+    const val = item.name;
+    const selected = (val === category) ? "selected" : "";
+   	catOptions += `<option value="${val}" ${selected}>${val}</option>`;
+ 	});
+ 	$("#categoryname").prop('disabled', false).html(catOptions);
+ 	
   }
+  
+  
 
   function loadCategoryAndLanguageByTopic(category, topic, language) {
     const parsedTutorials = JSON.parse(jsontutorials);
@@ -302,7 +398,20 @@
     console.log("Filtered tutorials by topic:", filtered);
 
     const uniqueLanguages = [...new Set(filtered.map(item => item.language))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
-    const uniqueCategories = [...new Set(filtered.map(item => item.category))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+   
+    // ---------- Category Sorting By cat Order----------
+	  let uniqueCategories = [];
+	  const sortedCatByOrder = filtered
+	    .filter(item => item.cat_order !== undefined)
+	    .sort((a, b) => parseInt(a.cat_order) - parseInt(b.cat_order));
+	
+	  const seenCats = new Set();
+	  sortedCatByOrder.forEach(item => {
+	    if (!seenCats.has(item.category)) {
+	      seenCats.add(item.category);
+	      uniqueCategories.push({ name: item.category, order: parseInt(item.cat_order) });
+	    }
+	  });
 
     // Load Language options
     let langOptions = '<option value="">Select Language</option>';
@@ -311,14 +420,16 @@
     });
     $("#inputLanguage").prop('disabled', false).html(langOptions);
 
-    // Load Category options
+    // Build Category dropdown
     let catOptions = '<option value="">Select Category</option>';
-    $.each(uniqueCategories, (i, val) => {
-        console.log(`load Category : ${val}`);
-        catOptions += `<option value="${val}" ${val === category ? "selected" : ""}>${val}</option>`;
-    });
-    $("#categoryname").prop('disabled', false).html(catOptions);
-}
+	uniqueCategories.forEach((item) => {
+    const val = item.name;
+    const selected = (val === category) ? "selected" : "";
+    catOptions += `<option value="${val}" ${selected}>${val}</option>`;
+ 	});
+ 	$("#categoryname").prop('disabled', false).html(catOptions);
+
+  }
 
 
   function clearFormViewforHealth() {
