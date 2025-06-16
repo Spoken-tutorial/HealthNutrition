@@ -353,12 +353,12 @@ public class RestApi {
         Map<Integer, String> resultMap = new HashMap<>();
 
         if (courseName == null || courseName.trim().isEmpty()) {
-            resultMap.put(0, "No CourseName  is available in url");
+            resultMap.put(2, "No CourseName  is available in url");
             return ResponseEntity.ok(resultMap);
         }
 
         if (catIds == null || catIds.isEmpty()) {
-            resultMap.put(0, "No Category Id is available in url");
+            resultMap.put(2, "No Category Id is available in url");
             return ResponseEntity.ok(resultMap);
         }
 
@@ -377,11 +377,11 @@ public class RestApi {
         for (int catId : uniqeCatIds) {
             Category cat = catService.findByid(catId);
             if (cat == null) {
-                resultMap.put(0, "No Category exists for this catId: " + catId);
+                resultMap.put(2, "No Category exists for this catId: " + catId);
                 return ResponseEntity.ok(resultMap);
 
             } else if (!cat.isStatus()) {
-                resultMap.put(0, "No Enable Category exists for this catId: " + catId);
+                resultMap.put(2, "No Enable Category exists for this catId: " + catId);
                 return ResponseEntity.ok(resultMap);
             }
         }
@@ -389,7 +389,7 @@ public class RestApi {
         for (int lanId : uniquelanIds) {
             Language lan = lanService.getById(lanId);
             if (lan == null) {
-                resultMap.put(0, "No Language exists for this lanId: " + lanId);
+                resultMap.put(2, "No Language exists for this lanId: " + lanId);
                 return ResponseEntity.ok(resultMap);
 
             }
@@ -400,7 +400,7 @@ public class RestApi {
         if (zipUrl == null || zipUrl.isEmpty()) {
             resultMap.put(0, "Zip creation in progress... Please check back after 30 minutes.");
         } else if ("Error".equals(zipUrl)) {
-            resultMap.put(0, "No tutorials are available for the selected category and language.");
+            resultMap.put(2, "No tutorials are available for the selected category and language.");
         } else if (downloadCount.get() == downloadLimit) {
             resultMap.put(0, "Download limit reached. Please try again after 30 minutes.");
         } else {

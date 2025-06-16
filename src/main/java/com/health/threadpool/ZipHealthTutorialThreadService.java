@@ -159,8 +159,12 @@ public class ZipHealthTutorialThreadService {
                 Language lan = lanService.getById(lanId);
                 if (flag) {
                     lanList.add(lan);
+
                     tempLanIdFolder.append("lan").append(lanId).append("_");
-                    sb.append(lan.getLangName().replace(' ', '_')).append("_");
+                    if (lanId != 22) {
+                        sb.append(lan.getLangName().replace(' ', '_')).append("_");
+                    }
+
                 }
 
                 List<TopicCategoryMapping> tcmList = topicCatMappingService.findAllByCategory(cat);
@@ -241,14 +245,27 @@ public class ZipHealthTutorialThreadService {
 
                     try {
 
-                        Path sourcePathofTutorial = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                        Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                 tutorialPath1);
-                        Path destainationPath1 = destInationDirectoryforTutorial.resolve(topicName + ".mp4");
 
-                        File sourceFile1 = sourcePathofTutorial.toFile();
-                        if (sourceFile1.exists()) {
+                        String topicwithExtention;
+                        Path sourcePath;
 
-                            copyFileUsingRsync(sourcePathofTutorial, destainationPath1);
+                        Path webmSourcePath = replaceExtension(basePath, ".webm");
+                        if (webmSourcePath.toFile().exists()) {
+                            sourcePath = webmSourcePath;
+                            topicwithExtention = topicName + ".webm";
+                        } else {
+                            sourcePath = basePath; // replaceExtension(basePath, ".mp4");
+                            topicwithExtention = topicName + ".mp4";
+                        }
+
+                        Path destainationPath1 = destInationDirectoryforTutorial.resolve(topicwithExtention);
+
+                        File sourceFile = sourcePath.toFile();
+                        if (sourceFile.exists()) {
+
+                            copyFileUsingRsync(sourcePath, destainationPath1);
 
                         }
 
@@ -355,11 +372,34 @@ public class ZipHealthTutorialThreadService {
             // Call the Async method
             createZip(courseName, catIds, lanIds, env);
             return null;
-        }
-        if (zipName.isEmpty()) {
+        } else if (zipName.isEmpty()) {
             // processing already progress
             return null;
 
+        }
+
+        else if (!zipName.contains(courseName)) {
+            Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipName);
+
+            File file = zipFilePathName.toFile();
+
+            if (file.exists()) {
+
+                boolean isDeleted = file.delete();
+
+                if (isDeleted) {
+                    ZipNames.remove(key);
+                    createZip(courseName, catIds, lanIds, env);
+
+                    logger.info("Zip File deleted successfully: {} " + zipName);
+                } else {
+                    logger.info("Failed to delete the zip file: {} " + zipName);
+                }
+            } else {
+                logger.info(" ZipFile does not exist: {} " + zipName);
+            }
+
+            return null;
         }
 
         return zipName;
@@ -471,13 +511,28 @@ public class ZipHealthTutorialThreadService {
                 String topicName = originalTopicName.replace(' ', '_');
                 int topicOrder = tcm.getOrder();
                 int catOrder = cat.getOrder();
+                String tempTutorialPath = tempTutorial.getVideo();
 
                 int tutorialId = tempTutorial.getTutorialId();
                 // String tutorialIdString = Integer.toString(tutorialId);
-                Path sourcePathofTutorial = Paths.get(catName, File.separator, langName, File.separator, topicName,
-                        File.separator, topicName + ".mp4");
 
-                String videoPathofTutorial = sourcePathofTutorial.toString();
+                Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), tempTutorialPath);
+
+                Path sourcePath;
+
+                Path webmSourcePath = replaceExtension(basePath, ".webm");
+                if (webmSourcePath.toFile().exists()) {
+                    sourcePath = Paths.get(catName, File.separator, langName, File.separator, topicName, File.separator,
+                            topicName + ".webm");
+                    ;
+
+                } else {
+                    sourcePath = Paths.get(catName, File.separator, langName, File.separator, topicName, File.separator,
+                            topicName + ".mp4");
+
+                }
+
+                String videoPathofTutorial = sourcePath.toString();
                 tempTutorial.setIndexVideoPath(videoPathofTutorial);
                 tutorialList.add(tempTutorial);
                 uniqueTopics.add(topic);
