@@ -43,6 +43,7 @@
 										<form class="form-horizontal" th:action="@{/updateTrainingResource}"
 											method="post" enctype="multipart/form-data">							 
   											<input type="hidden"  name="trId"  th:value="${id}"/>
+  											<input type="hidden"  name="fileType"  th:value="${fileType}"/>
 											
 											
 						  					<div class="form-group">
