@@ -97,12 +97,17 @@
 			<video id="storedVideoId" style="  top: 0; left: 0; width: 100%; height: 100%;" class="video-fluid z-depth-1 vid1" playsinline  controls autoplay >
   			<source th:src="@{/files/{video}(video=${tutorial.getVideo()})}" type="video/mp4" />
   			
-  			 <!-- Condition for English tutorial -->
-   			 <track kind="captions" th:if="${languageCheck == 'English'}" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" />
-			
-			 <!-- Condition for non-English tutorial -->
-   			 <track kind="captions" th:unless="${languageCheck == 'English'}" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
-   			 <track kind="captions" th:unless="${languageCheck == 'English'}" th:label="${labelforEnglish}" th:src="@{/files/} + @{${vttFileforEnglish}}" th:srclang="${srclangforEnglish}" />
+  			<!-- IF English tutorial -->
+			<th:block th:if="${languageCheck == 'English'}">
+    		<track kind="captions" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
+			</th:block>
+
+			<!-- IF Non-English tutorial -->
+			<th:block th:if="${languageCheck != 'English'}">
+			    <track kind="captions" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
+			    <track kind="captions" th:label="${labelforEnglish}" th:src="@{/files/} + @{${vttFileforEnglish}}" th:srclang="${srclangforEnglish}" />
+			</th:block>
+
 
 			</video>
 			
@@ -528,9 +533,30 @@
 });
 
 </script>
- 
+
+ <script th:inline="javascript">
+	 
+	 function resetPlyrCaptionLanguageIfNonEnglish(languageCheck) {
+        const plyrKey = 'plyr';
+        const stored = localStorage.getItem(plyrKey);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (languageCheck !== 'English' && parsed.language) {
+                delete parsed.language;
+                localStorage.setItem(plyrKey, JSON.stringify(parsed));
+            }
+        }
+    }
+	 const srclang = /*[[${srclang}]]*/ "en"; // fallback value
+	 const languageCheck = /*[[${languageCheck}]]*/ "English"; // fallback value
+	 
+
+    resetPlyrCaptionLanguageIfNonEnglish(languageCheck);
+ </script>
  
 <script>
+	
+	
 		var projectPath='[(@{/})]';		
 		//var videos = document.querySelectorAll('video');
 			
@@ -547,7 +573,7 @@
     //'duration', // The full duration of the media
     'mute', // Toggle mute
     'volume', // Volume control
-   'captions',  // Toggle captions
+    'captions',  // Toggle captions
     'settings', // Settings menu
     'pip', // Picture-in-picture (currently Safari only)
     'airplay', // Airplay (currently Safari only)
@@ -555,8 +581,15 @@
     'fullscreen' // Toggle fullscreen
 ];
 
-  const player = new Plyr('.vid1',{controls});
-  
+  const player = new Plyr('.vid1',{controls: controls,
+    captions: {
+        active: true,        // Show captions by default if "default" is set on <track>
+        update: true, 
+        language: srclang,     // Update captions on the fly   
+    },
+    });
+    
+ 
 	  // Add toast element after Plyr initializes
 	const wrapper = document.querySelector('.plyr__video-wrapper');
 	const toast = document.createElement('div');

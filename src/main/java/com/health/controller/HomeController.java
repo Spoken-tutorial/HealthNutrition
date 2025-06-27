@@ -1813,6 +1813,7 @@ public class HomeController {
         model.addAttribute("tutorialId", tutId);
         model.addAttribute("autoplayChecked", autoplay == 1);
         model.addAttribute("fullscreenMode", fullscreen == 1);
+        model.addAttribute("languageCheck", langName);
 
         if (!langName.equals("English")) {
 
