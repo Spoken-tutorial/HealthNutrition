@@ -365,6 +365,7 @@
  </style>
  
  <script th:inline="javascript">
+	var projectPath='[(@{/})]';
 	 
     const autoplayFlag = /*[[${autoplayChecked}]]*/ 0;
     //const fullscreenFlag = /*[[${fullscreenMode}]]*/ 0;
@@ -513,30 +514,12 @@
 });
 
 
-    // On page load of new video page, re-enter fullscreen if needed
-			
-		/*
-			if (sessionStorage.getItem("reenterFullscreen") === "true") {
-			    sessionStorage.removeItem("reenterFullscreen");
-			    
-			    // Wait until Plyr is fully ready
-			    setTimeout(() => {
-			        if (player && player.fullscreen && typeof player.fullscreen.enter === 'function') {
-			            player.fullscreen.enter();
-			        } else {
-			            openFullScreen(video); // fallback
-			        }
-			    }, 500); // give it half a second to settle
-			}
-			
-			*/
 });
 
 </script>
 
  <script th:inline="javascript">
-	 
-	 function resetPlyrCaptionLanguageIfNonEnglish(languageCheck) {
+    function resetPlyrCaptionLanguageIfNonEnglish(languageCheck) {
         const plyrKey = 'plyr';
         const stored = localStorage.getItem(plyrKey);
         if (stored) {
@@ -547,52 +530,221 @@
             }
         }
     }
-	 const srclang = /*[[${srclang}]]*/ "en"; // fallback value
-	 const languageCheck = /*[[${languageCheck}]]*/ "English"; // fallback value
-	 
-
+    const srclang = /*[[${srclang}]]*/ "en"; // fallback value
+    const languageCheck = /*[[${languageCheck}]]*/ "English"; // fallback value
     resetPlyrCaptionLanguageIfNonEnglish(languageCheck);
- </script>
- 
+</script>
+
 <script>
 	
-	
-		var projectPath='[(@{/})]';		
-		//var videos = document.querySelectorAll('video');
-			
-		
-			 var controls =
-[
-    'play-large', // The large play button in the center
-   // 'restart', // Restart playback
-   // 'rewind', // Rewind by the seek time (default 10 seconds)
-    'play', // Play/pause playback
-    //'fast-forward', // Fast forward by the seek time (default 10 seconds)
-    'progress', // The progress bar and scrubber for playback and buffering
-    'current-time', // The current time of playback
-    //'duration', // The full duration of the media
-    'mute', // Toggle mute
-    'volume', // Volume control
-    'captions',  // Toggle captions
-    'settings', // Settings menu
-    'pip', // Picture-in-picture (currently Safari only)
-    'airplay', // Airplay (currently Safari only)
-    'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
-    'fullscreen' // Toggle fullscreen
-];
+    const controls = [
+        'play-large',
+        'play',
+        'progress',
+        'current-time',
+        'mute',
+        'volume',
+        'captions',
+        'settings',
+        'pip',
+        'airplay',
+        'download',
+        'fullscreen'
+    ];
 
-  const player = new Plyr('.vid1',{controls: controls,
-    captions: {
-        active: true,        // Show captions by default if "default" is set on <track>
-        update: true, 
-        language: srclang,     // Update captions on the fly   
-    },
-    });
-    
- 
-	  // Add toast element after Plyr initializes
+    let dropdown;
+    let toast;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const videoEl = document.querySelector('.vid1');
+        if (!videoEl) return;
+
+        const player = new Plyr(videoEl, {
+            controls: controls,
+            captions: {
+                active: true,
+                update: true,
+                language: srclang
+            },
+            settings: ['quality', 'speed']
+        });
+
+        player.on('ready', () => {
+            // Small delay to ensure textTracks are available in all browsers
+            setTimeout(() => {
+                const tracks = player.media.textTracks;
+                if (!tracks || tracks.length === 0) return;
+
+                const captionBtn = document.querySelector('.plyr__controls__item[data-plyr="captions"]');
+                if (!captionBtn) return;
+
+                // Create dropdown
+                dropdown = document.createElement('div');
+                dropdown.style.position = 'absolute';
+                dropdown.style.bottom = '40px';
+                dropdown.style.left = '50%';
+                dropdown.style.transform = 'translateX(-50%)';
+                dropdown.style.background = 'rgba(255, 255, 255, 0.9)';
+                dropdown.style.color = '#000';
+                dropdown.style.padding = '6px 0';
+                dropdown.style.borderRadius = '4px';
+                dropdown.style.display = 'none';
+                dropdown.style.zIndex = '9999';
+                dropdown.style.fontSize = '14px';
+                dropdown.style.minWidth = '120px';
+                dropdown.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+
+                // Create option
+			    function createOption(label, index) {
+				    const item = document.createElement('div');
+				    item.textContent = label;
+				    item.dataset.trackIndex = index;
+				    item.style.padding = '6px 12px';
+				    item.style.cursor = 'pointer';
+				    item.style.transition = 'background 0.2s ease';
+				    item.style.display = 'flex';
+				    item.style.alignItems = 'center';
+			
+			    // Create solid circle
+					const ring = document.createElement('span');
+					ring.classList.add('caption-ring');
+					ring.style.width = '15px';
+					ring.style.height = '15px';
+					ring.style.borderRadius = '50%';
+					ring.style.marginRight = '10px';
+					ring.style.backgroundColor = '#bbb'; // Solid gray circle by default
+					ring.style.flexShrink = '0';
+					
+					item.prepend(ring); // insert before label
+				
+				    // Hover effects
+				    item.addEventListener('mouseover', () => {
+				        item.style.background = '#ff9033';
+				        item.style.color = '#fff';
+				    });
+				
+				    item.addEventListener('mouseout', () => {
+				        item.style.background = 'transparent';
+				        item.style.color = '#000';
+				    });
+				
+				    item.addEventListener('click', (e) => {
+				        e.stopPropagation();
+				        player.currentTrack = index;
+				        updateActiveOption(index);
+				        setTimeout(() => dropdown.style.display = 'none', 100);
+				    });
+			
+			   		 return item;
+				}
+
+
+              function updateActiveOption(selectedIndex) {
+				    const items = dropdown.querySelectorAll('div');
+				
+				    items.forEach((item) => {
+				        const ring = item.querySelector('.caption-ring');
+				        const index = parseInt(item.dataset.trackIndex);
+				
+				        if (ring) {
+				            if (index === selectedIndex) {
+				                ring.style.border = '4px solid #ff9033';    // Orange border
+				                ring.style.backgroundColor = 'transparent'; // Hollow circle (ring)
+				            } else {
+				                ring.style.border = 'none';
+				                ring.style.backgroundColor = '#bbb'; // Solid gray circle
+				            }
+				        }
+				    });
+				}
+
+
+                // Add "Off" option
+                dropdown.appendChild(createOption('Off', -1));
+
+                // Add language tracks
+                for (let i = 0; i < tracks.length; i++) {
+                    const label = tracks[i].label || tracks[i].language || `Track ${i + 1}`;
+                    dropdown.appendChild(createOption(label, i));
+                }
+
+                captionBtn.style.position = 'relative';
+                captionBtn.appendChild(dropdown);
+                updateActiveOption(player.currentTrack ?? -1);
+                
+                setTimeout(() => {
+				    updateActiveOption(player.currentTrack ?? -1);
+				}, 200);
+                
+                // ✅ Highlight correct ring on subtitle toggle
+				player.on('captionsenabled', () => {
+				    updateActiveOption(player.currentTrack ?? -1);
+				});
+				
+				player.on('captionsdisabled', () => {
+				    updateActiveOption(-1); // highlight "captions Off"
+				});
+
+                // Toggle dropdown
+                let dropdownTimeout;
+				
+				// Desktop: show on hover
+				captionBtn.addEventListener('mouseover', () => {
+				    clearTimeout(dropdownTimeout);
+				    dropdown.style.display = 'block';
+				});
+				
+				// Desktop: hide on leave
+				captionBtn.addEventListener('mouseleave', () => {
+				    dropdownTimeout = setTimeout(() => {
+				        dropdown.style.display = 'none';
+				    }, 300);
+				});
+				
+				// Keep dropdown visible while mouse over it (desktop)
+				dropdown.addEventListener('mouseover', () => {
+				    clearTimeout(dropdownTimeout);
+				});
+				dropdown.addEventListener('mouseleave', () => {
+				    dropdownTimeout = setTimeout(() => {
+				        dropdown.style.display = 'none';
+				    }, 300);
+				});
+				
+				// 📱 For Mobile/Tablet 
+				let isTouch = false;
+				
+				// Detect touch interaction only once
+				window.addEventListener('touchstart', () => {
+				    isTouch = true;
+				}, { once: true });
+				
+				// Universal click (works for both desktop and touch)
+				captionBtn.addEventListener('click', (e) => {
+				    e.stopPropagation();
+				
+				    // Toggle dropdown
+				    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+				});
+				
+				// Prevent dropdown from closing when tapping inside it
+				dropdown.addEventListener('click', (e) => {
+				    e.stopPropagation();
+				});
+
+
+                document.addEventListener('click', (e) => {
+				    if (!captionBtn.contains(e.target) && !dropdown.contains(e.target)) {
+				        dropdown.style.display = 'none';
+				    }
+				});
+
+            }, 150); // 150ms delay for better reliability
+        });
+        
+         // Add toast element after Plyr initializes
 	const wrapper = document.querySelector('.plyr__video-wrapper');
-	const toast = document.createElement('div');
+	toast = document.createElement('div');
 	toast.id = 'nextVideoToast';
 	toast.style.cssText = `
 	    display: none;
@@ -614,11 +766,14 @@
 	`;
 	wrapper.appendChild(toast);
 
-			
-	</script>
+
+    });
+    
+    
+</script>
 	
 	
-	<!-- JavaScript for scrolling captions -->
+<!-- JavaScript for scrolling captions -->
 <script th:inline="javascript">
 	
 	
