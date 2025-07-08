@@ -95,8 +95,12 @@
 			<div class="col-md-8 p-2">
 									
 			<video id="storedVideoId" style="  top: 0; left: 0; width: 100%; height: 100%;" class="video-fluid z-depth-1 vid1" playsinline  controls autoplay >
-  			<source th:src="@{/files/{video}(video=${tutorial.getVideo()})}" type="video/mp4" />
   			
+  			 <th:block th:each="entry : ${videoPathWithResolution}">
+        		<source th:attr="src=@{/files/{video}(video=${entry.value})}, type='video/mp4', size=${entry.key}">
+    		</th:block>
+
+
   			<!-- IF English tutorial -->
 			<th:block th:if="${languageCheck == 'English'}">
     		<track kind="captions" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
@@ -108,6 +112,8 @@
 			    <track kind="captions" th:label="${labelforEnglish}" th:src="@{/files/} + @{${vttFileforEnglish}}" th:srclang="${srclangforEnglish}" />
 			</th:block>
 
+
+		 	<a th:href="@{/files/{video}(video=${tutorial.getVideo()})}" download>Download</a>
 
 			</video>
 			
