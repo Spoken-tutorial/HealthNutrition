@@ -43,12 +43,25 @@
 	
 	<div th:if="${docSearchList.size()>0}" th:each="docSearch : ${docSearchList}" class="row t-wrapper mt-3">
 		<div th:if="${docSearch.getDocumentType()=='Tutorial_for_Original_Script'}"  class="col-md-6" >
-		<div style="width: 100%; margin: auto;">
+		
+			<a th:if="${!query.isEmpty()}" th:href="@{'/tutorial_view/' +${docSearch.getTopic()} +'/'+${docSearch.getLanguage()} +'/'   + ${docSearch.getTutorialId()} +'/'+ ${query} +'/'}" style="color: black;text-decoration: none;">
+			<div style="width: 100%; margin: auto;">
 			<video  th:id="${'storedVideoId' + docSearch.getDocumentId()}" 
 				  controls style="width:100%!important;" class="vid1">
 				<source th:src="@{/files/{video}(video=${docSearch.getVideoPath()})}" type="video/mp4"></source>
 			</video>
 			</div>
+			</a>
+			<a  th:unless="${!query.isEmpty()}"th:href="@{'/tutorial_view/' +${docSearch.getTopic()} +'/'+${docSearch.getLanguage()} +'/'  + ${docSearch.getTutorialId()} +'/' + 'q' +'/'}" style="color: black;text-decoration: none;">
+			<div style="width: 100%; margin: auto;">
+			<video  th:id="${'storedVideoId' + docSearch.getDocumentId()}" 
+				  controls style="width:100%!important;" class="vid1">
+				<source th:src="@{/files/{video}(video=${docSearch.getVideoPath()})}" type="video/mp4"></source>
+			</video>
+			</div>
+			</a>
+			
+			
 		</div>
 		<div class="col-md-6" th:if="${docSearch.getDocumentType()=='Tutorial_for_Original_Script'}">
 		<a th:if="${!query.isEmpty()}" th:href="@{'/tutorial_view/' +${docSearch.getTopic()} +'/'+${docSearch.getLanguage()} +'/'   + ${docSearch.getTutorialId()} +'/'+ ${query} +'/'}" style="color: black;text-decoration: none;">
@@ -362,22 +375,22 @@ var isPlaying = [];
 		
 		 var controls =
 			 [
-			     'play-large', // The large play button in the center
+			     //'play-large', // The large play button in the center
 			    // 'restart', // Restart playback
 			    // 'rewind', // Rewind by the seek time (default 10 seconds)
-			     'play', // Play/pause playback
+			    // 'play', // Play/pause playback
 			    
-			     'progress', // The progress bar and scrubber for playback and buffering
-			     'current-time', // The current time of playback
+			    // 'progress', // The progress bar and scrubber for playback and buffering
+			    // 'current-time', // The current time of playback
 			    
-			     'mute', // Toggle mute
-			    'volume', // Volume control
+			     //'mute', // Toggle mute
+			    //'volume', // Volume control
 			    
 			     //'settings', // Settings menu
 			    // 'pip', // Picture-in-picture (currently Safari only)
-			     'airplay', // Airplay (currently Safari only)
-			     'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
-			     'fullscreen' // Toggle fullscreen
+			    // 'airplay', // Airplay (currently Safari only)
+			    // 'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+			    // 'fullscreen' // Toggle fullscreen
 			 ];
 
 		for(var i=0; i<videos.length; i++){
