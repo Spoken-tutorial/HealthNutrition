@@ -176,6 +176,7 @@ import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
 import com.health.threadpool.TimeoutOutputStream;
 import com.health.threadpool.ZipCreationThreadService;
+import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -219,6 +220,9 @@ public class HomeController {
 
     @Autowired
     private PackLanTutorialResourceService packLanTutorialResourceService;
+
+    @Autowired
+    private ZipHealthTutorialThreadService zipHealthTutorialThreadService;
 
     @Autowired
     private AjaxController ajaxController;
@@ -7949,6 +7953,10 @@ public class HomeController {
         tutorial.setPreRequisticStatus(CommonData.PUBLISH_STATUS);
         tutorial.setVideoStatus(CommonData.PUBLISH_STATUS);
         tutorial.setStatus(true);
+
+        int catId = tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
+        int lanId = tutorial.getConAssignedTutorial().getLan().getLanId();
+        zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
         taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
@@ -8844,14 +8852,17 @@ public class HomeController {
         List<Tutorial> tutorials;
 
         Tutorial tut = tutService.getById(id);
+        int catId = tut.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
+        int lanId = tut.getConAssignedTutorial().getLan().getLanId();
 
         if (tut.isStatus()) {
             tut.setStatus(false);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.DELETE_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
-
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }

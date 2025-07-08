@@ -1,16 +1,35 @@
 package com.health.controller;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.health.domain.security.UserRole;
@@ -28,7 +47,10 @@ import com.health.service.TopicCategoryMappingService;
 import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.threadpool.TimeoutOutputStream;
+import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
+import com.health.utility.ServiceUtility;
 
 /**
  * Rest APi class return data in JSON format
@@ -39,6 +61,8 @@ import com.health.utility.CommonData;
  */
 @RestController
 public class RestApi {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestApi.class);
 
     @Autowired
     private CategoryService catService;
@@ -60,6 +84,23 @@ public class RestApi {
 
     @Autowired
     private UserRoleService usrRoleService;
+
+    @Autowired
+    private ZipHealthTutorialThreadService zipHealthTutorialThreadService;
+
+    @Autowired
+    private Environment env;
+
+    @Value("${downloadLimit}")
+    private int downloadLimit;
+
+    @Value("${downloadTimeOut}")
+    private long downloadTimeOut;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    private AtomicInteger downloadCount = new AtomicInteger(0);
 
     /**
      * This url fetches all the category and language available in the system
@@ -301,6 +342,116 @@ public class RestApi {
         mapdata.put("healthnutrition", role);
 
         return new ResponseEntity<Object>(mapdata, HttpStatus.OK);
+
+    }
+
+    /// downloadHealthTutorials?courseName=HealthTutorial&catIds=1,2&lanIds=3,4
+    @GetMapping("/downloadHealthTutorials")
+    public ResponseEntity<Map<Integer, String>> getZipUrlOfHealthTutorial(@RequestParam String courseName,
+            @RequestParam List<Integer> catIds, @RequestParam(required = false) List<Integer> lanIds) {
+
+        Map<Integer, String> resultMap = new HashMap<>();
+
+        if (courseName == null || courseName.trim().isEmpty()) {
+            resultMap.put(2, "No CourseName  is available in url");
+            return ResponseEntity.ok(resultMap);
+        }
+
+        if (catIds == null || catIds.isEmpty()) {
+            resultMap.put(2, "No Category Id is available in url");
+            return ResponseEntity.ok(resultMap);
+        }
+
+        Collections.sort(catIds);
+        Set<Integer> uniqeCatIds = new LinkedHashSet<>(catIds);
+        List<Integer> updatedLanIds = new ArrayList<>();
+        if (lanIds != null) {
+            updatedLanIds.addAll(lanIds);
+        }
+        // Added English Lan Id to use by default
+        updatedLanIds.add(22);
+        Collections.sort(updatedLanIds);
+
+        Set<Integer> uniquelanIds = new LinkedHashSet<>(updatedLanIds);
+
+        for (int catId : uniqeCatIds) {
+            Category cat = catService.findByid(catId);
+            if (cat == null) {
+                resultMap.put(2, "No Category exists for this catId: " + catId);
+                return ResponseEntity.ok(resultMap);
+
+            } else if (!cat.isStatus()) {
+                resultMap.put(2, "No Enable Category exists for this catId: " + catId);
+                return ResponseEntity.ok(resultMap);
+            }
+        }
+
+        for (int lanId : uniquelanIds) {
+            Language lan = lanService.getById(lanId);
+            if (lan == null) {
+                resultMap.put(2, "No Language exists for this lanId: " + lanId);
+                return ResponseEntity.ok(resultMap);
+
+            }
+        }
+
+        String zipUrl = zipHealthTutorialThreadService.getZipName(courseName, uniqeCatIds, uniquelanIds, env);
+
+        if (zipUrl == null || zipUrl.isEmpty()) {
+            resultMap.put(0, "Zip creation in progress... Please check back after 30 minutes.");
+        } else if ("Error".equals(zipUrl)) {
+            resultMap.put(2, "No tutorials are available for the selected category and language.");
+        } else if (downloadCount.get() == downloadLimit) {
+            resultMap.put(0, "Download limit reached. Please try again after 30 minutes.");
+        } else {
+            String resultantzipUrl = ServiceUtility.convertFilePathToUrl(zipUrl);
+            resultMap.put(1, baseUrl + "/downloadManagerforhst?zipUrl=" + resultantzipUrl);
+
+        }
+
+        return ResponseEntity.ok(resultMap);
+    }
+
+    @GetMapping("/downloadManagerforhst")
+    public String downloadManager(@RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response) {
+        String message = "Please try again after 30 minutes.";
+        if (downloadCount.get() == downloadLimit) {
+
+            return message;
+        }
+        downloadCount.incrementAndGet();
+        logger.debug(" Increament downloadCount :{}", downloadCount.get());
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        try (OutputStream os = new TimeoutOutputStream(response.getOutputStream(), downloadTimeOut);
+                InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
+
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + ServiceUtility.getZipfileName(zipFilePathName));
+            response.setContentLengthLong(Files.size(zipFilePathName));
+
+            byte[] buffer = new byte[16384];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+
+                // TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
+                // tos.write(buffer, 0, length);
+
+                os.write(buffer, 0, length);
+
+            }
+            os.flush();
+
+        } catch (Exception e) {
+            logger.info("Exception:{}", e.getMessage());
+        } finally {
+            downloadCount.decrementAndGet();
+            logger.debug(" Decrement downloadCount :{}", downloadCount.get());
+        }
+
+        return null;
 
     }
 
