@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -1869,6 +1870,62 @@ public class HomeController {
         }
 
         model.addAttribute("tutorial", tutorial);
+
+        // video resolution path
+        String video720Path = tutorial.getVideo();
+
+        int dotIndex = video720Path.lastIndexOf('.');
+
+        String base = video720Path.substring(0, dotIndex); // Everything before ".mp4"
+        String extension = video720Path.substring(dotIndex); // ".mp4"
+
+        String video480Path = base + "_480p" + extension;
+        String video360Path = base + "_360p" + extension;
+        logger.info(video480Path);
+        logger.info(video360Path);
+
+        // TreeMap to store videos in descending resolution order
+        TreeMap<Integer, String> videoPathWithResolution = new TreeMap<>((a, b) -> b - a);
+
+        videoPathWithResolution.put(720, video720Path); // Always put 720p
+
+        // Get base path from environment
+        String externalPath = env.getProperty("spring.applicationexternalPath.name");
+
+        Path basePath = Paths.get(externalPath);
+
+        // Check for 480p file
+        Path path480 = Paths.get(video480Path);
+
+        path480 = basePath.resolve(path480);
+
+        if (path480.toFile().exists()) {
+            videoPathWithResolution.put(480, video480Path);
+        }
+
+        // Check for 360p file
+        Path path360 = Paths.get(video360Path);
+
+        path360 = basePath.resolve(path360);
+
+        if (path360.toFile().exists()) {
+            videoPathWithResolution.put(360, video360Path);
+        }
+
+//        ObjectMapper mapper = new ObjectMapper();
+//        String jsonMap;
+//        try {
+//            jsonMap = mapper.writeValueAsString(videoPathWithResolution);
+//            model.addAttribute("videoPathWithResolutionJson", jsonMap);
+//        } catch (JsonProcessingException e) {
+//
+//            logger.error("Json Processing Exception in video path resolution", e);
+//        }
+
+        model.addAttribute("videoPathWithResolution", videoPathWithResolution);
+        for (Map.Entry<Integer, String> entry : videoPathWithResolution.entrySet()) {
+            logger.info("Key:{}, Vlaue: {} ", entry.getKey(), entry.getValue());
+        }
 
         if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
             model.addAttribute("relatedContent", tutorial.getRelatedVideo());
