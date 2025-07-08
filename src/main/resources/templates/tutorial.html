@@ -545,6 +545,32 @@
 
 <script>
 	
+	
+	let defaultQuality = 480; // fallback default
+
+        // Check screen width
+        const width = window.innerWidth;
+
+        // Check network speed if supported
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+        if (width <= 480) {
+            defaultQuality = 360; // small screen (phones)
+        } else if (connection) {
+            const speed = connection.downlink || 1.5; // Mbps
+
+            if (speed < 1) {
+                defaultQuality = 360;
+            } else if (speed >= 4) {
+                defaultQuality = 720;
+            } else {
+                defaultQuality = 480;
+            }
+        }
+
+
+
+	
     const controls = [
         'play-large',
         'play',
@@ -574,6 +600,14 @@
                 update: true,
                 language: srclang
             },
+            
+            quality: {
+                default: defaultQuality,
+               	options: [720, 480, 360], // your available sizes
+                forced: true, // only allow listed options 
+               
+            }, 
+            
             settings: ['quality', 'speed']
         });
 
@@ -751,6 +785,20 @@
         });
         
          // Add toast element after Plyr initializes
+         
+         
+     function updateQualityDropdown(defaultQuality) {
+        setTimeout(() => {
+            const menuItems = document.querySelectorAll('.plyr__menu__container [data-plyr="quality"]');
+            menuItems.forEach((item) => {
+                if (item.getAttribute('value') === defaultQuality.toString()) {
+                    item.textContent = `Auto (${defaultQuality}p)`;
+                }
+            });
+        }, 300);
+    }
+
+    updateQualityDropdown(defaultQuality);    
 
 
 	const wrapper = document.querySelector('.plyr__video-wrapper');
