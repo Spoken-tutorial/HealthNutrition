@@ -1,9 +1,11 @@
 package com.health.utility;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
@@ -19,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -26,6 +29,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -41,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +54,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.User;
 import com.health.repository.UserRepository;
+import com.health.threadpool.TimeoutOutputStream;
 
 /**
  * Utility class
@@ -814,6 +820,54 @@ public class ServiceUtility {
             }
 
         });
+    }
+
+    /*
+     * dowanload Manager
+     * 
+     */
+
+    public static String downloadManager(String zipUrl, AtomicInteger downloadCount, int downloadLimit,
+            long downloadTimeOut, Environment env, HttpServletResponse response) {
+        String message = "Please try again after 30 minutes.";
+        if (downloadCount.get() == downloadLimit) {
+
+            return message;
+        }
+        downloadCount.incrementAndGet();
+        logger.debug(" Increament downloadCount :{}", downloadCount.get());
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        try (OutputStream os = new TimeoutOutputStream(response.getOutputStream(), downloadTimeOut);
+                InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
+
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + ServiceUtility.getZipfileName(zipFilePathName));
+            response.setContentLengthLong(Files.size(zipFilePathName));
+
+            byte[] buffer = new byte[16384];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+
+                // TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
+                // tos.write(buffer, 0, length);
+
+                os.write(buffer, 0, length);
+
+            }
+            os.flush();
+
+        } catch (Exception e) {
+            logger.info("Exception:{}", e.getMessage());
+        } finally {
+            downloadCount.decrementAndGet();
+            logger.debug(" Decrement downloadCount :{}", downloadCount.get());
+        }
+
+        return null;
+
     }
 
     /**

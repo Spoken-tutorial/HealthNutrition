@@ -1,12 +1,5 @@
 package com.health.controller;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +39,6 @@ import com.health.service.TopicCategoryMappingService;
 import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
-import com.health.threadpool.TimeoutOutputStream;
 import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.ServiceUtility;
@@ -414,45 +405,11 @@ public class RestApi {
 
     @GetMapping("/downloadManagerforhst")
     public String downloadManager(@RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response) {
-        String message = "Please try again after 30 minutes.";
-        if (downloadCount.get() == downloadLimit) {
 
-            return message;
-        }
-        downloadCount.incrementAndGet();
-        logger.debug(" Increament downloadCount :{}", downloadCount.get());
+        String message = ServiceUtility.downloadManager(zipUrl, downloadCount, downloadLimit, downloadTimeOut, env,
+                response);
 
-        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
-        try (OutputStream os = new TimeoutOutputStream(response.getOutputStream(), downloadTimeOut);
-                InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
-
-            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader("Content-Disposition",
-                    "attachment; filename=" + ServiceUtility.getZipfileName(zipFilePathName));
-            response.setContentLengthLong(Files.size(zipFilePathName));
-
-            byte[] buffer = new byte[16384];
-            int length;
-
-            while ((length = is.read(buffer)) > 0) {
-
-                // TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
-                // tos.write(buffer, 0, length);
-
-                os.write(buffer, 0, length);
-
-            }
-            os.flush();
-
-        } catch (Exception e) {
-            logger.info("Exception:{}", e.getMessage());
-        } finally {
-            downloadCount.decrementAndGet();
-            logger.debug(" Decrement downloadCount :{}", downloadCount.get());
-        }
-
-        return null;
+        return message;
 
     }
-
 }
