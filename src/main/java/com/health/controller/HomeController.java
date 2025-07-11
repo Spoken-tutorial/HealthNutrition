@@ -5011,7 +5011,13 @@ public class HomeController {
         model.addAttribute("languages", languages);
 
         List<Topic> topics = getTopics();
-        List<TrainingResource> trainingResourceList = trainingResourceService.findAll();
+        List<TrainingResource> trainingResourceList = new ArrayList<>();
+        List<TrainingResource> tempResourceList = trainingResourceService.findAll();
+        for (TrainingResource temp : tempResourceList) {
+            if (ServiceUtility.hasAnyResourceFile(temp)) {
+                trainingResourceList.add(temp);
+            }
+        }
         model.addAttribute("topics", topics);
         model.addAttribute("trainingResourceList", trainingResourceList);
 
@@ -5080,6 +5086,10 @@ public class HomeController {
                         } else {
                             tr = trList.get(0);
                         }
+
+                        tr.setDateAdded(dateAdded);
+                        tr.setTopicLanMapping(topicLanMapping);
+                        trainingResourceService.save(tr); // Saved first to get exact Id
                         int trId = tr.getTrainingResourceId();
 
                         Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trId), langName);
@@ -5169,9 +5179,6 @@ public class HomeController {
                             }
 
                         }
-
-                        tr.setDateAdded(dateAdded);
-                        tr.setTopicLanMapping(topicLanMapping);
 
                         trainingResourceService.save(tr);
 
@@ -5319,7 +5326,13 @@ public class HomeController {
         List<Language> languages = getLanguages();
         languages.sort(Comparator.comparing(Language::getLangName));
         List<Topic> topics = getTopics();
-        List<TrainingResource> trainingResourceList = trainingResourceService.findAll();
+        List<TrainingResource> trainingResourceList = new ArrayList<>();
+        List<TrainingResource> tempTrainingResourceList = trainingResourceService.findAll();
+        for (TrainingResource temp : tempTrainingResourceList) {
+            if (ServiceUtility.hasAnyResourceFile(temp)) {
+                trainingResourceList.add(temp);
+            }
+        }
         model.addAttribute("languages", languages);
         model.addAttribute("topics", topics);
         model.addAttribute("trainingResourceList", trainingResourceList);
@@ -5378,6 +5391,7 @@ public class HomeController {
         int trIdInt = Integer.parseInt(trId);
         int topicIdInt = Integer.parseInt(topicId);
         int lanIdInt = Integer.parseInt(lanId);
+        int oldtrId = trIdInt;
 
         Topic topic = topicService.findById(topicIdInt);
         Language lan = lanService.getById(lanIdInt);
@@ -5388,6 +5402,12 @@ public class HomeController {
         String originalFileType = "";
         String oldPath = "";
         TrainingResource oldTrainingResource = trainingResourceService.findByTrainingResourceId(trIdInt);
+
+        if (oldTrainingResource == null) {
+            model.addAttribute("error_msg", "TrainingResource doesn't exist");
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+        }
+
         boolean fileMatch = false;
 
         if (fileType.equals("Doc")) {
@@ -5417,57 +5437,69 @@ public class HomeController {
             }
         }
 
-//        if (topicLan == null) {
-//            model.addAttribute("error_msg", "Please select Topic and Laguage");
-//            return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
-//        }
-
-        if (oldTrainingResource == null) {
-            model.addAttribute("error_msg", "TrainingResource doesn't exist");
-            return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
-        }
-        if (file.isEmpty()) {
-            model.addAttribute("error_msg", "Please upolad File");
-            return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
+        if (oldPath == null || oldPath.isEmpty()) {
+            model.addAttribute("error_msg",
+                    "The data has already moved to another Training Resource. Please check the View section to edit.");
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
         }
 
-        /*
-         * Since trainingResource have doc, image, pdf and excel path. If someone wants
-         * to modify any path with new topic and lan then new trainingResource will be
-         * created and we update file path in it and respected file path will be empty
-         * in oldTraining Resource.
-         */
-        List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(topicLan);
+        if (topic == null || lan == null) {
+            model.addAttribute("error_msg", "Topic or Language not found.");
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+        }
+
         TrainingResource newTrainingResource;
         boolean newTrainingData = true;
-        if (trList.isEmpty()) {
-            newTrainingResource = new TrainingResource();
-        } else if (!trList.contains(oldTrainingResource)) {
-            newTrainingResource = trList.get(0);
+
+        if (topicLan != null) {
+            List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(topicLan);
+
+            if (trList.isEmpty()) {
+                newTrainingResource = new TrainingResource();
+                logger.info("new Training Resource Data");
+
+            } else if (!trList.contains(oldTrainingResource)) {
+                newTrainingResource = trList.get(0);
+                logger.info("new Training Resource Data from trList");
+            } else {
+                newTrainingData = false;
+                newTrainingResource = oldTrainingResource; // or some appropriate fallback
+                logger.info("old Training resource data");
+            }
         } else {
-            newTrainingData = false;
-            newTrainingResource = oldTrainingResource; // or some appropriate fallback
+
+            topicLan = new TopicLanMapping(dateAdded, topic, lan);
+
+            topicLanMapiingService.save(topicLan);
+            newTrainingResource = new TrainingResource();
+
+        }
+
+        newTrainingResource.setDateAdded(dateAdded);
+        newTrainingResource.setTopicLanMapping(topicLan);
+
+        // To get exact Id of new trainining Resource Data
+        if (newTrainingData) {
+
+            trainingResourceService.save(newTrainingResource);
+            trIdInt = newTrainingResource.getTrainingResourceId();
+
         }
 
         try {
 
+            String langName = lan.getLangName();
+
+            Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trIdInt), langName);
+
+            String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
+            String docFolder = Paths.get(rootPath.toString(), "docs").toString();
+            String excelFolder = Paths.get(rootPath.toString(), "excel").toString();
+            String imageFolder = Paths.get(rootPath.toString(), "image").toString();
+            boolean fileFlag = false;
+
             if (!file.isEmpty()) {
-
-                if (topicLan == null) {
-                    topicLan = new TopicLanMapping(dateAdded, topic, lan);
-
-                    topicLanMapiingService.save(topicLan);
-
-                }
-
-                String langName = lan.getLangName();
-
-                Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trIdInt), langName);
-
-                String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
-                String docFolder = Paths.get(rootPath.toString(), "docs").toString();
-                String excelFolder = Paths.get(rootPath.toString(), "excel").toString();
-                String imageFolder = Paths.get(rootPath.toString(), "image").toString();
+                fileFlag = true;
 
                 Set<String> extentions = new HashSet<>();
                 String document = "";
@@ -5477,14 +5509,15 @@ public class HomeController {
                 if (fileExtention.equals(CommonData.UNSUPPORTED_EXTENSION)) {
                     model.addAttribute("error_msg", "Unsupported file");
 
-                    return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
+                    return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
                 }
 
                 else if (fileExtention.equals(CommonData.PDF_EXTENSION)
                         && originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
                     document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                     newTrainingResource.setPdfPath(document);
-                    oldTrainingResource.setPdfPath("");
+                    if (newTrainingData)
+                        oldTrainingResource.setPdfPath("");
                     fileMatch = true;
                 }
 
@@ -5492,7 +5525,8 @@ public class HomeController {
                         && originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
                     document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                     newTrainingResource.setDocPath(document);
-                    oldTrainingResource.setDocPath("");
+                    if (newTrainingData)
+                        oldTrainingResource.setDocPath("");
                     fileMatch = true;
                 }
 
@@ -5500,7 +5534,8 @@ public class HomeController {
                         && originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
                     document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                     newTrainingResource.setExcelPath(document);
-                    oldTrainingResource.setExcelPath("");
+                    if (newTrainingData)
+                        oldTrainingResource.setExcelPath("");
                     fileMatch = true;
                 }
 
@@ -5508,7 +5543,8 @@ public class HomeController {
                         && originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
                     document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                     newTrainingResource.setImgPath(document);
-                    oldTrainingResource.setImgPath("");
+                    if (newTrainingData)
+                        oldTrainingResource.setImgPath("");
                     fileMatch = true;
                 }
 
@@ -5521,7 +5557,10 @@ public class HomeController {
                                     && originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
                                 document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                                 newTrainingResource.setPdfPath(document);
-                                oldTrainingResource.setPdfPath("");
+                                if (newTrainingData) {
+                                    oldTrainingResource.setPdfPath("");
+                                }
+
                                 fileMatch = true;
 
                             }
@@ -5530,7 +5569,10 @@ public class HomeController {
                                     && originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
                                 document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                                 newTrainingResource.setDocPath(document);
-                                oldTrainingResource.setDocPath("");
+                                if (newTrainingData) {
+                                    oldTrainingResource.setDocPath("");
+                                }
+
                                 fileMatch = true;
                             }
 
@@ -5538,7 +5580,10 @@ public class HomeController {
                                     && originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
                                 document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                                 newTrainingResource.setExcelPath(document);
-                                oldTrainingResource.setExcelPath("");
+                                if (newTrainingData) {
+                                    oldTrainingResource.setExcelPath("");
+                                }
+
                                 fileMatch = true;
                             }
 
@@ -5546,7 +5591,10 @@ public class HomeController {
                                     && originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
                                 document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                                 newTrainingResource.setImgPath(document);
-                                oldTrainingResource.setImgPath("");
+                                if (newTrainingData) {
+                                    oldTrainingResource.setImgPath("");
+                                }
+
                                 fileMatch = true;
 
                             }
@@ -5555,7 +5603,7 @@ public class HomeController {
 
                                 model.addAttribute("error_msg", "Unsupported file Error ");
 
-                                return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
+                                return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
                             }
 
                         }
@@ -5564,12 +5612,12 @@ public class HomeController {
                     else {
                         model.addAttribute("error_msg", "Zip contains different types of files Error");
 
-                        return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
+                        return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
                     }
 
                 }
 
-                if (oldPath.endsWith(".zip")) {
+                if (oldPath != null && oldPath.endsWith(".zip")) {
 
                     String extractDir = oldPath.replace(".zip", "");
 
@@ -5582,29 +5630,80 @@ public class HomeController {
                 newTrainingResource.setTopicLanMapping(topicLan);
 
                 if (fileMatch) {
+                    newTrainingResource.setDateAdded(dateAdded);
+                    newTrainingResource.setTopicLanMapping(topicLan);
                     trainingResourceService.save(newTrainingResource);
                     if (newTrainingData) {
+                        logger.info("1st old data save is called");
                         trainingResourceService.save(oldTrainingResource);
                     }
                 } else {
-                    model.addAttribute("error_msg",
-                            "Please upload the ZIP or non-ZIP file of the same type that you want to edit. For example, if you want to edit a DOC file, do not upload an image, Excel, or PDF file.");
-
-                    return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
+                    model.addAttribute("error_msg", "Please upload a file of the same type. E.g., DOC for DOC type.");
+                    return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
                 }
+            }
 
+            // File Empty
+            else {
+                if (newTrainingData && !fileFlag && oldPath != null && !oldPath.isEmpty()) {
+
+                    Path sourcePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), oldPath);
+                    File sourceFile = sourcePath.toFile();
+                    String fileName = sourcePath.getFileName().toString();
+
+                    String document = "";
+
+                    if (sourceFile.exists()) {
+                        if (originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, docFolder, fileName, env);
+
+                            newTrainingResource.setDocPath(document);
+                            oldTrainingResource.setDocPath("");
+
+                        } else if (originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, excelFolder, fileName,
+                                    env);
+
+                            newTrainingResource.setExcelPath(document);
+                            oldTrainingResource.setExcelPath("");
+
+                        } else if (originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, pdfFolder, fileName, env);
+
+                            newTrainingResource.setPdfPath(document);
+                            oldTrainingResource.setPdfPath("");
+
+                        } else if (originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, imageFolder, fileName,
+                                    env);
+                            newTrainingResource.setImgPath(document);
+                            oldTrainingResource.setImgPath("");
+
+                        }
+
+                        newTrainingResource.setDateAdded(dateAdded);
+                        trainingResourceService.save(newTrainingResource);
+                        logger.info("2nd old data save is called");
+                        trainingResourceService.save(oldTrainingResource);
+                    }
+
+                }
             }
 
         } catch (Exception e) {
             logger.error("Exception while updating Training Resource: {} {} {}", topic, lan, file, e);
             model.addAttribute("error_msg", CommonData.RECORD_ERROR);
 
-            return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
         }
 
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
 
-        return trainingResourceEditGet(originalFileType, trIdInt, req, model, principal);
+        return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
     }
 
     @GetMapping("/trainingModules")

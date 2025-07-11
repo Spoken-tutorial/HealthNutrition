@@ -197,7 +197,7 @@ font-weight:bold!important;
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
 									               th:href="@{'/trainingReource/edit/pdfOrZipOfPdfs/' + ${temp.getTrainingResourceId()}}" 
-									               title="Edit Zip">
+									               title="Edit Pdf">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
@@ -206,7 +206,7 @@ font-weight:bold!important;
 									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
 									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
 									                    th:data-fileName="${temp.getPdfFileNameWithorWitoutZip()}"
-									                    title="Delete">
+									                    title="Delete Pdf">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
 									        </div>
@@ -234,7 +234,7 @@ font-weight:bold!important;
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
 									               th:href="@{'/trainingReource/edit/docOrZipOfDocs/' + ${temp.getTrainingResourceId()}}" 
-									               title="Edit Zip">
+									               title="Edit Doc">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
@@ -243,7 +243,7 @@ font-weight:bold!important;
 									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
 									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
 									                    th:data-fileName="${temp.getDocFileNameWithorWitoutZip()}"
-									                    title="Delete">
+									                    title="Delete Doc">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
 									        </div>
@@ -271,7 +271,7 @@ font-weight:bold!important;
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
 									               th:href="@{'/trainingReource/edit/excelOrZipOfexcels/' + ${temp.getTrainingResourceId()}}" 
-									               title="Edit Zip">
+									               title="Edit Excel">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
@@ -280,7 +280,7 @@ font-weight:bold!important;
 									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
 									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
 									                    th:data-fileName="${temp.getExcelFileNameWithorWitoutZip()}"
-									                    title="Delete">
+									                    title="Delete Excel">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
 									        </div>
@@ -309,7 +309,7 @@ font-weight:bold!important;
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
 									               th:href="@{'/trainingReource/edit/imageOrZipOfImages/' + ${temp.getTrainingResourceId()}}" 
-									               title="Edit Zip">
+									               title="Edit Image">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
@@ -318,7 +318,7 @@ font-weight:bold!important;
 									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
 									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
 									                    th:data-fileName="${temp.getImageFileNameWithorWitoutZip()}"
-									                    title="Delete">
+									                    title="Delete Image">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
 									        </div>
