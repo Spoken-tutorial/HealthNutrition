@@ -64,6 +64,17 @@ public class Topic implements Comparable<Topic>, Serializable {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<TopicCategoryMapping> topicCategoryMap = new HashSet<TopicCategoryMapping>();
 
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<TopicLanMapping> topicLanMappingd = new HashSet<TopicLanMapping>();
+
+    public Set<TopicLanMapping> getTopicLanMappingd() {
+        return topicLanMappingd;
+    }
+
+    public void setTopicLanMappingd(Set<TopicLanMapping> topicLanMappingd) {
+        this.topicLanMappingd = topicLanMappingd;
+    }
+
     public int getTopicId() {
         return topicId;
     }

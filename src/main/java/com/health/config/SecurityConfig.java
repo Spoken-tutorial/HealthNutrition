@@ -91,7 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
             "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
-            "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek",
+            "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/addTrainingResource",
+            "/trainingReourceAdminView/**", "/trainingReource/edit/**",
 
     };
 
@@ -151,9 +152,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/addTestimonial/**", "/addPromoVideo/**", "/addResearchPaper/**", "/brochure/edit/**",
                         "/promoVideo/edit/**", "/carousel/edit/**", "/event/edit/**", "/testimonial/edit/**",
                         "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
-                        "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/researchPaper/edit/**",
-                        "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**",
-                        "/addCitation/**", "/citation/edit/**")
+                        "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/addTrainingResource",
+                        "/researchPaper/edit/**", "/enableDisableBrouchure/**", "/enableDisableConsultant/**",
+                        "/enableDisableTestimonial/**", "/addCitation/**", "/citation/edit/**")
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
 
