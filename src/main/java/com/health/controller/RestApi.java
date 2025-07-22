@@ -336,10 +336,11 @@ public class RestApi {
 
     }
 
-    /// downloadHealthTutorials?courseName=HealthTutorial&catIds=1,2&lanIds=3,4
+    /// downloadHealthTutorials?courseName=HealthTutorial&videoQuality=L&catIds=1,2&lanIds=3,4
     @GetMapping("/downloadHealthTutorials")
     public ResponseEntity<Map<Integer, String>> getZipUrlOfHealthTutorial(@RequestParam String courseName,
-            @RequestParam List<Integer> catIds, @RequestParam(required = false) List<Integer> lanIds) {
+            @RequestParam(required = false) String videoQuality, @RequestParam List<Integer> catIds,
+            @RequestParam(required = false) List<Integer> lanIds) {
 
         Map<Integer, String> resultMap = new HashMap<>();
 
@@ -351,6 +352,25 @@ public class RestApi {
         if (catIds == null || catIds.isEmpty()) {
             resultMap.put(2, "No Category Id is available in url");
             return ResponseEntity.ok(resultMap);
+        }
+        String quality;
+
+        if (videoQuality == null || videoQuality.isEmpty()) {
+            quality = "High";
+        } else {
+            switch (videoQuality.toUpperCase()) {
+            case "H":
+                quality = "High";
+                break;
+            case "M":
+                quality = "Medium";
+                break;
+            case "L":
+                quality = "Low";
+                break;
+            default:
+                quality = "High";
+            }
         }
 
         Collections.sort(catIds);
@@ -386,7 +406,7 @@ public class RestApi {
             }
         }
 
-        String zipUrl = zipHealthTutorialThreadService.getZipName(courseName, uniqeCatIds, uniquelanIds, env);
+        String zipUrl = zipHealthTutorialThreadService.getZipName(courseName, quality, uniqeCatIds, uniquelanIds, env);
 
         if (zipUrl == null || zipUrl.isEmpty()) {
             resultMap.put(0, "Zip creation in progress... Please check back after 30 minutes.");
@@ -395,8 +415,10 @@ public class RestApi {
         } else if (downloadCount.get() == downloadLimit) {
             resultMap.put(0, "Download limit reached. Please try again after 30 minutes.");
         } else {
+            double zipSizeInMb = ServiceUtility.getZipSizeInMB(zipUrl, env);
             String resultantzipUrl = ServiceUtility.convertFilePathToUrl(zipUrl);
             resultMap.put(1, baseUrl + "/downloadManagerforhst?zipUrl=" + resultantzipUrl);
+            resultMap.put(3, String.valueOf(zipSizeInMb) + "MB");
 
         }
 

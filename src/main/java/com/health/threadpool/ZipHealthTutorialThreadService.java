@@ -137,8 +137,8 @@ public class ZipHealthTutorialThreadService {
     }
 
     @Async
-    private CompletableFuture<String> createZip(String courseName, Set<Integer> catIds, Set<Integer> lanIds,
-            Environment env) {
+    private CompletableFuture<String> createZip(String courseName, String quality, Set<Integer> catIds,
+            Set<Integer> lanIds, Environment env) {
         String zipUrl = "";
 
         List<Category> catList = new ArrayList<>();
@@ -176,7 +176,10 @@ public class ZipHealthTutorialThreadService {
             flag = false;
 
         }
-        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString();
+        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + quality;
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '_') {
+            sb.deleteCharAt(sb.length() - 1);
+        }
         String zipNameWithoutExtentions = courseName.replace(' ', '_') + "_" + sb.toString();
 
         if (ServiceUtility.IsCourseNameAndLanZipExist(parentZipfolder, zipNameWithoutExtentions, env)) {
@@ -244,9 +247,36 @@ public class ZipHealthTutorialThreadService {
                     }
 
                     try {
+                        String resolution = "";
+                        if (quality.equals("Medium")) {
+                            resolution = "_480p";
+                        } else if (quality.equals("Low")) {
+                            resolution = "_360p";
+                        }
 
-                        Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                        Path basePath;
+                        Path originalPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                 tutorialPath1);
+
+                        if (resolution == null || resolution.isEmpty()) {
+                            basePath = originalPath;
+                        } else {
+                            String resolutionUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolution);
+
+                            if (resolutionUrl != null) {
+                                Path resolutionPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                        resolutionUrl);
+
+                                if (resolutionPath.toFile().exists()) {
+                                    basePath = resolutionPath;
+
+                                } else {
+                                    basePath = originalPath;
+                                }
+                            } else {
+                                basePath = originalPath;
+                            }
+                        }
 
                         String topicwithExtention;
                         Path sourcePath;
@@ -263,7 +293,9 @@ public class ZipHealthTutorialThreadService {
                         Path destainationPath1 = destInationDirectoryforTutorial.resolve(topicwithExtention);
 
                         File sourceFile = sourcePath.toFile();
+                        logger.info("last assignment of source path :{}", sourcePath.toString());
                         if (sourceFile.exists()) {
+                            logger.info(sourcePath.toString());
 
                             copyFileUsingRsync(sourcePath, destainationPath1);
 
@@ -351,10 +383,33 @@ public class ZipHealthTutorialThreadService {
         return CompletableFuture.completedFuture(zipUrl);
     }
 
-    public String getZipName(String courseName, Set<Integer> catIds, Set<Integer> lanIds, Environment env) {
+    private boolean deleteParentDir(String parentZipfolder, Environment env) {
+        Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, parentZipfolder);
+
+        File parentDir = zipFilePathDirectory.toFile();
+
+        boolean isDeleted = false;
+
+        if (parentDir.exists()) {
+            try {
+                deleteFolderRecursively(parentDir.toPath());
+                if (!parentDir.exists()) {
+                    isDeleted = true; // folder deleted successfully
+                }
+            } catch (IOException e) {
+                logger.error("Failed to delete parent folder recursively: {}", parentDir.getAbsolutePath(), e);
+            }
+        }
+        return isDeleted;
+    }
+
+    public String getZipName(String courseName, String quality, Set<Integer> catIds, Set<Integer> lanIds,
+            Environment env) {
 
         StringBuilder tempCatIdFolder = new StringBuilder();
         StringBuilder tempLanIdFolder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         for (int catId : catIds) {
             tempCatIdFolder.append("cat").append(catId).append("_");
@@ -362,15 +417,23 @@ public class ZipHealthTutorialThreadService {
         for (int lanId : lanIds) {
             Language lan = lanService.getById(lanId);
             tempLanIdFolder.append("lan").append(lanId).append("_");
+            if (lanId != 22) {
+                sb.append(lan.getLangName().replace(' ', '_')).append("_");
+            }
 
         }
 
-        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString();
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '_') {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        String newzipNameWithoutExtentions = courseName.replace(' ', '_') + "_" + sb.toString();
+
+        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + quality;
         String key = parentZipfolder;
         String zipName = ZipNames.putIfAbsent(key, "");
         if (zipName == null) {
-            // Call the Async method
-            createZip(courseName, catIds, lanIds, env);
+
+            createZip(courseName, quality, catIds, lanIds, env);
             return null;
         } else if (zipName.isEmpty()) {
             // processing already progress
@@ -378,28 +441,26 @@ public class ZipHealthTutorialThreadService {
 
         }
 
-        else if (!zipName.contains(courseName)) {
+        else {
+
             Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipName);
-
-            File file = zipFilePathName.toFile();
-
-            if (file.exists()) {
-
-                boolean isDeleted = file.delete();
+            String fileName = zipFilePathName.getFileName().toString();
+            String newFileName = newzipNameWithoutExtentions + ".zip";
+            if (!fileName.equals(newFileName)) {
+                boolean isDeleted = deleteParentDir(parentZipfolder, env);
 
                 if (isDeleted) {
                     ZipNames.remove(key);
-                    createZip(courseName, catIds, lanIds, env);
+                    createZip(courseName, quality, catIds, lanIds, env);
 
-                    logger.info("Zip File deleted successfully: {} " + zipName);
+                    logger.info("Parent dir deleted successfully: {} " + parentZipfolder);
                 } else {
-                    logger.info("Failed to delete the zip file: {} " + zipName);
+                    logger.info("Failed to delete the Parent dir: {} " + parentZipfolder);
                 }
-            } else {
-                logger.info(" ZipFile does not exist: {} " + zipName);
+
+                return null;
             }
 
-            return null;
         }
 
         return zipName;

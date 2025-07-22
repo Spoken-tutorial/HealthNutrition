@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -694,6 +696,9 @@ public class ServiceUtility {
         String zipFileName = zipfileNameWithouExtention + ".zip";
 
         Path zipFilePathName = Paths.get(zipFilePathDirectory.toString(), zipFileName);
+        if (!zipFilePathName.toFile().exists()) {
+
+        }
 
         Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
 
@@ -867,6 +872,30 @@ public class ServiceUtility {
         }
 
         return null;
+
+    }
+
+    public static double getZipSizeInMB(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+        double fileSizeInMB = 0;
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            fileSizeInMB = fileSizeInBytes / (1024.0 * 1024.0);
+            fileSizeInMB = new BigDecimal(fileSizeInMB).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        }
+        return fileSizeInMB;
+
+    }
+
+    public static String getVideoResolutionPath(String VideoPath, String resolution) {
+        int dotIndex = VideoPath.lastIndexOf('.');
+
+        String base = VideoPath.substring(0, dotIndex);
+        String extension = VideoPath.substring(dotIndex);
+
+        String videoResolutionPath = base + resolution + extension;
+        return videoResolutionPath;
 
     }
 
