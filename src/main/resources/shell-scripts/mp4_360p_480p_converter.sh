@@ -7,8 +7,7 @@ export LC_ALL="en_US.UTF-8"
 oninterrupt() {
     echo ""
     echo "Interrupted. Cleaning up..."
-    [[ -n "$current360" && -f "$current360" && ! -s "$current360" ]] && rm -f "$current360"
-    [[ -n "$current480" && -f "$current480" && ! -s "$current480" ]] && rm -f "$current480"
+    find "$TMPDIR" -type f -iname "*.mp4" -exec rm -f {} +
     echo "[$successcount/$totalcount] files fully or partially converted before interruption."
     rm -f "$mp4file"
     exit 1
@@ -23,10 +22,16 @@ if [[ "$#" -ne 1 || ! -d "$DIR" ]]; then
 fi
 
 mp4file="$DIR/source-mp4file-paths.txt"
+TMPDIR="$DIR/.tmp_convert"
+mkdir -p "$TMPDIR"
 trap oninterrupt INT QUIT TERM
 
-# Find all .mp4 files (UTF-8 safe)
-find "$DIR" -type f -iname "*.mp4" | sort > "$mp4file"
+# Find only original .mp4 files, skip already converted or temp files
+find "$DIR" -type f -iname "*.mp4" \
+    ! -iname "*_360p.mp4" \
+    ! -iname "*_480p.mp4" \
+    ! -path "*/.tmp_convert/*" \
+    | sort > "$mp4file"
 
 totalcount=$(wc -l < "$mp4file")
 count=0
@@ -37,48 +42,50 @@ echo "[$totalcount] files to process"
 while IFS= read -r eachMp4File || [[ -n "$eachMp4File" ]]; do
     let count++
 
-    # Skip files that already include _360p or _480p
-    if [[ "$eachMp4File" == *_360p.* || "$eachMp4File" == *_480p.* ]]; then
+    base="${eachMp4File%.*}"
+    ext="${eachMp4File##*.}"
+
+    target360="${base}_360p.$ext"
+    target480="${base}_480p.$ext"
+    temp360="$TMPDIR/$(basename "${base}_360p.$ext")"
+    temp480="$TMPDIR/$(basename "${base}_480p.$ext")"
+
+    # Skip if both converted versions exist
+    if [[ -f "$target360" && -f "$target480" ]]; then
         echo "[$count/$totalcount] Skipping (already converted): $eachMp4File"
         continue
     fi
 
-    base="${eachMp4File%.*}"
-    ext="${eachMp4File##*.}"
-
-    current360="${base}_360p.$ext"
-    current480="${base}_480p.$ext"
-
+    echo "[$count/$totalcount] Processing: $eachMp4File"
     did_convert=false
 
-    echo "[$count/$totalcount] Processing: $eachMp4File"
-
     # Convert to 360p
-    if [[ ! -f "$current360" ]]; then
+    if [[ ! -f "$target360" ]]; then
         echo "    -> Converting to 360p"
-        ffmpeg -nostdin -y -v error -i "$eachMp4File" -vf "scale=-2:360" -c:a copy "$current360" \
-            || { echo "    !! Failed 360p, cleaning"; rm -f "$current360"; continue; }
-        did_convert=true
+        ffmpeg -nostdin -y -v error -i "$eachMp4File" -vf "scale=-2:360" -c:a copy "$temp360" \
+            && mv "$temp360" "$target360" \
+            && { echo "    ✅ 360p converted: $target360"; did_convert=true; } \
+            || { echo "    ❌ Failed 360p"; rm -f "$temp360"; }
     else
         echo "    -> Skipping 360p (already exists)"
     fi
 
     # Convert to 480p
-    if [[ ! -f "$current480" ]]; then
+    if [[ ! -f "$target480" ]]; then
         echo "    -> Converting to 480p"
-        ffmpeg -nostdin -y -v error -i "$eachMp4File" -vf "scale=-2:480" -c:a copy "$current480" \
-            || { echo "    !! Failed 480p, cleaning"; rm -f "$current480"; continue; }
-        did_convert=true
+        ffmpeg -nostdin -y -v error -i "$eachMp4File" -vf "scale=-2:480" -c:a copy "$temp480" \
+            && mv "$temp480" "$target480" \
+            && { echo "    ✅ 480p converted: $target480"; did_convert=true; } \
+            || { echo "    ❌ Failed 480p"; rm -f "$temp480"; }
     else
         echo "    -> Skipping 480p (already exists)"
     fi
 
     [[ "$did_convert" == true ]] && let ++successcount
-
-    current360=""
-    current480=""
 done < "$mp4file"
 
-echo "[$successcount/$totalcount] files had at least one new conversion"
+echo ""
+echo "✅ Done: [$successcount/$totalcount] files had at least one new conversion"
 rm -f "$mp4file"
+rm -rf "$TMPDIR"
 exit 0
