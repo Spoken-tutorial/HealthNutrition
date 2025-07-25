@@ -72,6 +72,7 @@ import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
 import com.health.model.TraineeInformation;
 import com.health.model.TrainingInformation;
+import com.health.model.TrainingResource;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.TutorialWithWeekAndPackage;
@@ -109,6 +110,7 @@ import com.health.service.TopicCategoryMappingService;
 import com.health.service.TopicService;
 import com.health.service.TraineeInformationService;
 import com.health.service.TrainingInformationService;
+import com.health.service.TrainingResourceService;
 import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
 import com.health.service.TutorialWithWeekAndPackageService;
@@ -161,6 +163,8 @@ public class AjaxController {
 
     @Autowired
     private PackageLanguageService packLanService;
+    @Autowired
+    private TrainingResourceService trainingResourceService;
 
     @Autowired
     private PackLanTutorialResourceService packLanTutorialResourceService;
@@ -649,6 +653,31 @@ public class AjaxController {
         } catch (Exception e) {
 
             logger.error("Error in Enable Disbale PacakgeAndPackLan: {}", packLan, e);
+            return false;
+        }
+
+    }
+
+    @GetMapping("/enableDisableTrainingResource")
+    public @ResponseBody boolean enableDisableTrainingResource(int trainingResourceId) {
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(trainingResourceId);
+
+        try {
+            if (tr.isStatus()) {
+                tr.setStatus(false);
+                trainingResourceService.save(tr);
+                return true;
+
+            } else {
+                tr.setStatus(true);
+                trainingResourceService.save(tr);
+                return true;
+
+            }
+
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Training Resource: {}", tr, e);
             return false;
         }
 
@@ -1493,6 +1522,42 @@ public class AjaxController {
     }
 
     /******************* Course End *****************************/
+
+    @RequestMapping("/delete-trainingResource")
+    public ResponseEntity<String> deleteTrainingResource(@RequestParam("trainingResourceId") int trainingResourceId,
+            @RequestParam("fileType") String fileType) {
+
+        try {
+            TrainingResource tr = trainingResourceService.findByTrainingResourceId(trainingResourceId);
+            if (tr != null) {
+                switch (fileType.toLowerCase()) {
+                case "image":
+                    tr.setImgPath("");
+                    break;
+                case "pdf":
+                    tr.setPdfPath("");
+                    break;
+                case "doc":
+                    tr.setDocPath("");
+                    break;
+                case "excel":
+                    tr.setExcelPath("");
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Unsupported file type: " + fileType);
+                }
+
+                trainingResourceService.save(tr);
+                return ResponseEntity.ok("Deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Training resource not found");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in deleting training resource", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error in deleting!");
+        }
+    }
 
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,

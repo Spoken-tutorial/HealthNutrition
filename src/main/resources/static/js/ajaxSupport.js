@@ -2806,6 +2806,132 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
 
     
 /************************************Assign Video End ********************************************** */
+
+/******************************** Trainig Resource Start ***************************************/
+
+$('.enableTrainingResource').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableTrainingResource",
+					data : {
+						"trainingResourceId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				$('#'+test_id).addClass('fas fa-times-circle');
+			   				$('#'+test_id).removeClass('fas fa-check-circle');
+			   				$('#'+test_id).css({"color": "red"});
+			   				$('#Success').css({"display": "block"});
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+			
+			$('.disableTrainingResource').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableTrainingResource",
+					data : {
+						"trainingResourceId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				
+			   				$('#'+test_id).addClass('fas fa-check-circle');
+			   				$('#'+test_id).removeClass('fas fa-times-circle');
+			   				$('#'+test_id).css({"color": "green"});
+			   				$('#Success').css({"display": "block"});
+			   				
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+		
+
+
+$(".deleteTrainingResource-btn").click(function(){
+    var row = $(this).closest("tr");
+    var trainingResourceId = $(this).data("trainingresourceid"); 
+    var topicName = $(this).data("topicname");
+    var langName = $(this).data("langname");
+    var fileName = $(this).data("filename");
+    var fileType = $(this).data("filetype");
+    
+
+    Swal.fire({
+        title: "Are you sure?",
+        html: "<b>Do you want to delete this Training Resource?</b><br><br>" +
+              "<b>Topic:</b> " + topicName + "<br>" +
+              "<b>Language:</b> " + langName + "<br>" +
+              "<b>file Type:</b> " + fileType + "<br>" +
+              "<b>file Name:</b> " + fileName,
+             
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        dangerMode: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/delete-trainingResource/",
+                data: {
+                   
+                   
+                    "trainingResourceId": trainingResourceId,
+                    "fileType": fileType
+                },
+                type: "DELETE",
+                success: function(result) {
+                    Swal.fire("Deleted!", "Deleted successfully!", "success");
+                   $("#" + fileType + trainingResourceId).text("Deleted");
+                },
+                error: function(err) {
+                    Swal.fire("Error!", "Error in deleting!", "error");
+                }
+            });
+        }
+    });
+});
+    
+
+
+/******************************** Training Resource End ****************************************/
 			
 			
 /***************** changes made by om prakash *********************************************/
