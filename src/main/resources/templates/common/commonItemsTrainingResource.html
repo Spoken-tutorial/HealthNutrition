@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<body>
+	<div th:fragment="my_fragment2(data_id, data_class)">
+		<p th:class="${data_id}" th:id="${data_class}"></p>
+	</div>
+	<div th:fragment="search_bar">
+		<section id="search-bar" class="container-lg my-5">
+<form th:action="@{/trainingResource}" class="form-inline" name="selectOption" id="form1" style="width:100%;" >
+<script type="text/javascript">
+function resetInput(id) {
+	   //document.getElementById(id).value="";
+	   console.log(id, 1);
+	   $('#'+id).get(0).selectedIndex = 0;
+	   return false;
+	  
+	}
+</script>
+<div class="row" style="width: 100%;">
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+            <select class="custom-select d-block form-control selectedValue" id="topicName" name="topicName">
+            
+            
+              <option  value="0">Select Topic</option>
+             
+              <option  th:each="topic : ${topics}" th:selected="${topic.value==localTopic}" th:value="${topic.value}" th:text="${topic.key}" ></option>
+            </select>
+            <div th:if="${localTopic != null and localTopic != 0}" class="input-group-btn" id="topicresetdiv" style=" padding-top: 4px;"><button  id="topicreset"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localTopic != null and localTopic != 0}" class="input-group-btn" id="topicresetdiv" style=" padding-top: 4px;  display: none;"><button  id="topicreset"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+           
+</div>
+
+
+<div class="col-md-4 mb-3 input-group" style="width:100%;">
+<select class="custom-select d-block form-control" id="langName" name="langName">
+			 
+              <option value="0">Select Language</option>
+              <option th:each="lan : ${languages}" th:selected="${lan.value==localLan}" th:value="${lan.value}" span th:text="${lan.key}"></option>
+            </select>
+            <div th:if="${localLan != null and localLan != 0}"  class="input-group-btn" id="lanresetdiv" style=" padding-top: 4px;"><button  id="lanreset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
+            <div th:unless="${localLan != null and localLan != 0}" class="input-group-btn" id="lanresetdiv" style=" padding-top: 4px;  display: none;"><button  id="lanreset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
+</div>
+
+
+
+<div class="col-md-4 mb-3 input-group" style="width:100%;" >
+<select class="custom-select d-block form-control" id="inputFileType" name="inputFileType">
+			 
+              <option value="0">Select File Type</option>
+              <option th:each="file : ${fileTypes}"  th:selected="${file.value==localFile}"th:value="${file.value}" th:text="${file.key}"></option> 
+            </select>
+             <div th:if="${localFile != null and localFile != 0}" class="input-group-btn"  id="fileresetdiv" style=" padding-top: 4px;"><button  id="filereset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
+            <div th:unless="${localFile != null and localFile != 0}" class="input-group-btn"  id="fileresetdiv" style=" padding-top: 4px; display: none;"><button  id="filereset"  style=" background: none;
+            border: none;"> <span style="font-size:20px;">&#10227;</span></button></div>
+            
+</div>
+
+         
+</div>
+<div class="row" style="width:100%; padding-top:1px;">
+	  
+    <div class="col-md-2  mb-3" style="width:100%;">
+    <button type="submit" class="btn btn-outline-info" id="submitBotton" style="height: 38px;width: 100%;margin:0;background:#1C7871;color:#fff;"> Submit </button>
+    </div>
+     <div class="col-md-2 mb-3" style="width: 100%;">
+          <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearForm" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
+           
+     </div>
+   
+  </div> 
+ 
+
+</form>
+       
+</section>
+</div>
+
+</body>
+</html>
