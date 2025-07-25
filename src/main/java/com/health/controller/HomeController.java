@@ -5089,6 +5089,7 @@ public class HomeController {
 
                         tr.setDateAdded(dateAdded);
                         tr.setTopicLanMapping(topicLanMapping);
+                        tr.setUser(usr);
                         trainingResourceService.save(tr); // Saved first to get exact Id
                         int trId = tr.getTrainingResourceId();
 
@@ -5179,7 +5180,7 @@ public class HomeController {
                             }
 
                         }
-
+                        tr.setUser(usr);
                         trainingResourceService.save(tr);
 
                     }
@@ -5477,6 +5478,7 @@ public class HomeController {
 
         newTrainingResource.setDateAdded(dateAdded);
         newTrainingResource.setTopicLanMapping(topicLan);
+        newTrainingResource.setUser(usr);
 
         // To get exact Id of new trainining Resource Data
         if (newTrainingData) {
@@ -5628,6 +5630,7 @@ public class HomeController {
 
                 newTrainingResource.setDateAdded(dateAdded);
                 newTrainingResource.setTopicLanMapping(topicLan);
+                newTrainingResource.setUser(usr);
 
                 if (fileMatch) {
                     newTrainingResource.setDateAdded(dateAdded);
@@ -5635,6 +5638,7 @@ public class HomeController {
                     trainingResourceService.save(newTrainingResource);
                     if (newTrainingData) {
                         logger.info("1st old data save is called");
+                        oldTrainingResource.setUser(usr);
                         trainingResourceService.save(oldTrainingResource);
                     }
                 } else {
@@ -5686,6 +5690,7 @@ public class HomeController {
                         }
 
                         newTrainingResource.setDateAdded(dateAdded);
+                        newTrainingResource.setUser(usr);
                         trainingResourceService.save(newTrainingResource);
                         logger.info("2nd old data save is called");
                         trainingResourceService.save(oldTrainingResource);

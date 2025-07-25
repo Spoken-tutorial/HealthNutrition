@@ -46,6 +46,10 @@ public class TrainingResource implements Serializable {
     @Column(name = "img_path", length = 1000)
     private String imgPath;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     public int getTrainingResourceId() {
         return trainingResourceId;
     }
@@ -100,6 +104,14 @@ public class TrainingResource implements Serializable {
 
     public void setImgPath(String imgPath) {
         this.imgPath = imgPath;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getPdfFileNameWithorWitoutZip() {
