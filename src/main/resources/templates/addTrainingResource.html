@@ -175,16 +175,16 @@ font-weight:bold!important;
 							      <td>
 	  		
 						   			<div th:if="${temp.isStatus()}">
-						   				<a class="disableTopicLanguage" th:value="${temp.getTrainingResourceId()}" title="Click to Disable Training Resource "><i class="fas fa-times-circle" th:id="${temp.getTrainingResourceId()}" style="color:red"></i></a>
+						   				<a class="disableTrainingResource" th:value="${temp.getTrainingResourceId()}" title="Click to Disable Training Resource "><i class="fas fa-times-circle" th:id="${temp.getTrainingResourceId()}" style="color:red"></i></a>
 						   			</div>
 						   			<div th:unless="${temp.isStatus()}">
-						   				<a class="enableTopicLanguage" th:value="${temp.getTrainingResourceId()}" title="Click to Enable Training Resource"><i class="fas fa-check-circle" th:id="${temp.getTrainingResourceId()}" style="color:green"></i> </a>
+						   				<a class="enableTrainingResource" th:value="${temp.getTrainingResourceId()}" title="Click to Enable Training Resource"><i class="fas fa-check-circle" th:id="${temp.getTrainingResourceId()}" style="color:green"></i> </a>
 						   			</div>
 						   		
 						  			</td>
 						  				
 						  			<td>
-									    <div>
+									    <div th:id="${'pdf'+ temp.getTrainingResourceId()}">
 									        <span th:text="${temp.getPdfFileNameWithorWitoutZip()}"></span><br>
 									
 									        <!-- Actions if PDF exists -->
@@ -201,11 +201,12 @@ font-weight:bold!important;
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
-									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
-									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
-									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
-									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
-									                    th:data-fileName="${temp.getPdfFileNameWithorWitoutZip()}"
+									            <button class="btn btn-sm btn-danger deleteTrainingResource-btn"
+									                    th:data-trainingresourceid="${temp.getTrainingResourceId()}"
+									                    th:data-topicname="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langname="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-filename="${temp.getPdfFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'pdf'"
 									                    title="Delete Pdf">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
@@ -221,7 +222,7 @@ font-weight:bold!important;
 									
 									<td>
 										
-										 <div>
+										<div th:id="${'doc'+ temp.getTrainingResourceId()}">
 									        <span th:text="${temp.getDocFileNameWithorWitoutZip()}"></span><br>
 									
 									        <!-- Actions if Doc exists -->
@@ -238,11 +239,12 @@ font-weight:bold!important;
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
-									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
-									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
-									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
-									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
-									                    th:data-fileName="${temp.getDocFileNameWithorWitoutZip()}"
+									            <button class="btn btn-sm btn-danger deleteTrainingResource-btn"
+									                    th:data-trainingresourceid="${temp.getTrainingResourceId()}"
+									                    th:data-topicname="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langname="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-filename="${temp.getDocFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'doc'"
 									                    title="Delete Doc">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
@@ -258,7 +260,7 @@ font-weight:bold!important;
 									
 									<td>
 										
-										 <div>
+										<div th:id="${'excel'+ temp.getTrainingResourceId()}">
 									        <span th:text="${temp.getExcelFileNameWithorWitoutZip()}"></span><br>
 									
 									        <!-- Actions if Excel exists -->
@@ -275,11 +277,12 @@ font-weight:bold!important;
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
-									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
-									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
-									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
-									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
-									                    th:data-fileName="${temp.getExcelFileNameWithorWitoutZip()}"
+									            <button class="btn btn-sm btn-danger deleteTrainingResource-btn"
+									                    th:data-trainingresourceid="${temp.getTrainingResourceId()}"
+									                    th:data-topicname="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langname="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-filename="${temp.getExcelFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'excel'"
 									                    title="Delete Excel">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
@@ -295,7 +298,7 @@ font-weight:bold!important;
 									</td>
 									
 									<td>
-										<div>
+										 <div th:id="${'image'+ temp.getTrainingResourceId()}">
 									        <span th:text="${temp.getImageFileNameWithorWitoutZip()}"></span><br>
 									
 									
@@ -313,11 +316,12 @@ font-weight:bold!important;
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
 												&ensp;
-									            <button class="btn btn-sm btn-danger deleteTrainingModuleTutorial-btn"
-									                    th:data-trainingResourceId="${temp.getTrainingResourceId()}"
-									                    th:data-topicName="${temp.getTopicLanMapping().getTopic().getTopicName()}"
-									                    th:data-langName="${temp.getTopicLanMapping().getLan().getLangName()}"
-									                    th:data-fileName="${temp.getImageFileNameWithorWitoutZip()}"
+									            <button class="btn btn-sm btn-danger deleteTrainingResource-btn"
+									                    th:data-trainingresourceid="${temp.getTrainingResourceId()}"
+									                    th:data-topicname="${temp.getTopicLanMapping().getTopic().getTopicName()}"
+									                    th:data-langname="${temp.getTopicLanMapping().getLan().getLangName()}"
+									                    th:data-filename="${temp.getImageFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'image'"
 									                    title="Delete Image">
 									                <i class="bi bi-trash"></i> Delete
 									            </button>
@@ -358,6 +362,7 @@ font-weight:bold!important;
 
 	</div>
 	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script type="text/javascript">
 $(document).ready( function () {
 	
