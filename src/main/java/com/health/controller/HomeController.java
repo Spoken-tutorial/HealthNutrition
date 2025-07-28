@@ -935,7 +935,7 @@ public class HomeController {
             if (local.isOnHome()) {
                 consulHome.add(local);
             }
-            if (++upperlimit > 4) {
+            if (++upperlimit > 3) {
                 break;
             }
         }
@@ -2098,7 +2098,7 @@ public class HomeController {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         List<Consultant> consults = consultService.findAll();
-        model.addAttribute("listConsultant", consults);
+        List<Consultant> listConsultant = new ArrayList<>();
 
         navigationLinkCheck(model);
 
@@ -2120,9 +2120,11 @@ public class HomeController {
                 }
 
                 map.put(c.getConsultantId(), s.substring(0, s.length() - 2));
+                listConsultant.add(c);
             }
 
         }
+        model.addAttribute("listConsultant", listConsultant);
 
         model.addAttribute("map", map);
         return "Consultants";
