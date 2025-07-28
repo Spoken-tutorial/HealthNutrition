@@ -1,11 +1,15 @@
 package com.health.utility;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -26,6 +31,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -41,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +56,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.User;
 import com.health.repository.UserRepository;
+import com.health.threadpool.TimeoutOutputStream;
 
 /**
  * Utility class
@@ -675,6 +683,95 @@ public class ServiceUtility {
         }
     }
 
+    public static String createFileWithSubDirectoriesforHealthTutorial(String parentFolderName,
+            String zipfileNameWithouExtention, String sourceDirurl, Environment env) throws IOException {
+
+        String document = "";
+        Path zipFilePathDirectory = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, parentFolderName);
+
+        Files.createDirectories(zipFilePathDirectory);
+
+        // SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+        String zipFileName = zipfileNameWithouExtention + ".zip";
+
+        Path zipFilePathName = Paths.get(zipFilePathDirectory.toString(), zipFileName);
+        if (!zipFilePathName.toFile().exists()) {
+
+        }
+
+        Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
+
+        try (OutputStream fos = Files.newOutputStream(zipFilePathName);
+                ZipOutputStream zos = new ZipOutputStream(fos)) {
+            File filetoZip = new File(sourceDirlName.toString());
+            zipFile(filetoZip, filetoZip.getName(), zos);
+
+            String temp = zipFilePathName.toString();
+            int indexToStart = temp.indexOf("Media");
+            document = temp.substring(indexToStart, temp.length());
+
+        } catch (IOException e) {
+            logger.error("Exception Error  ", e);
+        }
+
+        return document;
+    }
+
+    public static boolean IsCourseNameAndLanZipExist(String parentZipfolder, String zipNameWithoutExtention,
+            Environment env) {
+
+        String zipFileName = zipNameWithoutExtention + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, parentZipfolder, zipFileName);
+
+        File file = zipFilePathName.toFile();
+
+        return file.exists();
+
+    }
+
+    public static String getCourseNameAndLanZipPath(String parentZipfolder, String zipNameWithoutExtention,
+            Environment env) {
+        // String catName = originalCategoryName.replace(' ', '_');
+
+        String zipFileName = zipNameWithoutExtention + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, parentZipfolder, zipFileName);
+
+        String temp = zipFilePathName.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        return document;
+
+    }
+
+    public static void deleteCategoryAndLanZipIfExists(String originalCategoryName, String langName, Environment env) {
+        String catName = originalCategoryName.replace(' ', '_');
+
+        String zipFileName = catName + "_" + langName + ".zip";
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                CommonData.uploadDirectoryHealthTutorialZipFiles, zipFileName);
+
+        File file = zipFilePathName.toFile();
+
+        if (file.exists()) {
+
+            boolean isDeleted = file.delete();
+
+            if (isDeleted) {
+                logger.info("Zip File deleted successfully: {} " + zipFileName);
+            } else {
+                logger.info("Failed to delete the zip file: {} " + zipFileName);
+            }
+        } else {
+            logger.info(" ZipFile does not exist: {} " + zipFileName);
+        }
+    }
+
     /**
      * File Info
      * 
@@ -728,6 +825,78 @@ public class ServiceUtility {
             }
 
         });
+    }
+
+    /*
+     * dowanload Manager
+     * 
+     */
+
+    public static String downloadManager(String zipUrl, AtomicInteger downloadCount, int downloadLimit,
+            long downloadTimeOut, Environment env, HttpServletResponse response) {
+        String message = "Please try again after 30 minutes.";
+        if (downloadCount.get() == downloadLimit) {
+
+            return message;
+        }
+        downloadCount.incrementAndGet();
+        logger.debug(" Increament downloadCount :{}", downloadCount.get());
+
+        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        try (OutputStream os = new TimeoutOutputStream(response.getOutputStream(), downloadTimeOut);
+                InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
+
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + ServiceUtility.getZipfileName(zipFilePathName));
+            response.setContentLengthLong(Files.size(zipFilePathName));
+
+            byte[] buffer = new byte[16384];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+
+                // TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
+                // tos.write(buffer, 0, length);
+
+                os.write(buffer, 0, length);
+
+            }
+            os.flush();
+
+        } catch (Exception e) {
+            logger.info("Exception:{}", e.getMessage());
+        } finally {
+            downloadCount.decrementAndGet();
+            logger.debug(" Decrement downloadCount :{}", downloadCount.get());
+        }
+
+        return null;
+
+    }
+
+    public static double getZipSizeInMB(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+        double fileSizeInMB = 0;
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            fileSizeInMB = fileSizeInBytes / (1024.0 * 1024.0);
+            fileSizeInMB = new BigDecimal(fileSizeInMB).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        }
+        return fileSizeInMB;
+
+    }
+
+    public static String getVideoResolutionPath(String VideoPath, String resolution) {
+        int dotIndex = VideoPath.lastIndexOf('.');
+
+        String base = VideoPath.substring(0, dotIndex);
+        String extension = VideoPath.substring(dotIndex);
+
+        String videoResolutionPath = base + resolution + extension;
+        return videoResolutionPath;
+
     }
 
     /**

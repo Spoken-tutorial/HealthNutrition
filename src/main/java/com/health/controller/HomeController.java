@@ -1,11 +1,9 @@
 package com.health.controller;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,7 +54,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -174,8 +171,8 @@ import com.health.service.VideoResourceService;
 import com.health.service.WeekService;
 import com.health.service.WeekTitleVideoService;
 import com.health.threadpool.TaskProcessingService;
-import com.health.threadpool.TimeoutOutputStream;
 import com.health.threadpool.ZipCreationThreadService;
+import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
@@ -219,6 +216,9 @@ public class HomeController {
 
     @Autowired
     private PackLanTutorialResourceService packLanTutorialResourceService;
+
+    @Autowired
+    private ZipHealthTutorialThreadService zipHealthTutorialThreadService;
 
     @Autowired
     private AjaxController ajaxController;
@@ -5273,34 +5273,21 @@ public class HomeController {
     @PostMapping("/downloadTrainingModules")
     public String downloadPackagePost(HttpServletRequest req, Principal principal, Model model,
             @RequestParam(name = "packageDownloadName") String packageId,
-            @RequestParam(name = "languageDownloadName") String lanId) {
-
-        getPackageAndLanguageData(model);
-        List<WeekTitleVideo> weekTitleVideoList = tutorialWithWeekAndPackageService.findAll().stream()
-                .map(TutorialWithWeekAndPackage::getWeekTitle).distinct().collect(Collectors.toList());
-
-        weekTitleVideoList.sort(Comparator
-                .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
-                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
-                .thenComparing(WeekTitleVideo::getTitle));
-
-        model.addAttribute("weekTitleVideoList", weekTitleVideoList);
-        boolean downloadSection = false;
-
-        model.addAttribute("downloadSection", downloadSection);
+            @RequestParam(name = "languageDownloadName") String lanId, RedirectAttributes redirectAttributes) {
 
         PackageContainer packageContainer = packageContainerService.findByPackageId(Integer.parseInt(packageId));
         if (packageContainer == null) { // throw error
 
-            model.addAttribute("return_msg", "Please Select Package");
-            return "hstTrainingModule";
+            redirectAttributes.addFlashAttribute("return_msg", "Please Select Package");
+            return "redirect:/trainingModules";
+
         }
 
         Language lan = lanService.getById(Integer.parseInt(lanId));
         if (lan == null) { // throw error
 
-            model.addAttribute("return_msg", "Please Select Language");
-            return "hstTrainingModule";
+            redirectAttributes.addFlashAttribute("return_msg", "Please Select Language");
+            return "redirect:/trainingModules";
         }
 
         String langName = lan.getLangName();
@@ -5308,18 +5295,23 @@ public class HomeController {
         String zipUrl = zipCreationThreadService.getZipName(originalPackageName, langName, env);
 
         if (zipUrl == null || zipUrl.isEmpty()) {
-            model.addAttribute("return_msg", "Zip creation in progress.... , please check back after 30 minutes.");
-            return "hstTrainingModule";
+
+            redirectAttributes.addFlashAttribute("return_msg",
+                    "Zip creation in progress.... , please check back after 30 minutes.");
+            return "redirect:/trainingModules";
 
         }
 
         else if (zipUrl.equals("Error")) {
-            model.addAttribute("return_msg", "No Tutorials are available for selected Package,  and Language");
-            return "hstTrainingModule";
+
+            redirectAttributes.addFlashAttribute("return_msg",
+                    "No Tutorials are available for selected Package,  and Language");
+            return "redirect:/trainingModules";
 
         } else if (downloadCount.get() == downloadLimit) {
-            model.addAttribute("return_msg", "Please try again after 30 minutes.");
-            return "hstTrainingModule";
+
+            redirectAttributes.addFlashAttribute("return_msg", "Please try again after 30 minutes.");
+            return "redirect:/trainingModules";
         }
 
         else {
@@ -5336,46 +5328,19 @@ public class HomeController {
 
     @GetMapping("/downloadManager")
     public String downloadManager(HttpServletRequest req, Principal principal, Model model,
-            @RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response) {
-        if (downloadCount.get() == downloadLimit) {
-            getPackageAndLanguageData(model);
+            @RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response,
+            RedirectAttributes redirectAttributes) {
 
-            model.addAttribute("return_msg", "Please try again after 30 minutes.");
-            return "hstTrainingModule";
-        }
-        downloadCount.incrementAndGet();
-        logger.debug(" Increament downloadCount :{}", downloadCount.get());
+        String message = ServiceUtility.downloadManager(zipUrl, downloadCount, downloadLimit, downloadTimeOut, env,
+                response);
 
-        Path zipFilePathName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
-        try (OutputStream os = new TimeoutOutputStream(response.getOutputStream(), downloadTimeOut);
-                InputStream is = new BufferedInputStream(new FileInputStream(zipFilePathName.toFile()));) {
+        if (message != null) {
 
-            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader("Content-Disposition",
-                    "attachment; filename=" + ServiceUtility.getZipfileName(zipFilePathName));
-            response.setContentLengthLong(Files.size(zipFilePathName));
-
-            byte[] buffer = new byte[16384];
-            int length;
-
-            while ((length = is.read(buffer)) > 0) {
-
-                // TimeoutOutputStream tos = new TimeoutOutputStream(os, downloadTimeOut);
-                // tos.write(buffer, 0, length);
-
-                os.write(buffer, 0, length);
-
-            }
-            os.flush();
-
-        } catch (Exception e) {
-            logger.info("Exception:{}", e.getMessage());
-        } finally {
-            downloadCount.decrementAndGet();
-            logger.debug(" Decrement downloadCount :{}", downloadCount.get());
+            redirectAttributes.addFlashAttribute("return_msg", message);
+            return "redirect:/trainingModules";
         }
 
-        return null;
+        return message;
 
     }
 
@@ -7949,6 +7914,10 @@ public class HomeController {
         tutorial.setPreRequisticStatus(CommonData.PUBLISH_STATUS);
         tutorial.setVideoStatus(CommonData.PUBLISH_STATUS);
         tutorial.setStatus(true);
+
+        int catId = tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
+        int lanId = tutorial.getConAssignedTutorial().getLan().getLanId();
+        zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
         taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
@@ -8844,14 +8813,17 @@ public class HomeController {
         List<Tutorial> tutorials;
 
         Tutorial tut = tutService.getById(id);
+        int catId = tut.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
+        int lanId = tut.getConAssignedTutorial().getLan().getLanId();
 
         if (tut.isStatus()) {
             tut.setStatus(false);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.DELETE_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
-
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }

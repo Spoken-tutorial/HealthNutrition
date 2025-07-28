@@ -1,16 +1,27 @@
 package com.health.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.health.domain.security.UserRole;
@@ -28,7 +39,9 @@ import com.health.service.TopicCategoryMappingService;
 import com.health.service.TutorialService;
 import com.health.service.UserRoleService;
 import com.health.service.UserService;
+import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
+import com.health.utility.ServiceUtility;
 
 /**
  * Rest APi class return data in JSON format
@@ -39,6 +52,8 @@ import com.health.utility.CommonData;
  */
 @RestController
 public class RestApi {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestApi.class);
 
     @Autowired
     private CategoryService catService;
@@ -60,6 +75,23 @@ public class RestApi {
 
     @Autowired
     private UserRoleService usrRoleService;
+
+    @Autowired
+    private ZipHealthTutorialThreadService zipHealthTutorialThreadService;
+
+    @Autowired
+    private Environment env;
+
+    @Value("${downloadLimit}")
+    private int downloadLimit;
+
+    @Value("${downloadTimeOut}")
+    private long downloadTimeOut;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    private AtomicInteger downloadCount = new AtomicInteger(0);
 
     /**
      * This url fetches all the category and language available in the system
@@ -304,4 +336,102 @@ public class RestApi {
 
     }
 
+    /// downloadHealthTutorials?courseName=HealthTutorial&videoQuality=L&catIds=1,2&lanIds=3,4
+    @GetMapping("/downloadHealthTutorials")
+    public ResponseEntity<Map<Integer, String>> getZipUrlOfHealthTutorial(@RequestParam String courseName,
+            @RequestParam(required = false) String videoQuality, @RequestParam List<Integer> catIds,
+            @RequestParam(required = false) List<Integer> lanIds) {
+
+        Map<Integer, String> resultMap = new HashMap<>();
+
+        if (courseName == null || courseName.trim().isEmpty()) {
+            resultMap.put(2, "No CourseName  is available in url");
+            return ResponseEntity.ok(resultMap);
+        }
+
+        if (catIds == null || catIds.isEmpty()) {
+            resultMap.put(2, "No Category Id is available in url");
+            return ResponseEntity.ok(resultMap);
+        }
+        String quality;
+
+        if (videoQuality == null || videoQuality.isEmpty()) {
+            quality = "High";
+        } else {
+            switch (videoQuality.toUpperCase()) {
+            case "H":
+                quality = "High";
+                break;
+            case "M":
+                quality = "Medium";
+                break;
+            case "L":
+                quality = "Low";
+                break;
+            default:
+                quality = "High";
+            }
+        }
+
+        Collections.sort(catIds);
+        Set<Integer> uniqeCatIds = new LinkedHashSet<>(catIds);
+        List<Integer> updatedLanIds = new ArrayList<>();
+        if (lanIds != null) {
+            updatedLanIds.addAll(lanIds);
+        }
+        // Added English Lan Id to use by default
+        updatedLanIds.add(22);
+        Collections.sort(updatedLanIds);
+
+        Set<Integer> uniquelanIds = new LinkedHashSet<>(updatedLanIds);
+
+        for (int catId : uniqeCatIds) {
+            Category cat = catService.findByid(catId);
+            if (cat == null) {
+                resultMap.put(2, "No Category exists for this catId: " + catId);
+                return ResponseEntity.ok(resultMap);
+
+            } else if (!cat.isStatus()) {
+                resultMap.put(2, "No Enable Category exists for this catId: " + catId);
+                return ResponseEntity.ok(resultMap);
+            }
+        }
+
+        for (int lanId : uniquelanIds) {
+            Language lan = lanService.getById(lanId);
+            if (lan == null) {
+                resultMap.put(2, "No Language exists for this lanId: " + lanId);
+                return ResponseEntity.ok(resultMap);
+
+            }
+        }
+
+        String zipUrl = zipHealthTutorialThreadService.getZipName(courseName, quality, uniqeCatIds, uniquelanIds, env);
+
+        if (zipUrl == null || zipUrl.isEmpty()) {
+            resultMap.put(0, "Zip creation in progress... Please check back after 30 minutes.");
+        } else if ("Error".equals(zipUrl)) {
+            resultMap.put(2, "No tutorials are available for the selected category and language.");
+        } else if (downloadCount.get() == downloadLimit) {
+            resultMap.put(0, "Download limit reached. Please try again after 30 minutes.");
+        } else {
+            double zipSizeInMb = ServiceUtility.getZipSizeInMB(zipUrl, env);
+            String resultantzipUrl = ServiceUtility.convertFilePathToUrl(zipUrl);
+            resultMap.put(1, baseUrl + "/downloadManagerforhst?zipUrl=" + resultantzipUrl);
+            resultMap.put(3, String.valueOf(zipSizeInMb) + "MB");
+
+        }
+
+        return ResponseEntity.ok(resultMap);
+    }
+
+    @GetMapping("/downloadManagerforhst")
+    public String downloadManager(@RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response) {
+
+        String message = ServiceUtility.downloadManager(zipUrl, downloadCount, downloadLimit, downloadTimeOut, env,
+                response);
+
+        return message;
+
+    }
 }
