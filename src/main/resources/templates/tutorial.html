@@ -113,7 +113,6 @@
 			</th:block>
 
 
-		 	<a th:href="@{/files/{video}(video=${tutorial.getVideo()})}" download>Download</a>
 
 			</video>
 			
@@ -559,13 +558,21 @@
         } else if (connection) {
             const speed = connection.downlink || 1.5; // Mbps
 
-            if (speed < 1) {
+           /* if (speed < 1) {
                 defaultQuality = 360;
             } else if (speed >= 4) {
                 defaultQuality = 720;
             } else {
                 defaultQuality = 480;
             }
+            */
+	        if (width < 480 || speed < 1) {
+	            defaultQuality = 360;
+	        } else if (width < 720 || speed < 4) {
+	            defaultQuality = 480;
+	        } else {
+	            defaultQuality = 720;
+	        }
         }
 
 

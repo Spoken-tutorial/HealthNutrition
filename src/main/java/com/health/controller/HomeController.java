@@ -1881,8 +1881,6 @@ public class HomeController {
 
         String video480Path = base + "_480p" + extension;
         String video360Path = base + "_360p" + extension;
-        logger.info(video480Path);
-        logger.info(video360Path);
 
         // TreeMap to store videos in descending resolution order
         TreeMap<Integer, String> videoPathWithResolution = new TreeMap<>((a, b) -> b - a);
@@ -1911,16 +1909,6 @@ public class HomeController {
         if (path360.toFile().exists()) {
             videoPathWithResolution.put(360, video360Path);
         }
-
-//        ObjectMapper mapper = new ObjectMapper();
-//        String jsonMap;
-//        try {
-//            jsonMap = mapper.writeValueAsString(videoPathWithResolution);
-//            model.addAttribute("videoPathWithResolutionJson", jsonMap);
-//        } catch (JsonProcessingException e) {
-//
-//            logger.error("Json Processing Exception in video path resolution", e);
-//        }
 
         model.addAttribute("videoPathWithResolution", videoPathWithResolution);
         for (Map.Entry<Integer, String> entry : videoPathWithResolution.entrySet()) {
