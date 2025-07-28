@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://thymeleaf.org">
+<head >
+ <link rel="icon" th:href="@{${rootFolder + '/favicon.ico'}}" />
+<title >Health & Nutrition</title>
+
+
+	<meta charset="utf-8"/> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <link rel="stylesheet"
+	th:href="@{${rootFolder + '/mannual_downloads/all.min.css'}}"/>
+	<link rel="stylesheet"
+	th:href="@{${rootFolder + '/mannual_downloads/bootstrap.min.css'}}">
+    <link th:href="@{${rootFolder + '/DataTables/datatables.min.css'}}" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{${rootFolder + '/css/main.css'}}"/>
+	<link rel="stylesheet" th:href="@{${rootFolder + '/mannual_downloads/font-awesome.min.css'}}">
+	<link rel="stylesheet" th:href="@{${rootFolder + '/mannual_downloads/plyr.css'}}" />
+</head>
+
+</head>
+  <body>
+   <script th:src="@{${rootFolder + '/mannual_downloads/plyr.js'}}"></script>
+   <script th:src="@{${rootFolder + '/mannual_downloads/clipboard.min.js'}}"></script>
+  
+  
+  <header class="mb-5" id="top-fixed-banner">
+	<section th:fragment="header-bar">
+	<div class="px-md-3">
+	<div class="row header-top pt-2">
+	<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+		</div>
+	
+	</div>
+	</div>
+	</section>
+	
+  <nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="navbar">
+    <div class="container-fluid">
+        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{${rootFolder + '/logo.png'}}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">Spoken <span style="color: orange;font-size:1.8rem;">Tutorial</span>  </span>  <span style="color: rgba(0,0,0,0.9);font-size: 1.5rem;" class="ml-3"><span style="border-bottom:2px solid orange;">Health
+& Nutrition </span><span style="color: orange;font-size: 2rem;"></span></span> </span>
+
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavBar">
+            <div class="navbar-nav ml-auto">
+                <a class="nav-item nav-link active" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+  </header>
+  
+  
+	
+	<div class="tab-content" id="myTabContent">	
+		
+	
+		 <div class="container">
+
+
+
+<div class="row justify-content-center" style="width: 100%;">
+<div class="col-md-3 mb-3 input-group" style="width:100%;" >
+            <select class="custom-select d-block form-control selectedValue" id="categoryname" name="categoryName">
+            
+            
+              <option  value="">Select Category</option>
+             
+              <option  th:each="cat : ${categories}"  th:value="${cat.getCatName()}" th:text="${cat.getCatName()}" ></option>
+            </select>
+           
+</div>
+
+
+<div class="col-md-3 mb-3 input-group" style="width:100%;">
+<select class="custom-select d-block form-control" id="inputTopicName" name="topic">
+			 
+              <option value="">Select Topic</option>
+              <option th:each="topic : ${topics}"  th:value="${topic.getTopicName()}" span th:text="${topic.getTopicName()}"></option>
+            </select>
+            
+</div>
+
+
+
+<div class="col-md-3 mb-3 input-group" style="width:100%;" >
+<select class="custom-select d-block form-control" id="inputLanguage" name="lan">
+			 
+              <option value="">Select Language</option>
+              <option th:each="lan : ${languages}"  th:value="${lan.getLangName()}" th:text="${lan.getLangName()}"></option> 
+            </select>
+           
+            
+</div>
+
+
+
+ 
+     <div class="col-md-3 mb-3" style="width: 100%;">
+          <input class="btn btn-outline-info" type="button" value="Clear" id="btnClearFormViewforHealth" style="height: 35px;width: 100%;margin:0; color:#fff; background:SlateBlue;" />
+           
+     </div>
+     	      
+</div>
+
+</div>
+		
+<section>
+<div class="container-fluid">
+ <div class="row">
+ <div class="col">	
+
+
+<table class="table table-striped" id="health_table">
+  <thead>
+    
+      <th>Tutorials</th>
+	 
+  </thead>
+  <tbody>
+    <tr th:each="tempTutorial, iter1 : ${tutorialList}">
+      <td>
+        <div class="row t-wrapper mt-3">
+          <div class="col-md-6">
+            <div style="width: 100%; margin: auto;">
+              <video th:id="${'healthTutorialId' + tempTutorial.getTutorialId()}"
+                     controls style="width:100%!important;" class="vid1">
+                <source th:src="@{${tempTutorial.getIndexVideoPath()}}" type="video/mp4"></source>
+              </video>
+            </div>
+          </div>
+          <div class="col-md-6">
+			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${tempTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"></h4>
+			
+           <h5 style="color: #014F7A;font-size: 1rem;">   
+                <span th:text="${tempTutorial.getConAssignedTutorial().getTopicCatId().getCat().getCatName()}" class=""></span>
+            </h5>
+            <h6 style="color: #014F7A;font-size: 1rem;">   
+                <span th:text="${tempTutorial.getConAssignedTutorial().getLan().getLangName()}" class=""></span>
+            </h6>
+             
+          </div>
+        </div>
+      </td>
+            
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+    
+
+		
+	
+       
+	</div>   
+    
+    <footer class="footer">
+    <div class="text-center">	<p>Developed at IIT-Bombay</p>
+    </div>
+	
+    </footer>
+  <script th:src="@{${rootFolder + '/mannual_downloads/jquery-3.5.1.min.js'}}" ></script>
+			<script th:src="@{${rootFolder + '/mannual_downloads/popper.min.js'}}" ></script>
+			<script th:src="@{${rootFolder + '/mannual_downloads/bootstrap.min.js'}}" ></script>
+		    
+		   <script th:src="@{${rootFolder + '/DataTables/datatables.min.js'}}"></script>
+		    <script th:src="@{${rootFolder + '/js/main.js'}}"></script>
+		    
+		    
+		    <script th:src="@{${rootFolder +'/js/ajaxSupport.js' }}"></script>
+	
+
+
+<style>
+	
+	
+.share-button {
+            background-color: rgb(255, 255, 255);
+           
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 15px;
+            margin: 2px 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+   
+        }
+        .share-button:hover::after {
+          
+		    position: absolute;
+		    top: -30px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #333;
+		    color: #fff;
+		    padding: 5px 10px;
+		    border-radius: 4px;
+		    white-space: nowrap;
+		    z-index: 1000;
+		    opacity: 0.9;
+		    font-size: 12px;
+		    line-height: 1.2;
+		    pointer-events: none;
+        } 
+	
+	
+  :root {
+  --plyr-color-main: #ff9033;
+   
+}
+  .plyr__controls__item plyr__volume{
+    margin-bottom: 25px;
+    padding-bottom:25px;
+  }
+  
+  
+  
+  .dt-layout-cell {
+    display: flex;
+    flex-direction: row;
+   
+}
+.dt-search{
+	display: none;
+}
+
+.dt-layout-cell td:nth-child(1), 
+.dt-layout-cell td:nth-child(2) {
+    width: 20%; /*Adjust width as needed to fit two lines per row */ 
+    flex:40%;
+} 
+
+</style>
+
+<script th:inline="javascript">
+  const jsontutorials = /*[[${tutorialJson}]]*/ [];
+   
+</script>
+<script type="text/javascript">
+	
+  function loadTopicAndLanguageByCategory(category, topic, language) {
+    const parsedTutorials = JSON.parse(jsontutorials);
+    const filtered = (category === "") ? parsedTutorials : parsedTutorials.filter(item => item.category === category);
+    let topicFiltered=filtered;
+    if (language !== "") {
+     topicFiltered = filtered.filter(item => item.language === language);
+  }
+
+    let uniqueTopics = [];
+    
+	  if (category !== "") {
+	    // Sort by topic_order (converted to int), and keep topic names unique
+	    const sortedByOrder = topicFiltered
+	      .filter(item => item.topic_order !== undefined)
+	      .sort((a, b) => parseInt(a.topic_order) - parseInt(b.topic_order));
+	
+	    const seenTopics = new Set();
+	    sortedByOrder.forEach(item => {
+	      if (!seenTopics.has(item.topic)) {
+	        seenTopics.add(item.topic);
+	        uniqueTopics.push({ name: item.topic, order: parseInt(item.topic_order) });
+	      }
+	    });
+	  } else {
+	    // Just get unique topics and sort alphabetically (case-insensitive)
+	    const topicNames = [...new Set(topicFiltered.map(item => item.topic))];
+	    uniqueTopics = topicNames
+	      .map(name => ({ name }))
+	      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+	  }
+
+    const uniqueLanguages = [...new Set(filtered.map(item => item.language))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+
+    // Build topic dropdown with numbering
+		let topicOptions = '<option value="">Select Topic</option>';
+		uniqueTopics.forEach((item, index) => {
+		 const val = item.name;
+		 const selected = (val === topic) ? "selected" : "";
+		
+		  // If category is selected, show numbered topic names, else just show name
+		 const displayText = (category !== "") ? `${index + 1}. ${val}` : val;
+		
+		 topicOptions += `<option value="${val}" ${selected}>${displayText}</option>`;
+		});
+		$("#inputTopicName").prop('disabled', false).html(topicOptions);
+
+	 // Build Language dropdown 
+	    let langOptions = '<option value="">Select Language</option>';
+	    $.each(uniqueLanguages, (i, val) => {
+	      langOptions += `<option value="${val}" ${val === language ? "selected" : ""}>${val}</option>`;
+	    });
+	    $("#inputLanguage").prop('disabled', false).html(langOptions);
+  }
+  
+  
+
+  function loadCategoryAndTopicByLanguage(category, topic, language) {
+    const parsedTutorials = JSON.parse(jsontutorials);
+    const filtered = (language === "") ? parsedTutorials : parsedTutorials.filter(item => item.language === language);
+
+     let uniqueTopics = [];
+	
+	if (category !== "") {
+	  // 🔥 Filter both by language AND selected category
+	  let categoryFiltered = filtered.filter(item => item.category === category);
+	
+	  // 🔢 Sort by topic_order
+	  const sortedByOrder = categoryFiltered
+	    .filter(item => item.topic_order !== undefined)
+	    .sort((a, b) => parseInt(a.topic_order) - parseInt(b.topic_order));
+	
+	  // 🚫 Remove duplicates
+	  const seenTopics = new Set();
+	  sortedByOrder.forEach(item => {
+	    if (!seenTopics.has(item.topic)) {
+	      seenTopics.add(item.topic);
+	      uniqueTopics.push({ name: item.topic, order: parseInt(item.topic_order) });
+	    }
+	  });
+	
+	} else {
+	  // 🧠 All topics for selected language, sorted alphabetically
+	  const topicNames = [...new Set(filtered.map(item => item.topic))];
+	  uniqueTopics = topicNames
+	    .map(name => ({ name }))
+	    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+	}
+
+
+    // ---------- Category Sorting By cat Order----------
+	  let uniqueCategories = [];
+	  let topicFilterd=filtered;
+	  if((topic !== "")){
+		  topicFilterd =filtered.filter(item => item.topic === topic);
+	  }
+	  
+	  const sortedCatByOrder = topicFilterd
+	    .filter(item => item.cat_order !== undefined)
+	    .sort((a, b) => parseInt(a.cat_order) - parseInt(b.cat_order));
+	
+	  const seenCats = new Set();
+	  sortedCatByOrder.forEach(item => {
+	    if (!seenCats.has(item.category)) {
+	      seenCats.add(item.category);
+	      uniqueCategories.push({ name: item.category, order: parseInt(item.cat_order) });
+	    }
+	  });
+
+   // Build topic dropdown with numbering
+	let topicOptions = '<option value="">Select Topic</option>';
+	uniqueTopics.forEach((item, index) => {
+	  const val = item.name;
+	  const selected = (val === topic) ? "selected" : "";
+	
+	  // If category is selected, show numbered topic names, else just show name
+	  const displayText = (category !== "") ? `${index + 1}. ${val}` : val;
+	
+	  topicOptions += `<option value="${val}" ${selected}>${displayText}</option>`;
+	});
+	$("#inputTopicName").prop('disabled', false).html(topicOptions);
+	
+
+     // Build  Category dropdown
+    let catOptions = '<option value="">Select Category</option>';
+	uniqueCategories.forEach((item) => {
+    const val = item.name;
+    const selected = (val === category) ? "selected" : "";
+   	catOptions += `<option value="${val}" ${selected}>${val}</option>`;
+ 	});
+ 	$("#categoryname").prop('disabled', false).html(catOptions);
+ 	
+  }
+  
+  
+
+  function loadCategoryAndLanguageByTopic(category, topic, language) {
+    const parsedTutorials = JSON.parse(jsontutorials);
+
+    console.log("Selected Topic:", topic);
+    
+    const filtered = (topic === "") 
+        ? parsedTutorials 
+        : parsedTutorials.filter(item => item.topic.trim() === topic.trim());
+
+    console.log("Filtered tutorials by topic:", filtered);
+
+    const uniqueLanguages = [...new Set(filtered.map(item => item.language))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));;
+   
+    // ---------- Category Sorting By cat Order----------
+	  let uniqueCategories = [];
+	  const sortedCatByOrder = filtered
+	    .filter(item => item.cat_order !== undefined)
+	    .sort((a, b) => parseInt(a.cat_order) - parseInt(b.cat_order));
+	
+	  const seenCats = new Set();
+	  sortedCatByOrder.forEach(item => {
+	    if (!seenCats.has(item.category)) {
+	      seenCats.add(item.category);
+	      uniqueCategories.push({ name: item.category, order: parseInt(item.cat_order) });
+	    }
+	  });
+
+    // Load Language options
+    let langOptions = '<option value="">Select Language</option>';
+    $.each(uniqueLanguages, (i, val) => {
+        langOptions += `<option value="${val}" ${val === language ? "selected" : ""}>${val}</option>`;
+    });
+    $("#inputLanguage").prop('disabled', false).html(langOptions);
+
+    // Build Category dropdown
+    let catOptions = '<option value="">Select Category</option>';
+	uniqueCategories.forEach((item) => {
+    const val = item.name;
+    const selected = (val === category) ? "selected" : "";
+    catOptions += `<option value="${val}" ${selected}>${val}</option>`;
+ 	});
+ 	$("#categoryname").prop('disabled', false).html(catOptions);
+
+  }
+
+
+  function clearFormViewforHealth() {
+    $('#categoryname, #inputTopicName, #inputLanguage').val('');
+  }
+
+  function selectCategoryTopicLanguage() {
+    const selectedcategory = $('#categoryname').val();
+    const selectedtopic = $('#inputTopicName').val();
+    const selectedLanguage = $('#inputLanguage').val();
+
+   // console.log("Selected Category: " + selectedcategory);
+    //console.log("Selected Topic: " + selectedtopic);
+    //console.log("Selected Language: " + selectedLanguage);
+
+    const cat = selectedcategory ? `"${selectedcategory}"` : "";
+    const top = selectedtopic ? `"${selectedtopic}"` : "";
+    const lan = selectedLanguage ? `"${selectedLanguage}"` : "";
+
+    $('#health_table').DataTable().search(cat + " " + top + " " + lan).draw();
+  }
+
+  $(document).ready(function () {
+    const healthTable = $('#health_table').DataTable({ "ordering": false });
+
+    $('#categoryname').change(function () {
+      const category = $(this).val();
+      const topic = $('#inputTopicName').val();
+      const language = $('#inputLanguage').val();
+      loadTopicAndLanguageByCategory(category, topic, language);
+      selectCategoryTopicLanguage();
+    });
+
+    $('#inputLanguage').change(function () {
+      const language = $(this).val();
+      const category = $('#categoryname').val();
+      const topic = $('#inputTopicName').val();
+      loadCategoryAndTopicByLanguage(category, topic, language);
+      selectCategoryTopicLanguage();
+    });
+
+    $('#inputTopicName').change(function () {
+      const topic = $(this).val();
+      const category = $('#categoryname').val();
+      const language = $('#inputLanguage').val();
+      loadCategoryAndLanguageByTopic(category, topic, language);
+      selectCategoryTopicLanguage();
+    });
+
+    $('#btnClearFormViewforHealth').click(function () {
+      clearFormViewforHealth();
+      loadTopicAndLanguageByCategory("", "", "");
+      loadCategoryAndTopicByLanguage("", "", "");
+      loadCategoryAndLanguageByTopic("", "", "");
+      selectCategoryTopicLanguage();
+      return false;
+    });
+  });
+</script>
+
+<script>
+var projectPath='[(@{/})]';
+		
+		
+  		
+var isPlaying = [];
+				
+				var videos = document.querySelectorAll('video');
+				for(var i=0; i<videos.length; i++){
+				  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+				}
+				
+				
+
+				function pauseAll(elem){
+					var videos2 = document.querySelectorAll('video');
+					for(var i=0; i<videos2.length; i++){
+				                if(videos2[i] == elem) continue;
+				                if(videos2[i].played.length > 0 && !videos2[i].paused){
+				                  videos2[i].pause();
+				                }
+				        }
+				  }
+				
+				
+				
+				
+				   // Functions to play the video with/without sound
+					function playMutedVideoMouseOver(event) {
+						var video = event.target;
+					 	var flag=0;
+					 	for (var j = 0; j < videos.length; j++){
+							 if(!videos[j].paused && !videos[j].muted)
+					 			flag=flag+1;
+						 }
+					 	if(flag==0){
+					 	video.play();
+					 	video.muted = true;
+						}
+					 
+					}
+				   
+
+					function playUnmutedVideoOnClick(event) {
+					 var video = event.target;
+					 video.muted = false;
+					 video.play();
+					}
+					
+					function pauseWithMutedVideoMouseOut(event) {
+						 var video = event.target;
+							if(video.muted){
+								video.pause();
+								//video.muted=!video.muted;
+							}
+						 
+						}
+						
+					
+				
+					 
+					
+					
+		
+		
+		
+		 var controls =
+[
+'play-large', // The large play button in the center
+// 'restart', // Restart playback
+// 'rewind', // Rewind by the seek time (default 10 seconds)
+'play', // Play/pause playback
+//'fast-forward', // Fast forward by the seek time (default 10 seconds)
+'progress', // The progress bar and scrubber for playback and buffering
+'current-time', // The current time of playback
+//'duration', // The full duration of the media
+'mute', // Toggle mute
+'volume', // Volume control
+'captions', // Toggle captions
+'settings', // Settings menu
+'pip', // Picture-in-picture (currently Safari only)
+'airplay', // Airplay (currently Safari only)
+'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+'fullscreen' // Toggle fullscreen
+];
+
+
+
+for(var i=0; i<videos.length; i++){
+	
+	const player = new Plyr(videos[i],{controls});	
+		   
+}
+		
+
+</script>
+</body>
+</html>
