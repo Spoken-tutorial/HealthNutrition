@@ -95,8 +95,12 @@
 			<div class="col-md-8 p-2">
 									
 			<video id="storedVideoId" style="  top: 0; left: 0; width: 100%; height: 100%;" class="video-fluid z-depth-1 vid1" playsinline  controls autoplay >
-  			<source th:src="@{/files/{video}(video=${tutorial.getVideo()})}" type="video/mp4" />
   			
+  			 <th:block th:each="entry : ${videoPathWithResolution}">
+        		<source th:attr="src=@{/files/{video}(video=${entry.value})}, type='video/mp4', size=${entry.key}">
+    		</th:block>
+
+
   			<!-- IF English tutorial -->
 			<th:block th:if="${languageCheck == 'English'}">
     		<track kind="captions" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
@@ -107,6 +111,7 @@
 			    <track kind="captions" th:label="${label}" th:src="@{/files/} + @{${vttFile}}" th:srclang="${srclang}" default />
 			    <track kind="captions" th:label="${labelforEnglish}" th:src="@{/files/} + @{${vttFileforEnglish}}" th:srclang="${srclangforEnglish}" />
 			</th:block>
+
 
 
 			</video>
@@ -518,6 +523,8 @@
 
 </script>
 
+
+
  <script th:inline="javascript">
     function resetPlyrCaptionLanguageIfNonEnglish(languageCheck) {
         const plyrKey = 'plyr';
@@ -536,6 +543,40 @@
 </script>
 
 <script>
+	
+	
+	let defaultQuality = 480; // fallback default
+
+        // Check screen width
+        const width = window.innerWidth;
+
+        // Check network speed if supported
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+        if (width <= 480) {
+            defaultQuality = 360; // small screen (phones)
+        } else if (connection) {
+            const speed = connection.downlink || 1.5; // Mbps
+
+           /* if (speed < 1) {
+                defaultQuality = 360;
+            } else if (speed >= 4) {
+                defaultQuality = 720;
+            } else {
+                defaultQuality = 480;
+            }
+            */
+	        if (width < 480 || speed < 1) {
+	            defaultQuality = 360;
+	        } else if (width < 720 || speed < 4) {
+	            defaultQuality = 480;
+	        } else {
+	            defaultQuality = 720;
+	        }
+        }
+
+
+
 	
     const controls = [
         'play-large',
@@ -566,6 +607,14 @@
                 update: true,
                 language: srclang
             },
+            
+            quality: {
+                default: defaultQuality,
+               	options: [720, 480, 360], // your available sizes
+                forced: true, // only allow listed options 
+               
+            }, 
+            
             settings: ['quality', 'speed']
         });
 
@@ -743,6 +792,22 @@
         });
         
          // Add toast element after Plyr initializes
+         
+         
+     function updateQualityDropdown(defaultQuality) {
+        setTimeout(() => {
+            const menuItems = document.querySelectorAll('.plyr__menu__container [data-plyr="quality"]');
+            menuItems.forEach((item) => {
+                if (item.getAttribute('value') === defaultQuality.toString()) {
+                    item.textContent = `Auto (${defaultQuality}p)`;
+                }
+            });
+        }, 300);
+    }
+
+    updateQualityDropdown(defaultQuality);    
+
+
 	const wrapper = document.querySelector('.plyr__video-wrapper');
 	toast = document.createElement('div');
 	toast.id = 'nextVideoToast';
