@@ -272,7 +272,7 @@
 		    <script th:src="@{${rootFolder + '/js/main.js'}}"></script>
 		    
 		    
-		    <script th:src="@{${rootFolder +'/js/ajaxSupport.js' }}"></script>
+		   
 	
 
 
@@ -356,7 +356,11 @@
         $('#languageView').on('change',selectweekLanguage);
         
        
-        $('#btnClearFormView').on('click', selectweekLanguage);
+        
+        $('#btnClearFormView').on('click', function() {
+        clearFormViewforTrainingResource();
+        selectweekLanguage();
+   		 });
         
         function selectweekLanguage() {
 		 var selectedLanguage = $('#languageView').val();
@@ -374,7 +378,10 @@
             table.search(selectedWeek +" " + selectedLanguage ).draw();
             
         }
-        
+        function clearFormViewforTrainingResource() {
+        $('#weekView').val('');
+        $('#languageView').val('');
+    	}
         
         
         $('#topicView').on('change', selectTopicLanguage);
