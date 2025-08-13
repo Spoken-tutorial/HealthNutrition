@@ -66,4 +66,10 @@ public class CourseCatTopicServiceImpl implements CourseCatTopicService {
 
     }
 
+    @Override
+    public void delete(CourseCatTopicMapping courseCatTopicMapping) {
+        repo.delete(courseCatTopicMapping);
+
+    }
+
 }

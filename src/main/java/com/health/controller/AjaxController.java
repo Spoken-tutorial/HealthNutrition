@@ -53,6 +53,7 @@ import com.health.model.Comment;
 import com.health.model.Consultant;
 import com.health.model.ContributorAssignedMultiUserTutorial;
 import com.health.model.ContributorAssignedTutorial;
+import com.health.model.CourseCatTopicMapping;
 import com.health.model.District;
 import com.health.model.Event;
 import com.health.model.FeedbackForm;
@@ -87,6 +88,8 @@ import com.health.service.CommentService;
 import com.health.service.ConsultantService;
 import com.health.service.ContributorAssignedMultiUserTutorialService;
 import com.health.service.ContributorAssignedTutorialService;
+import com.health.service.CourseCatTopicService;
+import com.health.service.CourseService;
 import com.health.service.DistrictService;
 import com.health.service.EventService;
 import com.health.service.FeedbackService;
@@ -161,6 +164,12 @@ public class AjaxController {
 
     @Autowired
     private PackLanTutorialResourceService packLanTutorialResourceService;
+
+    @Autowired
+    private CourseCatTopicService courseCatTopicService;
+
+    @Autowired
+    private CourseService courseService;
 
     @Autowired
     private TutorialWithWeekAndPackageService tutorialWithPackageAndService;
@@ -1392,6 +1401,61 @@ public class AjaxController {
     /*********************
      * Delete Tutorial of Training Module and HST End
      *****************************/
+
+    @DeleteMapping("/delete-category-topic-from-course")
+    public ResponseEntity<String> deleteTutorialFromCourse(
+            @RequestParam(value = "coursecattopicId") String coursecattopicId) {
+
+        int coursecattopicId_int = Integer.parseInt(coursecattopicId);
+        logger.info("coursecattopicId_int in deleteTutorialFromCourse:{} ", coursecattopicId_int);
+
+        try {
+
+            CourseCatTopicMapping cctm = courseCatTopicService.findByCourseCatTopicId(coursecattopicId_int);
+
+            if (cctm != null) {
+
+                int catId = cctm.getCat().getCategoryId();
+
+                // zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId,
+                // lanId, env);
+                courseCatTopicService.delete(cctm);
+            }
+
+            return ResponseEntity.ok("Tutorial deleted successfully");
+        } catch (Exception e) {
+            logger.error("Error in Deleting deleteTutorialFromCourse", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
+        }
+    }
+
+    @GetMapping("/enableDisableCourseCatTopic")
+    public @ResponseBody boolean enableDisableCourseCatTopic(int courseCatTopicId) {
+
+        CourseCatTopicMapping cctm = courseCatTopicService.findByCourseCatTopicId(courseCatTopicId);
+
+        try {
+            if (cctm.isStatus()) {
+                cctm.setStatus(false);
+                // zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId,
+                // lanId, env);
+                courseCatTopicService.save(cctm);
+                return true;
+
+            } else {
+                cctm.setStatus(true);
+                // zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId,
+                // lanId, env);
+                courseCatTopicService.save(cctm);
+                return true;
+            }
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Course Cat Topic: {}", cctm, e);
+            return false;
+        }
+
+    }
 
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,

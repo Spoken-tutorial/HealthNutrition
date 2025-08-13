@@ -68,6 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addCarousel/**", "/approveRole/**", "/assignTutorialToContributor/**", "/assignContributor/edit/**",
             "/enableRoleById/**", "/deleteMasterRole/**", "/viewTrainee/**", "/details/**", "/tutorialStatus/**",
             "/users/**", "/unpublishTopic/**", "/clearAllCaches/**", "/addConsultant/**",
+            "/enableDisableCourseCatTopic", "/delete-category-topic-from-course", "/createCourse",
+            "/courseName/edit/**",
 
 //			"/unpublishTutorial/**"
 
@@ -92,7 +94,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
             "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
-            "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek",
+            "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/enableDisableCourseCatTopic",
+            "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**",
 
     };
 

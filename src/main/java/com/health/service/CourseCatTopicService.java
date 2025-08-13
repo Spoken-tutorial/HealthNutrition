@@ -23,4 +23,6 @@ public interface CourseCatTopicService {
     void save(CourseCatTopicMapping courseCatTopicMapping);
 
     void saveAll(List<CourseCatTopicMapping> courseCatTopicMappings);
+
+    void delete(CourseCatTopicMapping courseCatTopicMapping);
 }
