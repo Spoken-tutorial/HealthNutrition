@@ -69,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/enableRoleById/**", "/deleteMasterRole/**", "/viewTrainee/**", "/details/**", "/tutorialStatus/**",
             "/users/**", "/unpublishTopic/**", "/clearAllCaches/**", "/addConsultant/**",
             "/enableDisableCourseCatTopic", "/delete-category-topic-from-course", "/createCourse",
-            "/courseName/edit/**",
+            "/courseName/edit/**", "/updateCourseName",
 
 //			"/unpublishTutorial/**"
 
@@ -95,7 +95,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
             "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
             "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/enableDisableCourseCatTopic",
-            "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**",
+            "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**", "/updateCourseName",
 
     };
 
@@ -157,7 +157,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
                         "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/researchPaper/edit/**",
                         "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**",
-                        "/addCitation/**", "/citation/edit/**")
+                        "/addCitation/**", "/citation/edit/**", "/enableDisableCourseCatTopic",
+                        "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**",
+                        "/updateCourseName")
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
 

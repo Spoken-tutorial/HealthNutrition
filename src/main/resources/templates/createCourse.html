@@ -153,9 +153,20 @@ font-weight:bold!important;
 							<tbody>
 								<tr th:each="temp : ${courseCatTopicList}">
 								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
-								 <td><span th:text = "${temp.getCourse().getCourseName()}"></span>
-								 <span><a th:href="@{${'/courseName/edit/' + temp.getCourse().getCourseId()}}">Edit CourseName</a></span>
-								 </td>
+								
+								<td>
+							    <div>
+							        <span th:text="${temp.getCourse().getCourseName()}"></span>
+							    </div>
+							    <div class="mt-1">
+							        <a th:href="@{'/courseName/edit/' + ${temp.getCourse().getCourseId()}}"
+							             style="font-size: 10px; padding: 2px 6px;">
+							            Edit Name
+							        </a>
+							    </div>
+								</td>
+
+								
 								 <td><span th:text = "${temp.getCat().getCatName()}"></span></td>
 								 <td><span th:text = "${temp.getTopic().getTopicName()}"></span></td>
 								  <td><button class="delete-btn btn-outline-danger deleteCourse-btn"

@@ -1402,6 +1402,8 @@ public class AjaxController {
      * Delete Tutorial of Training Module and HST End
      *****************************/
 
+    /******************* Course Start *****************************/
+
     @DeleteMapping("/delete-category-topic-from-course")
     public ResponseEntity<String> deleteTutorialFromCourse(
             @RequestParam(value = "coursecattopicId") String coursecattopicId) {
@@ -1417,8 +1419,7 @@ public class AjaxController {
 
                 int catId = cctm.getCat().getCategoryId();
 
-                // zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId,
-                // lanId, env);
+                // delete key and zip will be added
                 courseCatTopicService.delete(cctm);
             }
 
@@ -1437,15 +1438,13 @@ public class AjaxController {
         try {
             if (cctm.isStatus()) {
                 cctm.setStatus(false);
-                // zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId,
-                // lanId, env);
+                // delete key and zip will be added
                 courseCatTopicService.save(cctm);
                 return true;
 
             } else {
                 cctm.setStatus(true);
-                // zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId,
-                // lanId, env);
+                // delete key and zip will be added
                 courseCatTopicService.save(cctm);
                 return true;
             }
@@ -1456,6 +1455,31 @@ public class AjaxController {
         }
 
     }
+
+    @RequestMapping("/loadTopicByCategoryforCourse")
+    public @ResponseBody TreeMap<String, Integer> loadTopicByCategoryforCourse(
+            @RequestParam(value = "catId") int catId) {
+        TreeMap<String, Integer> topicMaps = new TreeMap<>();
+
+        Category cat = catService.findByid(catId);
+
+        List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+        List<ContributorAssignedTutorial> con = conService.findAllByTopicCat(tcm);
+
+        List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(con);
+
+        for (Tutorial temp : tutorials) {
+
+            Topic topic = temp.getConAssignedTutorial().getTopicCatId().getTopic();
+
+            topicMaps.put(topic.getTopicName(), topic.getTopicId());
+
+        }
+
+        return topicMaps;
+    }
+
+    /******************* Course End *****************************/
 
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,

@@ -1,6 +1,7 @@
 package com.health.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -20,4 +21,6 @@ public interface CourseCatTopicMappingRepository extends JpaRepository<CourseCat
     List<CourseCatTopicMapping> findByCourse(Course course);
 
     List<CourseCatTopicMapping> findByCatAndTopic(Category cat, Topic topic);
+
+    Optional<CourseCatTopicMapping> findByCourseAndCatAndTopic(Course course, Category cat, Topic topic);
 }

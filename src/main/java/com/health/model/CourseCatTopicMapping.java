@@ -67,11 +67,11 @@ public class CourseCatTopicMapping implements Serializable {
         this.user = user;
     }
 
-    public int getCoureseCatTopicId() {
+    public int getCourseCatTopicId() {
         return courseCatTopicId;
     }
 
-    public void setCoureseCatTopicId(int courseCatTopicId) {
+    public void setCourseCatTopicId(int courseCatTopicId) {
         this.courseCatTopicId = courseCatTopicId;
     }
 

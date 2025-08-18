@@ -92,6 +92,8 @@ import com.health.model.Comment;
 import com.health.model.Consultant;
 import com.health.model.ContributorAssignedMultiUserTutorial;
 import com.health.model.ContributorAssignedTutorial;
+import com.health.model.Course;
+import com.health.model.CourseCatTopicMapping;
 import com.health.model.DocumentSearch;
 import com.health.model.Event;
 import com.health.model.FeedbackMasterTrainer;
@@ -135,6 +137,8 @@ import com.health.service.CommentService;
 import com.health.service.ConsultantService;
 import com.health.service.ContributorAssignedMultiUserTutorialService;
 import com.health.service.ContributorAssignedTutorialService;
+import com.health.service.CourseCatTopicService;
+import com.health.service.CourseService;
 import com.health.service.DistrictService;
 import com.health.service.EventService;
 import com.health.service.FeedBackMasterTrainerService;
@@ -213,6 +217,12 @@ public class HomeController {
 
     @Autowired
     private SpokenVideoService spokenVideoService;
+
+    @Autowired
+    private CourseService courseService;
+
+    @Autowired
+    private CourseCatTopicService courseCatTopicService;
 
     @Autowired
     private PackLanTutorialResourceService packLanTutorialResourceService;
@@ -4747,6 +4757,158 @@ public class HomeController {
     /**************************************************
      * Spoken Video End
      *************************************/
+
+    /************************** Course Start **********************/
+
+    @GetMapping("/createCourse")
+    public String createCourseGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        List<Course> courseList = courseService.findAll();
+        List<CourseCatTopicMapping> courseCatTopicList = courseCatTopicService.findAll();
+        List<Category> categories = getCategories();
+        model.addAttribute("courseList", courseList);
+        model.addAttribute("categories", categories);
+        model.addAttribute("courseCatTopicList", courseCatTopicList);
+
+        return "createCourse";
+    }
+
+    @PostMapping("/createCourse")
+    public String createCoursePost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "courseId") int courseId, @RequestParam(name = "courseName") String courseName,
+            @RequestParam(name = "categoryforCourse") int categoryId,
+            @RequestParam(name = "topicforCourse") Optional<int[]> topicIds) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        Course course;
+        boolean viewSection = false;
+
+        if (courseId == 0 || categoryId == 0) {
+            model.addAttribute("error_msg", "Course and category should not be null");
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            return createCourseGet(req, principal, model);
+        }
+
+        Category cat = catService.findByid(categoryId);
+
+        if (courseId == -1) {
+            course = courseService.findByCourseName(courseName);
+        } else {
+            course = courseService.findByCourseId(courseId);
+        }
+
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+        if (course == null && !courseName.isEmpty()) {
+            course = new Course();
+            course.setCourseName(courseName);
+            course.setDateAdded(dateAdded);
+            courseService.save(course);
+        }
+
+        try {
+
+            List<CourseCatTopicMapping> courseCatTopicMappingList = new ArrayList<>();
+            if (topicIds != null && topicIds.isPresent() && topicIds.get().length > 0) {
+                for (int j = 0; j < topicIds.get().length; j++) {
+
+                    Topic topic = topicService.findById(topicIds.get()[j]);
+                    CourseCatTopicMapping existingCourseCatTopicMapping = courseCatTopicService
+                            .findByCourseAndCatAndTopic(course, cat, topic);
+
+                    if (existingCourseCatTopicMapping == null) {
+                        CourseCatTopicMapping cctm = new CourseCatTopicMapping(dateAdded, course, cat, topic, usr);
+
+                        courseCatTopicMappingList.add(cctm);
+                    }
+
+                }
+            }
+
+            if (courseCatTopicMappingList.size() > 0)
+                courseCatTopicService.saveAll(courseCatTopicMappingList);
+
+        } catch (Exception e) {
+            model.addAttribute("error_msg", "Some errors occurred, please contact the Admin");
+            logger.error("Error:", e);
+            return createCourseGet(req, principal, model);
+        }
+        // delete key and zip will be added
+
+        model.addAttribute("viewSection", viewSection);
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+        return createCourseGet(req, principal, model);
+    }
+
+    @GetMapping("/courseName/edit/{id}")
+    public String editCourseNameGet(@PathVariable int id, HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        Course course = courseService.findByCourseId(id);
+
+        if (course == null) {
+
+            return "redirect:/createCourse";
+        }
+
+        model.addAttribute("course", course);
+
+        return "updateCourseName";
+    }
+
+    @PostMapping("/updateCourseName")
+    public String updateCourseNamePost(HttpServletRequest req, Model model, Principal principal) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String courseId = req.getParameter("courseId");
+        String courseName = req.getParameter("courseName");
+
+        int courseIdInt = Integer.parseInt(courseId);
+
+        Course course = courseService.findByCourseId(courseIdInt);
+        if (course == null) {
+            model.addAttribute("error_msg", "Course doesn't exist");
+            return editCourseNameGet(courseIdInt, req, model, principal);
+        }
+        model.addAttribute("course", course);
+
+        if (courseName == null || courseName.trim().isEmpty()) {
+            model.addAttribute("error_msg", "Course Name should not be empty");
+            return editCourseNameGet(courseIdInt, req, model, principal);
+        }
+
+        try {
+            Course otherCourse = courseService.findByCourseName(courseName);
+            if (otherCourse != null && otherCourse.getCourseId() != courseIdInt) {
+                model.addAttribute("error_msg", "This course name is already assigned to another course");
+                return editCourseNameGet(courseIdInt, req, model, principal);
+            }
+
+            course.setCourseName(courseName);
+            courseService.save(course);
+            // delete key and zip will be added
+
+        } catch (Exception e) {
+            logger.error("Error updating course name", e);
+            model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+            return editCourseNameGet(courseIdInt, req, model, principal);
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+        return editCourseNameGet(courseIdInt, req, model, principal);
+    }
+
+    /************************** Course End ************************/
 
     /************************************
      * Video Resource Start

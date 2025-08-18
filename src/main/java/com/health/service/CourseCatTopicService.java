@@ -25,4 +25,6 @@ public interface CourseCatTopicService {
     void saveAll(List<CourseCatTopicMapping> courseCatTopicMappings);
 
     void delete(CourseCatTopicMapping courseCatTopicMapping);
+
+    CourseCatTopicMapping findByCourseAndCatAndTopic(Course course, Category cat, Topic topic);
 }

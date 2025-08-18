@@ -72,4 +72,9 @@ public class CourseCatTopicServiceImpl implements CourseCatTopicService {
 
     }
 
+    @Override
+    public CourseCatTopicMapping findByCourseAndCatAndTopic(Course course, Category cat, Topic topic) {
+        return repo.findByCourseAndCatAndTopic(course, cat, topic).orElse(null);
+    }
+
 }
