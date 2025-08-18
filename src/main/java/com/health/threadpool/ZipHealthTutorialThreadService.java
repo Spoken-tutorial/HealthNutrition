@@ -161,9 +161,9 @@ public class ZipHealthTutorialThreadService {
                     lanList.add(lan);
 
                     tempLanIdFolder.append("lan").append(lanId).append("_");
-                    if (lanId != 22) {
-                        sb.append(lan.getLangName().replace(' ', '_')).append("_");
-                    }
+                    // if (lanId != 22) {
+                    sb.append(lan.getLangName().replace(' ', '_')).append("_");
+                    // }
 
                 }
 
@@ -417,9 +417,9 @@ public class ZipHealthTutorialThreadService {
         for (int lanId : lanIds) {
             Language lan = lanService.getById(lanId);
             tempLanIdFolder.append("lan").append(lanId).append("_");
-            if (lanId != 22) {
-                sb.append(lan.getLangName().replace(' ', '_')).append("_");
-            }
+            // if (lanId != 22) {
+            sb.append(lan.getLangName().replace(' ', '_')).append("_");
+            // }
 
         }
 

@@ -380,7 +380,7 @@ public class RestApi {
             updatedLanIds.addAll(lanIds);
         }
         // Added English Lan Id to use by default
-        updatedLanIds.add(22);
+        // updatedLanIds.add(22);
         Collections.sort(updatedLanIds);
 
         Set<Integer> uniquelanIds = new LinkedHashSet<>(updatedLanIds);
