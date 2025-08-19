@@ -1,6 +1,7 @@
 package com.health.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -174,6 +175,16 @@ public class ContributorAssignedTutorialServiceImpl implements ContributorAssign
     public ContributorAssignedTutorial findById(int id) {
         // TODO Auto-generated method stub
         return conRepo.findById(id).get();
+    }
+
+    @Override
+    public List<ContributorAssignedTutorial> findByTopicCatLanList(List<TopicCategoryMapping> tcmList,
+            List<Language> lanList) {
+        if (tcmList.isEmpty() || lanList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return conRepo.findByTopicCatLanList(tcmList, lanList);
     }
 
 }

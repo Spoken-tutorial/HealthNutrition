@@ -158,6 +158,23 @@ public class ServiceUtility {
         return newFileName;
     }
 
+    public static String sanitizeCourseName(String courseName) {
+
+        String tempCourseName = sanitizeFilename(courseName);
+
+        String sanitized = tempCourseName.replaceAll(CommonData.ILLEGAL_CHARS, "_");
+
+        sanitized = sanitized.trim().replaceAll("^_+|_+$", "");
+
+        // Limit length (Windows has path length limits taking as 100 now)
+        int maxLength = 100;
+        if (sanitized.length() > maxLength) {
+            sanitized = sanitized.substring(0, maxLength);
+        }
+
+        return sanitized;
+    }
+
     private static String uploadFile(MultipartFile uploadFile, String pathToUpload) throws Exception { // uploading file
         String path = null;
 

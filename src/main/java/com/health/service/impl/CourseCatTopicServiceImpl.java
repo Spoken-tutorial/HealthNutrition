@@ -77,4 +77,35 @@ public class CourseCatTopicServiceImpl implements CourseCatTopicService {
         return repo.findByCourseAndCatAndTopic(course, cat, topic).orElse(null);
     }
 
+    @Override
+    public List<Integer> findDistinctCatIdsByCourseIdAndStatusTrue(int courseId) {
+        return repo.findDistinctCatIdsByCourseIdAndStatusTrue(courseId);
+    }
+
+    @Override
+    public List<Integer> findDistinctTopicIdsByCourseIdAndStatusTrue(int courseId) {
+
+        return repo.findDistinctTopicIdsByCourseIdAndStatusTrue(courseId);
+
+    }
+
+    @Override
+    public List<CourseCatTopicMapping> findAllByStatusTrue() {
+
+        return repo.findAllByStatusTrue();
+
+    }
+
+    @Override
+    public List<Integer> findDistinctEnabledCatIdsByCourseIdAndStatusTrue(int courseId) {
+
+        return repo.findDistinctEnabledCatIdsByCourseIdAndStatusTrue(courseId);
+    }
+
+    @Override
+    public List<CourseCatTopicMapping> findAllByCourse_CourseIdAndStatusTrue(int courseId) {
+
+        return repo.findAllByCourse_CourseIdAndStatusTrue(courseId);
+    }
+
 }

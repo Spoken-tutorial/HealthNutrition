@@ -4809,7 +4809,7 @@ public class HomeController {
             course.setDateAdded(dateAdded);
             courseService.save(course);
         }
-
+        courseId = course.getCourseId();
         try {
 
             List<CourseCatTopicMapping> courseCatTopicMappingList = new ArrayList<>();
@@ -4829,6 +4829,15 @@ public class HomeController {
                 }
             }
 
+            // delete keys and zips
+            List<Integer> catIds = courseCatTopicService.findDistinctCatIdsByCourseIdAndStatusTrue(courseId);
+            Optional<Integer> optionalCourseId = Optional.ofNullable(courseId);
+            for (int catId : catIds) {
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null,
+                        optionalCourseId, env);
+            }
+
+            // save courseCatTopicMappingList
             if (courseCatTopicMappingList.size() > 0)
                 courseCatTopicService.saveAll(courseCatTopicMappingList);
 
@@ -4837,7 +4846,6 @@ public class HomeController {
             logger.error("Error:", e);
             return createCourseGet(req, principal, model);
         }
-        // delete key and zip will be added
 
         model.addAttribute("viewSection", viewSection);
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
@@ -4896,7 +4904,13 @@ public class HomeController {
 
             course.setCourseName(courseName);
             courseService.save(course);
-            // delete key and zip will be added
+            // delete keys and zips
+            List<Integer> catIds = courseCatTopicService.findDistinctCatIdsByCourseIdAndStatusTrue(courseIdInt);
+            Optional<Integer> optionalCourseId = Optional.ofNullable(courseIdInt);
+            for (int catId : catIds) {
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null,
+                        optionalCourseId, env);
+            }
 
         } catch (Exception e) {
             logger.error("Error updating course name", e);
@@ -8129,7 +8143,9 @@ public class HomeController {
 
         int catId = tutorial.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
         int lanId = tutorial.getConAssignedTutorial().getLan().getLanId();
-        zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
+        Optional<Integer> lanIdOptional = Optional.ofNullable(lanId);
+        zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanIdOptional, null,
+                env);
         taskProcessingService.addUpdateDeleteTutorial(tutorial, CommonData.ADD_DOCUMENT);
 
         tutService.save(tutorial);
@@ -9027,15 +9043,18 @@ public class HomeController {
         Tutorial tut = tutService.getById(id);
         int catId = tut.getConAssignedTutorial().getTopicCatId().getCat().getCategoryId();
         int lanId = tut.getConAssignedTutorial().getLan().getLanId();
+        Optional<Integer> lanIdOptional = Optional.ofNullable(lanId);
 
         if (tut.isStatus()) {
             tut.setStatus(false);
-            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanIdOptional, null,
+                    env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.DELETE_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial unpublished Successfully");
         } else {
             tut.setStatus(true);
-            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanId, env);
+            zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, lanIdOptional, null,
+                    env);
             taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
             model.addAttribute("success_msg", "Tutorial published Successfully");
         }

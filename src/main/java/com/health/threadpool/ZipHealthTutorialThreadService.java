@@ -8,12 +8,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,12 +40,15 @@ import com.health.config.ThymeleafService;
 import com.health.controller.AjaxController;
 import com.health.model.Category;
 import com.health.model.ContributorAssignedTutorial;
+import com.health.model.CourseCatTopicMapping;
 import com.health.model.Language;
 import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
 import com.health.model.Tutorial;
 import com.health.service.CategoryService;
 import com.health.service.ContributorAssignedTutorialService;
+import com.health.service.CourseCatTopicService;
+import com.health.service.CourseService;
 import com.health.service.LanguageService;
 import com.health.service.TopicCategoryMappingService;
 import com.health.service.TutorialService;
@@ -78,6 +83,12 @@ public class ZipHealthTutorialThreadService {
 
     @Autowired
     private TutorialService tutorialService;
+
+    @Autowired
+    private CourseService courseService;
+
+    @Autowired
+    private CourseCatTopicService courseCatTopicService;
 
     @Autowired
     private ContributorAssignedTutorialService conService;
@@ -130,14 +141,14 @@ public class ZipHealthTutorialThreadService {
 
     }
 
-    private void generateLocalIndexHtml(Set<Integer> catIds, Set<Integer> lanIds, String indexPath, Path originalPath,
-            Environment env) {
-        Map<String, Object> modelAttributes = getHealthTutorialData(catIds, lanIds, originalPath, env);
+    private void generateLocalIndexHtml(int courseId, Set<Integer> catIds, Set<Integer> lanIds, String indexPath,
+            Path originalPath, Environment env) {
+        Map<String, Object> modelAttributes = getHealthTutorialData(courseId, catIds, lanIds, originalPath, env);
         thymeleafService.createHtmlFromTemplate("indexofHealthTutorial", modelAttributes, indexPath, request, response);
     }
 
     @Async
-    private CompletableFuture<String> createZip(String courseName, String quality, Set<Integer> catIds,
+    private CompletableFuture<String> createZip(int courseId, String courseName, String quality, Set<Integer> catIds,
             Set<Integer> lanIds, Environment env) {
         String zipUrl = "";
 
@@ -146,8 +157,13 @@ public class ZipHealthTutorialThreadService {
         Set<Tutorial> uniqueTutorials = new LinkedHashSet<>();
         StringBuilder tempCatIdFolder = new StringBuilder();
         StringBuilder tempLanIdFolder = new StringBuilder();
+        StringBuilder tempcourseIdFolder = new StringBuilder();
         StringBuilder sb = new StringBuilder();
         boolean flag = true;
+
+        List<TopicCategoryMapping> tcmList = new ArrayList<>();
+        List<ContributorAssignedTutorial> conList = new ArrayList<>();
+        List<Tutorial> tutorials = new ArrayList<>();
 
         for (int catId : catIds) {
             tempCatIdFolder.append("cat").append(catId).append("_");
@@ -166,17 +182,45 @@ public class ZipHealthTutorialThreadService {
                     // }
 
                 }
+                if (courseId == 0) {
+                    tcmList = topicCatMappingService.findAllByCategory(cat);
+                    conList = conService.findAllByTopicCatAndLan(tcmList, lan);
+                    tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+                    uniqueTutorials.addAll(tutorials);
 
-                List<TopicCategoryMapping> tcmList = topicCatMappingService.findAllByCategory(cat);
-                List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
-                List<Tutorial> tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
-                uniqueTutorials.addAll(tutorials);
+                }
 
             }
             flag = false;
 
         }
-        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + quality;
+        String parentZipfolder = "";
+        if (courseId != 0) {
+            List<CourseCatTopicMapping> cctmList = courseCatTopicService
+                    .findAllByCourse_CourseIdAndStatusTrue(courseId);
+
+            for (CourseCatTopicMapping temp : cctmList) {
+                Category cat = temp.getCat();
+                if (cat.isStatus()) {
+                    Topic topic = temp.getTopic();
+                    TopicCategoryMapping tcm = topicCatMappingService.findAllByCategoryAndTopic(cat, topic);
+                    tcmList.add(tcm);
+                }
+
+            }
+
+            conList = conService.findByTopicCatLanList(tcmList, lanList);
+            logger.info("conList size in create zip : {}", conList.size());
+            tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+            uniqueTutorials.addAll(tutorials);
+
+            tempcourseIdFolder.append("CourseId").append(courseId).append("_");
+            parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + tempcourseIdFolder.toString()
+                    + quality;
+        } else {
+            parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + quality;
+        }
+
         if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '_') {
             sb.deleteCharAt(sb.length() - 1);
         }
@@ -202,10 +246,10 @@ public class ZipHealthTutorialThreadService {
 
                 // String catName = originalCategoryName.replace(' ', '_');
                 String rootFolder = zipNameWithoutExtentions;
-                Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                Path destinationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                         CommonData.uploadDirectoryHealthTutorialZipFiles, sdfString, File.separator, rootFolder);
 
-                Path indexHtmlPath = Paths.get(destInationDirectory1.toString(), File.separator, "index.html");
+                Path indexHtmlPath = Paths.get(destinationDirectory1.toString(), File.separator, "index.html");
 
                 for (Tutorial tempTutorial : uniqueTutorials) {
 
@@ -237,13 +281,28 @@ public class ZipHealthTutorialThreadService {
 //                            CommonData.uploadDirectoryScriptOdtFileforDownload, tutorialId + ".odt");
 //                    Path destainationPath = destInationDirectoryforTopiccAndLan.resolve(topicName + ".odt");
 
-                    Path destInationDirectoryforTutorial = Paths.get(destInationDirectory1.toString(), File.separator,
-                            catName, File.separator, langName, File.separator, topicName);
-                    try {
-                        ServiceUtility.createFolder(destInationDirectoryforTutorial);
-                    } catch (IOException e) {
+                    Path destinationCourse = Paths.get(destinationDirectory1.toString(), catName, langName);
+                    Path destinationVideo = destinationCourse.resolve("Tutorials");
+                    Path destinationSlide = destinationCourse.resolve("Slides");
+                    Path destinationScript = destinationCourse.resolve("Scripts");
 
-                        logger.error("Exception: ", e);
+                    Path destinationTimedScript = destinationScript.resolve("Timed_Scripts");
+                    Path destinationOriginalScript = null;
+
+                    List<Path> foldersToCreate = new ArrayList<>(Arrays.asList(destinationCourse, destinationVideo,
+                            destinationSlide, destinationScript, destinationTimedScript));
+
+                    if (langName.equals("English")) {
+                        destinationOriginalScript = destinationScript.resolve("Original_Scripts");
+                        foldersToCreate.add(destinationOriginalScript);
+                    }
+
+                    try {
+                        for (Path folder : foldersToCreate) {
+                            ServiceUtility.createFolder(folder);
+                        }
+                    } catch (IOException e) {
+                        logger.error("Exception occurred while creating directories: ", e);
                     }
 
                     try {
@@ -278,19 +337,25 @@ public class ZipHealthTutorialThreadService {
                             }
                         }
 
-                        String topicwithExtention;
+//                        String topicNameForTutorial = "";
+//                        if (!resolution.isEmpty()) {
+//                            topicNameForTutorial = topicName + resolution;
+//                        } else {
+//                            topicNameForTutorial = topicName;
+//                        }
+                        String finaltutorialName = "";
                         Path sourcePath;
 
                         Path webmSourcePath = replaceExtension(basePath, ".webm");
                         if (webmSourcePath.toFile().exists()) {
                             sourcePath = webmSourcePath;
-                            topicwithExtention = topicName + ".webm";
+                            finaltutorialName = topicName + ".webm";
                         } else {
                             sourcePath = basePath; // replaceExtension(basePath, ".mp4");
-                            topicwithExtention = topicName + ".mp4";
+                            finaltutorialName = topicName + ".mp4";
                         }
 
-                        Path destainationPath1 = destInationDirectoryforTutorial.resolve(topicwithExtention);
+                        Path destainationPath1 = destinationVideo.resolve(finaltutorialName);
 
                         File sourceFile = sourcePath.toFile();
                         logger.info("last assignment of source path :{}", sourcePath.toString());
@@ -308,9 +373,12 @@ public class ZipHealthTutorialThreadService {
                         if (sourceofSlide.exists()) {
                             // Extract the file name (e.g., "myslide.zip")
                             String slideFileName = sourcePathofSlide.getFileName().toString();
+                            String fileExtension = slideFileName.contains(".")
+                                    ? slideFileName.substring(slideFileName.lastIndexOf('.'))
+                                    : "";
 
                             // Create destination path with filename preserved
-                            Path destainationSlidePath = destInationDirectoryforTutorial.resolve(slideFileName);
+                            Path destainationSlidePath = destinationSlide.resolve(topicName + fileExtension);
 
                             // Now copy the file with correct filename
                             copyFileUsingRsync(sourcePathofSlide, destainationSlidePath);
@@ -328,12 +396,10 @@ public class ZipHealthTutorialThreadService {
                                     : "";
 
                             // Construct destination path using the same extension
-                            destainationTimedScriptPath = destInationDirectoryforTutorial
-                                    .resolve("timed_script" + fileExtension);
+                            destainationTimedScriptPath = destinationTimedScript.resolve(topicName + fileExtension);
 
                         } else {
-                            destainationTimedScriptPath = destInationDirectoryforTutorial
-                                    .resolve("timed_script" + ".odt");
+                            destainationTimedScriptPath = destinationTimedScript.resolve(topicName + ".odt");
                         }
 
                         File sourceofTimedScript = sourcePathofTimedScript.toFile();
@@ -346,8 +412,8 @@ public class ZipHealthTutorialThreadService {
                         if (!original_script.isEmpty()) {
                             Path sourcePathofOriginalScript = Paths
                                     .get(env.getProperty("spring.applicationexternalPath.name"), original_script);
-                            Path destainationPathOfOriginalScript = destInationDirectoryforTutorial
-                                    .resolve("orginal_Script" + ".odt");
+                            Path destainationPathOfOriginalScript = destinationOriginalScript
+                                    .resolve(topicName + ".odt");
 
                             File sourceOriginalScript = sourcePathofOriginalScript.toFile();
                             if (sourceOriginalScript.exists()) {
@@ -365,7 +431,7 @@ public class ZipHealthTutorialThreadService {
 
                 }
 
-                generateLocalIndexHtml(catIds, lanIds, indexHtmlPath.toString(), destInationDirectory1, env);
+                generateLocalIndexHtml(courseId, catIds, lanIds, indexHtmlPath.toString(), destinationDirectory1, env);
                 Path destInationDirectory2 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                         CommonData.uploadDirectoryHealthTutorialZipFiles, sdfString, File.separator, rootFolder);
                 String temp = destInationDirectory2.toString();
@@ -404,11 +470,12 @@ public class ZipHealthTutorialThreadService {
         return isDeleted;
     }
 
-    public String getZipName(String courseName, String quality, Set<Integer> catIds, Set<Integer> lanIds,
+    public String getZipName(int courseId, String courseName, String quality, Set<Integer> catIds, Set<Integer> lanIds,
             Environment env) {
 
         StringBuilder tempCatIdFolder = new StringBuilder();
         StringBuilder tempLanIdFolder = new StringBuilder();
+        StringBuilder tempcourseIdFolder = new StringBuilder();
         StringBuilder sb = new StringBuilder();
 
         for (int catId : catIds) {
@@ -427,13 +494,20 @@ public class ZipHealthTutorialThreadService {
             sb.deleteCharAt(sb.length() - 1);
         }
         String newzipNameWithoutExtentions = courseName.replace(' ', '_') + "_" + sb.toString();
+        String parentZipfolder = "";
+        if (courseId != 0) {
+            tempcourseIdFolder.append("CourseId").append(courseId).append("_");
+            parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + tempcourseIdFolder.toString()
+                    + quality;
+        } else {
+            parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + quality;
+        }
 
-        String parentZipfolder = tempCatIdFolder.toString() + tempLanIdFolder.toString() + quality;
         String key = parentZipfolder;
         String zipName = ZipNames.putIfAbsent(key, "");
         if (zipName == null) {
 
-            createZip(courseName, quality, catIds, lanIds, env);
+            createZip(courseId, courseName, quality, catIds, lanIds, env);
             return null;
         } else if (zipName.isEmpty()) {
             // processing already progress
@@ -451,7 +525,7 @@ public class ZipHealthTutorialThreadService {
 
                 if (isDeleted) {
                     ZipNames.remove(key);
-                    createZip(courseName, quality, catIds, lanIds, env);
+                    createZip(courseId, courseName, quality, catIds, lanIds, env);
 
                     logger.info("Parent dir deleted successfully: {} " + parentZipfolder);
                 } else {
@@ -466,10 +540,19 @@ public class ZipHealthTutorialThreadService {
         return zipName;
     }
 
-    public void deleteKeyFromZipNamesAndHealthTutorialZipIfExists(int catId, int lanId, Environment env) {
+    public void deleteKeyFromZipNamesAndHealthTutorialZipIfExists(int catId, Optional<Integer> lanId,
+            Optional<Integer> courseId, Environment env) {
         // Construct identifiers to match in folder names
         String catIdentifier = "cat" + catId;
-        String lanIdentifier = "lan" + lanId;
+        if (lanId == null)
+            lanId = Optional.empty();
+        if (courseId == null)
+            courseId = Optional.empty();
+
+        int lanIdInt = lanId.orElse(0);
+        int courseIdInt = courseId.orElse(0);
+        String lanIdentifier = "lan" + lanIdInt;
+        String courseIdentifier = "CourseId" + courseIdInt;
 
         // Resolve the main directory path
         Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
@@ -491,7 +574,8 @@ public class ZipHealthTutorialThreadService {
             String folderName = subFolder.getName();
 
             // Check if the folder name contains both catId and lanId
-            if (folderName.contains(catIdentifier) && folderName.contains(lanIdentifier)) {
+            if ((folderName.contains(catIdentifier) && folderName.contains(lanIdentifier))
+                    || (folderName.contains(catIdentifier) && folderName.contains(courseIdentifier))) {
                 // Delete the folder and its contents recursively
                 try {
                     deleteFolderRecursively(subFolder.toPath());
@@ -512,8 +596,8 @@ public class ZipHealthTutorialThreadService {
         Files.walk(folderPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
     }
 
-    private Map<String, Object> getHealthTutorialData(Set<Integer> catIds, Set<Integer> lanIds, Path originalPath,
-            Environment env) {
+    private Map<String, Object> getHealthTutorialData(int courseId, Set<Integer> catIds, Set<Integer> lanIds,
+            Path originalPath, Environment env) {
         Map<String, Object> modelAttributes = new HashMap<>();
 
         try {
@@ -539,20 +623,51 @@ public class ZipHealthTutorialThreadService {
         Set<Category> uniqueCategories = new LinkedHashSet<>();
         Set<Topic> uniqueTopics = new LinkedHashSet<>();
         Set<Language> uniqueLanguage = new LinkedHashSet<>();
+        List<TopicCategoryMapping> tcmList = new ArrayList<>();
+        List<ContributorAssignedTutorial> conList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String, String>> tutorialJsonList = new ArrayList<>();
+        List<Tutorial> tutorials = new ArrayList<>();
+        boolean flag = true;
 
         for (int catId : catIds) {
             Category cat = catService.findByid(catId);
             for (int lanId : lanIds) {
                 Language lan = lanService.getById(lanId);
+                if (flag) {
+                    lanList.add(lan);
 
-                List<TopicCategoryMapping> tcmList = topicCatMappingService.findAllByCategory(cat);
-                List<ContributorAssignedTutorial> conList = conService.findAllByTopicCatAndLan(tcmList, lan);
-                List<Tutorial> tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
-                uniqueTutorials.addAll(tutorials);
+                }
+                if (courseId == 0) {
+                    tcmList = topicCatMappingService.findAllByCategory(cat);
+                    conList = conService.findAllByTopicCatAndLan(tcmList, lan);
+                    tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+                    uniqueTutorials.addAll(tutorials);
+                }
 
             }
+            flag = false;
+
+        }
+
+        if (courseId != 0) {
+            List<CourseCatTopicMapping> cctmList = courseCatTopicService
+                    .findAllByCourse_CourseIdAndStatusTrue(courseId);
+
+            for (CourseCatTopicMapping temp : cctmList) {
+                Category cat = temp.getCat();
+                if (cat.isStatus()) {
+                    Topic topic = temp.getTopic();
+                    TopicCategoryMapping tcm = topicCatMappingService.findAllByCategoryAndTopic(cat, topic);
+                    tcmList.add(tcm);
+                }
+
+            }
+
+            conList = conService.findByTopicCatLanList(tcmList, lanList);
+            logger.info("conList size in getHealthTutorialData : {}", conList.size());
+            tutorials = tutorialService.findAllByconAssignedTutorialAndStatus(conList);
+            uniqueTutorials.addAll(tutorials);
 
         }
 
@@ -583,13 +698,13 @@ public class ZipHealthTutorialThreadService {
 
                 Path webmSourcePath = replaceExtension(basePath, ".webm");
                 if (webmSourcePath.toFile().exists()) {
-                    sourcePath = Paths.get(catName, File.separator, langName, File.separator, topicName, File.separator,
-                            topicName + ".webm");
+                    sourcePath = Paths.get(catName, File.separator, langName, File.separator, "Tutorials",
+                            File.separator, topicName + ".webm");
                     ;
 
                 } else {
-                    sourcePath = Paths.get(catName, File.separator, langName, File.separator, topicName, File.separator,
-                            topicName + ".mp4");
+                    sourcePath = Paths.get(catName, File.separator, langName, File.separator, "Tutorials",
+                            File.separator, topicName + ".mp4");
 
                 }
 

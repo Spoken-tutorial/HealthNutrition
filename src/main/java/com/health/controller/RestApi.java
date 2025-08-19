@@ -28,12 +28,15 @@ import com.health.domain.security.UserRole;
 import com.health.model.Category;
 import com.health.model.ContributorAssignedMultiUserTutorial;
 import com.health.model.ContributorAssignedTutorial;
+import com.health.model.Course;
 import com.health.model.Language;
 import com.health.model.TopicCategoryMapping;
 import com.health.model.Tutorial;
 import com.health.model.User;
 import com.health.service.CategoryService;
 import com.health.service.ContributorAssignedTutorialService;
+import com.health.service.CourseCatTopicService;
+import com.health.service.CourseService;
 import com.health.service.LanguageService;
 import com.health.service.TopicCategoryMappingService;
 import com.health.service.TutorialService;
@@ -69,6 +72,12 @@ public class RestApi {
 
     @Autowired
     private TutorialService tutService;
+
+    @Autowired
+    private CourseService courseService;
+
+    @Autowired
+    private CourseCatTopicService courseCatTopicService;
 
     @Autowired
     private UserService userService;
@@ -336,21 +345,52 @@ public class RestApi {
 
     }
 
-    /// downloadHealthTutorials?courseName=HealthTutorial&videoQuality=L&catIds=1,2&lanIds=3,4
+    // API Url 1 :
+    // downloadHealthTutorials?courseName=HealthTutorial&videoQuality=L&catIds=1,2&lanIds=3,4
+    // API Url 2 : downloadHealthTutorials?courseId=1&videoQuality=L&lanIds=3,4
+
+    /*
+     * Here We have added required =false in many parameters. But, It will act
+     * according to above API 1 and API 2 urls . If they are not passed according to
+     * api then it will give errors.
+     */
     @GetMapping("/downloadHealthTutorials")
-    public ResponseEntity<Map<Integer, String>> getZipUrlOfHealthTutorial(@RequestParam String courseName,
-            @RequestParam(required = false) String videoQuality, @RequestParam List<Integer> catIds,
-            @RequestParam(required = false) List<Integer> lanIds) {
+    public ResponseEntity<Map<Integer, String>> getZipUrlOfHealthTutorial(
+            @RequestParam(required = false) String courseName,
+            @RequestParam(required = false, defaultValue = "0") int courseId,
+
+            @RequestParam(required = false) String videoQuality, @RequestParam(required = false) List<Integer> catIds,
+            @RequestParam(required = true) List<Integer> lanIds) {
 
         Map<Integer, String> resultMap = new HashMap<>();
 
+        Course course;
+
+        if (courseId != 0) {
+            course = courseService.findByCourseId(courseId);
+            if (course == null) {
+                resultMap.put(2, "No Course is found");
+                return ResponseEntity.ok(resultMap);
+            } else {
+                courseName = course.getCourseName();
+                catIds = courseCatTopicService.findDistinctEnabledCatIdsByCourseIdAndStatusTrue(courseId);
+
+            }
+        }
+
+        String finalCourseName = "";
+
         if (courseName == null || courseName.trim().isEmpty()) {
-            resultMap.put(2, "No CourseName  is available in url");
+            resultMap.put(2, "No CourseName  is found");
             return ResponseEntity.ok(resultMap);
+        } else {
+            String sanitized = ServiceUtility.sanitizeCourseName(courseName);
+            finalCourseName = sanitized.replace(" ", "_").replaceAll("_+", "_");
+
         }
 
         if (catIds == null || catIds.isEmpty()) {
-            resultMap.put(2, "No Category Id is available in url");
+            resultMap.put(2, "No Category Id is found");
             return ResponseEntity.ok(resultMap);
         }
         String quality;
@@ -406,7 +446,8 @@ public class RestApi {
             }
         }
 
-        String zipUrl = zipHealthTutorialThreadService.getZipName(courseName, quality, uniqeCatIds, uniquelanIds, env);
+        String zipUrl = zipHealthTutorialThreadService.getZipName(courseId, finalCourseName, quality, uniqeCatIds,
+                uniquelanIds, env);
 
         if (zipUrl == null || zipUrl.isEmpty()) {
             resultMap.put(0, "Zip creation in progress... Please check back after 30 minutes.");

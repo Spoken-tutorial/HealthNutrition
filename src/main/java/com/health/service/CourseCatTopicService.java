@@ -27,4 +27,15 @@ public interface CourseCatTopicService {
     void delete(CourseCatTopicMapping courseCatTopicMapping);
 
     CourseCatTopicMapping findByCourseAndCatAndTopic(Course course, Category cat, Topic topic);
+
+    List<Integer> findDistinctCatIdsByCourseIdAndStatusTrue(int courseId);
+
+    List<Integer> findDistinctEnabledCatIdsByCourseIdAndStatusTrue(int courseId);
+
+    List<Integer> findDistinctTopicIdsByCourseIdAndStatusTrue(int courseId);
+
+    List<CourseCatTopicMapping> findAllByCourse_CourseIdAndStatusTrue(int courseId);
+
+    List<CourseCatTopicMapping> findAllByStatusTrue();
+
 }

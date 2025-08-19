@@ -1418,8 +1418,10 @@ public class AjaxController {
             if (cctm != null) {
 
                 int catId = cctm.getCat().getCategoryId();
+                Optional<Integer> courseId = Optional.ofNullable(cctm.getCourse().getCourseId());
 
-                // delete key and zip will be added
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null, courseId,
+                        env);
                 courseCatTopicService.delete(cctm);
             }
 
@@ -1434,17 +1436,21 @@ public class AjaxController {
     public @ResponseBody boolean enableDisableCourseCatTopic(int courseCatTopicId) {
 
         CourseCatTopicMapping cctm = courseCatTopicService.findByCourseCatTopicId(courseCatTopicId);
+        int catId = cctm.getCat().getCategoryId();
+        Optional<Integer> courseId = Optional.ofNullable(cctm.getCourse().getCourseId());
 
         try {
             if (cctm.isStatus()) {
                 cctm.setStatus(false);
-                // delete key and zip will be added
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null, courseId,
+                        env);
                 courseCatTopicService.save(cctm);
                 return true;
 
             } else {
                 cctm.setStatus(true);
-                // delete key and zip will be added
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null, courseId,
+                        env);
                 courseCatTopicService.save(cctm);
                 return true;
             }
@@ -3464,8 +3470,10 @@ public class AjaxController {
             res.put(CommonData.KEYWORD, CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
             res.put(CommonData.VIDEO, CommonData.tutorialStatus[tutorial.getVideoStatus()]);
             res.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
+            Optional<Integer> lanId = Optional.ofNullable(lang.getLanId());
+
             zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(cat_.getCategoryId(),
-                    lang.getLanId(), env);
+                    lanId, null, env);
         } else {
             res.put("response", "0");
         }
