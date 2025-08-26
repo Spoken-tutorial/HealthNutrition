@@ -8,7 +8,7 @@
 <!---> Package Download Start </-->		
 
 <div th:fragment="download_package">
-    <form th:if="${downloadPackageFlag}" th:action="@{/downloadTrainingModules}" method="post" class="form-inline my-2 my-lg-0" name="selectOption" id="packageForm" style="width: 100%;">
+    <form th:if="${downloadPackageFlag}" th:action="@{/downloadTrainingModules}" method="post" class="form-inline my-2 my-lg-0" name="selectOption" id="downloadPackageForm" style="width: 100%;">
         
             
                 <select class="custom-select form-control mr-sm-2 mb-2 mb-md-0" id="packageDownloadName" name="packageDownloadName">
@@ -33,10 +33,39 @@
     <div id="loadingMessage" style="display: none; color: orange; font-weight: bold; margin-top: 10px;">
      
     </div>
-     
+    
+    <!-- Hidden iframe for auto download -->
+    <iframe id="hiddenDownloader" style="display:none;"></iframe>
+
+    <!-- Status + Spinner -->
+    <div id="downloadStatus" style="margin-top:15px; display:none;">
+        <div id="spinner" style="display:none;">
+            <div></div>
+        </div>
+        <p id="statusMessage"></p>
+    </div>	
+	
+   <style>
+	   @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        #spinner div {
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #3498db;
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          animation: spin 2s linear infinite;
+        }
+   </style>  
+   
+   
 </div>
 	
 <!---> Package Download End  </-->	
+
+
 
 
 <div th:fragment="trainingModuleView_bar">
@@ -67,6 +96,8 @@ function resetInput(id) {
         text-align: center;
       }
     }
+    
+     
   </style>
 
   

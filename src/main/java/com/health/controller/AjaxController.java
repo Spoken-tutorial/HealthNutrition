@@ -1,6 +1,8 @@
 package com.health.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +15,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.servlet.http.HttpServletResponse;
 //import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -21,6 +25,7 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.health.config.SecurityConfig;
 import com.health.domain.security.Role;
@@ -257,6 +263,14 @@ public class AjaxController {
 
     @Autowired
     private EventService eventService;
+
+    @Value("${downloadLimit}")
+    private int downloadLimit;
+
+    @Value("${downloadTimeOut}")
+    private long downloadTimeOut;
+
+    private AtomicInteger downloadCount = new AtomicInteger(0);
 
     @Autowired
     private MailConstructor mailConstructor;
@@ -1144,6 +1158,52 @@ public class AjaxController {
         }
 
         return tutorialName;
+    }
+
+    @PostMapping("/downloadTrainingModules")
+    @ResponseBody
+    public String downloadPackagePost(@RequestParam String packageDownloadName,
+            @RequestParam String languageDownloadName) {
+
+        PackageContainer packageContainer = packageContainerService
+                .findByPackageId(Integer.parseInt(packageDownloadName));
+        if (packageContainer == null) {
+            return "Please Select Package";
+        }
+
+        Language lan = lanService.getById(Integer.parseInt(languageDownloadName));
+        if (lan == null) {
+            return "Please Select Language";
+        }
+
+        String langName = lan.getLangName();
+        String originalPackageName = packageContainer.getPackageName();
+        String zipUrl = zipCreationThreadService.getZipName(originalPackageName, langName, env);
+
+        if (zipUrl == null || zipUrl.isEmpty()) {
+            return "progress";
+        } else if (zipUrl.equals("Error")) {
+            return "No Tutorials are available for selected Package and Language";
+        } else if (downloadCount.get() == downloadLimit) {
+            return "Please try again after 30 minutes.";
+        }
+
+        return "/downloadManager?zipUrl=" + URLEncoder.encode(zipUrl, StandardCharsets.UTF_8);
+    }
+
+    @GetMapping("/downloadManager")
+    public String downloadManager(@RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response,
+            RedirectAttributes redirectAttributes) {
+
+        String message = ServiceUtility.downloadManager(zipUrl, downloadCount, downloadLimit, downloadTimeOut, env,
+                response);
+
+        if (message != null) {
+            redirectAttributes.addFlashAttribute("return_msg", message);
+            return "redirect:/trainingModules";
+        }
+
+        return null;
     }
 
     /*********************************

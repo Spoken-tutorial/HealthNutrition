@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -5317,79 +5316,83 @@ public class HomeController {
 
     /********************** Training Modules Download Start **********************/
 
-    @PostMapping("/downloadTrainingModules")
-    public String downloadPackagePost(HttpServletRequest req, Principal principal, Model model,
-            @RequestParam(name = "packageDownloadName") String packageId,
-            @RequestParam(name = "languageDownloadName") String lanId, RedirectAttributes redirectAttributes) {
-
-        PackageContainer packageContainer = packageContainerService.findByPackageId(Integer.parseInt(packageId));
-        if (packageContainer == null) { // throw error
-
-            redirectAttributes.addFlashAttribute("return_msg", "Please Select Package");
-            return "redirect:/trainingModules";
-
-        }
-
-        Language lan = lanService.getById(Integer.parseInt(lanId));
-        if (lan == null) { // throw error
-
-            redirectAttributes.addFlashAttribute("return_msg", "Please Select Language");
-            return "redirect:/trainingModules";
-        }
-
-        String langName = lan.getLangName();
-        String originalPackageName = packageContainer.getPackageName();
-        String zipUrl = zipCreationThreadService.getZipName(originalPackageName, langName, env);
-
-        if (zipUrl == null || zipUrl.isEmpty()) {
-
-            redirectAttributes.addFlashAttribute("return_msg",
-                    "Zip creation in progress.... , please check back after 30 minutes.");
-            return "redirect:/trainingModules";
-
-        }
-
-        else if (zipUrl.equals("Error")) {
-
-            redirectAttributes.addFlashAttribute("return_msg",
-                    "No Tutorials are available for selected Package,  and Language");
-            return "redirect:/trainingModules";
-
-        } else if (downloadCount.get() == downloadLimit) {
-
-            redirectAttributes.addFlashAttribute("return_msg", "Please try again after 30 minutes.");
-            return "redirect:/trainingModules";
-        }
-
-        else {
-
-            model.addAttribute("zipUrl", zipUrl);
-            model.addAttribute("success_msg",
-                    "Record Submitted Successfully ! Click on the download link to download resources");
-
-            return "downloadTrainingModule";
-
-        }
-
-    }
-
-    @GetMapping("/downloadManager")
-    public String downloadManager(HttpServletRequest req, Principal principal, Model model,
-            @RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response,
-            RedirectAttributes redirectAttributes) {
-
-        String message = ServiceUtility.downloadManager(zipUrl, downloadCount, downloadLimit, downloadTimeOut, env,
-                response);
-
-        if (message != null) {
-
-            redirectAttributes.addFlashAttribute("return_msg", message);
-            return "redirect:/trainingModules";
-        }
-
-        return message;
-
-    }
+    /*
+     * @PostMapping("/downloadTrainingModules") public String
+     * downloadPackagePost(HttpServletRequest req, Principal principal, Model model,
+     * 
+     * @RequestParam(name = "packageDownloadName") String packageId,
+     * 
+     * @RequestParam(name = "languageDownloadName") String lanId, RedirectAttributes
+     * redirectAttributes) {
+     * 
+     * PackageContainer packageContainer =
+     * packageContainerService.findByPackageId(Integer.parseInt(packageId)); if
+     * (packageContainer == null) { // throw error
+     * 
+     * redirectAttributes.addFlashAttribute("return_msg", "Please Select Package");
+     * return "redirect:/trainingModules";
+     * 
+     * }
+     * 
+     * Language lan = lanService.getById(Integer.parseInt(lanId)); if (lan == null)
+     * { // throw error
+     * 
+     * redirectAttributes.addFlashAttribute("return_msg", "Please Select Language");
+     * return "redirect:/trainingModules"; }
+     * 
+     * String langName = lan.getLangName(); String originalPackageName =
+     * packageContainer.getPackageName(); String zipUrl =
+     * zipCreationThreadService.getZipName(originalPackageName, langName, env);
+     * 
+     * if (zipUrl == null || zipUrl.isEmpty()) {
+     * 
+     * redirectAttributes.addFlashAttribute("return_msg",
+     * "Zip creation in progress.... , please check back after 30 minutes."); return
+     * "redirect:/trainingModules";
+     * 
+     * }
+     * 
+     * else if (zipUrl.equals("Error")) {
+     * 
+     * redirectAttributes.addFlashAttribute("return_msg",
+     * "No Tutorials are available for selected Package,  and Language"); return
+     * "redirect:/trainingModules";
+     * 
+     * } else if (downloadCount.get() == downloadLimit) {
+     * 
+     * redirectAttributes.addFlashAttribute("return_msg",
+     * "Please try again after 30 minutes."); return "redirect:/trainingModules"; }
+     * 
+     * else {
+     * 
+     * model.addAttribute("zipUrl", zipUrl); model.addAttribute("success_msg",
+     * "Record Submitted Successfully ! Click on the download link to download resources"
+     * );
+     * 
+     * return "downloadTrainingModule";
+     * 
+     * }
+     * 
+     * }
+     * 
+     * @GetMapping("/downloadManager") public String
+     * downloadManager(HttpServletRequest req, Principal principal, Model model,
+     * 
+     * @RequestParam(name = "zipUrl") String zipUrl, HttpServletResponse response,
+     * RedirectAttributes redirectAttributes) {
+     * 
+     * String message = ServiceUtility.downloadManager(zipUrl, downloadCount,
+     * downloadLimit, downloadTimeOut, env, response);
+     * 
+     * if (message != null) {
+     * 
+     * redirectAttributes.addFlashAttribute("return_msg", message); return
+     * "redirect:/trainingModules"; }
+     * 
+     * return message;
+     * 
+     * }
+     */
 
     /***************************** Training Modules Download End *****************/
 
