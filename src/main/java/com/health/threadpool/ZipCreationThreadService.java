@@ -268,8 +268,25 @@ public class ZipCreationThreadService {
 
                     try {
 
-                        Path basePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                        Path originalPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                 tutorialPath1);
+                        Path basePath;
+                        String resolution = "_480p";
+                        String resolutionUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolution);
+
+                        if (resolutionUrl != null) {
+                            Path resolutionPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    resolutionUrl);
+
+                            if (resolutionPath.toFile().exists()) {
+                                basePath = resolutionPath;
+
+                            } else {
+                                basePath = originalPath;
+                            }
+                        } else {
+                            basePath = originalPath;
+                        }
 
                         String topicwithExtention;
                         Path sourcePath;
