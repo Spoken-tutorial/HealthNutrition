@@ -2028,7 +2028,59 @@ $("#languageDownloadName").change(function() {
 					});
 					
 					
-					
+ function showStatus(message, showSpinner) {
+        $("#downloadStatus").show();
+        $("#statusMessage").text(message);
+        if (showSpinner) {
+            $("#spinner").show();
+        } else {
+            $("#spinner").hide();
+        }
+    }
+
+    function tryDownload(formData, actionUrl) {
+        showStatus("Checking zip status...", true);
+
+        $.ajax({
+            url: actionUrl,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                if (result.startsWith("/downloadManager")) {
+                    //trigger download automatically
+                    $("#hiddenDownloader").attr("src", result);
+                    showStatus("🎉 Download started!", false);
+                    setTimeout(function() {
+					        $("#downloadStatus").fadeOut();
+					    }, 5000);
+                } 
+                else if (result === "progress") {
+                    showStatus("⏳ Zip is being created. Will retry automatically in 20 minutes...", true);
+
+                    //  Retry after 20 minutes (1200000 ms)
+                    setTimeout(function() {
+                        tryDownload(formData, actionUrl);
+                    }, 1200000);
+                } 
+                else {
+                    showStatus("⚠️ " + result, false);
+                }
+            },
+            error: function(xhr, status, error) {
+                showStatus("❌ Something went wrong: " + error, false);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $("#downloadPackageForm").on("submit", function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            tryDownload(formData, $(this).attr("action"));
+        });
+    });				
 					
 
 $("#languageIdforAssignTutorial").change(function() {

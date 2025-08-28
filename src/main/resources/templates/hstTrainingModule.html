@@ -22,7 +22,7 @@
 	<link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
 </head>
 
-</head>
+
   <body>
    <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
@@ -217,7 +217,7 @@
 		    	
 	   var table=  $('#events_table').DataTable({ "ordering": false});
 	   
-	   
+	  
 	   selectweekLanguage();
 	   
 	       
@@ -233,21 +233,52 @@
 		 var selectedLanguage = $('#languageView').val();
 		 var selectedWeek = $('#weekView').val();
 		
-		   var hstTrainingModuleViewPageUrl = document.getElementById('hstTrainingModuleViewPageUrl');
-			var newUrl = '/trainingModules?week=' + selectedWeek +   '&lan=' + selectedLanguage ;
-            hstTrainingModuleViewPageUrl.href = newUrl;
+		  // var hstTrainingModuleViewPageUrl = document.getElementById('hstTrainingModuleViewPageUrl');
+		 //	var newUrl = '/trainingModules?week=' + selectedWeek +   '&lan=' + selectedLanguage ;
+         // hstTrainingModuleViewPageUrl.href = newUrl;
+          var newUrl = '/trainingModules';
 
- 			if(selectedWeek!=""){
-			    selectedWeek='"' + selectedWeek + '"';
-		     }
+        if (selectedWeek || selectedLanguage) {
+            newUrl += '?';
+            if (selectedWeek) newUrl += 'week=' + encodeURIComponent(selectedWeek);
+            if (selectedWeek && selectedLanguage) newUrl += '&';
+            if (selectedLanguage) newUrl += 'lan=' + encodeURIComponent(selectedLanguage);
+        }
+
+        	//  Only update if newUrl is different
+		    const currentUrl = window.location.pathname + window.location.search;
+		    if (newUrl !== currentUrl) {
+		        window.history.replaceState({}, "", newUrl);
+		    }
+
+ 			// if(selectedWeek!=""){
+			//    selectedWeek='"' + selectedWeek + '"';
+		    // }
 		     
-		   if(selectedLanguage!=""){
-			   selectedLanguage='"' + selectedLanguage + '"';
-		     }
+		    // if(selectedLanguage!=""){
+			//   selectedLanguage='"' + selectedLanguage + '"';
+		    // }
 		     
-            table.search(selectedWeek +" " + selectedLanguage ).draw();
+            // table.search(selectedWeek +" " + selectedLanguage ).draw();
+            
+            //Build regex-based search string
+		    let searchParts = [];
+		
+		    if (selectedWeek) {
+		        searchParts.push("\\b" + selectedWeek + "\\b");  
+		    }
+		
+		    if (selectedLanguage) {
+		        searchParts.push("\\b" + selectedLanguage + "\\b");  
+		    }
+		
+		    let searchRegex = searchParts.join(".*"); // week and language can appear anywhere in row text
+		
+		    table.search(searchRegex, true, false).draw();
             
         }
+        
+        
         
         
 	} );
