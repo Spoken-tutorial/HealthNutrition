@@ -243,7 +243,7 @@ public class CommonData {
     public static final long Zip_DIR_MAX_SIZE_GB = 5 * 1000 * 1024 * 1024;
 
     public static final String SCRIPT_UPLOAD_ERROR = "Script Not Uploaded";
-    public static final String ILLEGAL_CHARS = "[\\\\/:*?\"<>|&+]";
+    public static final String ILLEGAL_CHARS = "[\\\\/:*?\"<>|!@#$%^&()+=,.;\\[\\]{}']";
 
 //public static String SCRIPT_MANAGER_BASE= "http://127.0.0.1:8000/";
     public static String SCRIPT_MANAGER_BASE = "https://scriptmanager.spoken-tutorial.org/";

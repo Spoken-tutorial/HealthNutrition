@@ -618,6 +618,7 @@ public class ZipHealthTutorialThreadService {
 
         List<Category> catList = new ArrayList<>();
         List<Language> lanList = new ArrayList<>();
+        List<Language> finalLanList = new ArrayList<>();
         List<Topic> topics = new ArrayList<>();
         Set<Tutorial> uniqueTutorials = new LinkedHashSet<>();
         Set<Category> uniqueCategories = new LinkedHashSet<>();
@@ -736,7 +737,7 @@ public class ZipHealthTutorialThreadService {
 
             catList.addAll(uniqueCategories);
             topics.addAll(uniqueTopics);
-            lanList.addAll(uniqueLanguage);
+            finalLanList.addAll(uniqueLanguage);
 
             tutorialList.sort(Comparator.comparing(
                     tempTutorial -> tempTutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()));
@@ -751,15 +752,15 @@ public class ZipHealthTutorialThreadService {
             tutorialList.sort(
                     Comparator.comparing(tempTutorial -> tempTutorial.getConAssignedTutorial().getLan().getLangName()));
 
-            lanList.sort(Comparator.comparing(Language::getLangName));
+            finalLanList.sort(Comparator.comparing(Language::getLangName));
 
         }
 
         modelAttributes.put("tutorialList", tutorialList);
         modelAttributes.put("categories", catList);
         modelAttributes.put("topics", topics);
-        modelAttributes.put("languages", lanList);
-        modelAttributes.put("languageCount", lanList.size());
+        modelAttributes.put("languages", finalLanList);
+        modelAttributes.put("languageCount", finalLanList.size());
         // getModelData(modelAttributes, catIds, lanIds, 0);
         return modelAttributes;
     }

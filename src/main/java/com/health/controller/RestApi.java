@@ -384,7 +384,7 @@ public class RestApi {
             resultMap.put(2, "No CourseName  is found");
             return ResponseEntity.ok(resultMap);
         } else {
-            String sanitized = ServiceUtility.sanitizeCourseName(courseName);
+            String sanitized = ServiceUtility.sanitizeName(courseName);
             finalCourseName = sanitized.replace(" ", "_").replaceAll("_+", "_");
 
         }

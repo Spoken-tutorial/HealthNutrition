@@ -158,7 +158,7 @@ public class ServiceUtility {
         return newFileName;
     }
 
-    public static String sanitizeCourseName(String courseName) {
+    public static String sanitizeName(String courseName) {
 
         String tempCourseName = sanitizeFilename(courseName);
 
