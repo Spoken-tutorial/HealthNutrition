@@ -189,7 +189,9 @@ public class ZipCreationThreadService {
 
                 for (WeekTitleVideo temp : weekTitleList) {
                     String weekName = temp.getWeek().getWeekName().replace(' ', '_');
-                    String title = temp.getTitle().replace(' ', '_');
+                    String temptitle = temp.getTitle().replace(' ', '_');
+                    String sanitized = ServiceUtility.sanitizeName(temptitle);
+                    String title = sanitized.replace(" ", "_").replaceAll("_+", "_");
 
                     String tutorialPath = temp.getVideoResource().getVideoPath();
                     String thumbnailPath = temp.getVideoResource().getThumbnailPath();
@@ -448,7 +450,9 @@ public class ZipCreationThreadService {
                     WeekTitleVideo weekTitleVideo = temp.getWeekTitle();
 
                     String sessionName = weekTitleVideo.getVideoResource().getSessionName();
-                    String title = weekTitleVideo.getTitle().replace(' ', '_');
+                    String temptitle = weekTitleVideo.getTitle().replace(' ', '_');
+                    String sanitized = ServiceUtility.sanitizeName(temptitle);
+                    String title = sanitized.replace(" ", "_").replaceAll("_+", "_");
                     String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
                     String tempTutorialPath = weekTitleVideo.getVideoResource().getVideoPath();
 

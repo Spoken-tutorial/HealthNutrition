@@ -53,6 +53,7 @@ import com.health.model.Comment;
 import com.health.model.Consultant;
 import com.health.model.ContributorAssignedMultiUserTutorial;
 import com.health.model.ContributorAssignedTutorial;
+import com.health.model.CourseCatTopicMapping;
 import com.health.model.District;
 import com.health.model.Event;
 import com.health.model.FeedbackForm;
@@ -87,6 +88,8 @@ import com.health.service.CommentService;
 import com.health.service.ConsultantService;
 import com.health.service.ContributorAssignedMultiUserTutorialService;
 import com.health.service.ContributorAssignedTutorialService;
+import com.health.service.CourseCatTopicService;
+import com.health.service.CourseService;
 import com.health.service.DistrictService;
 import com.health.service.EventService;
 import com.health.service.FeedbackService;
@@ -161,6 +164,12 @@ public class AjaxController {
 
     @Autowired
     private PackLanTutorialResourceService packLanTutorialResourceService;
+
+    @Autowired
+    private CourseCatTopicService courseCatTopicService;
+
+    @Autowired
+    private CourseService courseService;
 
     @Autowired
     private TutorialWithWeekAndPackageService tutorialWithPackageAndService;
@@ -1392,6 +1401,91 @@ public class AjaxController {
     /*********************
      * Delete Tutorial of Training Module and HST End
      *****************************/
+
+    /******************* Course Start *****************************/
+
+    @DeleteMapping("/delete-category-topic-from-course")
+    public ResponseEntity<String> deleteTutorialFromCourse(
+            @RequestParam(value = "coursecattopicId") String coursecattopicId) {
+
+        int coursecattopicId_int = Integer.parseInt(coursecattopicId);
+        logger.info("coursecattopicId_int in deleteTutorialFromCourse:{} ", coursecattopicId_int);
+
+        try {
+
+            CourseCatTopicMapping cctm = courseCatTopicService.findByCourseCatTopicId(coursecattopicId_int);
+
+            if (cctm != null) {
+
+                int catId = cctm.getCat().getCategoryId();
+                Optional<Integer> courseId = Optional.ofNullable(cctm.getCourse().getCourseId());
+
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null, courseId,
+                        env);
+                courseCatTopicService.delete(cctm);
+            }
+
+            return ResponseEntity.ok("Tutorial deleted successfully");
+        } catch (Exception e) {
+            logger.error("Error in Deleting deleteTutorialFromCourse", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting tutorial");
+        }
+    }
+
+    @GetMapping("/enableDisableCourseCatTopic")
+    public @ResponseBody boolean enableDisableCourseCatTopic(int courseCatTopicId) {
+
+        CourseCatTopicMapping cctm = courseCatTopicService.findByCourseCatTopicId(courseCatTopicId);
+        int catId = cctm.getCat().getCategoryId();
+        Optional<Integer> courseId = Optional.ofNullable(cctm.getCourse().getCourseId());
+
+        try {
+            if (cctm.isStatus()) {
+                cctm.setStatus(false);
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null, courseId,
+                        env);
+                courseCatTopicService.save(cctm);
+                return true;
+
+            } else {
+                cctm.setStatus(true);
+                zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(catId, null, courseId,
+                        env);
+                courseCatTopicService.save(cctm);
+                return true;
+            }
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Course Cat Topic: {}", cctm, e);
+            return false;
+        }
+
+    }
+
+    @RequestMapping("/loadTopicByCategoryforCourse")
+    public @ResponseBody TreeMap<String, Integer> loadTopicByCategoryforCourse(
+            @RequestParam(value = "catId") int catId) {
+        TreeMap<String, Integer> topicMaps = new TreeMap<>();
+
+        Category cat = catService.findByid(catId);
+
+        List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+        List<ContributorAssignedTutorial> con = conService.findAllByTopicCat(tcm);
+
+        List<Tutorial> tutorials = tutService.findAllByconAssignedTutorialAndStatus(con);
+
+        for (Tutorial temp : tutorials) {
+
+            Topic topic = temp.getConAssignedTutorial().getTopicCatId().getTopic();
+
+            topicMaps.put(topic.getTopicName(), topic.getTopicId());
+
+        }
+
+        return topicMaps;
+    }
+
+    /******************* Course End *****************************/
 
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,
@@ -3376,8 +3470,10 @@ public class AjaxController {
             res.put(CommonData.KEYWORD, CommonData.tutorialStatus[tutorial.getKeywordStatus()]);
             res.put(CommonData.VIDEO, CommonData.tutorialStatus[tutorial.getVideoStatus()]);
             res.put(CommonData.PRE_REQUISTIC, CommonData.tutorialStatus[tutorial.getPreRequisticStatus()]);
+            Optional<Integer> lanId = Optional.ofNullable(lang.getLanId());
+
             zipHealthTutorialThreadService.deleteKeyFromZipNamesAndHealthTutorialZipIfExists(cat_.getCategoryId(),
-                    lang.getLanId(), env);
+                    lanId, null, env);
         } else {
             res.put("response", "0");
         }

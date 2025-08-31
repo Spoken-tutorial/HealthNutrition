@@ -239,6 +239,9 @@ public class User implements UserDetails, Serializable {
     @OneToMany(mappedBy = "preRequiticUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Tutorial> tutorialPreReqUser = new HashSet<Tutorial>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<CourseCatTopicMapping> courseCatTopicMappings = new HashSet<CourseCatTopicMapping>();
+
     public Set<Question> getQuestions() {
         return questions;
     }
@@ -270,6 +273,14 @@ public class User implements UserDetails, Serializable {
 
     public void setWeekTitleVideos(Set<WeekTitleVideo> weekTitleVideos) {
         this.weekTitleVideos = weekTitleVideos;
+    }
+
+    public Set<CourseCatTopicMapping> getCourseCatTopicMappings() {
+        return courseCatTopicMappings;
+    }
+
+    public void setCourseCatTopicMappings(Set<CourseCatTopicMapping> courseCatTopicMappings) {
+        this.courseCatTopicMappings = courseCatTopicMappings;
     }
 
     @Override
