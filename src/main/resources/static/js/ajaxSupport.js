@@ -1947,7 +1947,208 @@ $("#languageIdViewPage").change(function() {
                 }
             });
         });
-/***********************************Citation End***********************************************/		
+/***********************************Citation End***********************************************/	
+
+
+/**************************************** Create Course Start**********************************/
+$('#courseId').on('change', function() {
+        var selectedValue = $(this).val();
+        var divToHide = $('#enterNewCourseName');
+        if (selectedValue === '-1') {
+          divToHide.show();
+        } else {
+          divToHide.hide();
+        }
+      });
+      
+ $(document).ready(function () {
+            const select = $('#topicforCourse');
+
+            // Handle clicks on options to toggle selection without Ctrl key
+            select.on('mousedown', 'option', function (e) {
+                e.preventDefault();
+                const option = $(this);
+                option.prop('selected', !option.prop('selected'));
+            });
+
+            // Handle Ctrl+A for selecting/deselecting all options
+            $(document).keydown(function (e) {
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    const allOptions = select.find('option');
+                    const allSelected = allOptions.length === allOptions.filter(':selected').length;
+
+                    allOptions.prop('selected', !allSelected);
+                }
+            });
+        });
+        
+        
+     $("#categoryforCourse").change(function() {
+
+						var catgoryId = $(this).find(":selected").val();
+						
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryforCourse",
+							data : {
+								"catId" : catgoryId,
+								
+								
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + value + '>'
+		  			               + key
+		  			               + '</option>';
+		  	  			        })
+	  	  			            html += '</option>';
+								$("#topicforCourse").prop('disabled',false);
+								$('#topicforCourse').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+
+
+ 
+
+
+
+ $(".deleteCourse-btn").click(function(){
+    var row = $(this).closest("tr");
+    var coursecattopicId = $(this).data("coursecattopicid");
+    var courseName = $(this).data("coursename");
+    var category = $(this).data("category");
+    var topic = $(this).data("topic");
+
+    Swal.fire({
+        title: "Are you sure?",
+        html: "<b>Do you want to delete this tutorial?</b><br><br>" +
+              "<b>Course:</b> " + courseName + "<br>" +
+              "<b>Category:</b> " + category + "<br>" +
+              "<b>Topic:</b> " + topic,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        dangerMode: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/delete-category-topic-from-course/",
+                data: {
+                    
+                    "coursecattopicId": coursecattopicId
+                   
+                },
+                type: "DELETE",
+                success: function(result) {
+                    Swal.fire("Deleted!", "Tutorial deleted successfully!", "success");
+                    row.remove(); // Remove row after successful deletion
+                },
+                error: function(err) {
+                    Swal.fire("Error!", "Error deleting tutorial!", "error");
+                }
+            });
+        }
+    });
+});
+
+
+	
+	$('.enableCourseCatTopic').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableCourseCatTopic",
+					data : {
+						"courseCatTopicId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				$('#'+test_id).addClass('fas fa-times-circle');
+			   				$('#'+test_id).removeClass('fas fa-check-circle');
+			   				$('#'+test_id).css({"color": "red"});
+			   				$('#Success').css({"display": "block"});
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+			
+			$('.disableCourseCatTopic').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableCourseCatTopic",
+					data : {
+						"courseCatTopicId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				
+			   				$('#'+test_id).addClass('fas fa-check-circle');
+			   				$('#'+test_id).removeClass('fas fa-times-circle');
+			   				$('#'+test_id).css({"color": "green"});
+			   				$('#Success').css({"display": "block"});
+			   				
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+		
+
+		
+
+
+/*****************************************Create Course End ***********************************/	
 
 
 /************************   Assign Video Start *****************************************************/	

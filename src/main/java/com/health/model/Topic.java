@@ -65,6 +65,7 @@ public class Topic implements Comparable<Topic>, Serializable {
     private Set<TopicCategoryMapping> topicCategoryMap = new HashSet<TopicCategoryMapping>();
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
     private Set<TopicLanMapping> topicLanMappingd = new HashSet<TopicLanMapping>();
 
     public Set<TopicLanMapping> getTopicLanMappingd() {
@@ -74,6 +75,8 @@ public class Topic implements Comparable<Topic>, Serializable {
     public void setTopicLanMappingd(Set<TopicLanMapping> topicLanMappingd) {
         this.topicLanMappingd = topicLanMappingd;
     }
+
+    private Set<CourseCatTopicMapping> courseCatTopicMappings = new HashSet<CourseCatTopicMapping>();
 
     public int getTopicId() {
         return topicId;
@@ -105,6 +108,14 @@ public class Topic implements Comparable<Topic>, Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public Set<CourseCatTopicMapping> getCourseCatTopicMappings() {
+        return courseCatTopicMappings;
+    }
+
+    public void setCourseCatTopicMappings(Set<CourseCatTopicMapping> courseCatTopicMappings) {
+        this.courseCatTopicMappings = courseCatTopicMappings;
     }
 
     public User getUser() {

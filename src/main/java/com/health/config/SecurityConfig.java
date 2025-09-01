@@ -68,6 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addCarousel/**", "/approveRole/**", "/assignTutorialToContributor/**", "/assignContributor/edit/**",
             "/enableRoleById/**", "/deleteMasterRole/**", "/viewTrainee/**", "/details/**", "/tutorialStatus/**",
             "/users/**", "/unpublishTopic/**", "/clearAllCaches/**", "/addConsultant/**",
+            "/enableDisableCourseCatTopic", "/delete-category-topic-from-course", "/createCourse",
+            "/courseName/edit/**", "/updateCourseName",
 
 //			"/unpublishTutorial/**"
 
@@ -92,9 +94,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
             "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
-            "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/addTrainingResource",
-            "/trainingReourceAdminView/**", "/trainingReource/edit/**", "/enableDisableTrainingResource",
-            "/delete-trainingResource",
+
+            "/addTrainingResource", "/trainingReourceAdminView/**", "/trainingReource/edit/**",
+            "/enableDisableTrainingResource", "/delete-trainingResource",
+
+            "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/enableDisableCourseCatTopic",
+            "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**", "/updateCourseName",
 
     };
 
@@ -154,9 +159,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/addTestimonial/**", "/addPromoVideo/**", "/addResearchPaper/**", "/brochure/edit/**",
                         "/promoVideo/edit/**", "/carousel/edit/**", "/event/edit/**", "/testimonial/edit/**",
                         "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
-                        "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/addTrainingResource",
-                        "/researchPaper/edit/**", "/enableDisableBrouchure/**", "/enableDisableConsultant/**",
-                        "/enableDisableTestimonial/**", "/addCitation/**", "/citation/edit/**")
+
+                        "/addTrainingResource",
+
+                        "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/researchPaper/edit/**",
+                        "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**",
+                        "/addCitation/**", "/citation/edit/**", "/enableDisableCourseCatTopic",
+                        "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**",
+                        "/updateCourseName")
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
 

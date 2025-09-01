@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Create Course - Admin - Health And Nutrition')"></head>
+<style>
+.nav-create_course{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-create_course a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">View</a></li>
+				</ul>
+				
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Create Course</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-8">
+							
+										<form th:action="@{/createCourse}" method="post"
+											enctype="multipart/form-data" id="inputForm">
+											<div id="rawData">
+												
+											</div>
+											
+											  
+											  <div class="form-group">
+													<label for="courseId"><b>Select Course *</b></label> 
+													<select id="courseId" class="form-control course_input" name="courseId" required="required">
+
+															<option value='0'>Select Course</option>
+															<option value='-1'>Enter New Course</option>
+															<option th:each="courseItr: ${courseList}" th:value="${courseItr.getCourseId()}" th:text="${courseItr.getCourseName()}">
+														</option>
+								
+													</select>
+
+											</div>
+							
+							
+
+											<div class="form-group" id="enterNewCourseName">
+
+													<label for="courseName"><b>Course</b></label> 
+													<input type="text" class="form-control" id="courseName" name="courseName" placeholder="Enter Course name" />
+
+											</div>
+											
+											
+											<div class="container">
+											<div class="row">
+											<div class="col-md-4">
+											<div class="form-group">
+											<label for="categoryforCourse">Select Category </label>
+											<select id="categoryforCourse" class="form-control" name="categoryforCourse" required>
+	
+												<option value="0">Select any one category</option>
+												
+													<option 
+													th:each="category: ${categories}"
+													th:value="${category.getCategoryId()}" th:text="${category.getCatName()}">
+															</option>
+											
+										   </select>
+										   </div>
+										   </div>
+											
+											<div class="col-md-8">
+											<div class="form-group">
+											<span>To select all topics press ctrl + A keys. </span>
+											<br>
+											<label for="topicforCourse">Select Topic  </label> 
+											<select id="topicforCourse" class="form-control" name="topicforCourse"
+												 size="15" multiple="multiple">
+												
+										   </select>
+										   </div>								
+										  </div>	
+										</div>
+										</div>
+										<br>
+		
+										<button type="submit" class="btn  btn-success"  style="float:left;  margin-left:15px; margin-right:40px;">Submit</button>
+										</form>
+										
+									
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable"  data-order='[[ 0, "desc" ]]'>
+						
+							
+							<thead>
+								<tr>
+									<th scope="col">Date Added</th>
+									<th scope="col">Course</th>
+									<th scope="col">Category</th>
+									<th scope="col">Topic</th>
+									<th scope="col">Delete</th>
+									<th scope="col">Enable/Disable</th>
+									
+									 
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="temp : ${courseCatTopicList}">
+								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
+								
+								<td>
+							    <div>
+							        <span th:text="${temp.getCourse().getCourseName()}"></span>
+							    </div>
+							    <div class="mt-1">
+							        <a th:href="@{'/courseName/edit/' + ${temp.getCourse().getCourseId()}}"
+							             style="font-size: 10px; padding: 2px 6px;">
+							            Edit Name
+							        </a>
+							    </div>
+								</td>
+
+								
+								 <td><span th:text = "${temp.getCat().getCatName()}"></span></td>
+								 <td><span th:text = "${temp.getTopic().getTopicName()}"></span></td>
+								  <td><button class="delete-btn btn-outline-danger deleteCourse-btn"
+						                            th:data-coursecattopicid="${ temp.getCourseCatTopicId()}"
+						                         	th:data-coursename="${ temp.getCourse().getCourseName()}"
+						                         	th:data-category="${ temp.getCat().getCatName()}"
+						                         	th:data-topic="${temp.getTopic().getTopicName()}">
+						                         	Delete</button></td> 
+							     
+							       <td>
+	  		
+						   			<div th:if="${temp.isStatus()}">
+						   				<a class="disableCourseCatTopic" th:value="${temp.getCourseCatTopicId()}" title="Click to Disable Course Category-Topic"><i class="fas fa-times-circle" th:id="${temp.getCourseCatTopicId()}" style="color:red"></i></a>
+						   			</div>
+						   			<div th:unless="${temp.isStatus()}">
+						   				<a class="enableCourseCatTopic" th:value="${temp.getCourseCatTopicId()}" title="Click to Enable Course Category-Topic"><i class="fas fa-check-circle" th:id="${temp.getCourseCatTopicId()}" style="color:green"></i> </a>
+						   			</div>
+						   		
+						  			</td>
+							
+							     
+							     
+								  
+							    </tr>
+
+							</tbody>
+						</table >
+						</div>
+												
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+	
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript">
+$(document).ready( function () {
+	
+    $('#myTable').DataTable();
+    
+     $('#enterNewCourseName').hide();
+     
+   
+} );
+
+
+
+</script>
+
+	<script th:inline="javascript">
+	
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>

@@ -106,4 +106,6 @@ public interface ContributorAssignedTutorialService {
             Language lan);
 
     List<ContributorAssignedTutorial> findAllByLanWithcategoryTrue(Language lan);
+
+    List<ContributorAssignedTutorial> findByTopicCatLanList(List<TopicCategoryMapping> tcmList, List<Language> lanList);
 }
