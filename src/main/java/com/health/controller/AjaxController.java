@@ -1,8 +1,8 @@
 package com.health.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1197,7 +1197,13 @@ public class AjaxController {
             return "Please try again after 30 minutes.";
         }
 
-        return "/downloadManager?zipUrl=" + URLEncoder.encode(zipUrl, StandardCharsets.UTF_8);
+        try {
+            return "/downloadManager?zipUrl=" + URLEncoder.encode(zipUrl, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+
+            logger.error("Error in Download Package", e);
+            return "Error in Download";
+        }
     }
 
     @GetMapping("/downloadManager")
