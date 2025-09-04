@@ -1198,7 +1198,8 @@ public class AjaxController {
         }
 
         try {
-            return "/downloadManager?zipUrl=" + URLEncoder.encode(zipUrl, "UTF-8");
+            String finalZipUrl = ServiceUtility.convertFilePathToUrl(zipUrl);
+            return "/downloadManager?zipUrl=" + URLEncoder.encode(finalZipUrl, "UTF-8");
         } catch (UnsupportedEncodingException e) {
 
             logger.error("Error in Download Package", e);

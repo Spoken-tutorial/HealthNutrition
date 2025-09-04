@@ -48,9 +48,9 @@
 	</section>
 	
   <nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="navbar">
-    <div class="container-fluid">
-        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Smiley face" height="50" width="50"> </img></a>
-								<span style="color: rgba(0,0,0,0.9);font-size: 1.8rem; margin-top:8px;" class="ml-3">HST Training Modules  </span> </span>
+   
+        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Spoken Tutorial" height="50" width="50"> </img></a>
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.6rem; margin-top:8px;" class="ml-3">HST Training Modules  </span> </span>
 
         
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,7 @@
                 <div th:replace="common/commonItemsHSTTrainingModule :: download_package"></div>
             </div>
         </div>
-    </div>
+  
 </nav>
 
   </header>
@@ -210,6 +210,11 @@
     flex:40%;
 } 
 
+
+.dt-input{
+	 margin-right: 8px;
+}
+
 </style>
 
 <script type="text/javascript">
@@ -227,11 +232,28 @@
         $('#languageView').on('change',selectweekLanguage);
         
        
-        $('#btnClearFormView').on('click', selectweekLanguage);
+        //$('#btnClearFormView').on('click', selectweekLanguage);
+        $('#weekreset').on('click', selectweekLanguage);
+        $('#languagereset').on('click', selectweekLanguage);
         
         function selectweekLanguage() {
 		 var selectedLanguage = $('#languageView').val();
 		 var selectedWeek = $('#weekView').val();
+		 
+		 if (selectedWeek !== "") {
+				$("#weekresetdiv").show();
+			} 
+		 else {
+				$("#weekresetdiv").hide();
+			}
+			
+		 if (selectedLanguage !== "") {
+				$("#languageresetdiv").show();
+			} 
+		else {
+				$("#languageresetdiv").hide();
+			}
+ 
 		
 		  // var hstTrainingModuleViewPageUrl = document.getElementById('hstTrainingModuleViewPageUrl');
 		 //	var newUrl = '/trainingModules?week=' + selectedWeek +   '&lan=' + selectedLanguage ;

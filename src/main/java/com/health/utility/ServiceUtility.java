@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -171,6 +172,31 @@ public class ServiceUtility {
         if (sanitized.length() > maxLength) {
             sanitized = sanitized.substring(0, maxLength);
         }
+
+        return sanitized;
+    }
+
+    public static String sanitizetitle(String title) {
+        if (title == null || title.isEmpty()) {
+            return "untitled";
+        }
+
+        String normalized = Normalizer.normalize(title, Normalizer.Form.NFKC);
+
+        String sanitized = normalized.replaceAll(CommonData.ILLEGAL_CHARS, "_");
+
+        sanitized = sanitized.replaceAll("\\s+", "_");
+
+        sanitized = sanitized.replaceAll("^_+|_+$", "");
+
+        sanitized = sanitized.replaceAll("_+", "_");
+
+        int maxLength = 100;
+        if (sanitized.length() > maxLength) {
+            sanitized = sanitized.substring(0, maxLength);
+        }
+
+        logger.info("Sanitized Title:{}", sanitized);
 
         return sanitized;
     }
