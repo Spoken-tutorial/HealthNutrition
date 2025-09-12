@@ -182,16 +182,14 @@ public class ZipCreationThreadService {
                 String packageName = originalPackageName.replace(' ', '_');
                 String rootFolder = packageName + "_" + langName;
                 Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder,
-                        File.separator, packageName);
+                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder);
 
                 Path indexHtmlPath = Paths.get(destInationDirectory1.toString(), File.separator, "index.html");
 
                 for (WeekTitleVideo temp : weekTitleList) {
                     String weekName = temp.getWeek().getWeekName().replace(' ', '_');
-                    String temptitle = temp.getTitle().replace(' ', '_');
-                    String sanitized = ServiceUtility.sanitizeName(temptitle);
-                    String title = sanitized.replace(" ", "_").replaceAll("_+", "_");
+
+                    String title = ServiceUtility.sanitizetitle(temp.getTitle());
 
                     String tutorialPath = temp.getVideoResource().getVideoPath();
                     String thumbnailPath = temp.getVideoResource().getThumbnailPath();
@@ -217,11 +215,12 @@ public class ZipCreationThreadService {
                         if (webmSourcePath.toFile().exists()) {
                             sourcePath = webmSourcePath;
                             titleWithExtension = title + ".webm";
+
                         } else {
                             sourcePath = basePath; // replaceExtension(basePath, ".mp4");
                             titleWithExtension = title + ".mp4";
                         }
-
+                        logger.info("video file name: {}", titleWithExtension);
                         Path destinationPath = destInationDirectoryforLanAndWeek.resolve(titleWithExtension);
                         File sourceFile = sourcePath.toFile();
 
@@ -248,6 +247,10 @@ public class ZipCreationThreadService {
                     }
 
                 }
+
+                logger.info("Checking copied Training Modules video files in the destination folder");
+                ServiceUtility.printFilesNameFromPath(destInationDirectory1);
+
                 for (PackLanTutorialResource tempTutorial : packLanTutorialResourceList) {
 
                     ContributorAssignedTutorial con = tempTutorial.getTutorial().getConAssignedTutorial();
@@ -450,9 +453,9 @@ public class ZipCreationThreadService {
                     WeekTitleVideo weekTitleVideo = temp.getWeekTitle();
 
                     String sessionName = weekTitleVideo.getVideoResource().getSessionName();
-                    String temptitle = weekTitleVideo.getTitle().replace(' ', '_');
-                    String sanitized = ServiceUtility.sanitizeName(temptitle);
-                    String title = sanitized.replace(" ", "_").replaceAll("_+", "_");
+
+                    String title = ServiceUtility.sanitizetitle(weekTitleVideo.getTitle());
+
                     String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
                     String tempTutorialPath = weekTitleVideo.getVideoResource().getVideoPath();
 
