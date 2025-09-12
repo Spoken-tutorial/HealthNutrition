@@ -182,8 +182,7 @@ public class ZipCreationThreadService {
                 String packageName = originalPackageName.replace(' ', '_');
                 String rootFolder = packageName + "_" + langName;
                 Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder,
-                        File.separator, packageName);
+                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder);
 
                 Path indexHtmlPath = Paths.get(destInationDirectory1.toString(), File.separator, "index.html");
 
@@ -216,11 +215,12 @@ public class ZipCreationThreadService {
                         if (webmSourcePath.toFile().exists()) {
                             sourcePath = webmSourcePath;
                             titleWithExtension = title + ".webm";
+
                         } else {
                             sourcePath = basePath; // replaceExtension(basePath, ".mp4");
                             titleWithExtension = title + ".mp4";
                         }
-
+                        logger.info("video file name: {}", titleWithExtension);
                         Path destinationPath = destInationDirectoryforLanAndWeek.resolve(titleWithExtension);
                         File sourceFile = sourcePath.toFile();
 
@@ -247,6 +247,10 @@ public class ZipCreationThreadService {
                     }
 
                 }
+
+                logger.info("Checking copied Training Modules video files in the destination folder");
+                ServiceUtility.printFilesNameFromPath(destInationDirectory1);
+
                 for (PackLanTutorialResource tempTutorial : packLanTutorialResourceList) {
 
                     ContributorAssignedTutorial con = tempTutorial.getTutorial().getConAssignedTutorial();

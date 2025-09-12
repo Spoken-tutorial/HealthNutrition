@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -34,6 +35,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -658,9 +661,10 @@ public class ServiceUtility {
         Path sourceDirlName = Paths.get(env.getProperty("spring.applicationexternalPath.name"), sourceDirurl);
 
         try (OutputStream fos = Files.newOutputStream(zipFilePathName);
-                ZipOutputStream zos = new ZipOutputStream(fos)) {
+                ZipArchiveOutputStream zipOut = new ZipArchiveOutputStream(fos)) {
+            zipOut.setEncoding("UTF-8");
             File filetoZip = new File(sourceDirlName.toString());
-            zipFile(filetoZip, filetoZip.getName(), zos);
+            zipFileforTrainingModule(filetoZip, filetoZip.getName(), zipOut);
 
             String temp = zipFilePathName.toString();
             int indexToStart = temp.indexOf("Media");
@@ -671,6 +675,43 @@ public class ServiceUtility {
         }
 
         return document;
+    }
+
+    private static void zipFileforTrainingModule(File fileToZip, String fileName, ZipArchiveOutputStream zipOut)
+            throws IOException {
+        if (fileToZip.isHidden()) {
+            return;
+        }
+
+        if (fileToZip.isDirectory()) {
+            if (!fileName.endsWith("/")) {
+                fileName += "/";
+            }
+            ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
+            zipOut.putArchiveEntry(entry);
+            zipOut.closeArchiveEntry();
+
+            File[] children = fileToZip.listFiles();
+            if (children != null) {
+                for (File childFile : children) {
+                    zipFileforTrainingModule(childFile, fileName + childFile.getName(), zipOut);
+                }
+            }
+            return;
+        }
+
+        try (FileInputStream fis = new FileInputStream(fileToZip)) {
+            ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
+            zipOut.putArchiveEntry(entry);
+
+            byte[] bytes = new byte[16384];
+            int length;
+            while ((length = fis.read(bytes)) >= 0) {
+                zipOut.write(bytes, 0, length);
+            }
+
+            zipOut.closeArchiveEntry();
+        }
     }
 
     public static boolean IsPackageAndLanZipExist(String originalPackageName, String langName, Environment env) {
@@ -723,6 +764,25 @@ public class ServiceUtility {
             }
         } else {
             logger.info(" ZipFile does not exist: {} " + zipFileName);
+        }
+    }
+
+    public static void printFilesNameFromPath(Path dirPath) {
+        try (Stream<Path> walk = Files.walk(dirPath)) {
+            walk.filter(Files::isRegularFile).map(path -> {
+
+                int contentIndex = path.getNameCount();
+                for (int i = 0; i < path.getNameCount(); i++) {
+                    if (path.getName(i).toString().equalsIgnoreCase("Media")) {
+                        contentIndex = i;
+                        break;
+                    }
+                }
+
+                return path.subpath(contentIndex, path.getNameCount());
+            }).forEach(path -> logger.info("File: {}", path));
+        } catch (IOException e) {
+            logger.error("Error while listing files", e);
         }
     }
 
