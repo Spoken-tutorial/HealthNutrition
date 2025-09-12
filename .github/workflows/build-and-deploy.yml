@@ -47,7 +47,7 @@ jobs:
           remote_host: ${{ secrets.TEST_SERVER_HOST }}
           remote_username: ${{ secrets.TEST_SERVER_USERNAME }}
           remote_key: ${{ secrets.TEST_SERVER_KEY }}
-          path: *.war
+          path: HealthNutrition.war
           remote_target: /tmp/
 
       - name: Install WAR on Test Server
