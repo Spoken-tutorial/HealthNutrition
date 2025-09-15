@@ -1924,6 +1924,14 @@ public class HomeController {
             logger.info("Key:{}, Vlaue: {} ", entry.getKey(), entry.getValue());
         }
 
+        String downloadVideo = base + "_withSubtitle" + extension;
+        Path downloadVideoPath = basePath.resolve(downloadVideo);
+        if (downloadVideoPath.toFile().exists()) {
+            model.addAttribute("downloadVideo", downloadVideo);
+        } else {
+            model.addAttribute("downloadVideo", video720Path);
+        }
+
         if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
             model.addAttribute("relatedContent", tutorial.getRelatedVideo());
 
