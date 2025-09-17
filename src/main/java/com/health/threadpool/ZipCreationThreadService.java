@@ -277,11 +277,15 @@ public class ZipCreationThreadService {
                                 tutorialPath1);
                         Path basePath;
                         String resolution = "_480p";
+                        String resolutionSubtitle = resolution+CommonData.WITH_SUBTITLES;
                         String resolutionUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolution);
+                        String resolutionSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolutionSubtitle);
+                        String originalSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, CommonData.WITH_SUBTITLES);
 
                         if (resolutionUrl != null) {
                             Path resolutionPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                     resolutionUrl);
+                            
 
                             if (resolutionPath.toFile().exists()) {
                                 basePath = resolutionPath;
@@ -291,6 +295,25 @@ public class ZipCreationThreadService {
                             }
                         } else {
                             basePath = originalPath;
+                        }
+                        
+                        Path resolutionSubtitlePath;
+                        Path originalSubtitlePath;
+                       
+                        if(resolutionSubtitleUrl!=null) {
+                             resolutionSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    resolutionSubtitleUrl);
+                             if(resolutionSubtitlePath.toFile().exists()) {
+                                 basePath = resolutionSubtitlePath;
+                             }
+                        }
+                        
+                        if(originalSubtitleUrl!=null && resolutionUrl==null) {
+                            originalSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    originalSubtitleUrl);
+                             if(originalSubtitlePath.toFile().exists()) {
+                                 basePath = originalSubtitlePath;
+                             }
                         }
 
                         String topicwithExtention;

@@ -311,6 +311,7 @@ public class CommonData {
     public static final String QUEUE_TIME = "queueTime";
     public static final String RUNNING_DOCUMENT = "runningDocument";
     public static final String SKIPPED_DOCUMENT = "skippedDocument";
+    public static final String WITH_SUBTITLES = "_withSubtitles";
     public static final Long NO_TASK_SLEEP_TIME = 30L * 1000;
     public static final Long TASK_SLEEP_TIME = 10L * 1000;
     public static final Long NO_TASK_SLEEP_TIME_FOR_DELETE = 60L * 1000 * 60;

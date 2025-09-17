@@ -316,11 +316,11 @@ public class ZipHealthTutorialThreadService {
                         Path basePath;
                         Path originalPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                 tutorialPath1);
+                        String resolutionUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolution);
 
                         if (resolution == null || resolution.isEmpty()) {
                             basePath = originalPath;
                         } else {
-                            String resolutionUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolution);
 
                             if (resolutionUrl != null) {
                                 Path resolutionPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
@@ -334,6 +334,30 @@ public class ZipHealthTutorialThreadService {
                                 }
                             } else {
                                 basePath = originalPath;
+                            }
+                        }
+
+                        String resolutionSubtitle = resolution + CommonData.WITH_SUBTITLES;
+                        String resolutionSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1,
+                                resolutionSubtitle);
+                        String originalSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1,
+                                CommonData.WITH_SUBTITLES);
+                        Path resolutionSubtitlePath;
+                        Path originalSubtitlePath;
+
+                        if (resolutionSubtitleUrl != null) {
+                            resolutionSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    resolutionSubtitleUrl);
+                            if (resolutionSubtitlePath.toFile().exists()) {
+                                basePath = resolutionSubtitlePath;
+                            }
+                        }
+
+                        if (originalSubtitleUrl != null && resolutionUrl == null) {
+                            originalSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    originalSubtitleUrl);
+                            if (originalSubtitlePath.toFile().exists()) {
+                                basePath = originalSubtitlePath;
                             }
                         }
 
