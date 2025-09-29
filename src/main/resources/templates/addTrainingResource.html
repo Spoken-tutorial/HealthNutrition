@@ -190,7 +190,7 @@ font-weight:bold!important;
 									        <!-- Actions if PDF exists -->
 									        <div th:if="${temp.getPdfFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{'/trainingReource/view/pdfOrZipOfPdfs/' + ${temp.getTrainingResourceId()}}" 
+									               th:href="@{'/trainingReourceAdminView/pdfOrZipOfPdfs/' + ${temp.getTrainingResourceId()}}" 
 									               title="View PDF">
 									                <i class="bi bi-eye"></i> View
 									            </a>
@@ -227,7 +227,7 @@ font-weight:bold!important;
 									        <!-- Actions if Doc exists -->
 									        <div th:if="${temp.getDocFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{${'/trainingReource/view/docOrZipOfDocs/' + temp.getTrainingResourceId()}}" 
+									               th:href="@{${'/trainingReourceAdminView/docOrZipOfDocs/' + temp.getTrainingResourceId()}}" 
 									               title="View Doc">
 									                <i class="bi bi-eye"></i> View
 									            </a>
@@ -264,7 +264,7 @@ font-weight:bold!important;
 									        <!-- Actions if Excel exists -->
 									        <div th:if="${temp.getExcelFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{${'/trainingReource/view/excelOrZipOfexcels/' + temp.getTrainingResourceId()}}" 
+									               th:href="@{${'/trainingReourceAdminView/excelOrZipOfexcels/' + temp.getTrainingResourceId()}}" 
 									               title="View Excel">
 									                <i class="bi bi-eye"></i> View
 									            </a>
@@ -302,7 +302,7 @@ font-weight:bold!important;
 									        <!-- Actions if Image exists -->
 									        <div th:if="${temp.getImageFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{${'/trainingReource/view/imageOrZipOfImages/' + temp.getTrainingResourceId()}}" 
+									               th:href="@{${'/trainingReourceAdminView/imageOrZipOfImages/' + temp.getTrainingResourceId()}}" 
 									               title="View Image">
 									                <i class="bi bi-eye"></i> View
 									            </a>

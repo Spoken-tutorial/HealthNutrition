@@ -5504,7 +5504,7 @@ public class HomeController {
         return addTrainingResourceGet(req, principal, model);
     }
 
-    @GetMapping("/trainingReource/view/{fileType}/{id}")
+    @GetMapping("/trainingReourceAdminView/{fileType}/{id}")
     public String TrainingResourceViewforAdmin(@PathVariable String fileType, @PathVariable int id,
             HttpServletRequest req, Model model, Principal principal) {
 
@@ -5512,8 +5512,8 @@ public class HomeController {
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
-        TrainingResource tr = trainingResourceService.findBTrainingResourceId(id);
-        List<Sting> filePaths = new ArrayList<>();
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(id);
+        List<String> filePaths = new ArrayList<>();
 
         if (tr == null) {
 
@@ -5523,28 +5523,46 @@ public class HomeController {
 
         if (fileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
             filePath = tr.getDocPath();
+            model.addAttribute("fileType", "Doc");
 
         }
 
         else if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
             filePath = tr.getPdfPath();
+            model.addAttribute("fileType", "Pdf");
         }
 
         else if (fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
             filePath = tr.getImgPath();
+            model.addAttribute("fileType", "Image");
         }
 
         else if (fileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
             filePath = tr.getExcelPath();
+            model.addAttribute("fileType", "Excel");
         }
 
         if (filePath.toLowerCase().endsWith(".zip")) {
+            try {
+                filePaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+            } catch (IOException e) {
+                logger.error("Zip Extraction or zip error", e);
 
+                return "redirect:/addTrainingResource";
+
+            }
         }
 
         else {
-            filePaths.add(filePath);
-            model.addAttribute("filePaths", filePath);
+            filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+
+        }
+
+        model.addAttribute("trainingResource", tr);
+        model.addAttribute("filePaths", filePaths);
+        logger.info("Alok Kumar");
+        for (String str : filePaths) {
+            logger.info("file Path :{}", str);
         }
 
         return "trainingResourceViewAdmin";
