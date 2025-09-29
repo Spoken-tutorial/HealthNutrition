@@ -7,7 +7,7 @@ import com.health.model.TrainingResource;
 
 public interface TrainingResourceService {
 
-    TrainingResource findBTrainingResourceId(int trainingResourceId);
+    TrainingResource findByTrainingResourceId(int trainingResourceId);
 
     List<TrainingResource> findByTopicLanMapping(TopicLanMapping topicLanMapping);
 

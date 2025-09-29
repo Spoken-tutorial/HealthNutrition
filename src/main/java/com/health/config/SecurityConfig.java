@@ -97,9 +97,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/enableDisableCourseCatTopic",
             "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**", "/updateCourseName",
-            "/addTrainingResource",
-
-            "/trainingReource/view/**",
+            "/addTrainingResource", "/trainingReource/view/**", "/trainingReourceAdminView/**",
 
     };
 

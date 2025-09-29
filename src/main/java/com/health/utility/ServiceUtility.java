@@ -457,6 +457,45 @@ public class ServiceUtility {
 
     }
 
+    public static List<String> extractZipIfNeeded(String zipFilePathStr, Environment env) throws IOException {
+
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipFilePathStr);
+        String zipFileName = zipFilePath.getFileName().toString();
+        String folderName = zipFileName.substring(0, zipFileName.lastIndexOf('.'));
+        Path extractDir = zipFilePath.getParent().resolve(folderName);
+
+        List<String> filePaths = new ArrayList<>();
+
+        if (!Files.exists(extractDir)) {
+            Files.createDirectories(extractDir);
+            try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(zipFilePath))) {
+                ZipEntry entry;
+                while ((entry = zipIn.getNextEntry()) != null) {
+                    if (!entry.isDirectory()) {
+                        Path outputFile = extractDir.resolve(entry.getName());
+                        Files.createDirectories(outputFile.getParent());
+                        try (OutputStream out = Files.newOutputStream(outputFile)) {
+                            zipIn.transferTo(out);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Collect all file paths from the folder (whether just extracted or already
+        // existed)
+        try (Stream<Path> files = Files.walk(extractDir)) {
+            files.filter(Files::isRegularFile).map(Path::toString).filter(p -> p.contains("Media")) // ensure "Media"
+                                                                                                    // exists in path
+                    .map(p -> {
+                        int indexToStart = p.indexOf("Media");
+                        return convertFilePathToUrl(p.substring(indexToStart));
+                    }).forEach(filePaths::add);
+        }
+
+        return filePaths;
+    }
+
     public static Set<String> checkFileExtentionsInZip(ZipFile zip) {
         Set<String> extensions = new HashSet<>();
 

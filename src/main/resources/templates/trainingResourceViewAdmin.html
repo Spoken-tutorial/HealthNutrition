@@ -1,0 +1,188 @@
+
+<!-- Author: Alok Kumar -->
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Training Resource View - Admin - Health And Nutrition')"></head>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4><b><i><span th:text="${trainingResource.getTopicLanMapping().getTopic().getTopicName()}" style="color: blue;"></span></i></b></h4>
+								<h5><b><i><span th:text="${ trainingResource.getTopicLanMapping().getLan().getLangName()}"></span></i></b></h5>
+								<h6><span th:text="${fileType}"></span></h6>
+							</div>
+							<div class="card-body">
+								<div th:if="${fileType == 'Image'}">
+									<div class="row g-4 mb-4"> <!-- g-4 adds padding between columns and rows -->
+								    <div class="col-md-3 mb-4" th:each="path : ${filePaths}">
+								        <div class="card image-card h-100 text-center p-2">
+										    <!-- Image -->
+										    <img th:src="@{/files/}+@{${path}}" class="card-img-top img-fluid" alt="Image"/>
+										
+										    <!-- File name -->
+										    <h6 class="mt-2 text-truncate" th:text="${#strings.substring(path, path.lastIndexOf('/') + 1)}"
+										         th:title="${#strings.substring(path, path.lastIndexOf('/') + 1)}">
+										    </h6>
+										
+										    <!-- Download icon -->
+										    <a th:href="@{/files/}+@{${path}}" download class="btn btn-sm btn-outline-info mt-1">
+										        <i class="fas fa-file-image"></i> Download Image
+										    </a>
+										</div>
+
+								    </div>
+								</div>
+
+								</div>
+								
+								<div th:unless="${fileType == 'Image'}">
+								<div class="row">
+							    <div class="col-md-6 mb-4" th:each="path : ${filePaths}">
+							       
+							            <!-- ✅ PDF: Preview + File Name + Download -->
+							            <div th:if="${fileType == 'Pdf'}">
+							                <div class="card p-3">
+							                    <!-- File Name -->
+							                    <h6 class="mb-2" th:text="${#strings.substring(path, path.lastIndexOf('/') + 1)}"></h6>
+							
+							                    <!-- Preview -->
+							                    <iframe th:src="@{/files/}+@{${path}}" width="100%" height="400px" frameborder="0"></iframe>
+							
+							                    <!-- Download -->
+							                    <a th:href="@{/files/}+@{${path}}" download class="btn btn-sm btn-outline-danger mt-3">
+							                        <i class="fas fa-download"></i> Download PDF
+							                    </a>
+							                </div>
+							            </div>
+							
+							            <!-- ✅ Word: File Name + Icon + Download -->
+							            <div th:if="${fileType == 'Doc'}">
+							                <div class="card p-3 d-flex align-items-start">
+							                    <h6 th:text="${#strings.substring(path, path.lastIndexOf('/') + 1)}"></h6>
+							                    <i class="fas fa-file-word fa-3x text-primary mb-2"></i>
+							                    <a th:href="@{/files/}+@{${path}}" download class="btn btn-sm btn-outline-primary mt-2">
+							                        <i class="fas fa-download"></i> Download Word
+							                    </a>
+							                </div>
+							            </div>
+							
+							            <!-- ✅ Excel: File Name + Icon + Download -->
+							            <div th:if="${fileType == 'Excel'}">
+							                <div class="card p-3 d-flex align-items-start">
+							                    <h6 th:text="${#strings.substring(path, path.lastIndexOf('/') + 1)}"></h6>
+							                    <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
+							                    <a th:href="@{/files/}+@{${path}}" download class="btn btn-sm btn-outline-success mt-2">
+							                        <i class="fas fa-download"></i> Download Excel
+							                    </a>
+							                </div>
+							            </div>
+							
+							            
+							
+							       
+							    </div>
+							</div>
+
+								</div>
+
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+			
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<style>
+	.image-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+	}
+
+	.image-card:hover {
+	    transform: scale(1.05);
+		 box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+	}
+	
+	h6 {
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+	}
+	
+	.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	}
+
+	</style>
+	<script th:src="@{js/jquery-3.3.1.js}"></script>
+	<script th:src="@{/js/ckeditor.js}"></script>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+	
+<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+		var editor;
+	ClassicEditor
+    .create(document.querySelector('#citation'), {
+        height: '300px' 
+    })
+	    .then( newEditor => {
+	       editor = newEditor;
+	    } )
+	    .catch( error => {
+	        console.error( error );
+	    } );
+		
+
+	</script>	
+</body>
+</html>
+
+ 
+
+ 
