@@ -5504,6 +5504,52 @@ public class HomeController {
         return addTrainingResourceGet(req, principal, model);
     }
 
+    @GetMapping("/trainingReource/view/{fileType}/{id}")
+    public String TrainingResourceViewforAdmin(@PathVariable String fileType, @PathVariable int id,
+            HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        TrainingResource tr = trainingResourceService.findBTrainingResourceId(id);
+        List<Sting> filePaths = new ArrayList<>();
+
+        if (tr == null) {
+
+            return "redirect:/addTrainingResource";
+        }
+        String filePath = "";
+
+        if (fileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+            filePath = tr.getDocPath();
+
+        }
+
+        else if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+            filePath = tr.getPdfPath();
+        }
+
+        else if (fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            filePath = tr.getImgPath();
+        }
+
+        else if (fileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+            filePath = tr.getExcelPath();
+        }
+
+        if (filePath.toLowerCase().endsWith(".zip")) {
+
+        }
+
+        else {
+            filePaths.add(filePath);
+            model.addAttribute("filePaths", filePath);
+        }
+
+        return "trainingResourceViewAdmin";
+    }
+
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,
             @RequestParam(name = "lan", required = false, defaultValue = "") String langName, HttpServletRequest req,
