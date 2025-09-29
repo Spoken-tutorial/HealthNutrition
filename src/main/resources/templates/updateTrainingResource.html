@@ -1,0 +1,120 @@
+
+<!-- Author: Alok Kumar -->
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Training Resource - Admin - Health And Nutrition')"></head>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Update Training Resource</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-6">
+										<form class="form-horizontal" th:action="@{/updateTrainingResource}"
+											method="post" enctype="multipart/form-data">							 
+  											<input type="hidden"  name="trId"  th:value="${id}"/>
+											
+											
+						  					<div class="form-group">
+													<label for="topicId"><b>Select Topic *</b></label> 
+													<select id="topicId" class="form-control" name="topicId" required="required">
+													<option th:value="${topic.getTopicId()}" th:text="${topic.getTopicName()}"></option>
+													<option th:each="tp: ${topics}" th:value="${tp.getTopicId()}" th:text="${tp.getTopicName()}"></option>
+													</select>
+												</div>
+												
+											<div class="form-group">
+		               	                 		<label  for="lanId"><b>Select Language *</b></label>
+												<select th:id="lanId" class="form-control" name="lanId" required="required">
+			  									<option th:value="${language.getLanId()}" th:text="${language.getLangName()}"></option>
+			  									<option th:each="lanitr : ${languages}" th:value="${lanitr.getLanId()}" th:text="${lanitr.getLangName()}"></option>
+												</select>
+		  									</div>
+		  									
+		  									
+		  									
+											<div class=" form-group alert alert-info" th:if="${zipFile != null}">
+											  <span>  The following data contains a zip file, which may include multiple files.</span> <br>
+											   <span> If you want to update a single file or multiple files, please download the zip file, extract all files, make your changes, and re-create the zip file including both the new and existing files. Then upload the updated zip file.<br>
+											    For any questions or assistance, please contact the system administrator.</span>
+											    
+											    <a th:href="@{/files/}+@{${zipFile}}" download class="btn btn-sm btn-outline-info mt-1">
+										        <i class="fas fa-file-image"></i> Download Zip File
+										    </a> 
+											</div>
+											 <!-- Download icon -->
+										   
+											
+											  <div class="form-group">
+												<label  for="file">Upload File</label> 
+												<input type="file" class="form-control" th:id="file" name="file"  accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.odt,.xlsx,.csv,.zip"  onchange="validate_file_size(this,734003200)"/>
+												<small> (.jpg or .png or .pdf or .docx or .odt or .xlsx or .csv  or .zip Only)</small> 
+												<small>Max file size : 700 MB</small>
+											</div>
+											<h6>
+											    <strong>
+											        <span th:text="${'File Type: ' + fileType + ' or Zip of ' + fileType}"
+											              style="color: blue; background-color: yellow;"></span>
+											    </strong>
+											</h6>
+  
+											<button type="submit" class="btn a-btn">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+			
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+	<script th:inline="javascript">
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+</html>
+
+ 
+
+ 

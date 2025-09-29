@@ -5619,6 +5619,68 @@ public class HomeController {
         return "trainingResourceViewAdmin";
     }
 
+    @GetMapping("/trainingReource/edit/{fileType}/{id}")
+    public String TrainingResourceEditGet(@PathVariable String fileType, @PathVariable int id, HttpServletRequest req,
+            Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(id);
+
+        if (tr == null) {
+
+            return "redirect:/addTrainingResource";
+        }
+        Topic topic = tr.getTopicLanMapping().getTopic();
+        Language lan = tr.getTopicLanMapping().getLan();
+        List<Language> languages = getLanguages();
+        languages.sort(Comparator.comparing(Language::getLangName));
+        List<Topic> topics = getTopics();
+        List<TrainingResource> trainingResourceList = trainingResourceService.findAll();
+        model.addAttribute("languages", languages);
+        model.addAttribute("topics", topics);
+        model.addAttribute("trainingResourceList", trainingResourceList);
+        model.addAttribute("trainingResource", tr);
+        model.addAttribute("topic", topic);
+        model.addAttribute("language", lan);
+        model.addAttribute("id", id);
+        String filePath = "";
+
+        if (fileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+            filePath = tr.getDocPath();
+            model.addAttribute("fileType", "Doc");
+
+        }
+
+        else if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+            filePath = tr.getPdfPath();
+            model.addAttribute("fileType", "Pdf");
+        }
+
+        else if (fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            filePath = tr.getImgPath();
+            model.addAttribute("fileType", "Image");
+        }
+
+        else if (fileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+            filePath = tr.getExcelPath();
+            model.addAttribute("fileType", "Excel");
+        }
+
+        if (filePath.toLowerCase().endsWith(".zip")) {
+            model.addAttribute("zipFile", filePath);
+        }
+
+        else {
+            model.addAttribute("nonZipFile", filePath);
+
+        }
+
+        return "updateTrainingResource";
+    }
+
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,
             @RequestParam(name = "lan", required = false, defaultValue = "") String langName, HttpServletRequest req,
