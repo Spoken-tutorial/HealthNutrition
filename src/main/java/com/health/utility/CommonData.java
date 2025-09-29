@@ -303,6 +303,11 @@ public class CommonData {
     public static final String DOCUMENT_TYPE_FILES_OF_BROCHURE = "Files_Of_Brochure";
     public static final String DOCUMENT_TYPE_RESEARCHPAPER = "ResearchPaper";
 
+    public static final String Doc_OR_ZIP_OF_DOCS = "docOrZipOfDocs";
+    public static final String image_OR_ZIP_OF_IMAGES = "imageOrZipOfImages";
+    public static final String PDF_OR_ZIP_OF_PDFS = "pdfOrZipOfPdfs";
+    public static final String Excel_OR_ZIP_OF_EXCELS = "excelOrZipOfexcels";
+
     public static final String DOCUMENT_ID_TUTORIAL_TIMESCRIPT = "Tts";
     public static final String DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT = "Tos";
     public static final String DOCUMENT_ID_BROCHURE = "Bro";

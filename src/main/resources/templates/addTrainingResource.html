@@ -190,13 +190,13 @@ font-weight:bold!important;
 									        <!-- Actions if PDF exists -->
 									        <div th:if="${temp.getPdfFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{'/trainingReource/view/PdfZip/' + ${temp.getTrainingResourceId()}}" 
+									               th:href="@{'/trainingReource/view/pdfOrZipOfPdfs/' + ${temp.getTrainingResourceId()}}" 
 									               title="View PDF">
 									                <i class="bi bi-eye"></i> View
 									            </a>
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
-									               th:href="@{'/trainingReource/edit/PdfZip/' + ${temp.getTrainingResourceId()}}" 
+									               th:href="@{'/trainingReource/edit/pdfOrZipOfPdfs/' + ${temp.getTrainingResourceId()}}" 
 									               title="Edit Zip">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
@@ -227,13 +227,13 @@ font-weight:bold!important;
 									        <!-- Actions if Doc exists -->
 									        <div th:if="${temp.getDocFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{${'/trainingReource/view/DocZip/' + temp.getTrainingResourceId()}}" 
+									               th:href="@{${'/trainingReource/view/docOrZipOfDocs/' + temp.getTrainingResourceId()}}" 
 									               title="View Doc">
 									                <i class="bi bi-eye"></i> View
 									            </a>
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
-									               th:href="@{'/trainingReource/edit/DocZip/' + ${temp.getTrainingResourceId()}}" 
+									               th:href="@{'/trainingReource/edit/docOrZipOfDocs/' + ${temp.getTrainingResourceId()}}" 
 									               title="Edit Zip">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
@@ -264,13 +264,13 @@ font-weight:bold!important;
 									        <!-- Actions if Excel exists -->
 									        <div th:if="${temp.getExcelFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{${'/trainingReource/view/ExcelZip/' + temp.getTrainingResourceId()}}" 
+									               th:href="@{${'/trainingReource/view/excelOrZipOfexcels/' + temp.getTrainingResourceId()}}" 
 									               title="View Excel">
 									                <i class="bi bi-eye"></i> View
 									            </a>
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
-									               th:href="@{'/trainingReource/edit/ExcelZip/' + ${temp.getTrainingResourceId()}}" 
+									               th:href="@{'/trainingReource/edit/excelOrZipOfexcels/' + ${temp.getTrainingResourceId()}}" 
 									               title="Edit Zip">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
@@ -302,13 +302,13 @@ font-weight:bold!important;
 									        <!-- Actions if Image exists -->
 									        <div th:if="${temp.getImageFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
 									            <a class="btn btn-sm btn-primary " 
-									               th:href="@{${'/trainingReource/view/ImageZip/' + temp.getTrainingResourceId()}}" 
+									               th:href="@{${'/trainingReource/view/imageOrZipOfImages/' + temp.getTrainingResourceId()}}" 
 									               title="View Image">
 									                <i class="bi bi-eye"></i> View
 									            </a>
 												&ensp;
 									            <a class="btn btn-sm btn-warning me-2" 
-									               th:href="@{'/trainingReource/edit/ImageZip/' + ${temp.getTrainingResourceId()}}" 
+									               th:href="@{'/trainingReource/edit/imageOrZipOfImages/' + ${temp.getTrainingResourceId()}}" 
 									               title="Edit Zip">
 									                <i class="bi bi-pencil-square"></i> Edit
 									            </a>
