@@ -116,8 +116,10 @@ import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
+import com.health.model.TopicLanMapping;
 import com.health.model.TraineeInformation;
 import com.health.model.TrainingInformation;
+import com.health.model.TrainingResource;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.TutorialWithWeekAndPackage;
@@ -161,9 +163,11 @@ import com.health.service.SpokenVideoService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
 import com.health.service.TopicCategoryMappingService;
+import com.health.service.TopicLanMappingService;
 import com.health.service.TopicService;
 import com.health.service.TraineeInformationService;
 import com.health.service.TrainingInformationService;
+import com.health.service.TrainingResourceService;
 import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
 import com.health.service.TutorialWithWeekAndPackageService;
@@ -178,6 +182,7 @@ import com.health.threadpool.TaskProcessingService;
 import com.health.threadpool.ZipCreationThreadService;
 import com.health.threadpool.ZipHealthTutorialThreadService;
 import com.health.utility.CommonData;
+import com.health.utility.FileConversionUtility;
 import com.health.utility.MailConstructor;
 import com.health.utility.SecurityUtility;
 import com.health.utility.ServiceUtility;
@@ -211,6 +216,9 @@ public class HomeController {
 
     @Autowired
     private CommonData commonData;
+
+    @Autowired
+    private FileConversionUtility fileConversionUtility;
 
     @Autowired
     private LiveTutorialService liveTutorialService;
@@ -280,6 +288,12 @@ public class HomeController {
 
     @Autowired
     private WeekTitleVideoService weekTitleVideoService;
+
+    @Autowired
+    private TopicLanMappingService topicLanMapiingService;
+
+    @Autowired
+    private TrainingResourceService trainingResourceService;
 
     @Autowired
     private TopicCategoryMappingService topicCatService;
@@ -382,6 +396,9 @@ public class HomeController {
 
     @Value("${scriptmanager_path}")
     private String scriptmanager_path;
+
+    @Value("${doc_to_pdf.command}")
+    private String doctoPdfCommand;
 
     private static YouTube youtube;
 
@@ -5202,6 +5219,719 @@ public class HomeController {
     /******************************************
      * Assign Tutorial on Week And Package End
      ********************/
+
+    @GetMapping("/addTrainingResource")
+    public String addTrainingResourceGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        List<Language> languages = getLanguages();
+
+        languages.sort(Comparator.comparing(Language::getLangName));
+
+        model.addAttribute("languages", languages);
+
+        List<Topic> topics = getTopics();
+        List<TrainingResource> trainingResourceList = new ArrayList<>();
+        List<TrainingResource> tempResourceList = trainingResourceService.findAll();
+        for (TrainingResource temp : tempResourceList) {
+            if (ServiceUtility.hasAnyResourceFile(temp)) {
+                trainingResourceList.add(temp);
+            }
+        }
+        model.addAttribute("topics", topics);
+        model.addAttribute("trainingResourceList", trainingResourceList);
+
+        return "addTrainingResource";
+    }
+
+    @PostMapping("/addTrainingResource")
+    public String addTrainingResourcePost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "topicId") int topicId, @RequestParam("langName") List<Integer> lanIds,
+            @RequestParam(name = "file") List<MultipartFile> files) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        boolean viewSection = false;
+
+        if (topicId == 0) {
+            model.addAttribute("error_msg", "Topic should not be null");
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            return addTrainingResourceGet(req, principal, model);
+        }
+
+        if (lanIds.isEmpty() || files.isEmpty()) {
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            model.addAttribute("error_msg", "Language and Files should not be null");
+            return addTrainingResourceGet(req, principal, model);
+        }
+
+        Topic topic = topicService.findById(topicId);
+
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+
+        Set<Language> addedLan = new HashSet<>();
+
+        try {
+
+            for (int i = 0; i < lanIds.size(); i++) {
+                if (i < files.size())
+                    logger.info("File: {}", files.get(i));
+                if (lanIds.get(i) != 0 && !files.get(i).isEmpty()) {
+                    Language language = lanService.getById(lanIds.get(i));
+
+                    if (language != null) {
+                        String langName = language.getLangName();
+                        TopicLanMapping topicLanMapping = topicLanMapiingService.findByTopicAndLan(topic, language);
+
+                        boolean addedLanFlag = addedLan.add(language);
+
+                        if (topicLanMapping == null && addedLanFlag) {
+                            topicLanMapping = new TopicLanMapping(dateAdded, topic, language);
+
+                            topicLanMapiingService.save(topicLanMapping);
+                            logger.info(" iter:{}  TopicLanMapping :{}", i, topicLanMapping);
+                        }
+
+                        List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(topicLanMapping);
+                        TrainingResource tr = null;
+
+                        if (trList.isEmpty()) {
+                            tr = new TrainingResource();
+                            logger.info("iter:{} TrainingResource  :{}", i, tr);
+
+                        } else {
+                            tr = trList.get(0);
+                        }
+
+                        tr.setDateAdded(dateAdded);
+                        tr.setTopicLanMapping(topicLanMapping);
+                        tr.setUser(usr);
+                        trainingResourceService.save(tr); // Saved first to get exact Id
+                        int trId = tr.getTrainingResourceId();
+
+                        Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trId), langName);
+
+                        String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
+                        String docFolder = Paths.get(rootPath.toString(), "docs").toString();
+                        String excelFolder = Paths.get(rootPath.toString(), "excel").toString();
+                        String imageFolder = Paths.get(rootPath.toString(), "image").toString();
+
+                        Set<String> extentions = new HashSet<>();
+                        String document = "";
+
+                        MultipartFile file = files.get(i);
+
+                        String fileExtention = ServiceUtility.checkFileExtensions(file);
+
+                        if (fileExtention.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                            model.addAttribute("error_msg", "Unsupported file Error at language:" + langName);
+                            viewSection = true;
+                            model.addAttribute("viewSection", viewSection);
+                            return addTrainingResourceGet(req, principal, model);
+                        }
+
+                        else if (fileExtention.equals(CommonData.PDF_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                            tr.setPdfPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.DOC_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                            tr.setDocPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                            tr.setExcelPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                            tr.setImgPath(document);
+                        }
+
+                        if (fileExtention.equals(CommonData.ZIP_EXTENSION)) {
+
+                            extentions = ServiceUtility.checkFileExtentionsInZip(file);
+                            if (extentions.size() == 1) {
+                                for (String ext : extentions) {
+                                    if (ext.equals(CommonData.PDF_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                                        tr.setPdfPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.DOC_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                                        tr.setDocPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.EXCEL_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                                        tr.setExcelPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.IMAGE_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                                        tr.setImgPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                                        viewSection = true;
+                                        model.addAttribute("viewSection", viewSection);
+                                        model.addAttribute("error_msg",
+                                                "Unsupported file Error at language:" + langName);
+
+                                        return addTrainingResourceGet(req, principal, model);
+                                    }
+
+                                }
+                            }
+
+                            else {
+                                model.addAttribute("error_msg",
+                                        "Zip contains different types of files Error at language:" + langName);
+                                viewSection = true;
+                                model.addAttribute("viewSection", viewSection);
+                                return addTrainingResourceGet(req, principal, model);
+                            }
+
+                        }
+                        tr.setUser(usr);
+                        trainingResourceService.save(tr);
+
+                    }
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            model.addAttribute("error_msg", "Some errors occurred, please contact the Admin");
+            logger.error("Error:", e);
+            return addTrainingResourceGet(req, principal, model);
+        }
+
+        model.addAttribute("viewSection", viewSection);
+        model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        return addTrainingResourceGet(req, principal, model);
+    }
+
+    @GetMapping("/trainingReourceAdminView/{fileType}/{id}")
+    public String TrainingResourceViewforAdmin(@PathVariable String fileType, @PathVariable int id,
+            HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(id);
+        List<String> filePaths = new ArrayList<>();
+
+        if (tr == null) {
+
+            return "redirect:/addTrainingResource";
+        }
+        String filePath = "";
+
+        if (fileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+            filePath = tr.getDocPath();
+            model.addAttribute("fileType", "Doc");
+
+        }
+
+        else if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+            filePath = tr.getPdfPath();
+            model.addAttribute("fileType", "Pdf");
+        }
+
+        else if (fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            filePath = tr.getImgPath();
+            model.addAttribute("fileType", "Image");
+        }
+
+        else if (fileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+            filePath = tr.getExcelPath();
+            model.addAttribute("fileType", "Excel");
+        }
+
+        if (filePath.toLowerCase().endsWith(".zip")) {
+            try {
+                filePaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+            } catch (IOException e) {
+                logger.error("Zip Extraction or zip error", e);
+
+                return "redirect:/addTrainingResource";
+
+            }
+        }
+
+        else {
+            filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+
+        }
+
+        // Conversion of doc/excel to pdf and pdf to thumbnails.
+        List<String> finalFilePath = new ArrayList<>();
+
+        if (!fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+                for (String str : filePaths) {
+
+                    /*
+                     * Here we check png beacuse parent folder may have alreday created thumnails
+                     * and their paths have been added in filePaths from extractZipIfNeeded function
+                     * if zip is alreday extracted then that folder is used for pdf and thumnails
+                     * too.
+                     * 
+                     */
+                    if (!str.endsWith(".png")) {
+                        finalFilePath.add(str);
+                        fileConversionUtility.generateThumbnailFromPdfAndSave(str);
+                    }
+
+                }
+            }
+
+            else {
+                // Intially we convert both doc and excel using same libreoffice cmd
+                for (String str : filePaths) {
+                    /*
+                     * Here we check png and pdf beacuse parent folder may have alreday created
+                     * thumnails and pdfs and their respective paths have been added in filePaths
+                     * from extractZipIfNeeded function if zip is alreday extracted then that folder
+                     * is used for pdf and thumnails too.
+                     * 
+                     */
+                    if (!str.endsWith(".png") && !str.endsWith(".pdf")) {
+                        finalFilePath.add(str);
+                        String pdfPath = fileConversionUtility.convertDoctoPdf(str, doctoPdfCommand);
+                        fileConversionUtility.generateThumbnailFromPdfAndSave(pdfPath);
+                    }
+
+                }
+            }
+        } else {
+            finalFilePath.addAll(filePaths);
+        }
+
+        model.addAttribute("trainingResource", tr);
+        model.addAttribute("filePaths", finalFilePath);
+
+        for (String str : filePaths) {
+            logger.info("file Path :{}", str);
+        }
+
+        return "trainingResourceViewAdmin";
+    }
+
+    @GetMapping("/trainingReource/edit/{fileType}/{id}")
+    public String trainingResourceEditGet(@PathVariable String fileType, @PathVariable int id, HttpServletRequest req,
+            Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(id);
+
+        if (tr == null) {
+
+            return "redirect:/addTrainingResource";
+        }
+        Topic topic = tr.getTopicLanMapping().getTopic();
+        Language lan = tr.getTopicLanMapping().getLan();
+        List<Language> languages = getLanguages();
+        languages.sort(Comparator.comparing(Language::getLangName));
+        List<Topic> topics = getTopics();
+        List<TrainingResource> trainingResourceList = new ArrayList<>();
+        List<TrainingResource> tempTrainingResourceList = trainingResourceService.findAll();
+        for (TrainingResource temp : tempTrainingResourceList) {
+            if (ServiceUtility.hasAnyResourceFile(temp)) {
+                trainingResourceList.add(temp);
+            }
+        }
+        model.addAttribute("languages", languages);
+        model.addAttribute("topics", topics);
+        model.addAttribute("trainingResourceList", trainingResourceList);
+        model.addAttribute("trainingResource", tr);
+        model.addAttribute("topic", topic);
+        model.addAttribute("language", lan);
+        model.addAttribute("id", id);
+        String filePath = "";
+
+        if (fileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+            filePath = tr.getDocPath();
+            model.addAttribute("fileType", "Doc");
+
+        }
+
+        else if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+            filePath = tr.getPdfPath();
+            model.addAttribute("fileType", "Pdf");
+        }
+
+        else if (fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            filePath = tr.getImgPath();
+            model.addAttribute("fileType", "Image");
+        }
+
+        else if (fileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+            filePath = tr.getExcelPath();
+            model.addAttribute("fileType", "Excel");
+        }
+
+        if (filePath.toLowerCase().endsWith(".zip")) {
+            model.addAttribute("zipFile", filePath);
+        }
+
+        else {
+            model.addAttribute("nonZipFile", filePath);
+
+        }
+
+        return "updateTrainingResource";
+    }
+
+    @PostMapping("/updateTrainingResource")
+    public String updateTrainingResourcePost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam("file") MultipartFile file) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String trId = req.getParameter("trId");
+        String topicId = req.getParameter("topicId");
+        String lanId = req.getParameter("lanId");
+        String fileType = req.getParameter("fileType");
+        int trIdInt = Integer.parseInt(trId);
+        int topicIdInt = Integer.parseInt(topicId);
+        int lanIdInt = Integer.parseInt(lanId);
+        int oldtrId = trIdInt;
+
+        Topic topic = topicService.findById(topicIdInt);
+        Language lan = lanService.getById(lanIdInt);
+
+        TopicLanMapping topicLan = topicLanMapiingService.findByTopicAndLan(topic, lan);
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+
+        String originalFileType = "";
+        String oldPath = "";
+        TrainingResource oldTrainingResource = trainingResourceService.findByTrainingResourceId(trIdInt);
+
+        if (oldTrainingResource == null) {
+            model.addAttribute("error_msg", "TrainingResource doesn't exist");
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+        }
+
+        boolean fileMatch = false;
+
+        if (fileType.equals("Doc")) {
+            originalFileType = CommonData.Doc_OR_ZIP_OF_DOCS;
+            if (oldTrainingResource != null) {
+                oldPath = oldTrainingResource.getDocPath();
+            }
+        }
+
+        else if (fileType.equals("Pdf")) {
+            originalFileType = CommonData.PDF_OR_ZIP_OF_PDFS;
+            if (oldTrainingResource != null) {
+                oldPath = oldTrainingResource.getPdfPath();
+            }
+        }
+
+        else if (fileType.equals("Image")) {
+            originalFileType = CommonData.image_OR_ZIP_OF_IMAGES;
+            if (oldTrainingResource != null) {
+                oldPath = oldTrainingResource.getImgPath();
+            }
+
+        } else if (fileType.equals("Excel")) {
+            originalFileType = CommonData.Excel_OR_ZIP_OF_EXCELS;
+            if (oldTrainingResource != null) {
+                oldPath = oldTrainingResource.getExcelPath();
+            }
+        }
+
+        if (oldPath == null || oldPath.isEmpty()) {
+            model.addAttribute("error_msg",
+                    "The data has already moved to another Training Resource. Please check the View section to edit.");
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+        }
+
+        if (topic == null || lan == null) {
+            model.addAttribute("error_msg", "Topic or Language not found.");
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+        }
+
+        TrainingResource newTrainingResource;
+        boolean newTrainingData = true;
+
+        if (topicLan != null) {
+            List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(topicLan);
+
+            if (trList.isEmpty()) {
+                newTrainingResource = new TrainingResource();
+                logger.info("new Training Resource Data");
+
+            } else if (!trList.contains(oldTrainingResource)) {
+                newTrainingResource = trList.get(0);
+                logger.info("new Training Resource Data from trList");
+            } else {
+                newTrainingData = false;
+                newTrainingResource = oldTrainingResource; // or some appropriate fallback
+                logger.info("old Training resource data");
+            }
+        } else {
+
+            topicLan = new TopicLanMapping(dateAdded, topic, lan);
+
+            topicLanMapiingService.save(topicLan);
+            newTrainingResource = new TrainingResource();
+
+        }
+
+        newTrainingResource.setDateAdded(dateAdded);
+        newTrainingResource.setTopicLanMapping(topicLan);
+        newTrainingResource.setUser(usr);
+
+        // To get exact Id of new trainining Resource Data
+        if (newTrainingData) {
+
+            trainingResourceService.save(newTrainingResource);
+            trIdInt = newTrainingResource.getTrainingResourceId();
+
+        }
+
+        try {
+
+            String langName = lan.getLangName();
+
+            Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trIdInt), langName);
+
+            String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
+            String docFolder = Paths.get(rootPath.toString(), "docs").toString();
+            String excelFolder = Paths.get(rootPath.toString(), "excel").toString();
+            String imageFolder = Paths.get(rootPath.toString(), "image").toString();
+            boolean fileFlag = false;
+
+            if (!file.isEmpty()) {
+                fileFlag = true;
+
+                Set<String> extentions = new HashSet<>();
+                String document = "";
+
+                String fileExtention = ServiceUtility.checkFileExtensions(file);
+
+                if (fileExtention.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                    model.addAttribute("error_msg", "Unsupported file");
+
+                    return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+                }
+
+                else if (fileExtention.equals(CommonData.PDF_EXTENSION)
+                        && originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                    newTrainingResource.setPdfPath(document);
+                    if (newTrainingData)
+                        oldTrainingResource.setPdfPath("");
+                    fileMatch = true;
+                }
+
+                else if (fileExtention.equals(CommonData.DOC_EXTENSION)
+                        && originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                    newTrainingResource.setDocPath(document);
+                    if (newTrainingData)
+                        oldTrainingResource.setDocPath("");
+                    fileMatch = true;
+                }
+
+                else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)
+                        && originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                    newTrainingResource.setExcelPath(document);
+                    if (newTrainingData)
+                        oldTrainingResource.setExcelPath("");
+                    fileMatch = true;
+                }
+
+                else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)
+                        && originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                    newTrainingResource.setImgPath(document);
+                    if (newTrainingData)
+                        oldTrainingResource.setImgPath("");
+                    fileMatch = true;
+                }
+
+                if (fileExtention.equals(CommonData.ZIP_EXTENSION)) {
+
+                    extentions = ServiceUtility.checkFileExtentionsInZip(file);
+                    if (extentions.size() == 1) {
+                        for (String ext : extentions) {
+                            if (ext.equals(CommonData.PDF_EXTENSION)
+                                    && originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                                newTrainingResource.setPdfPath(document);
+                                if (newTrainingData) {
+                                    oldTrainingResource.setPdfPath("");
+                                }
+
+                                fileMatch = true;
+
+                            }
+
+                            else if (ext.equals(CommonData.DOC_EXTENSION)
+                                    && originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                                newTrainingResource.setDocPath(document);
+                                if (newTrainingData) {
+                                    oldTrainingResource.setDocPath("");
+                                }
+
+                                fileMatch = true;
+                            }
+
+                            else if (ext.equals(CommonData.EXCEL_EXTENSION)
+                                    && originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                                newTrainingResource.setExcelPath(document);
+                                if (newTrainingData) {
+                                    oldTrainingResource.setExcelPath("");
+                                }
+
+                                fileMatch = true;
+                            }
+
+                            else if (ext.equals(CommonData.IMAGE_EXTENSION)
+                                    && originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                                newTrainingResource.setImgPath(document);
+                                if (newTrainingData) {
+                                    oldTrainingResource.setImgPath("");
+                                }
+
+                                fileMatch = true;
+
+                            }
+
+                            else if (ext.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+
+                                model.addAttribute("error_msg", "Unsupported file Error ");
+
+                                return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+                            }
+
+                        }
+                    }
+
+                    else {
+                        model.addAttribute("error_msg", "Zip contains different types of files Error");
+
+                        return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+                    }
+
+                }
+
+                if (oldPath != null && oldPath.endsWith(".zip")) {
+
+                    String extractDir = oldPath.replace(".zip", "");
+
+                    Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
+                    FileUtils.deleteDirectory(extractDirPath.toFile());
+
+                }
+
+                newTrainingResource.setDateAdded(dateAdded);
+                newTrainingResource.setTopicLanMapping(topicLan);
+                newTrainingResource.setUser(usr);
+
+                if (fileMatch) {
+                    newTrainingResource.setDateAdded(dateAdded);
+                    newTrainingResource.setTopicLanMapping(topicLan);
+                    trainingResourceService.save(newTrainingResource);
+                    if (newTrainingData) {
+                        logger.info("1st old data save is called");
+                        oldTrainingResource.setUser(usr);
+                        trainingResourceService.save(oldTrainingResource);
+                    }
+                } else {
+                    model.addAttribute("error_msg", "Please upload a file of the same type. E.g., DOC for DOC type.");
+                    return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+                }
+            }
+
+            // File Empty
+            else {
+                if (newTrainingData && !fileFlag && oldPath != null && !oldPath.isEmpty()) {
+
+                    Path sourcePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), oldPath);
+                    File sourceFile = sourcePath.toFile();
+                    String fileName = sourcePath.getFileName().toString();
+
+                    String document = "";
+
+                    if (sourceFile.exists()) {
+                        if (originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, docFolder, fileName, env);
+
+                            newTrainingResource.setDocPath(document);
+                            oldTrainingResource.setDocPath("");
+
+                        } else if (originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, excelFolder, fileName,
+                                    env);
+
+                            newTrainingResource.setExcelPath(document);
+                            oldTrainingResource.setExcelPath("");
+
+                        } else if (originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, pdfFolder, fileName, env);
+
+                            newTrainingResource.setPdfPath(document);
+                            oldTrainingResource.setPdfPath("");
+
+                        } else if (originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, imageFolder, fileName,
+                                    env);
+                            newTrainingResource.setImgPath(document);
+                            oldTrainingResource.setImgPath("");
+
+                        }
+
+                        newTrainingResource.setDateAdded(dateAdded);
+                        newTrainingResource.setUser(usr);
+                        trainingResourceService.save(newTrainingResource);
+                        logger.info("2nd old data save is called");
+                        trainingResourceService.save(oldTrainingResource);
+                    }
+
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception while updating Training Resource: {} {} {}", topic, lan, file, e);
+            model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+
+        return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+    }
 
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,

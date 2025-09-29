@@ -94,8 +94,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
             "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
             "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
+
             "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/enableDisableCourseCatTopic",
             "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**", "/updateCourseName",
+            "/addTrainingResource", "/trainingReource/view/**", "/trainingReourceAdminView/**",
+            "/trainingReource/edit/**", "/enableDisableTrainingResource", "/delete-trainingResource",
 
     };
 
@@ -155,11 +158,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/addTestimonial/**", "/addPromoVideo/**", "/addResearchPaper/**", "/brochure/edit/**",
                         "/promoVideo/edit/**", "/carousel/edit/**", "/event/edit/**", "/testimonial/edit/**",
                         "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
+
                         "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/researchPaper/edit/**",
                         "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**",
                         "/addCitation/**", "/citation/edit/**", "/enableDisableCourseCatTopic",
                         "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**",
-                        "/updateCourseName")
+                        "/updateCourseName", "/addTrainingResource")
+
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
 
