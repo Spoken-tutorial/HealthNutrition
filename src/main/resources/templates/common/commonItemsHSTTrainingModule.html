@@ -80,59 +80,52 @@ function resetInput(id) {
 	  
 	}
 </script>
-
 <div class="row w-100 align-items-center mentor-row">
- 
-  <style>
-    @media (max-width:1203px) and (max-height:703px) {
-      .mentor-row > div {
-        flex: 0 0 100% !important;
-        max-width: 100% !important;
-      }
-      #btnClearFormView {
-        width: 100% !important;
-      }
-      .mentor-row h3 {
-        text-align: center;
-      }
-    }
-    
-     
-  </style>
 
-  
-  <div class="col-auto col-12 col-sm-auto mb-3">
-    <h3 class="mb-0" style="white-space: nowrap;">Mentor Content:</h3>
-  </div>
-
-
-  <div class="col-sm-4 col-12 mb-3">
-     <select class="custom-select d-block form-control selectedValue" id="weekView" name="week">            
-            
-              <option  value="">Select Week</option>
-             
-              <option  th:each="weekTemp : ${weekList}" th:selected="${weekTemp.value==localWeek}" th:value="${weekTemp.value}" th:text="${weekTemp.key}" ></option>
-            </select>
-  </div>
-
- 
-  <div class="col-sm-4 col-12 mb-3">
-    <select class="custom-select d-block form-control" id="languageView" name="lan">
-			 
-              <option value="">Select Language</option>
-              <option th:each="lan : ${languages}"  th:selected="${lan.value==localLanguage}"th:value="${lan.value}" th:text="${lan.key}"></option> 
-            </select>
-  </div>
-
-  
-  <div class="col-auto col-12 col-sm-auto mb-3">
-    <input class="btn btn-outline-info  w-100 w-sm-auto" 
-           type="button" 
-           value="Clear" 
-           id="btnClearFormView" 
-           style=" color:#fff; background:SlateBlue;" />
-  </div>
+ <div class="col-auto mb-3" style="margin-bottom:1px; padding-bottom:1px;">
+  <h4>Mentor Content:</h4>
 </div>
+
+  <div class="col-md-4 mb-3 input-group">
+     <select class="custom-select d-block form-control selectedValue" id="weekView" name="week">            
+        <option value="">Select Week</option>
+        <option th:each="weekTemp : ${weekList}" 
+                th:selected="${weekTemp.value==localWeek}" 
+                th:value="${weekTemp.value}" 
+                th:text="${weekTemp.key}">
+        </option>
+     </select>
+     <div th:if="${localWeek != null and localWeek != 0}" 
+          class="input-group-btn" 
+          id="weekresetdiv" 
+          style="padding-top: 4px;">
+        <button id="weekreset" style="background:none; border:none;">
+          <span style="font-size:20px;">&#10227;</span>
+        </button>
+     </div>
+  </div>
+
+  <div class="col-md-4 mb-3 input-group">
+    <select class="custom-select d-block form-control" id="languageView" name="lan">
+      <option value="">Select Language</option>
+      <option th:each="lan : ${languages}" 
+              th:selected="${lan.value==localLanguage}" 
+              th:value="${lan.value}" 
+              th:text="${lan.key}">
+      </option> 
+    </select>
+    <div th:if="${localLanguage != null and localLanguage != 0}" 
+         class="input-group-btn" 
+         id="languageresetdiv" 
+         style="padding-top: 4px;">
+      <button id="languagereset" style="background:none; border:none;">
+        <span style="font-size:20px;">&#10227;</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
 
      <!--div id="hstTrainingModuleViewPageId"  class="col-md-2 mb-3"> 
 				<a  id="hstTrainingModuleViewPageUrl" th:href="@{'/trainingModules'}" style="display: none;"> View </a>

@@ -182,16 +182,14 @@ public class ZipCreationThreadService {
                 String packageName = originalPackageName.replace(' ', '_');
                 String rootFolder = packageName + "_" + langName;
                 Path destInationDirectory1 = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder,
-                        File.separator, packageName);
+                        CommonData.uploadDirectoryTrainingModuleZipFiles, sdfString, File.separator, rootFolder);
 
                 Path indexHtmlPath = Paths.get(destInationDirectory1.toString(), File.separator, "index.html");
 
                 for (WeekTitleVideo temp : weekTitleList) {
                     String weekName = temp.getWeek().getWeekName().replace(' ', '_');
-                    String temptitle = temp.getTitle().replace(' ', '_');
-                    String sanitized = ServiceUtility.sanitizeName(temptitle);
-                    String title = sanitized.replace(" ", "_").replaceAll("_+", "_");
+
+                    String title = ServiceUtility.sanitizetitle(temp.getTitle());
 
                     String tutorialPath = temp.getVideoResource().getVideoPath();
                     String thumbnailPath = temp.getVideoResource().getThumbnailPath();
@@ -217,11 +215,12 @@ public class ZipCreationThreadService {
                         if (webmSourcePath.toFile().exists()) {
                             sourcePath = webmSourcePath;
                             titleWithExtension = title + ".webm";
+
                         } else {
                             sourcePath = basePath; // replaceExtension(basePath, ".mp4");
                             titleWithExtension = title + ".mp4";
                         }
-
+                        logger.info("video file name: {}", titleWithExtension);
                         Path destinationPath = destInationDirectoryforLanAndWeek.resolve(titleWithExtension);
                         File sourceFile = sourcePath.toFile();
 
@@ -248,6 +247,10 @@ public class ZipCreationThreadService {
                     }
 
                 }
+
+                logger.info("Checking copied Training Modules video files in the destination folder");
+                ServiceUtility.printFilesNameFromPath(destInationDirectory1);
+
                 for (PackLanTutorialResource tempTutorial : packLanTutorialResourceList) {
 
                     ContributorAssignedTutorial con = tempTutorial.getTutorial().getConAssignedTutorial();
@@ -274,11 +277,15 @@ public class ZipCreationThreadService {
                                 tutorialPath1);
                         Path basePath;
                         String resolution = "_480p";
+                        String resolutionSubtitle = resolution+CommonData.WITH_SUBTITLES;
                         String resolutionUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolution);
+                        String resolutionSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolutionSubtitle);
+                        String originalSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, CommonData.WITH_SUBTITLES);
 
                         if (resolutionUrl != null) {
                             Path resolutionPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                     resolutionUrl);
+                            
 
                             if (resolutionPath.toFile().exists()) {
                                 basePath = resolutionPath;
@@ -288,6 +295,25 @@ public class ZipCreationThreadService {
                             }
                         } else {
                             basePath = originalPath;
+                        }
+                        
+                        Path resolutionSubtitlePath;
+                        Path originalSubtitlePath;
+                       
+                        if(resolutionSubtitleUrl!=null) {
+                             resolutionSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    resolutionSubtitleUrl);
+                             if(resolutionSubtitlePath.toFile().exists()) {
+                                 basePath = resolutionSubtitlePath;
+                             }
+                        }
+                        
+                        if(originalSubtitleUrl!=null && resolutionUrl==null) {
+                            originalSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    originalSubtitleUrl);
+                             if(originalSubtitlePath.toFile().exists()) {
+                                 basePath = originalSubtitlePath;
+                             }
                         }
 
                         String topicwithExtention;
@@ -450,9 +476,9 @@ public class ZipCreationThreadService {
                     WeekTitleVideo weekTitleVideo = temp.getWeekTitle();
 
                     String sessionName = weekTitleVideo.getVideoResource().getSessionName();
-                    String temptitle = weekTitleVideo.getTitle().replace(' ', '_');
-                    String sanitized = ServiceUtility.sanitizeName(temptitle);
-                    String title = sanitized.replace(" ", "_").replaceAll("_+", "_");
+
+                    String title = ServiceUtility.sanitizetitle(weekTitleVideo.getTitle());
+
                     String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
                     String tempTutorialPath = weekTitleVideo.getVideoResource().getVideoPath();
 

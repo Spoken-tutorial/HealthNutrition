@@ -200,16 +200,12 @@
 							<a class="originalScriptClass" 
 								th:value="${tutorial.getTutorialId()}"
 								th:href="${'/OriginalScript/' + tutorial.getTutorialId()}" name="ScriptPdf"
-								target="_blank" id="ScriptPdf">Original Script</a>
+								target="_blank" >Original Script</a>
 								
 								
 								
 								
-								<!-- th:if="${tutorial.getScript()}" -->
-								<!-- <a
-								th:unless="${tutorial.getScript()}"
-								 th:href="@{/files/}+@{${tutorial.getScript()}}" name="ScriptPdf"
-								target="_blank" id="ScriptPdf">Original Script</a> -->
+								
 								
 							<a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
@@ -217,7 +213,7 @@
 								<li  th:if="${!sm_url2.isEmpty()}" class="mb-3"><i class="fas fa-file-download mr-3"></i> 
 								<a 
 								th:href="@{${sm_url2}}" name="ScriptPdf"
-								target="_blank" id="ScriptPdf">Create a New Original Script (Requires login on scriptmanager)</a>
+								target="_blank" >Create a New Original Script (Requires login on scriptmanager)</a>
 								<a
 								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
 								
@@ -225,15 +221,15 @@
 								<li th:if="${tutorial.getTimeScript()}"class="mb-3"><i class="fas fa-file-download mr-3"></i> <a 
 								th:if="${tutorial.getScriptStatus() != 0}"
 								th:href="${'/TimeScript/' + tutorial.getTutorialId()}" name="ScriptPdf"
-								target="_blank" id="ScriptPdf">Timed Script</a> <a
-								name="ScriptPdf" target="_blank" id="viewScript" href="#"></a></li>
+								 >Timed Script</a> <a
+								name="ScriptPdf"  id="viewScript" href="#"></a></li>
 								
 							<li class="mb-3" th:unless="${relatedContent}"><i class="fas fa-file-download mr-3"></i> 
-							<a  name="sliedPdf" th:if="${tutorial.getSlideStatus() != 0}" target="_blank" th:href="${'/Slide/' + tutorial.getTutorialId()}"
+							<a  name="sliedPdf" th:if="${tutorial.getSlideStatus() != 0}"  th:href="${'/Slide/' + tutorial.getTutorialId()}"
 																	id="sliedPdf"> Slide</a>
 							</li>
 							<li class="mb-3" th:if="${relatedContent}"><i class="fas fa-file-download mr-3"> </i> 
-							<a name="sliedPdf" target="_blank" th:href="${'/Slide/' + tutorial.getTutorialId()}"
+							<a name="sliedPdf"  th:href="${'/Slide/' + tutorial.getTutorialId()}"
 																	id="sliedPdf"> Slide</a>
 							</li>
 						</ul>
@@ -526,6 +522,7 @@
 
 
  <script th:inline="javascript">
+	const downloadUrl = /*[[@{/files/{file}(file=${downloadVideo})}]]*/ '/files/_withSubtitle.mp4';
     function resetPlyrCaptionLanguageIfNonEnglish(languageCheck) {
         const plyrKey = 'plyr';
         const stored = localStorage.getItem(plyrKey);
@@ -540,6 +537,8 @@
     const srclang = /*[[${srclang}]]*/ "en"; // fallback value
     const languageCheck = /*[[${languageCheck}]]*/ "English"; // fallback value
     resetPlyrCaptionLanguageIfNonEnglish(languageCheck);
+    
+
 </script>
 
 <script>
@@ -597,6 +596,7 @@
     let toast;
 
     document.addEventListener('DOMContentLoaded', () => {
+		
         const videoEl = document.querySelector('.vid1');
         if (!videoEl) return;
 
@@ -607,6 +607,10 @@
                 update: true,
                 language: srclang
             },
+           
+            urls: {
+            download: downloadUrl
+        	},
             
             quality: {
                 default: defaultQuality,

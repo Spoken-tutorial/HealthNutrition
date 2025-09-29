@@ -1924,6 +1924,14 @@ public class HomeController {
             logger.info("Key:{}, Vlaue: {} ", entry.getKey(), entry.getValue());
         }
 
+        String downloadVideo = base + CommonData.WITH_SUBTITLES + extension;
+        Path downloadVideoPath = basePath.resolve(downloadVideo);
+        if (downloadVideoPath.toFile().exists()) {
+            model.addAttribute("downloadVideo", downloadVideo);
+        } else {
+            model.addAttribute("downloadVideo", video720Path);
+        }
+
         if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
             model.addAttribute("relatedContent", tutorial.getRelatedVideo());
 
@@ -5199,6 +5207,36 @@ public class HomeController {
         return "updatePackageName";
     }
 
+    private List<WeekTitleVideo> compareBasedonWeekLanSessionTitle(List<WeekTitleVideo> list) {
+        list.sort(Comparator
+                .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
+                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
+                .thenComparing(Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .thenComparing(WeekTitleVideo::getTitle));
+        return list;
+    }
+
+    private List<WeekTitleVideo> getEnglishTrainingMouduleFirst(List<WeekTitleVideo> list) {
+        List<WeekTitleVideo> englishWeekTitleVideoList = new ArrayList<>();
+        List<WeekTitleVideo> otherLanguagesWeekTitleVideoList = new ArrayList<>();
+        List<WeekTitleVideo> finalWeekTitleVideoList = new ArrayList<>();
+
+        for (WeekTitleVideo temp : list) {
+            if (temp.getVideoResource().getLan().getLangName().equals("English")) {
+                englishWeekTitleVideoList.add(temp);
+            } else {
+                otherLanguagesWeekTitleVideoList.add(temp);
+            }
+        }
+
+        finalWeekTitleVideoList.addAll(compareBasedonWeekLanSessionTitle(englishWeekTitleVideoList));
+
+        finalWeekTitleVideoList.addAll(compareBasedonWeekLanSessionTitle(otherLanguagesWeekTitleVideoList));
+        return finalWeekTitleVideoList;
+
+    }
+
     /******************************************
      * Assign Tutorial on Week And Package End
      ********************/
@@ -5231,21 +5269,14 @@ public class HomeController {
         logger.info("localWeek:{}", localWeek);
         logger.info("localLan:{}", localLan);
 
-        List<WeekTitleVideo> weekTitleVideoList = new ArrayList<>();
-
-        weekTitleVideoList = tutorialWithWeekAndPackageService.findAll().stream()
+        List<WeekTitleVideo> weekTitleVideoList = tutorialWithWeekAndPackageService.findAll().stream()
                 .map(TutorialWithWeekAndPackage::getWeekTitle).distinct().collect(Collectors.toList());
 
-        weekTitleVideoList.sort(Comparator
-                .comparingInt((WeekTitleVideo wtv) -> ServiceUtility.extractInteger(wtv.getWeek().getWeekName()))
-                .thenComparing(wtv -> wtv.getVideoResource().getLan().getLangName())
-                .thenComparing(Comparator.comparing((WeekTitleVideo wtv) -> wtv.getVideoResource().getSessionName(),
-                        Comparator.nullsLast(Comparator.naturalOrder())))
-                .thenComparing(WeekTitleVideo::getTitle));
+        List<WeekTitleVideo> finalWeekTitleVideoList = getEnglishTrainingMouduleFirst(weekTitleVideoList);
 
         model.addAttribute("userInfo", usr);
 
-        model.addAttribute("weekTitleVideoList", weekTitleVideoList);
+        model.addAttribute("weekTitleVideoList", finalWeekTitleVideoList);
 
         return "hstTrainingModule";
 
