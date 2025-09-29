@@ -21,7 +21,7 @@ public class TrainingReourceServiceImpl implements TrainingResourceService {
     private TrainingResourceRepository repo;
 
     @Override
-    public TrainingResource findBTrainingResourceId(int trainingResourceId) {
+    public TrainingResource findByTrainingResourceId(int trainingResourceId) {
 
         return repo.findByTrainingResourceId(trainingResourceId);
     }
