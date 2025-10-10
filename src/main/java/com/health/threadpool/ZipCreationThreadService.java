@@ -299,20 +299,24 @@ public class ZipCreationThreadService {
                             basePath = originalPath;
                         }
 
-                        // Path resolutionSubtitlePath;
-                        // Path originalSubtitlePath;
+                        Path resolutionSubtitlePath;
+                        Path originalSubtitlePath;
 
-                        /*
-                         * if(resolutionSubtitleUrl!=null) { resolutionSubtitlePath =
-                         * Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                         * resolutionSubtitleUrl); if(resolutionSubtitlePath.toFile().exists()) {
-                         * basePath = resolutionSubtitlePath; } }
-                         * 
-                         * if(originalSubtitleUrl!=null && resolutionUrl==null) { originalSubtitlePath =
-                         * Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                         * originalSubtitleUrl); if(originalSubtitlePath.toFile().exists()) { basePath =
-                         * originalSubtitlePath; } }
-                         */
+                        if (resolutionSubtitleUrl != null) {
+                            resolutionSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    resolutionSubtitleUrl);
+                            if (resolutionSubtitlePath.toFile().exists()) {
+                                basePath = resolutionSubtitlePath;
+                            }
+                        }
+
+                        if (originalSubtitleUrl != null && resolutionUrl == null) {
+                            originalSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    originalSubtitleUrl);
+                            if (originalSubtitlePath.toFile().exists()) {
+                                basePath = originalSubtitlePath;
+                            }
+                        }
 
                         String topicwithExtention;
                         Path sourcePath;
