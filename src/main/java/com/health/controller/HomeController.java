@@ -1925,15 +1925,12 @@ public class HomeController {
         }
 
         String downloadVideo = base + CommonData.WITH_SUBTITLES + extension;
-        // Path downloadVideoPath = basePath.resolve(downloadVideo);
-//        if (downloadVideoPath.toFile().exists()) {
-//            model.addAttribute("downloadVideo", downloadVideo);
-//        } else {
-//            model.addAttribute("downloadVideo", video720Path);
-//        }
-
-        // Currently I am using original video without subtitle to download
-        model.addAttribute("downloadVideo", video720Path);
+        Path downloadVideoPath = basePath.resolve(downloadVideo);
+        if (downloadVideoPath.toFile().exists()) {
+            model.addAttribute("downloadVideo", downloadVideo);
+        } else {
+            model.addAttribute("downloadVideo", video720Path);
+        }
 
         if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
             model.addAttribute("relatedContent", tutorial.getRelatedVideo());

@@ -115,7 +115,7 @@ for id in "${tutorial_ids[@]}"; do
 
         # Convert VTT → ASS if missing
         if [[ ! -f "$ass_file" ]]; then
-            ffmpeg -y -i "$vtt_file" -c:s ass "$ass_file"
+            ffmpeg -nostdin -y -hide_banner -nostats -i "$vtt_file" -c:s ass "$ass_file"
             if [[ $? -ne 0 ]]; then
                 echo " ❌ Failed to convert VTT to ASS"
                 continue
@@ -137,7 +137,7 @@ for id in "${tutorial_ids[@]}"; do
                 ((progress_count++))
                 echo " [${progress_count}/${expected_to_convert}] 🎥 Burning subs into: $(basename "$video_file")"
 
-                ffmpeg -nostdin -y -v error -i "$video_file" -vf "ass=$ass_file" "$tmp_output"
+                ffmpeg -nostdin -y -hide_banner -nostats -i "$video_file" -vf "ass=$ass_file" "$tmp_output"
                 if [[ $? -eq 0 ]]; then
                     mv "$tmp_output" "$final_output"
 
