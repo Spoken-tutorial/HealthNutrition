@@ -51,4 +51,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     // @Cacheable(cacheNames = "categories")
     List<Category> findAllByOrderBy();
 
+    List<Category> findByStatusTrueOrderByCatNameAsc();
+
 }

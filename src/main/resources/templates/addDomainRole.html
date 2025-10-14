@@ -79,15 +79,20 @@ font-weight:bold!important;
 							</div>
 							
 						<div class="form-group">
-								<label for="categoryId">Select Category</label> 
-								<select id="categoryDomainId" name="catSelected"
-									class="form-control" required="required">
-									
-									<option th:each="cat : ${categories}" th:value="${cat.getCatName()}" th:text="${cat.getCatName()}">Select Category</option>
+									    <label for="category">Select Categories* <span class="text-muted">(For multiple categories selection, press Ctrl key)</span> </label>
+									    <select id="category"
+									            class="form-control"
+									            name="categoryIds"
+									            multiple="multiple"
+									            size="15" 
+									            required>
+									        <option th:each="cat : ${categories}"
+									                th:value="${cat.getCategoryId()}"
+									                th:text="${cat.getCatName()}">
+									        </option>
+									    </select>
+									</div>
 
-								</select>
-
-						</div>
 							
 								<div class="form-group">
 								 <span style="color: red;"

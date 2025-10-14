@@ -1054,10 +1054,7 @@ $(document).ready(function() {
 			});
 
 			
-			$('#approveContributorId').on('show.bs.tab', function() {
-				location.reload();
-
-			});
+			
 
 			
 			$('#videoViewIdAdmin').on('hidden.bs.modal', function() {
@@ -2850,10 +2847,7 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
 					});
 
 			
-			$('#approveContributorId').on('show.bs.tab', function() {
-				location.reload();
-			});
-
+			
 
 
 	
@@ -4335,205 +4329,231 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
 
 			/* here calling approve button for contributorvideoUpload */
 			
-			$('.approveContributor').click(
-					function() {
-						// use localStorage to retrieve information on
-						// page refresh
-						localStorage.setItem('activeTab', "Contributer");
-
-						var contributionId = $(this).val();
-
-						$.ajax({
-							type : "GET",
-							url : projectPath+"enableRoleById",
-							data : {
-								"id" : contributionId
-							},
-							contentType : "application/json",
-							success : function(result) {
-
-								$("#statusContributor").prop('disabled', false);
-
-								localStorage.setItem('msg', result);
-								location.reload();
-
-							},
-
-							error : function(err) {
-								console.lo3g("not working. ERROR: "+ JSON.stringify(err));
-							}
-
-						});
-
-					});
+		
+				$(document).on('click', '.approveContributor', function (e) {
+			    e.preventDefault(); 
+			
+			    var $btn = $(this); 
+			    var contributionId = $btn.val();
+			     $btn
+			        .prop('disabled', true)
+			        .removeClass('btn-info')
+			        .addClass('btn-warning')
+			        .text('Approving... ⏳');
+			
+			    $.ajax({
+			        type: "GET",
+			        url: projectPath + "enableRoleById",
+			        data: { "id": contributionId },
+			        success: function (result) {
+			            
+			            $btn
+			                .prop('disabled', true)
+			                .removeClass('btn-warning btn-info') 
+			                .addClass('btn-success')
+			                .text('Approved ✅');
+			
+			            
+			            $btn.closest('tr').find('.rejectRole')
+			                .prop('disabled', true)
+			                .removeClass('btn-danger')
+			                .addClass('btn-secondary')
+			                .text('Rejected 🚫 (disabled)');
+			
+			            
+			            $btn.closest('tr').css('background-color', '#e8f8e8');
+			
+			            
+			           
+			        },
+			        error: function (err) {
+			            console.log("Error: " + JSON.stringify(err));
+			           
+			        }
+			    });
+			});
 
 			// Here is code for Admin Reviwer Approve
 /***************************** changes made by om prakash **************************************************/
 			
-			$('.approveAdmin').click(function() {
-						// use localStorage to retrieve information on
-						// page refresh
-						localStorage.setItem('activeTab', "Admin");
-						var contributionId = $(this).val();
-
-						$.ajax({
-							type : "GET",
-							url : projectPath+"enableRoleById",
-							data : {
-								"id" : contributionId
-							},
-							contentType : "application/json",
-							success : function(result) {
-
-								$("#statusAdmin").prop('disabled',false);
-								localStorage.setItem('msg', result);
-
-								$('#ContributerPage').on('hidden.bs.modal', function() {
-
-											location.reload();
-								});
-
-								location.reload();
-							},
-
-							error : function(err) {
-								console.lo3g("not working. ERROR: "+ JSON.stringify(err));
-							}
-
-						});
-
-					});
+			
+				$(document).on('click', '.approveAdmin', function (e) {
+			    e.preventDefault(); 
+			
+			    var $btn = $(this); 
+			    var contributionId = $btn.val();
+			    
+			     $btn
+			        .prop('disabled', true)
+			        .removeClass('btn-info')
+			        .addClass('btn-warning')
+			        .text('Approving... ⏳');
+			
+			    $.ajax({
+			        type: "GET",
+			        url: projectPath + "enableRoleById",
+			        data: { "id": contributionId },
+			        success: function (result) {
+			            
+			            $btn
+			                .prop('disabled', true)
+			                .removeClass('btn-warning btn-info') 
+			                .addClass('btn-success')
+			                .text('Approved ✅');
+			
+			            
+			            $btn.closest('tr').find('.rejectRole')
+			                .prop('disabled', true)
+			                .removeClass('btn-danger')
+			                .addClass('btn-secondary')
+			                .text('Rejected 🚫 (disabled)');
+			
+			            
+			            $btn.closest('tr').css('background-color', '#e8f8e8');
+			
+			            
+			           
+			        },
+			        error: function (err) {
+			            console.log("Error: " + JSON.stringify(err));
+			            
+			        }
+			    });
+			});
 
 			// Here is code for Quality Reviweer
 /***************************** changes made by om prakash **************************************************/
 			
-			$('.approveQuality').click(function() {
-						// use localStorage to retrieve information on
-						// page refresh
-						localStorage.setItem('activeTab', "Quality");
-						var contributionId = $(this).val();
+			$(document).on('click', '.approveQuality', function (e) {
+			    e.preventDefault(); 
+			
+			    var $btn = $(this); 
+			    var contributionId = $btn.val();
+			    
+			     $btn
+			        .prop('disabled', true)
+			        .removeClass('btn-info')
+			        .addClass('btn-warning')
+			        .text('Approving... ⏳');
+			
+			    $.ajax({
+			        type: "GET",
+			        url: projectPath + "enableRoleById",
+			        data: { "id": contributionId },
+			        success: function (result) {
+			            
+			            $btn
+			                .prop('disabled', true)
+			                .removeClass('btn-warning btn-info') 
+			                .addClass('btn-success')
+			                .text('Approved ✅');
+			
+			            
+			            $btn.closest('tr').find('.rejectRole')
+			                .prop('disabled', true)
+			                .removeClass('btn-danger')
+			                .addClass('btn-secondary')
+			                .text('Rejected 🚫 (disabled)');
+			
+			           
+			            $btn.closest('tr').css('background-color', '#e8f8e8');
+			
+			          
+			        },
+			        error: function (err) {
+			            console.log("Error: " + JSON.stringify(err));
+			            
+			        }
+			    });
+			});
 
-						$.ajax({
-							type : "GET",
-							url : projectPath+"enableRoleById",
-							data : {
-								"id" : contributionId
-							},
-							contentType : "application/json",
-							success : function(result) {
-
-								$("#statusQuality").prop('disabled',false);
-								$('#statusQuality').html(result);
-								localStorage.setItem('msg', result);
-
-								$('#ContributerPage').on('hidden.bs.modal', function() {
-
-											location.reload();
-
-								});
-
-								location.reload();
-
-							},
-
-							error : function(err) {
-								console.lo3g("not working. ERROR: "
-										+ JSON.stringify(err));
-							}
-
-						});
-
-					});
+			
 
 			// Here is code for Master Trainer
 
-			$('.approvemaster').click(function() {
-						// use localStorage to retrieve information on
-						// page refresh
-						localStorage.setItem('activeTab',"MasterTrainer");
-
-						var contributionId = $(this).val();
-
-						$.ajax({
-							type : "GET",
-							url : projectPath+"enableRoleById",
-							data : {
-								"id" : contributionId
-							},
-							contentType : "application/json",
-							success : function(result) {
-
-								$("#statusMaster").prop('disabled',false);
-								$('#statusMaster').html(result);
-								localStorage.setItem('msg', result);
-
-								$('#ContributerPage').on('hidden.bs.modal', function() {
-
-											location.reload();
-
-								});
-
-								location.reload();
-
-							},
-
-							error : function(err) {
-								console.log("not working. ERROR: "+ JSON.stringify(err));
-							}
-
-						});
-
-					});
 			
-			//Following function refreshes the table dynamically whenever a row is deleted
-			$('.dynamicTable tbody').on( 'click', '.rejectRole', function () {
-				var elem = $(this).parents('table');
-				var id = $(elem).attr('id');
-				var table = $('#'+id).DataTable();	
-		    	table.row( $(this).parents('tr') ).remove().draw();
-			} );
+				$(document).on('click', '.approvemaster', function (e) {
+			    e.preventDefault(); 
 			
-			//Following function refreshes the table dynamically whenever a row is deleted
-			$('.dynamicTable tbody').on( 'click', '.approveRole', function () {
-				//alert('b');
-				var elem = $(this).parents('table');
-				var id = $(elem).attr('id');
-				var table = $('#'+id).DataTable();	
-		    	table.row( $(this).parents('tr') ).remove().draw();
-			} );
+			    var $btn = $(this); 
+			    var contributionId = $btn.val();
+			    
+			     $btn
+			        .prop('disabled', true)
+			        .removeClass('btn-info')
+			        .addClass('btn-warning')
+			        .text('Approving... ⏳');
 			
-			$('.rejectRole').click(function() {
-				// use localStorage to retrieve information on
-				// page refresh
-				localStorage.setItem('activeTab',"MasterTrainer");
-				var contributionId = $(this).val();
-				
-				
-				var table = $('#tableIdContributor').DataTable();
-
-				$.ajax({
-					type : "GET",
-					url : projectPath+"deleteRole",
-					data : {
-						"id" : contributionId
-					},
-					contentType : "application/json",
-					success : function(result) {
-
-						$("#statusMaster").prop('disabled',false);
-						$('#statusMaster').html(result);
-						localStorage.setItem('msg', result);
-						table.draw();
-				
-					},
-
-					error : function(err) {
-						console.log("not working. ERROR: "+ JSON.stringify(err));
-					}
-
-				});
-
+			    $.ajax({
+			        type: "GET",
+			        url: projectPath + "enableRoleById",
+			        data: { "id": contributionId },
+			        success: function (result) {
+			            
+			            $btn
+			                .prop('disabled', true)
+			                .removeClass('btn-warning btn-info') 
+			                .addClass('btn-success')
+			                .text('Approved ✅');
+			
+			            
+			            $btn.closest('tr').find('.rejectRole')
+			                .prop('disabled', true)
+			                .removeClass('btn-danger')
+			                .addClass('btn-secondary')
+			                .text('Rejected 🚫 (disabled)');
+			
+			            
+			            $btn.closest('tr').css('background-color', '#e8f8e8');
+			
+			            
+			            
+			        },
+			        error: function (err) {
+			            console.log("Error: " + JSON.stringify(err));
+			           
+			        }
+			    });
 			});
+			
+			$(document).on('click', '.rejectRole', function (e) {
+			    e.preventDefault(); 
+			
+			    var $btn = $(this); 
+			    var contributionId = $btn.val();
+			
+			    $.ajax({
+			        type: "GET",
+			        url: projectPath + "deleteRole",
+			        data: { "id": contributionId },
+			        success: function (result) {
+			            
+			            $btn
+			                .prop('disabled', true)
+			                .removeClass('btn-danger')
+			                .addClass('btn-secondary')
+			                .text('Rejected ❌');
+			
+			            
+			            $btn.closest('tr').find('.approveRole')
+			                .prop('disabled', true)
+			                .removeClass('btn-info')
+			                .addClass('btn-light')
+			                .text('Approve (disabled)');
+			
+			           
+			            $btn.closest('tr').css('background-color', '#f8e8e8');
+			
+			            
+			        },
+			        error: function (err) {
+			            console.log("Error: " + JSON.stringify(err));
+			            
+			        }
+			    });
+			});
+
+
 			
 /**************************************** End ************************************************************/
 						$('#contributorId').on('change',function() {

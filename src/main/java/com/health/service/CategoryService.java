@@ -73,4 +73,6 @@ public interface CategoryService {
 
     List<Category> getCategoriesForCache();
 
+    List<Category> findAllEnabledCategories();
+
 }
