@@ -25,6 +25,8 @@ public interface UserRoleService {
      */
     void save(UserRole usrRole);
 
+    void saveAll(List<UserRole> userRoles);
+
     /**
      * List of UserRole object given user object
      * 

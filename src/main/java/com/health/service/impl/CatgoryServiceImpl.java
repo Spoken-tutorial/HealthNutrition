@@ -179,4 +179,10 @@ public class CatgoryServiceImpl implements CategoryService {
         return catTempSorted;
     }
 
+    @Override
+    public List<Category> findAllEnabledCategories() {
+
+        return categoryRepo.findByStatusTrueOrderByCatNameAsc();
+    }
+
 }
