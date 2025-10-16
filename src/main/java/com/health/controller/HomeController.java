@@ -7518,13 +7518,21 @@ public class HomeController {
 
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
+        List<Category> catList = catService.findAllEnabledCategories();
+        model.addAttribute("catList", catList);
 
         List<ContributorAssignedTutorial> userRoles = conService.findAll();
         List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
-            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
-                userRoles1.add(temp);
+            TopicCategoryMapping tcm = temp.getTopicCatId();
+            if (tcm != null) {
+                if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
+                    userRoles1.add(temp);
+                }
+            } else {
+                logger.info("Contributor Assigned Tutorial whose tcm does not exists: {}", temp);
             }
+
         }
 
         List<UserRole> userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
@@ -7544,12 +7552,45 @@ public class HomeController {
     public String assignTutorialToContributorePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "contributorName") String contributorName,
             @RequestParam(name = "languageName") String lanName,
-            @RequestParam(name = "contributorCategory") String catName,
-            @RequestParam(name = "inputTopic") String[] topics) {
+
+            @RequestParam(name = "catName") List<Integer> catIds) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
+
+        List<Category> catList = catService.findAllEnabledCategories();
+        model.addAttribute("catList", catList);
+
+        if (catIds.isEmpty()) {
+            model.addAttribute("error_msg", "please select at least one category and their repective topics");
+            return assignTutorialToContributoreGet(req, model, principal);
+        }
+
+        logger.info("CatIds :{}", catIds);
+        Map<Integer, List<Integer>> catIdAsKeyTopicListasValue = new HashMap<>();
+
+        for (int i = 0; i < catIds.size(); i++) {
+            if (catIds.get(i) == 0)
+                continue;
+
+            String paramName = "topicName_" + i;
+            String[] topicArray = req.getParameterValues(paramName);
+            List<Integer> topicIds = new ArrayList<>();
+            if (topicArray != null) {
+                for (String t : topicArray) {
+                    topicIds.add(Integer.parseInt(t));
+                }
+                catIdAsKeyTopicListasValue.put(catIds.get(i), topicIds);
+
+            }
+        }
+
+        logger.info("cat and topicIds :{}", catIdAsKeyTopicListasValue);
+        if (catIdAsKeyTopicListasValue.isEmpty()) {
+            model.addAttribute("error_msg", "please select at least one category and their repective topics");
+            return assignTutorialToContributoreGet(req, model, principal);
+        }
 
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
@@ -7557,9 +7598,13 @@ public class HomeController {
         List<ContributorAssignedTutorial> userRoles = conService.findAll();
         List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
-            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
-                userRoles1.add(temp);
+            TopicCategoryMapping tcm = temp.getTopicCatId();
+            if (tcm != null) {
+                if (tcm.getCat().isStatus() && tcm.getTopic().isStatus()) {
+                    userRoles1.add(temp);
+                }
             }
+
         }
 
         List<UserRole> userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
@@ -7579,52 +7624,96 @@ public class HomeController {
         model.addAttribute("userByContributors", userRolesUniqueTemp);
 
         Language lan = lanService.getByLanName(lanName);
-        Category cat = catService.findByid(Integer.parseInt(catName));
+
         User userAssigned = userService.findByUsername(contributorName);
+
+        if (lan == null || userAssigned == null) {
+            model.addAttribute("error_msg", "please select both user and language");
+            return assignTutorialToContributoreGet(req, model, principal);
+        }
 
         int conNewId = conService.getNewId();
         int conMutliUserNewId = conMultiUser.getNewId();
 
-        for (String topic : topics) {
+        for (Map.Entry<Integer, List<Integer>> entry : catIdAsKeyTopicListasValue.entrySet()) {
+            int categoryId = entry.getKey();
 
-            Topic localtopic = topicService.findById(Integer.parseInt(topic));
-            if (localtopic != null) {
+            Category cat = catService.findByid(categoryId);
+            if (cat == null)
+                continue;
+            List<Integer> topicList = entry.getValue();
+            logger.info("Category ID: " + categoryId);
+            logger.info("Topic ids: " + topicList);
 
-                TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat, localtopic);
+            if (cat != null) {
 
-                ContributorAssignedTutorial x = conService.findByTopicCatAndLanViewPart(topicCat, lan);
+                if (topicList != null && !topicList.isEmpty()) {
+                    for (int id : topicList) {
 
-                if (x == null) {
+                        if (id != 0) {
+                            Topic localtopic = topicService.findById(id);
+                            if (localtopic != null) {
 
-                    ContributorAssignedTutorial temp = new ContributorAssignedTutorial(conNewId++,
-                            ServiceUtility.getCurrentTime(), topicCat, lan);
-                    conService.save(temp);
-                    ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
-                            conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, temp);
-                    conMultiUser.save(multiUser);
+                                TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat,
+                                        localtopic);
 
-                } else {
+                                ContributorAssignedTutorial x = null;
 
-                    ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
-                            conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, x);
-                    conMultiUser.save(multiUser);
+                                if (topicCat != null) {
+                                    x = conService.findByTopicCatAndLanViewPart(topicCat, lan);
+                                }
 
+                                if (x == null && topicCat != null) {
+
+                                    ContributorAssignedTutorial temp = new ContributorAssignedTutorial(conNewId++,
+                                            ServiceUtility.getCurrentTime(), topicCat, lan);
+                                    conService.save(temp);
+                                    ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
+                                            conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, temp);
+                                    conMultiUser.save(multiUser);
+
+                                } else if (x != null) {
+
+                                    List<ContributorAssignedMultiUserTutorial> conUserList = conMultiUser
+                                            .findByUserAndConAssignedTutorial(userAssigned, x);
+                                    if (conUserList.isEmpty()) {
+                                        ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
+                                                conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, x);
+                                        conMultiUser.save(multiUser);
+                                    } else {
+                                        for (ContributorAssignedMultiUserTutorial tempCon : conUserList) {
+                                            logger.info(
+                                                    "Existing UserName: {}, ContributorAssignedMultiUserTutorial id: {}",
+                                                    tempCon.getUser().getUsername(), tempCon.getId());
+                                        }
+                                    }
+
+                                }
+
+                            } else {
+
+                                model.addAttribute("error_msg", CommonData.CONTRIBUTOR_TOPIC_ERROR);
+                                return "assignContributorList";
+                            }
+
+                        }
+                    }
                 }
-
-            } else {
-
-                model.addAttribute("error_msg", CommonData.CONTRIBUTOR_TOPIC_ERROR);
-                return "assignContributorList";
             }
+
         }
 
         userRoles = conService.findAll();
 
         userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
-            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
-                userRoles1.add(temp);
+            TopicCategoryMapping tcm = temp.getTopicCatId();
+            if (tcm != null) {
+                if (tcm.getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
+                    userRoles1.add(temp);
+                }
             }
+
         }
 
         userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);

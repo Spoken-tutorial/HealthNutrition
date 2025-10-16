@@ -3,6 +3,7 @@ package com.health.service;
 import java.util.List;
 
 import com.health.model.ContributorAssignedMultiUserTutorial;
+import com.health.model.ContributorAssignedTutorial;
 import com.health.model.User;
 
 /**
@@ -36,4 +37,8 @@ public interface ContributorAssignedMultiUserTutorialService {
      * @return list of ContributorAssignedMultiUserTutorial object
      */
     List<ContributorAssignedMultiUserTutorial> getAllByuser(User usr);
+
+    List<ContributorAssignedMultiUserTutorial> findByUserAndConAssignedTutorial(User user,
+            ContributorAssignedTutorial conAssignedTutorial);
+
 }
