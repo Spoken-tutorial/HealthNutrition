@@ -493,19 +493,10 @@ public class TaskProcessingService {
         Optional<String> videoPath = Optional.of("");
         Optional<String> thumbnailPath = Optional.of("");
 
-        Optional<Integer> catId = Optional.empty();
-        Optional<String> category = Optional.empty();
-        Optional<Integer> topicId1 = Optional.empty();
-        Optional<String> topicName = Optional.empty();
-
-        TopicCategoryMapping topicCat = brochure.getTopicCatId();
-        if (topicCat != null) {
-            catId = Optional.of(topicCat.getCat().getCategoryId());
-            category = Optional.of(topicCat.getCat().getCatName());
-            topicId1 = Optional.of(topicCat.getTopic().getTopicId());
-            topicName = Optional.of(topicCat.getTopic().getTopicName());
-
-        }
+        Optional<Integer> categoryId = Optional.of(0);
+        Optional<Integer> topicId = Optional.of(0);
+        Optional<String> category = Optional.of("");
+        Optional<String> topic = Optional.of("");
 
         String documentType = CommonData.DOCUMENT_TYPE_BROCHURE;
 
@@ -525,7 +516,7 @@ public class TaskProcessingService {
             if (requestType.equals(CommonData.ADD_DOCUMENT) && !fileofBro.isAddedQueue()) {
 
                 Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl, rank,
-                        view_url, languageId, language, catId, category, topicId1, topicName, null, requestType,
+                        view_url, languageId, language, categoryId, category, topicId, topic, null, requestType,
                         videoPath, title, description, thumbnailPath, null);
                 if (resultMap.containsValue(CommonData.SUCCESS))
                     fileofBro.setAddedQueue(true);
@@ -537,8 +528,8 @@ public class TaskProcessingService {
                         || requestType.equals(CommonData.UPDATE_DOCUMENT_RANK)
                         || requestType.equals(CommonData.DELETE_DOCUMENT)) {
                     Map<String, String> resultMap = addDocument(documentId, documentType, documentPath, documentUrl,
-                            rank, view_url, languageId, language, catId, category, topicId1, topicName, null,
-                            requestType, null, title, null, thumbnailPath, null);
+                            rank, view_url, languageId, language, null, null, null, null, null, requestType, null,
+                            title, null, thumbnailPath, null);
 
                     if (requestType.equals(CommonData.DELETE_DOCUMENT)) {
                         if (resultMap.containsValue(CommonData.SUCCESS))
