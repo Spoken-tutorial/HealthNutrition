@@ -3345,8 +3345,7 @@ public class HomeController {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-        List<Category> category = catService.findAll();
-        model.addAttribute("categories", category);
+
         List<Language> lans = lanService.getAllLanguages();
         model.addAttribute("languages", lans);
         List<Brouchure> brouchures = broService.findAll();
@@ -3380,7 +3379,7 @@ public class HomeController {
     @PostMapping("/addBrochure")
     public String addBrochurePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("brouchure") List<MultipartFile> brochures,
-            @RequestParam(value = "categoryName") int categoryId, @RequestParam(name = "inputTopicName") int topicId,
+
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam(value = "primaryVersion") int primaryVersion, @RequestParam(name = "title") String title) {
 
@@ -3392,8 +3391,7 @@ public class HomeController {
         model.addAttribute("viewSection", viewSection);
 
         List<Language> languages = lanService.getAllLanguages();
-        List<Category> categories = catService.findAll();
-        model.addAttribute("categories", categories);
+
         model.addAttribute("languages", languages);
         List<Brouchure> brouchures = broService.findAll();
 
@@ -3418,10 +3416,6 @@ public class HomeController {
 
         }
 
-        Category cat = catService.findByid(categoryId);
-
-        Topic topic = topicService.findById(topicId);
-
         String versionStr = Integer.toString(primaryVersion);
 
         if (versionStr == null) { // throw error
@@ -3445,17 +3439,6 @@ public class HomeController {
         brochureTemp.setLan(lan);
         brochureTemp.setTitle(title);
         brochureTemp.setPrimaryVersion(primaryVersion);
-
-        if (cat != null) {
-            brochureTemp.setCatId(cat);
-        }
-
-        if (cat != null && topic != null)
-
-        {
-            TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-            brochureTemp.setTopicCatId(topicCat);
-        }
 
         Version version = new Version();
 

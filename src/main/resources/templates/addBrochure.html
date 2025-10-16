@@ -59,28 +59,9 @@ font-weight:bold!important;
 							<div class="col-lg-6">
 								<form th:action="@{/addBrochure}"
 									method="post" enctype="multipart/form-data">
-									<div class="form-group">
-										<label for="MasterCategoryId">Select Category </label> <select
-											id="MasterCategoryId" class="form-control"
-											name="categoryName" >
+									
 
-											<option value="0">Select any one category</option>
-											
-												<option 
-												th:each="category: ${categories}"
-												th:value="${category.getCategoryId()}" th:text="${category.getCatName()}">
-														</option>
-										
-										</select>
-									</div>
-
-									<div class="form-group">
-										<label for="inputTopic">Select Topic </label> <select
-											id="inputTopic" class="form-control" name="inputTopicName"
-											>
-											<option value="0">Select Topic</option>
-										</select>
-									</div>
+									
 									
 									<div class="form-group">
 
@@ -138,8 +119,7 @@ font-weight:bold!important;
   <thead>
     <tr>
     <th scope="col">Date Added</th>
-      <th scope="col">Category Name</th>
-      <th scope="col">Topic Name</th>
+     
       <th scope="col">Language</th>
       <th scope="col">Title</th>
       <th scope="col">Brochure</th>
@@ -154,13 +134,8 @@ font-weight:bold!important;
        <span th:text="${ver.getDateAdded()}"></span>
        
       </td>
-      <td >
-       <span th:text="${ver.getBrouchure().getCatId() != null ? ver.getBrouchure().getCatId().getCatName() : 'NA'}"></span>
-      </td>
-      <td>
-       <span th:text="${ver.getBrouchure().getTopicCatId() != null ? ver.getBrouchure().getTopicCatId().getTopic().getTopicName() : 'NA'}"></span>
-       
-     </td>
+      
+     
       <td><span  th:text="${ver.findAlllangNames()}"> </span>
 	  </td>
 	   <td><span th:text = "${ver.getBrouchure().getTitle()}"> </span>

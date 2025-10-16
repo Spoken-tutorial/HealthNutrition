@@ -123,7 +123,7 @@ border-right: 2px solid #014F7A;
 					            	<th>Date Added</th>
 					            	<th>Brochure</th>
 					            	<th>Title</th>
-					                <th>Category name</th>
+					               
 					                <th>Language Name</th>
 					            </tr>
 					            </thead>
@@ -143,8 +143,7 @@ border-right: 2px solid #014F7A;
 										<a th:href="${'/Brochure/' + filesBro.getBroFileId()}" download >Download</a>
 					                </td>
 					                 <td th:text="${filesBro.getVersion().getBrouchure().getTitle()}"></td>
-					                <td > 
-					                  <span th:text="${filesBro.getVersion().getBrouchure().getCatId() != null ?filesBro.getVersion().getBrouchure().getCatId().getCatName() : 'NA'}"></span></td>
+					                
 					                <td th:text="${filesBro.getLan().getLangName()}"></td>
 					            </tr>
 					            
