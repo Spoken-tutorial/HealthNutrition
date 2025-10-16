@@ -4606,39 +4606,34 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
 						});
 					});
 			
-/************************* changes made by om prakash **********************************************/	
-			$('#catgoryByContributor').on('change',function() {
-						var category = $(this).find("option:selected").val();
-						$.ajax({
-							type : "GET",
-							url : projectPath+"loadTopicByCategoryInAssignContri",
-							data : {
-								"id" : category
-							},
-							contentType : "application/json",
-							success : function(result) {
-
-								var html = '';
-								var len = result.length;
-
-								$.each(result , function( key, value ) {
-			  	  			        html += '<option value=' + key + '>'
-			  			               + value
-			  			               + '</option>';
-			  	  			 		})
-			  	  			 	html += '</option>';
-								$("#assignTopic").prop('disabled', false);
-								$('#assignTopic').html(html);
-
-							},
-							error : function(err) {
-								console.log("not working. ERROR: "+ JSON.stringify(err));
-							}
-						});
-
-					});
-					
-					
+/************************* changes made by Alok **********************************************/	
+			$('.cat-select').on('change', function () {
+				    var category = $(this).find("option:selected").val();
+				    var index = $(this).data("index"); // Get the index of this category select
+				    var topicSelect = $('#topicId' + index); // Get the corresponding topic select by ID
+				
+				    $.ajax({
+				        type: "GET",
+				        url: projectPath + "loadTopicByCategoryInAssignContri",
+				        data: { id: category },
+				        contentType: "application/json",
+				        success: function (result) {
+				            var html = '';
+				
+				            $.each(result, function (key, value) {
+				                html += '<option value="' + key + '">' + value + '</option>';
+				            });
+				
+				            topicSelect.prop('disabled', false);
+				            topicSelect.html(html); // Set topics only for this row
+				        },
+				        error: function (err) {
+				            console.log("not working. ERROR: " + JSON.stringify(err));
+				        }
+				    });
+				});
+				
+									
 
 			
 /*********************************** end*******************************************************/
