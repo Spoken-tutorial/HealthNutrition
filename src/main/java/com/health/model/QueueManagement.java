@@ -1,5 +1,6 @@
 package com.health.model;
 
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -456,7 +457,9 @@ public class QueueManagement implements Runnable {
                         || getRequestType().equals(CommonData.UPDATE_DOCUMENT)) {
 
                     documentSb.append("/");
-                    documentSb.append(language);
+                    String encodedLanguage = URLEncoder.encode(language, "UTF-8").replace("+", "%20");
+
+                    documentSb.append(encodedLanguage);
                     documentSb.append("/");
                     documentSb.append(rank);
                     api_url = documentSb.toString();

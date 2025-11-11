@@ -887,8 +887,10 @@ public class HomeController {
         List<Version> versions = new ArrayList<Version>();
         for (Brouchure bro : brochures) {
             for (Version ver : allVersions) {
-                if (bro.getId() == ver.getBrouchure().getId() && bro.getPrimaryVersion() == ver.getBroVersion())
+                if (bro.getId() == ver.getBrouchure().getId() && bro.getPrimaryVersion() == ver.getBroVersion()
+                        && !(ver.findWebFileofEnglish().isEmpty()))
                     versions.add(ver);
+
             }
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
