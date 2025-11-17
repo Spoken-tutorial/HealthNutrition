@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Add Training Resource - Admin - Health And Nutrition')"></head>
+<style>
+.nav-add_training_resource{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-add_training_resource a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+
+ .trainingResourceTable {
+        background-color: #f8f9fa; /* Light gray background */
+        color: #333; /* Dark text color */
+    }
+
+    .trainingResourceTable th {
+        background-color: #007bff; /* Blue header background */
+        color: white; /* White header text */
+    }
+
+    .trainingResourceTable td {
+        background-color: #ffffff; /* White cell background */
+    }
+
+    .trainingResourceTable tr:nth-child(even) td {
+        background-color: #f2f2f2; /* Light gray for even rows */
+    }
+    
+   
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">Training Resource View</a></li>
+						
+				
+   
+
+
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Training Resource </h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-8">
+							
+										<form th:action="@{/addTrainingResource}" method="post"
+											enctype="multipart/form-data" id="inputForm">
+											<div id="rawData">
+												
+											</div>
+											
+											  
+											 
+											  
+											  <div class="form-group">
+													<label for="topicId"><b>Select Topic *</b></label> <select id="topicId"
+														class="form-control package_input" name="topicId" required="required">
+
+															<option value='0'>Select Topic</option>
+														
+															<option th:each="topic: ${topics}" th:value="${topic.getTopicId()}" th:text="${topic.getTopicName()}">
+														</option>
+								
+													</select>
+
+											</div>
+							
+							
+
+											
+										 <input type="hidden" id="lengthofLanguage" name="lengthofLanguage"  th:value="${languages.size()}"/>	
+										
+									<div th:each="lan,iter: ${languages}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									
+									<div class="container">
+										
+								        <div class="row">
+								            <div class="col-md-5">
+								              
+								               <div class="form-group">
+		               	                 		<label th:if="${iter.index == 0}" th:for="${'lanId' + iter.index}">Select Language </label>
+												<select th:id="${'lanId' + iter.index}" class="form-control week-select" name="langName" th:data-index="${iter.index}">
+			  									<option value="0">Select Language</option>
+			  									<option th:each="lanitr : ${languages}" th:value="${lanitr.getLanId()}" th:text="${lanitr.getLangName()}"></option>
+												</select>
+		  									</div>
+								            
+								            </div>
+								            
+								         
+								            
+								            <div class="col-md-7">
+												
+								            <div class="form-group">
+
+												<label th:if="${iter.index == 0}" th:for="${'file' + iter.index}">Upload File</label> 
+												<input type="file" class="form-control" th:id="${'fileId' + iter.index}" name="file" th:data-index="${iter.index}" accept=".jpeg,.jpg,.png,.pdf,.doc,.xlsx,.csv,.zip"  onchange="validate_file_size(this,734003200)"/>
+												<small> (.jpg or .png or .pdf or .docx or .odt or .xlsx or .csv  or .zip Only)</small> 
+												<small>Max file size : 700 MB</small>
+
+											</div>
+												
+								            </div>
+								        </div>
+								    </div>
+									
+									
+
+									
+
+									
+									<br>
+									</div>									  
+											<br>
+																        
+									        
+											
+											<button type="submit" class="btn  btn-success"  style="float:left;  margin-left:15px; margin-right:40px;">Submit</button>
+										</form>
+										
+									
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable"  data-order='[[ 0, "desc" ]]'>
+						
+							
+							<thead>
+								<tr>
+									<th scope="col">Date Added</th>
+									<th scope="col">Topic</th>
+									
+									<th scope="col">Language</th>
+									<th scope="col">Enable/Disable</th>
+									<th scope="col">Files</th>
+									
+									 
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="temp : ${topicLanList}">
+								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
+								 <td><span th:text = "${temp.getTopic().getTopicName()}"></span></td>
+								  <td><span th:text = "${temp.getLan().getLangName()}"></span></td>
+							      <td>
+	  		
+						   			<div th:if="${temp.isStatus()}">
+						   				<a class="disableTopicLanguage" th:value="${temp.getTopicLanId()}" title="Click to Disable Topic-Language"><i class="fas fa-times-circle" th:id="${temp.getTopicLanId()}" style="color:red"></i></a>
+						   			</div>
+						   			<div th:unless="${temp.isStatus()}">
+						   				<a class="enableTopicLanguage" th:value="${temp.getTopicLanId()}" title="Click to Enable Topic-Language"><i class="fas fa-check-circle" th:id="${temp.getTopicLanId()}" style="color:green"></i> </a>
+						   			</div>
+						   		
+						  			</td>
+							
+							      <td>
+									    <div th:if="${temp.getAllTrainingResourceFile() != null}">
+						                    <table class="table table-striped weekTitleTable" th:id="${'trainingResourceTable' + temp.getTopicLanId() }">
+												<thead>
+													<tr>
+														<th scope="col"> </th>
+														<th scope="col">PNG File</th>
+														<th scope="col">PDF File</th>
+														<th scope="col">DOC File</th>
+														<th scope="col">Excel File</th>
+														
+														
+													</tr>
+												</thead>
+												<tbody>
+						                        <tr th:each="tempTrainingReaiurce : ${temp.getAllTrainingResourceFile()}">
+						                            <td><span th:text="${tempTrainingReaiurce.PngFile()}"></span>
+						                            <a th:href="@{${'/trainingReource/edit/Png/' + temp.getTrainingResourceId()}}">Edit</a></td>
+						                            <td><span th:text="${tempTrainingReaiurce.getPdfFile()}"></span>
+						                             <a th:href="@{${'/trainingReource/edit/Pdf/' + temp.getTrainingResourceId()}}">Edit</a></td>
+						                            <td><span th:text="${tempTrainingReaiurce.getDocFile()}"></span></td>
+						                             <a th:href="@{${'/trainingReource/edit/Doc/' + temp.getTrainingResourceId()}}">Edit</a>
+						                            <td><span th:text="${tempTrainingReaiurce.getExcelFile()}"></span></td>
+						                             <a th:href="@{${'/trainingReource/edit/Excel/' + temp.getTrainingResourceId()}}">Edit</a>
+						                        </tr>
+						                        </tbody>
+						                    </table>
+						                </div>
+								  </td>
+							     
+								  
+							    </tr>
+
+							</tbody>
+						</table >
+						</div>
+						
+												
+						
+
+						
+					</div>
+
+
+
+				</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script type="text/javascript">
+$(document).ready( function () {
+	$('#trainingResourceTable').DataTable();
+    $('#myTable').DataTable();
+    $('.trainingResourceTable').each(function() {
+				$(this).DataTable();
+			});
+    
+     
+    
+   
+} );
+
+var divid = 0;
+
+function addListener(divid) {
+	var lanSelect = document.getElementById("lanId" + (divid - 1));
+	if (lanSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	lanSelect.addEventListener("change", function() {
+	  var selectedLan = lanSelect.value;
+	  if (selectedLan !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+function setRequired(divid) {
+	var topicName = document.getElementById("topicId" + divid).value;
+	var lan = document.getElementById("lanId" + divid);
+	var title = document.getElementById("fileId" + divid);
+	video.required = (value != "");
+	title.required = (value != "");
+	return false;
+}
+
+addRow(divid);
+
+
+</script>
+
+	<script th:inline="javascript">
+	
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>

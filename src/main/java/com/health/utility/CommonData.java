@@ -163,6 +163,8 @@ public class CommonData {
 
     public static String uploadBrouchure = "Media/Content/Brochure/";
 
+    public static String uploadTrainingResource = "Media/Content/TrainingResource/";
+
     public static String uploadPromoVideo = "Media/Content/PromoVideo/";
 
     public static String uploadVersion = "Media/Content/Version/";
@@ -269,6 +271,13 @@ public class CommonData {
     public static String SUCCESS_STATUS = "1";
 
     public int HANDLER_DATA = 10000000;
+
+    public static final String PDF_EXTENSION = "pdf";
+    public static final String EXCEL_EXTENSION = "excel";
+    public static final String DOC_EXTENSION = "doc";
+    public static final String IMAGE_EXTENSION = "img";
+    public static final String ZIP_EXTENSION = "zip";
+    public static final String UNSUPPORTED_EXTENSION = "unsupported";
 
     public static final String STATUS = "status";
     public static final String STATUS_QUEUED = "queued";

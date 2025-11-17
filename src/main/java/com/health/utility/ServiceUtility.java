@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,12 +23,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
@@ -37,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -376,6 +383,112 @@ public class ServiceUtility {
         }
 
         return true;
+    }
+
+    /*
+     * check FileExtention of Training Resource
+     * 
+     */
+
+    public static String checkFileExtensions(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        if (filename == null) {
+            return CommonData.UNSUPPORTED_EXTENSION;
+        }
+
+        String lowerCaseFilename = filename.toLowerCase();
+
+        if (lowerCaseFilename.endsWith(".pdf")) {
+            return CommonData.PDF_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".csv") || lowerCaseFilename.endsWith(".ods")
+                || lowerCaseFilename.endsWith(".xlsx")) {
+            return CommonData.EXCEL_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".docx") || lowerCaseFilename.endsWith(".odt")
+                || lowerCaseFilename.endsWith(".rtf")) {
+            return CommonData.DOC_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".png") || lowerCaseFilename.endsWith(".jpg")
+                || lowerCaseFilename.endsWith(".jpeg")) {
+            return CommonData.IMAGE_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".zip")) {
+            return CommonData.ZIP_EXTENSION;
+        } else {
+            return CommonData.UNSUPPORTED_EXTENSION;
+        }
+    }
+
+    /**
+     * Check file extentions of zip for training Resource
+     * 
+     * @throws IOException
+     * @throws FileNotFoundException
+     * 
+     */
+
+    public static Set<String> checkFileExtentionsInZip(MultipartFile file) {
+        Set<String> extensions = new HashSet<>();
+
+        try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    String ext = FilenameUtils.getExtension(entry.getName()).toLowerCase();
+                    if (ext.equals("pdf")) {
+                        extensions.add(CommonData.PDF_EXTENSION);
+                    } else if (ext.equals("csv") || ext.equals("ods") || ext.equals("xlsx")) {
+                        extensions.add(CommonData.EXCEL_EXTENSION);
+                    } else if (ext.equals("png") || ext.equals("jpg") || ext.equals("jpeg")) {
+                        extensions.add(CommonData.IMAGE_EXTENSION);
+                    } else if (ext.equals("docx") || ext.equals("odt") || ext.equals("rtf")) {
+                        extensions.add(CommonData.DOC_EXTENSION);
+                    }
+
+                    else {
+                        extensions.add(CommonData.UNSUPPORTED_EXTENSION);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception Error in checkFileExtentionsINZip", e);
+        }
+
+        logger.info("Extensions found in zip: {}", extensions);
+
+        return extensions;
+
+    }
+
+    public static Set<String> checkFileExtentionsInZip(ZipFile zip) {
+        Set<String> extensions = new HashSet<>();
+
+        try {
+
+            for (Enumeration e = zip.entries(); e.hasMoreElements();) {
+                ZipEntry entry = (ZipEntry) e.nextElement();
+                if (!entry.isDirectory()) {
+                    String ext = FilenameUtils.getExtension(entry.getName()).toLowerCase();
+                    if (ext.equals("pdf")) {
+                        extensions.add(CommonData.PDF_EXTENSION);
+                    } else if (ext.equals("csv") || ext.equals("ods") || ext.equals("xlsx")) {
+                        extensions.add(CommonData.EXCEL_EXTENSION);
+                    } else if (ext.equals("png") || ext.equals("jpg") || ext.equals("jpeg")) {
+                        extensions.add(CommonData.IMAGE_EXTENSION);
+                    } else if (ext.equals("docx") || ext.equals("odt") || ext.equals("rtf")) {
+                        extensions.add(CommonData.DOC_EXTENSION);
+                    }
+
+                    else {
+                        extensions.add(CommonData.UNSUPPORTED_EXTENSION);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception Error in checkFileExtentionsINZip", e);
+        }
+
+        logger.info("Extensions found in zip: {}", extensions);
+
+        return extensions;
+
     }
 
     /**
