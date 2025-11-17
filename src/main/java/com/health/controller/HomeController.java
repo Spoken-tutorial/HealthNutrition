@@ -116,8 +116,10 @@ import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
+import com.health.model.TopicLanMapping;
 import com.health.model.TraineeInformation;
 import com.health.model.TrainingInformation;
+import com.health.model.TrainingResource;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.TutorialWithWeekAndPackage;
@@ -161,9 +163,11 @@ import com.health.service.SpokenVideoService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
 import com.health.service.TopicCategoryMappingService;
+import com.health.service.TopicLanMappingService;
 import com.health.service.TopicService;
 import com.health.service.TraineeInformationService;
 import com.health.service.TrainingInformationService;
+import com.health.service.TrainingResourceService;
 import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
 import com.health.service.TutorialWithWeekAndPackageService;
@@ -280,6 +284,12 @@ public class HomeController {
 
     @Autowired
     private WeekTitleVideoService weekTitleVideoService;
+
+    @Autowired
+    private TopicLanMappingService topicLanMapiingService;
+
+    @Autowired
+    private TrainingResourceService trainingResourceService;
 
     @Autowired
     private TopicCategoryMappingService topicCatService;
@@ -5299,6 +5309,218 @@ public class HomeController {
     /******************************************
      * Assign Tutorial on Week And Package End
      ********************/
+
+    @GetMapping("/addTrainingResource")
+    public String addTrainingResourceGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        List<Language> languages = getLanguages();
+
+        languages.sort(Comparator.comparing(Language::getLangName));
+
+        model.addAttribute("languages", languages);
+
+        List<Topic> topics = getTopics();
+        model.addAttribute("topics", topics);
+
+        return "addTrainingResource";
+    }
+
+    @PostMapping("/addTrainingResource")
+    public String addTrainingResourcePost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "topicId") int topicId, @RequestParam("langName") List<Integer> lanIds,
+            @RequestParam(name = "file") List<MultipartFile> files) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        boolean viewSection = false;
+
+        if (topicId == 0) {
+            model.addAttribute("error_msg", "Topic should not be null");
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            return addTrainingResourceGet(req, principal, model);
+        }
+
+        if (lanIds.isEmpty() || files.isEmpty()) {
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            model.addAttribute("error_msg", "Language and Files should not be null");
+            return addTrainingResourceGet(req, principal, model);
+        }
+
+//        for (MultipartFile uniquefile : files) {
+//            if (!uniquefile.isEmpty()) {
+//                if (!ServiceUtility.checkFileExtensionZip(uniquefile)) {
+//                    model.addAttribute("error_msg", "Only zip files are supported");
+//                    return addTrainingResourceGet(req, principal, model);
+//                }
+//            }
+//
+//        }
+
+        Topic topic = topicService.findById(topicId);
+
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+
+        List<TrainingResource> trainingResources = new ArrayList<>();
+
+        Set<Language> addedLan = new HashSet<>();
+
+        try {
+
+            for (int i = 0; i < lanIds.size(); i++) {
+                if (i < files.size())
+                    logger.info("File: {}", files.get(i));
+                if (lanIds.get(i) != 0 && !files.get(i).isEmpty()) {
+                    Language language = lanService.getById(lanIds.get(i));
+
+                    if (language != null) {
+                        String langName = language.getLangName();
+                        TopicLanMapping topicLanMapping = topicLanMapiingService.findByTopicAndLan(topic, language);
+
+                        boolean addedLanFlag = addedLan.add(language);
+
+                        if (topicLanMapping == null && addedLanFlag) {
+                            topicLanMapping = new TopicLanMapping(dateAdded, topic, language);
+
+                            topicLanMapiingService.save(topicLanMapping);
+                            logger.info(" iter:{}  TopicLanMapping :{}", i, topicLanMapping);
+                        }
+
+                        // String zipOriginalFilename = zipFile.getOriginalFilename();
+
+                        // Save the zip file temporarily to extract contents
+                        // Path tempZipPath = Files.createTempFile("uploaded-", ".zip");
+                        // Files.write(tempZipPath, zipFile.getBytes());
+
+                        List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(topicLanMapping);
+                        TrainingResource tr = null;
+
+                        if (trList.isEmpty()) {
+                            tr = new TrainingResource();
+                            logger.info("iter:{} TrainingResource  :{}", i, tr);
+
+                        } else {
+                            tr = trList.get(0);
+                        }
+                        int trId = tr.getTrainingResourceId();
+
+                        Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trId), langName);
+
+                        String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
+                        String docFolder = Paths.get(rootPath.toString(), "docs").toString();
+                        String excelFolder = Paths.get(rootPath.toString(), "excel").toString();
+                        String imageFolder = Paths.get(rootPath.toString(), "image").toString();
+
+                        Set<String> extentions = new HashSet<>();
+                        String document = "";
+
+                        MultipartFile file = files.get(i);
+
+                        String fileExtention = ServiceUtility.checkFileExtensions(file);
+
+                        if (fileExtention.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                            model.addAttribute("error_msg", "Unsupported file Error at language:" + langName);
+                            viewSection = true;
+                            model.addAttribute("viewSection", viewSection);
+                            return addTrainingResourceGet(req, principal, model);
+                        }
+
+                        else if (fileExtention.equals(CommonData.PDF_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                            tr.setPdfPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.DOC_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                            tr.setDocPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                            tr.setExcelPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)) {
+                            document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                            tr.setImgPath(document);
+                        }
+
+                        if (fileExtention.equals(CommonData.ZIP_EXTENSION)) {
+                            // ZipFile zip=new ZipFile(file.getOriginalFilename());
+                            extentions = ServiceUtility.checkFileExtentionsInZip(file);
+                            if (extentions.size() == 1) {
+                                for (String ext : extentions) {
+                                    if (ext.equals(CommonData.PDF_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                                        tr.setPdfPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.DOC_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                                        tr.setDocPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.EXCEL_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                                        tr.setExcelPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.IMAGE_EXTENSION)) {
+                                        document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                                        tr.setImgPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                                        viewSection = true;
+                                        model.addAttribute("viewSection", viewSection);
+                                        model.addAttribute("error_msg",
+                                                "Unsupported file Error at language:" + langName);
+
+                                        return addTrainingResourceGet(req, principal, model);
+                                    }
+
+                                }
+                            }
+
+                            else {
+                                model.addAttribute("error_msg",
+                                        "Zip contains different types of files Error at language:" + langName);
+                                viewSection = true;
+                                model.addAttribute("viewSection", viewSection);
+                                return addTrainingResourceGet(req, principal, model);
+                            }
+
+                        }
+
+                        tr.setDateAdded(dateAdded);
+                        tr.setTopicLanMapping(topicLanMapping);
+                        trainingResources.add(tr);
+                        // Files.deleteIfExists(tempZipPath);
+
+                    }
+
+                }
+
+            }
+
+            trainingResourceService.saveAll(trainingResources);
+
+        } catch (Exception e) {
+            model.addAttribute("error_msg", "Some errors occurred, please contact the Admin");
+            logger.error("Error:", e);
+            return addTrainingResourceGet(req, principal, model);
+        }
+
+        model.addAttribute("viewSection", viewSection);
+        model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        return addTrainingResourceGet(req, principal, model);
+    }
 
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,
