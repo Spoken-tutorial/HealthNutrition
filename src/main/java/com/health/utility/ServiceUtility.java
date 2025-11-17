@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -65,6 +66,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.health.model.TrainingResource;
 import com.health.model.User;
 import com.health.repository.UserRepository;
 import com.health.threadpool.TimeoutOutputStream;
@@ -1082,11 +1084,6 @@ public class ServiceUtility {
         });
     }
 
-    /*
-     * dowanload Manager
-     * 
-     */
-
     public static String downloadManager(String zipUrl, AtomicInteger downloadCount, int downloadLimit,
             long downloadTimeOut, Environment env, HttpServletResponse response) {
         String message = "Please try again after 30 minutes.";
@@ -1151,6 +1148,48 @@ public class ServiceUtility {
 
         String videoResolutionPath = base + resolution + extension;
         return videoResolutionPath;
+
+    }
+
+    public static String copyFileAndGetRelativePath(File sourceFile, String destinationFolder, String fileName,
+            Environment env) throws IOException {
+
+        logger.info("destination Folder: {}", destinationFolder);
+        logger.info("fileName: {}", fileName);
+
+        Path destinationFolderPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                destinationFolder);
+        boolean flag = createFolder(destinationFolderPath);
+
+        Path destinationPath = destinationFolderPath.resolve(fileName);
+
+        File destinationFile = destinationPath.toFile();
+
+        if (flag && sourceFile.exists() && sourceFile.isFile()) {
+            FileUtils.copyFile(sourceFile, destinationFile);
+            logger.info("file is copied");
+        }
+
+        String temp = destinationPath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        String resultantPath = convertFilePathToUrl(document);
+        logger.info("resultant Path: {}", resultantPath);
+
+        return resultantPath;
+    }
+
+    public static boolean hasAnyResourceFile(TrainingResource tr) {
+        boolean hasData = true;
+        if ((tr.getPdfPath() == null || tr.getPdfPath().isEmpty())
+                && (tr.getDocPath() == null || tr.getDocPath().isEmpty())
+                && (tr.getExcelPath() == null || tr.getExcelPath().isEmpty())
+                && (tr.getImgPath() == null || tr.getImgPath().isEmpty())) {
+
+            hasData = false;
+        }
+
+        return hasData;
 
     }
 
