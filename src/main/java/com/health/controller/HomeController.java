@@ -1589,7 +1589,7 @@ public class HomeController {
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
             @PathVariable(name = "query") String query, Principal principal, Model model) {
 
-        return viewTutorial(req, cat, topic, lan, 0, 0, 0, query, principal, model);
+        return viewTutorial(req, cat, topic, lan, 0, 0, 0, 0, 0, query, principal, model);
     }
 
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{catId}/{topicId}/{lanId}/{query}/")
@@ -1597,7 +1597,8 @@ public class HomeController {
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
             @PathVariable(name = "catId") int catId, @PathVariable(name = "topicId") int topicId,
             @PathVariable(name = "lanId") int lanId,
-
+            @RequestParam(name = "autoplay", required = false, defaultValue = "0") int autoplay,
+            @RequestParam(name = "fullscreen", required = false, defaultValue = "0") int fullscreen,
             @PathVariable(name = "query") String query, Principal principal, Model model) {
 
         Category catName = catService.findBycategoryname(cat);
@@ -1647,14 +1648,26 @@ public class HomeController {
 
         tutorial.setUserVisit(tutorial.getUserVisit() + 1);
         tutService.save(tutorial);
+        int tutId = tutorial.getTutorialId();
         // Caption Start
+        ContributorAssignedTutorial con = tutorial.getConAssignedTutorial();
+        TopicCategoryMapping tcm = con.getTopicCatId();
+        Language language = con.getLan();
 
-        if (!lan.equals("English")) {
+        String langName = language.getLangName();
+
+        Topic topic1 = tcm.getTopic();
+
+        model.addAttribute("tutorialId", tutId);
+        model.addAttribute("autoplayChecked", autoplay == 1);
+        model.addAttribute("fullscreenMode", fullscreen == 1);
+        model.addAttribute("languageCheck", langName);
+
+        if (!langName.equals("English")) {
 
             Language lanEnglish = lanService.getByLanName("English");
 
-            ContributorAssignedTutorial conTutforEnglish = conService.findByTopicCatAndLanViewPart(topicCatMap,
-                    lanEnglish);
+            ContributorAssignedTutorial conTutforEnglish = conService.findByTopicCatAndLanViewPart(tcm, lanEnglish);
 
             List<Tutorial> tempTutorialsforEnglish = tutService
                     .findAllByContributorAssignedTutorialEnabled(conTutforEnglish);
@@ -1694,7 +1707,68 @@ public class HomeController {
 
         // Caption End
 
+        Tutorial preRequisticTutrial = tutorial.getPreRequistic();
+        if (preRequisticTutrial != null && preRequisticTutrial.isStatus()) {
+            Category catPreReqistic = preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getCat();
+            if (catPreReqistic.isStatus()) {
+                model.addAttribute("preRequisticTutrial", preRequisticTutrial);
+            }
+
+        }
+
         model.addAttribute("tutorial", tutorial);
+
+        // video resolution path
+        String video720Path = tutorial.getVideo();
+
+        int dotIndex = video720Path.lastIndexOf('.');
+
+        String base = video720Path.substring(0, dotIndex); // Everything before ".mp4"
+        String extension = video720Path.substring(dotIndex); // ".mp4"
+
+        String video480Path = base + "_480p" + extension;
+        String video360Path = base + "_360p" + extension;
+
+        // TreeMap to store videos in descending resolution order
+        TreeMap<Integer, String> videoPathWithResolution = new TreeMap<>((a, b) -> b - a);
+
+        videoPathWithResolution.put(720, video720Path); // Always put 720p
+
+        // Get base path from environment
+        String externalPath = env.getProperty("spring.applicationexternalPath.name");
+
+        Path basePath = Paths.get(externalPath);
+
+        // Check for 480p file
+        Path path480 = Paths.get(video480Path);
+
+        path480 = basePath.resolve(path480);
+
+        if (path480.toFile().exists()) {
+            videoPathWithResolution.put(480, video480Path);
+        }
+
+        // Check for 360p file
+        Path path360 = Paths.get(video360Path);
+
+        path360 = basePath.resolve(path360);
+
+        if (path360.toFile().exists()) {
+            videoPathWithResolution.put(360, video360Path);
+        }
+
+        model.addAttribute("videoPathWithResolution", videoPathWithResolution);
+        for (Map.Entry<Integer, String> entry : videoPathWithResolution.entrySet()) {
+            logger.info("Key:{}, Vlaue: {} ", entry.getKey(), entry.getValue());
+        }
+
+        String downloadVideo = base + CommonData.WITH_SUBTITLES + extension;
+        Path downloadVideoPath = basePath.resolve(downloadVideo);
+        if (downloadVideoPath.toFile().exists()) {
+            model.addAttribute("downloadVideo", downloadVideo);
+        } else {
+            model.addAttribute("downloadVideo", video720Path);
+        }
 
         if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
             model.addAttribute("relatedContent", tutorial.getRelatedVideo());
