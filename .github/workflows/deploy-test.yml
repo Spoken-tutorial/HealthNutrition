@@ -19,10 +19,34 @@ jobs:
           ref: main
 
       - name: Download built WAR
-        uses: actions/download-artifact@v4
+        uses: actions/github-script@v7
+        id: download
         with:
-          name: war-file
-          pr: ${{ github.event.pull_request.number }}
+          script: |
+            const run_id = context.payload.workflow_run.id;
+
+            // List artifacts for this specific run
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run_id,
+            });
+
+            const artifact = artifacts.data.artifacts.find(a => a.name === "war-file");
+            if (!artifact) throw new Error("WAR artifact not found");
+
+            const download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: artifact.id,
+              archive_format: "zip",
+            });
+
+            const fs = require("fs");
+            fs.writeFileSync("artifact.zip", Buffer.from(download.data));
+
+      - name: Unzip artifact
+        run: unzip artifact.zip
 
       - name: Rsync WAR to Test Server
         uses: burnett01/rsync-deployments@7.1.0
