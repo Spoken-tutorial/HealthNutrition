@@ -25,7 +25,7 @@ jobs:
           pr: ${{ github.event.pull_request.number }}
 
       - name: Rsync WAR to Test Server
-        uses: burnett01/rsync-deployments@v7.1.0
+        uses: burnett01/rsync-deployments@7.1.0
         with:
           remote_host: ${{ secrets.TEST_SERVER_HOST }}
           remote_user: ${{ secrets.TEST_SERVER_USERNAME }}
