@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.ContributorAssignedMultiUserTutorial;
+import com.health.model.ContributorAssignedTutorial;
 import com.health.model.User;
 
 /**
@@ -34,6 +35,9 @@ public interface ContributorAssignedMultiUserTutorialRepository
      * @return list of ContributorAssignedMultiUserTutorial object
      */
     List<ContributorAssignedMultiUserTutorial> findAllByuser(User user);
+
+    List<ContributorAssignedMultiUserTutorial> findByUserAndConAssignedTutorial(User user,
+            ContributorAssignedTutorial conAssignedTutorial);
 
     @Override
     List<ContributorAssignedMultiUserTutorial> findAll();

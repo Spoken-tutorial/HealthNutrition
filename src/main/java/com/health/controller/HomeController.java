@@ -887,8 +887,10 @@ public class HomeController {
         List<Version> versions = new ArrayList<Version>();
         for (Brouchure bro : brochures) {
             for (Version ver : allVersions) {
-                if (bro.getId() == ver.getBrouchure().getId() && bro.getPrimaryVersion() == ver.getBroVersion())
+                if (bro.getId() == ver.getBrouchure().getId() && bro.getPrimaryVersion() == ver.getBroVersion()
+                        && !(ver.findWebFileofEnglish().isEmpty()))
                     versions.add(ver);
+
             }
         }
         Collections.sort(versions, Version.SortByBroVersionTime);
@@ -1587,7 +1589,7 @@ public class HomeController {
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
             @PathVariable(name = "query") String query, Principal principal, Model model) {
 
-        return viewTutorial(req, cat, topic, lan, 0, 0, 0, query, principal, model);
+        return viewTutorial(req, cat, topic, lan, 0, 0, 0, 0, 0, query, principal, model);
     }
 
     @GetMapping("/tutorialView/{catName}/{topicName}/{language}/{catId}/{topicId}/{lanId}/{query}/")
@@ -1595,7 +1597,8 @@ public class HomeController {
             @PathVariable(name = "topicName") String topic, @PathVariable(name = "language") String lan,
             @PathVariable(name = "catId") int catId, @PathVariable(name = "topicId") int topicId,
             @PathVariable(name = "lanId") int lanId,
-
+            @RequestParam(name = "autoplay", required = false, defaultValue = "0") int autoplay,
+            @RequestParam(name = "fullscreen", required = false, defaultValue = "0") int fullscreen,
             @PathVariable(name = "query") String query, Principal principal, Model model) {
 
         Category catName = catService.findBycategoryname(cat);
@@ -1645,14 +1648,26 @@ public class HomeController {
 
         tutorial.setUserVisit(tutorial.getUserVisit() + 1);
         tutService.save(tutorial);
+        int tutId = tutorial.getTutorialId();
         // Caption Start
+        ContributorAssignedTutorial con = tutorial.getConAssignedTutorial();
+        TopicCategoryMapping tcm = con.getTopicCatId();
+        Language language = con.getLan();
 
-        if (!lan.equals("English")) {
+        String langName = language.getLangName();
+
+        Topic topic1 = tcm.getTopic();
+
+        model.addAttribute("tutorialId", tutId);
+        model.addAttribute("autoplayChecked", autoplay == 1);
+        model.addAttribute("fullscreenMode", fullscreen == 1);
+        model.addAttribute("languageCheck", langName);
+
+        if (!langName.equals("English")) {
 
             Language lanEnglish = lanService.getByLanName("English");
 
-            ContributorAssignedTutorial conTutforEnglish = conService.findByTopicCatAndLanViewPart(topicCatMap,
-                    lanEnglish);
+            ContributorAssignedTutorial conTutforEnglish = conService.findByTopicCatAndLanViewPart(tcm, lanEnglish);
 
             List<Tutorial> tempTutorialsforEnglish = tutService
                     .findAllByContributorAssignedTutorialEnabled(conTutforEnglish);
@@ -1692,7 +1707,68 @@ public class HomeController {
 
         // Caption End
 
+        Tutorial preRequisticTutrial = tutorial.getPreRequistic();
+        if (preRequisticTutrial != null && preRequisticTutrial.isStatus()) {
+            Category catPreReqistic = preRequisticTutrial.getConAssignedTutorial().getTopicCatId().getCat();
+            if (catPreReqistic.isStatus()) {
+                model.addAttribute("preRequisticTutrial", preRequisticTutrial);
+            }
+
+        }
+
         model.addAttribute("tutorial", tutorial);
+
+        // video resolution path
+        String video720Path = tutorial.getVideo();
+
+        int dotIndex = video720Path.lastIndexOf('.');
+
+        String base = video720Path.substring(0, dotIndex); // Everything before ".mp4"
+        String extension = video720Path.substring(dotIndex); // ".mp4"
+
+        String video480Path = base + "_480p" + extension;
+        String video360Path = base + "_360p" + extension;
+
+        // TreeMap to store videos in descending resolution order
+        TreeMap<Integer, String> videoPathWithResolution = new TreeMap<>((a, b) -> b - a);
+
+        videoPathWithResolution.put(720, video720Path); // Always put 720p
+
+        // Get base path from environment
+        String externalPath = env.getProperty("spring.applicationexternalPath.name");
+
+        Path basePath = Paths.get(externalPath);
+
+        // Check for 480p file
+        Path path480 = Paths.get(video480Path);
+
+        path480 = basePath.resolve(path480);
+
+        if (path480.toFile().exists()) {
+            videoPathWithResolution.put(480, video480Path);
+        }
+
+        // Check for 360p file
+        Path path360 = Paths.get(video360Path);
+
+        path360 = basePath.resolve(path360);
+
+        if (path360.toFile().exists()) {
+            videoPathWithResolution.put(360, video360Path);
+        }
+
+        model.addAttribute("videoPathWithResolution", videoPathWithResolution);
+        for (Map.Entry<Integer, String> entry : videoPathWithResolution.entrySet()) {
+            logger.info("Key:{}, Vlaue: {} ", entry.getKey(), entry.getValue());
+        }
+
+        String downloadVideo = base + CommonData.WITH_SUBTITLES + extension;
+        Path downloadVideoPath = basePath.resolve(downloadVideo);
+        if (downloadVideoPath.toFile().exists()) {
+            model.addAttribute("downloadVideo", downloadVideo);
+        } else {
+            model.addAttribute("downloadVideo", video720Path);
+        }
 
         if (!tutorial.getConAssignedTutorial().getLan().getLangName().equalsIgnoreCase("english")) {
             model.addAttribute("relatedContent", tutorial.getRelatedVideo());
@@ -3345,8 +3421,7 @@ public class HomeController {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
-        List<Category> category = catService.findAll();
-        model.addAttribute("categories", category);
+
         List<Language> lans = lanService.getAllLanguages();
         model.addAttribute("languages", lans);
         List<Brouchure> brouchures = broService.findAll();
@@ -3380,7 +3455,7 @@ public class HomeController {
     @PostMapping("/addBrochure")
     public String addBrochurePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam("brouchure") List<MultipartFile> brochures,
-            @RequestParam(value = "categoryName") int categoryId, @RequestParam(name = "inputTopicName") int topicId,
+
             @RequestParam(name = "languageName") List<Integer> languageIds,
             @RequestParam(value = "primaryVersion") int primaryVersion, @RequestParam(name = "title") String title) {
 
@@ -3392,8 +3467,7 @@ public class HomeController {
         model.addAttribute("viewSection", viewSection);
 
         List<Language> languages = lanService.getAllLanguages();
-        List<Category> categories = catService.findAll();
-        model.addAttribute("categories", categories);
+
         model.addAttribute("languages", languages);
         List<Brouchure> brouchures = broService.findAll();
 
@@ -3418,10 +3492,6 @@ public class HomeController {
 
         }
 
-        Category cat = catService.findByid(categoryId);
-
-        Topic topic = topicService.findById(topicId);
-
         String versionStr = Integer.toString(primaryVersion);
 
         if (versionStr == null) { // throw error
@@ -3445,17 +3515,6 @@ public class HomeController {
         brochureTemp.setLan(lan);
         brochureTemp.setTitle(title);
         brochureTemp.setPrimaryVersion(primaryVersion);
-
-        if (cat != null) {
-            brochureTemp.setCatId(cat);
-        }
-
-        if (cat != null && topic != null)
-
-        {
-            TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat, topic);
-            brochureTemp.setTopicCatId(topicCat);
-        }
 
         Version version = new Version();
 
@@ -7093,7 +7152,7 @@ public class HomeController {
         model.addAttribute("userInfo", usr);
 
         List<Language> languages = lanService.getAllLanguages();
-        List<Category> categories = catService.findAll();
+        List<Category> categories = catService.findAllEnabledCategories();
 
         model.addAttribute("categories", categories);
 
@@ -7103,30 +7162,25 @@ public class HomeController {
     }
 
     @PostMapping("/addDomainRole")
-    public String addDomainPost(Model model, Principal principal, HttpServletRequest req) {
+    public String addDomainPost(@RequestParam("categoryIds") List<Integer> categoryIds, Model model,
+            Principal principal, HttpServletRequest req) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
 
         model.addAttribute("userInfo", usr);
+        List<Language> languages = lanService.getAllLanguages();
+        List<Category> categories = catService.findAllEnabledCategories();
+
+        model.addAttribute("categories", categories);
+
+        model.addAttribute("languages", languages);
 
         String lanName = req.getParameter("selectedLan");
-        String catName = req.getParameter("catSelected");
-
-        Category cat = catService.findBycategoryname(catName);
 
         Language lan = lanService.getByLanName(lanName);
+        if (categoryIds == null || categoryIds.isEmpty()) {
 
-        if (cat == null) {
-
-            // throw error
-            // model.addAttribute("msgSuccefull", CommonData.ADMIN_ADDED_SUCCESS_MSG);
-            List<Language> languages = lanService.getAllLanguages();
-            List<Category> categories = catService.findAll();
-
-            model.addAttribute("categories", categories);
-
-            model.addAttribute("languages", languages);
             model.addAttribute("error_msg", "Please try Again");
 
             return "addDomainRole";
@@ -7134,31 +7188,45 @@ public class HomeController {
 
         if (lan == null) {
 
-            List<Language> languages = lanService.getAllLanguages();
-            List<Category> categories = catService.findAll();
-
-            model.addAttribute("categories", categories);
-
-            model.addAttribute("languages", languages);
             model.addAttribute("error_msg", "Please try Again");
 
             return "addDomainRole";
         }
 
         Role role = roleService.findByname(CommonData.domainReviewerRole);
+        List<UserRole> userRolesList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        Boolean flag = false;
+        long userRoleId = usrRoleService.getNewUsrRoletId();
+        for (int id : categoryIds) {
+            Category cat = catService.findByid(id);
+            if (usrRoleService.findByLanCatUser(lan, cat, usr, role) == null) {
 
-        if (usrRoleService.findByLanCatUser(lan, cat, usr, role) != null) {
+                UserRole usrRole = new UserRole();
+                usrRole.setCreated(ServiceUtility.getCurrentTime());
+                usrRole.setUser(usr);
+                usrRole.setRole(role);
+                usrRole.setCategory(cat);
+                usrRole.setLanguage(lan);
+                usrRole.setUserRoleId(userRoleId);
+                userRolesList.add(usrRole);
+                userRoleId = userRoleId + 1;
 
-            List<Language> languages = lanService.getAllLanguages();
-            List<Category> categories = catService.findAll();
+            } else {
 
-            model.addAttribute("categories", categories);
+                sb.append(cat.getCatName());
+                sb.append(", ");
+                flag = true;
+            }
 
-            model.addAttribute("languages", languages);
-            model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR);
-
-            return "addDomainRole";
         }
+
+        String catError = sb.toString();
+        if (catError != null && catError.length() > 0) {
+            catError = catError.substring(0, catError.length() - 2);
+        }
+        if (flag)
+            model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR + " Categories: " + catError);
 
         int newConsultid = consultService.getNewConsultantId();
         Consultant local = new Consultant();
@@ -7170,31 +7238,18 @@ public class HomeController {
         Set<Consultant> consults = new HashSet<Consultant>();
         consults.add(local);
 
-        UserRole usrRole = new UserRole();
-        usrRole.setCreated(ServiceUtility.getCurrentTime());
-        usrRole.setUser(usr);
-        usrRole.setRole(role);
-        usrRole.setCategory(cat);
-        usrRole.setLanguage(lan);
-        usrRole.setUserRoleId(usrRoleService.getNewUsrRoletId());
-
         try {
-            usrRoleService.save(usrRole);
+            usrRoleService.saveAll(userRolesList);
+
             userService.addUserToConsultant(usr, consults);
             model.addAttribute("success_msg", "Request Submitted Sucessfully");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             model.addAttribute("error_msg", CommonData.ROLE_REQUEST_ERROR);
-            logger.error("Error in Add Domain Role: {} {} {}", usrRole, usr, consults, e);
-            return "addDomainRole"; // accommodate error message
+            logger.error("Error in Add Domain Role: {} {} {}", userRolesList, usr, consults, e);
+            return "addDomainRole";
+
         }
-
-        List<Language> languages = lanService.getAllLanguages();
-        List<Category> categories = catService.findAll();
-
-        model.addAttribute("categories", categories);
-
-        model.addAttribute("languages", languages);
 
         return "addDomainRole";
     }
@@ -7208,7 +7263,7 @@ public class HomeController {
         model.addAttribute("userInfo", usr);
 
         List<Language> languages = lanService.getAllLanguages();
-        List<Category> categories = catService.findAll();
+        List<Category> categories = catService.findAllEnabledCategories();
 
         model.addAttribute("categories", categories);
 
@@ -7218,7 +7273,8 @@ public class HomeController {
     }
 
     @PostMapping("/addQualityRole")
-    public String addQualityPost(Model model, Principal principal, HttpServletRequest req) {
+    public String addQualityPost(@RequestParam("categoryIds") List<Integer> categoryIds, Model model,
+            Principal principal, HttpServletRequest req) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
@@ -7226,20 +7282,18 @@ public class HomeController {
         model.addAttribute("userInfo", usr);
 
         String lanName = req.getParameter("selectedLan");
-        String catName = req.getParameter("catSelected");
 
-        Category cat = catService.findBycategoryname(catName);
+        List<Language> languages = lanService.getAllLanguages();
+        List<Category> categories = catService.findAllEnabledCategories();
+
+        model.addAttribute("categories", categories);
+
+        model.addAttribute("languages", languages);
 
         Language lan = lanService.getByLanName(lanName);
 
-        if (cat == null) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
 
-            List<Language> languages = lanService.getAllLanguages();
-            List<Category> categories = catService.findAll();
-
-            model.addAttribute("categories", categories);
-
-            model.addAttribute("languages", languages);
             model.addAttribute("error_msg", "Please try Again");
 
             return "addQualityRole";
@@ -7247,56 +7301,55 @@ public class HomeController {
 
         if (lan == null) {
 
-            List<Language> languages = lanService.getAllLanguages();
-            List<Category> categories = catService.findAll();
-
-            model.addAttribute("categories", categories);
-
-            model.addAttribute("languages", languages);
             model.addAttribute("error_msg", "Please try Again");
 
             return "addQualityRole";
         }
 
         Role role = roleService.findByname(CommonData.qualityReviewerRole);
+        List<UserRole> userRolesList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        Boolean flag = false;
+        long userRoleId = usrRoleService.getNewUsrRoletId();
+        for (int id : categoryIds) {
+            Category cat = catService.findByid(id);
+            if (usrRoleService.findByLanCatUser(lan, cat, usr, role) == null) {
 
-        if (usrRoleService.findByLanCatUser(lan, cat, usr, role) != null) {
+                UserRole usrRole = new UserRole();
+                usrRole.setCreated(ServiceUtility.getCurrentTime());
+                usrRole.setUser(usr);
+                usrRole.setRole(role);
+                usrRole.setCategory(cat);
+                usrRole.setLanguage(lan);
+                usrRole.setUserRoleId(userRoleId);
+                userRolesList.add(usrRole);
+                userRoleId = userRoleId + 1;
 
-            List<Language> languages = lanService.getAllLanguages();
-            List<Category> categories = catService.findAll();
+            } else {
 
-            model.addAttribute("categories", categories);
+                sb.append(cat.getCatName());
+                sb.append(", ");
+                flag = true;
+            }
 
-            model.addAttribute("languages", languages);
-            model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR);
-
-            return "addQualityRole";
         }
 
-        UserRole usrRole = new UserRole();
-        usrRole.setCreated(ServiceUtility.getCurrentTime());
-        usrRole.setUser(usr);
-        usrRole.setRole(role);
-        usrRole.setCategory(cat);
-        usrRole.setLanguage(lan);
-        usrRole.setUserRoleId(usrRoleService.getNewUsrRoletId());
+        String catError = sb.toString();
+        if (catError != null && catError.length() > 0) {
+            catError = catError.substring(0, catError.length() - 2);
+        }
+        if (flag)
+            model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR + " Categories: " + catError);
 
         try {
-            usrRoleService.save(usrRole);
+            usrRoleService.saveAll(userRolesList);
             model.addAttribute("success_msg", CommonData.QUALITY_ADDED_SUCCESS_MSG);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             model.addAttribute("error_msg", CommonData.ROLE_REQUEST_ERROR);
-            logger.error("Error in Add Quality Role:{}", usrRole, e);
-            // accommodate error message
+            logger.error("Error in Add Quality Role:{}", userRolesList, e);
+
         }
-
-        List<Language> languages = lanService.getAllLanguages();
-        List<Category> categories = catService.findAll();
-
-        model.addAttribute("categories", categories);
-
-        model.addAttribute("languages", languages);
 
         return "addQualityRole";
     }
@@ -7524,13 +7577,21 @@ public class HomeController {
 
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
+        List<Category> catList = catService.findAllEnabledCategories();
+        model.addAttribute("catList", catList);
 
         List<ContributorAssignedTutorial> userRoles = conService.findAll();
         List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
-            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
-                userRoles1.add(temp);
+            TopicCategoryMapping tcm = temp.getTopicCatId();
+            if (tcm != null) {
+                if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
+                    userRoles1.add(temp);
+                }
+            } else {
+                logger.info("Contributor Assigned Tutorial whose tcm does not exists: {}", temp);
             }
+
         }
 
         List<UserRole> userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
@@ -7550,12 +7611,45 @@ public class HomeController {
     public String assignTutorialToContributorePost(HttpServletRequest req, Model model, Principal principal,
             @RequestParam(name = "contributorName") String contributorName,
             @RequestParam(name = "languageName") String lanName,
-            @RequestParam(name = "contributorCategory") String catName,
-            @RequestParam(name = "inputTopic") String[] topics) {
+
+            @RequestParam(name = "catName") List<Integer> catIds) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
+
+        List<Category> catList = catService.findAllEnabledCategories();
+        model.addAttribute("catList", catList);
+
+        if (catIds.isEmpty()) {
+            model.addAttribute("error_msg", "please select at least one category and their repective topics");
+            return assignTutorialToContributoreGet(req, model, principal);
+        }
+
+        logger.info("CatIds :{}", catIds);
+        Map<Integer, List<Integer>> catIdAsKeyTopicListasValue = new HashMap<>();
+
+        for (int i = 0; i < catIds.size(); i++) {
+            if (catIds.get(i) == 0)
+                continue;
+
+            String paramName = "topicName_" + i;
+            String[] topicArray = req.getParameterValues(paramName);
+            List<Integer> topicIds = new ArrayList<>();
+            if (topicArray != null) {
+                for (String t : topicArray) {
+                    topicIds.add(Integer.parseInt(t));
+                }
+                catIdAsKeyTopicListasValue.put(catIds.get(i), topicIds);
+
+            }
+        }
+
+        logger.info("cat and topicIds :{}", catIdAsKeyTopicListasValue);
+        if (catIdAsKeyTopicListasValue.isEmpty()) {
+            model.addAttribute("error_msg", "please select at least one category and their repective topics");
+            return assignTutorialToContributoreGet(req, model, principal);
+        }
 
         Role role = roleService.findByname(CommonData.contributorRole);
         Role role1 = roleService.findByname(CommonData.externalContributorRole);
@@ -7563,9 +7657,13 @@ public class HomeController {
         List<ContributorAssignedTutorial> userRoles = conService.findAll();
         List<ContributorAssignedTutorial> userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
-            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
-                userRoles1.add(temp);
+            TopicCategoryMapping tcm = temp.getTopicCatId();
+            if (tcm != null) {
+                if (tcm.getCat().isStatus() && tcm.getTopic().isStatus()) {
+                    userRoles1.add(temp);
+                }
             }
+
         }
 
         List<UserRole> userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
@@ -7585,52 +7683,96 @@ public class HomeController {
         model.addAttribute("userByContributors", userRolesUniqueTemp);
 
         Language lan = lanService.getByLanName(lanName);
-        Category cat = catService.findByid(Integer.parseInt(catName));
+
         User userAssigned = userService.findByUsername(contributorName);
+
+        if (lan == null || userAssigned == null) {
+            model.addAttribute("error_msg", "please select both user and language");
+            return assignTutorialToContributoreGet(req, model, principal);
+        }
 
         int conNewId = conService.getNewId();
         int conMutliUserNewId = conMultiUser.getNewId();
 
-        for (String topic : topics) {
+        for (Map.Entry<Integer, List<Integer>> entry : catIdAsKeyTopicListasValue.entrySet()) {
+            int categoryId = entry.getKey();
 
-            Topic localtopic = topicService.findById(Integer.parseInt(topic));
-            if (localtopic != null) {
+            Category cat = catService.findByid(categoryId);
+            if (cat == null)
+                continue;
+            List<Integer> topicList = entry.getValue();
+            logger.info("Category ID: " + categoryId);
+            logger.info("Topic ids: " + topicList);
 
-                TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat, localtopic);
+            if (cat != null) {
 
-                ContributorAssignedTutorial x = conService.findByTopicCatAndLanViewPart(topicCat, lan);
+                if (topicList != null && !topicList.isEmpty()) {
+                    for (int id : topicList) {
 
-                if (x == null) {
+                        if (id != 0) {
+                            Topic localtopic = topicService.findById(id);
+                            if (localtopic != null) {
 
-                    ContributorAssignedTutorial temp = new ContributorAssignedTutorial(conNewId++,
-                            ServiceUtility.getCurrentTime(), topicCat, lan);
-                    conService.save(temp);
-                    ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
-                            conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, temp);
-                    conMultiUser.save(multiUser);
+                                TopicCategoryMapping topicCat = topicCatService.findAllByCategoryAndTopic(cat,
+                                        localtopic);
 
-                } else {
+                                ContributorAssignedTutorial x = null;
 
-                    ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
-                            conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, x);
-                    conMultiUser.save(multiUser);
+                                if (topicCat != null) {
+                                    x = conService.findByTopicCatAndLanViewPart(topicCat, lan);
+                                }
 
+                                if (x == null && topicCat != null) {
+
+                                    ContributorAssignedTutorial temp = new ContributorAssignedTutorial(conNewId++,
+                                            ServiceUtility.getCurrentTime(), topicCat, lan);
+                                    conService.save(temp);
+                                    ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
+                                            conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, temp);
+                                    conMultiUser.save(multiUser);
+
+                                } else if (x != null) {
+
+                                    List<ContributorAssignedMultiUserTutorial> conUserList = conMultiUser
+                                            .findByUserAndConAssignedTutorial(userAssigned, x);
+                                    if (conUserList.isEmpty()) {
+                                        ContributorAssignedMultiUserTutorial multiUser = new ContributorAssignedMultiUserTutorial(
+                                                conMutliUserNewId++, ServiceUtility.getCurrentTime(), userAssigned, x);
+                                        conMultiUser.save(multiUser);
+                                    } else {
+                                        for (ContributorAssignedMultiUserTutorial tempCon : conUserList) {
+                                            logger.info(
+                                                    "Existing UserName: {}, ContributorAssignedMultiUserTutorial id: {}",
+                                                    tempCon.getUser().getUsername(), tempCon.getId());
+                                        }
+                                    }
+
+                                }
+
+                            } else {
+
+                                model.addAttribute("error_msg", CommonData.CONTRIBUTOR_TOPIC_ERROR);
+                                return "assignContributorList";
+                            }
+
+                        }
+                    }
                 }
-
-            } else {
-
-                model.addAttribute("error_msg", CommonData.CONTRIBUTOR_TOPIC_ERROR);
-                return "assignContributorList";
             }
+
         }
 
         userRoles = conService.findAll();
 
         userRoles1 = new ArrayList<>();
         for (ContributorAssignedTutorial temp : userRoles) {
-            if (temp.getTopicCatId().getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
-                userRoles1.add(temp);
+            TopicCategoryMapping tcm = temp.getTopicCatId();
+            if (tcm != null) {
+                if (tcm.getCat().isStatus() && temp.getTopicCatId().getTopic().isStatus()) {
+                    userRoles1.add(temp);
+                }
             }
+
         }
 
         userRolesTemp = usrRoleService.findAllByRoleAndStatusAndRevoked(role, true, false);
@@ -8711,7 +8853,8 @@ public class HomeController {
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
-        List<Category> categories = catService.findAll();
+        List<Category> categories = catService.findAllEnabledCategories();
+
         List<Language> languages = lanService.getAllLanguages();
 
         model.addAttribute("categories", categories);
@@ -8724,18 +8867,18 @@ public class HomeController {
 
     @PostMapping("/assignRoleToAdmin")
     public String assignRoleToDomainPost(HttpServletRequest req, Model model, Principal principal,
-            @RequestParam(value = "category") String cat, @RequestParam(value = "language") String lan) {
+            @RequestParam("categoryIds") List<Integer> categoryIds, @RequestParam(value = "language") String lan) {
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
-        List<Category> categories = catService.findAll();
+        List<Category> categories = catService.findAllEnabledCategories();
         List<Language> languages = lanService.getAllLanguages();
 
         model.addAttribute("categories", categories);
         model.addAttribute("languages", languages);
 
-        Category category = catService.findBycategoryname(cat);
+        // Category category = catService.findBycategoryname(cat);
         Language language = lanService.getByLanName(lan);
 
         if (language == null) {
@@ -8743,35 +8886,54 @@ public class HomeController {
 
             return "assignRoleToDomain";
         }
-
-        if (category == null) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
             model.addAttribute("error_msg", "Please select Category");
 
             return "assignRoleToDomain";
         }
 
         Role role = roleService.findByname(CommonData.adminReviewerRole);
+        List<UserRole> userRolesList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        Boolean flag = false;
+        long userRoleId = usrRoleService.getNewUsrRoletId();
+        for (int id : categoryIds) {
+            Category cat = catService.findByid(id);
 
-        if (usrRoleService.findByLanCatUser(language, category, usr, role) != null) {
-            model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR);
-            return "assignRoleToDomain";
+            if (usrRoleService.findByLanCatUser(language, cat, usr, role) == null) {
+                UserRole usrRole = new UserRole();
+                usrRole.setCreated(ServiceUtility.getCurrentTime());
+                usrRole.setUser(usr);
+                usrRole.setRole(role);
+                usrRole.setLanguage(language);
+                usrRole.setCategory(cat);
+                usrRole.setUserRoleId(userRoleId);
+                userRolesList.add(usrRole);
+                userRoleId = userRoleId + 1;
+
+            } else {
+
+                sb.append(cat.getCatName());
+                sb.append(", ");
+                flag = true;
+            }
         }
 
-        UserRole usrRole = new UserRole();
-        usrRole.setCreated(ServiceUtility.getCurrentTime());
-        usrRole.setUser(usr);
-        usrRole.setRole(role);
-        usrRole.setLanguage(language);
-        usrRole.setCategory(category);
-        usrRole.setUserRoleId(usrRoleService.getNewUsrRoletId());
+        String catError = sb.toString();
+        if (catError != null && catError.length() > 0) {
+            catError = catError.substring(0, catError.length() - 2);
+        }
+        if (flag)
+            model.addAttribute("error_msg", CommonData.DUPLICATE_ROLE_ERROR + " Categories: " + catError);
 
         try {
-            usrRoleService.save(usrRole);
+            logger.info("UserRoles List Size: {} ", userRolesList.size());
+            usrRoleService.saveAll(userRolesList);
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
             model.addAttribute("error_msg", CommonData.ROLE_ERROR_MSG);
-            logger.error("Error in assign Roles to Domain : {}", usrRole, e);
+            logger.error("Error in assign Roles to Domain : {}", userRolesList, e);
             return "assignRoleToDomain"; // accommodate error message
         }
 

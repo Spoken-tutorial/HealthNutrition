@@ -2152,7 +2152,7 @@ public class AjaxController {
     @RequestMapping("/loadLanguageByUser")
     public @ResponseBody List<String> getLanguageByContributor(@RequestParam(value = "id") String username) {
 
-        List<String> langauges = new ArrayList<String>();
+        Set<String> languages = new LinkedHashSet<>();
 
         User usr = usrservice.findByUsername(username);
         Role role = roleService.findByname(CommonData.contributorRole);
@@ -2162,11 +2162,11 @@ public class AjaxController {
         userRoles.addAll(usrRoleService.findAllByRoleUserStatus(role1, usr, true));
         for (UserRole temp : userRoles) {
             if (temp.getLanguage() != null) {
-                langauges.add(temp.getLanguage().getLangName());
+                languages.add(temp.getLanguage().getLangName());
             }
         }
 
-        return langauges;
+        return new ArrayList<>(languages);
     }
 
     /**
