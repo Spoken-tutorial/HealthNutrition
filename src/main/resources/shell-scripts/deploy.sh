@@ -6,7 +6,7 @@ SERVICE="tomcat"
 CONFIG_DIR="/root/tomcat/$NAME"
 SOURCE_DIR="/tmp"
 TARGET_DIR="/beta_st/tomcat.new/webapps"
-RESTART="yes"
+RESTART="no"
 STATUS="no"
 # end configuration
 
