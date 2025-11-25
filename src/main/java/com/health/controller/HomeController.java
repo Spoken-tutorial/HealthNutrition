@@ -6030,6 +6030,63 @@ public class HomeController {
         return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
     }
 
+    @GetMapping("/trainingResource")
+    public String viewAndDownloadTrainingResource(HttpServletRequest req,
+            @RequestParam(name = "topicName", required = false, defaultValue = "0") int topicId,
+            @RequestParam(name = "langName", required = false, defaultValue = "0") int lanId,
+            @RequestParam(name = "inputFileType", required = false, defaultValue = "0") int inputFileType,
+
+            @RequestParam(name = "action", required = false, defaultValue = "") String action,
+
+            Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("topic", topicId);
+        model.addAttribute("lanId", lanId);
+        model.addAttribute("inputFileType", inputFileType);
+
+        if (action != null && !action.isEmpty() && action.equals("download")) {
+
+            model.addAttribute("action", action);
+        }
+
+        if (action != null && !action.isEmpty() && action.equals("view")) {
+
+            model.addAttribute("action", action);
+        }
+
+        if (action != null && !action.isEmpty() && action.equals("share")) {
+
+            model.addAttribute("action", action);
+        }
+
+        Topic localTopic = null;
+        Language localLan = null;
+        String localFile = null;
+
+        model.addAttribute("userInfo", usr);
+
+        // getModelData(model, cat, topic, lan, query, false);
+        navigationLinkCheck(model);
+
+        if (topicId != 0) {
+            localTopic = topicService.findById(topicId);
+            model.addAttribute("topicforQuery", localTopic);
+        }
+        if (lanId != 0) {
+            localLan = lanService.getById(lanId);
+            model.addAttribute("lanforQuery", localLan);
+        }
+        if (inputFileType != 0) {
+            // add some code
+            model.addAttribute("fileTypeQuery", localFile);
+        }
+
+        return "trainingResources";
+    }
+
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,
             @RequestParam(name = "lan", required = false, defaultValue = "") String langName, HttpServletRequest req,
