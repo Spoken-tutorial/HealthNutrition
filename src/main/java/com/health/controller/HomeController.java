@@ -878,6 +878,29 @@ public class HomeController {
         getPackageAndLanguageData(model, "", "");
     }
 
+    private void getModelTrainingResource(Model model, int topicId, int lanId, int fileTypeId) {
+
+        ArrayList<Map<String, Integer>> arlist = ajaxController.getLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
+        ArrayList<Map<String, Integer>> arlist1 = ajaxController.getTopicAndFileTypeByLan(topicId, lanId, fileTypeId);
+        Map<String, Integer> topic = arlist1.get(0);
+        Map<String, Integer> fileType = arlist1.get(1);
+        Map<String, Integer> lan = arlist.get(0);
+
+        model.addAttribute("topics", topic);
+        model.addAttribute("languages", lan);
+        model.addAttribute("fileTypes", fileType);
+
+        model.addAttribute("localTopic", topicId);
+        model.addAttribute("localLan", lanId);
+        model.addAttribute("localFile", fileTypeId);
+        model.addAttribute("languageCount", lan.size());
+
+    }
+
+    private void getModelTrainingResource(Model model) {
+        getModelTrainingResource(model, 0, 0, 0);
+    }
+
     @RequestMapping("/")
     public String index(Model model) {
 
