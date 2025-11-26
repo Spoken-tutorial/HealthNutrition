@@ -13,4 +13,6 @@ public interface TrainingResourceRepository extends JpaRepository<TrainingResour
 
     List<TrainingResource> findByTopicLanMapping(TopicLanMapping topicLanMapping);
 
+    List<TrainingResource> findByTopicLanMappingInAndStatusTrue(List<TopicLanMapping> topicLanMappingList);
+
 }

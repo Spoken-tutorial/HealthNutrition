@@ -50,4 +50,10 @@ public class TrainingReourceServiceImpl implements TrainingResourceService {
         return repo.findByTopicLanMapping(topicLanMapping);
     }
 
+    @Override
+    public List<TrainingResource> findByTopicLanMappingInAndStatusTrue(List<TopicLanMapping> topicLanMappingList) {
+
+        return repo.findByTopicLanMappingInAndStatusTrue(topicLanMappingList);
+    }
+
 }

@@ -279,6 +279,11 @@ public class CommonData {
     public static final String ZIP_EXTENSION = "zip";
     public static final String UNSUPPORTED_EXTENSION = "unsupported";
 
+    public static final int DOC = 1;
+    public static final int EXCEL = 2;
+    public static final int IMAGE = 3;
+    public static final int PDF = 4;
+
     public static final String STATUS = "status";
     public static final String STATUS_QUEUED = "queued";
     public static final String STATUS_PROCESSING = "processing";

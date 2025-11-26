@@ -11,6 +11,8 @@ public interface TrainingResourceService {
 
     List<TrainingResource> findByTopicLanMapping(TopicLanMapping topicLanMapping);
 
+    List<TrainingResource> findByTopicLanMappingInAndStatusTrue(List<TopicLanMapping> topicLanMappingList);
+
     List<TrainingResource> findAll();
 
     void save(TrainingResource trainingResource);
