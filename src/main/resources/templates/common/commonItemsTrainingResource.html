@@ -8,15 +8,22 @@
 
 <div th:fragment="search_bar">
 <section id="search-bar" class="container my-5">
+ <h3 class="text-center" style="font-weight: 400;">
+    <span style=" font-size:1.8rem;">
+        Training Resource
+    </span>
+</h3>
+<div id="formError" class="alert alert-danger d-none" role="alert"></div>
 
-<form th:action="@{/trainingResource}" class="w-100" name="selectOption" id="form1">
+
+<form th:action="@{/trainingResource}" class="w-100 mt-5" name="selectOption" id="form1">
 
 <div class="row ">
 
     <!-- Topic -->
     <div class="col-12 col-md-4 mb-3 input-group">
         <div class="input-group">
-            <select class="form-control selectedValue" id="topicName" name="topicName">
+            <select class="form-control selectedValue" id="topicNameTR" name="topicNameTR">
                 <option value="0">Select Topic</option>
                 <option th:each="topic : ${topics}"
                         th:selected="${topic.value==localTopic}"
@@ -24,18 +31,13 @@
                         th:text="${topic.key}">
                 </option>
             </select>
+            
+            <div th:if="${localTopic != null and localTopic != 0}" class="input-group-btn" id="topicResetDivTR" style=" padding-top: 4px;"><button  id="topicResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localTopic != null and localTopic != 0}" class="input-group-btn" id="topicResetDivTR" style=" padding-top: 4px;  display: none;"><button  id="topicResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
 
-            <button th:if="${localTopic != null and localTopic != 0}"
-                    id="topicreset"
-                    class="btn btn-light">
-                &#10227;
-            </button>
-
-            <button th:unless="${localTopic != null and localTopic != 0}"
-                    id="topicreset"
-                    class="btn btn-light d-none">
-                &#10227;
-            </button>
+       
         </div>
     </div>
 
@@ -43,7 +45,7 @@
     <!-- Language -->
     <div class="col-12 col-md-4 mb-3">
         <div class="input-group input-group">
-            <select class="form-control" id="langName" name="langName">
+            <select class="form-control" id="langNameTR" name="langNameTR">
                 <option value="0">Select Language</option>
                 <option th:each="lan : ${languages}"
                         th:selected="${lan.value==localLan}"
@@ -51,18 +53,12 @@
                         th:text="${lan.key}">
                 </option>
             </select>
+            
+            <div th:if="${localLan != null and localLan != 0}" class="input-group-btn" id="lanResetDivTR" style=" padding-top: 4px;"><button  id="lanResetTR"  style=" background: none;
+            	border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localLan != null and localLan != 0}" class="input-group-btn" id="lanResetDivTR" style=" padding-top: 4px;  display: none;"><button  id="lanResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
 
-            <button th:if="${localLan != null and localLan != 0}"
-                    id="lanreset"
-                    class="btn btn-light">
-                &#10227;
-            </button>
-
-            <button th:unless="${localLan != null and localLan != 0}"
-                    id="lanreset"
-                    class="btn btn-light d-none">
-                &#10227;
-            </button>
         </div>
     </div>
 
@@ -71,25 +67,20 @@
     <div class="col-12 col-md-4 mb-3 input-group">
         <div class="input-group">
             <select class="form-control" id="inputFileType" name="inputFileType">
-                <option value="0">Select File Type</option>
+                <option value="0">Select File</option>
                 <option th:each="file : ${fileTypes}"
                         th:selected="${file.value==localFile}"
                         th:value="${file.value}"
                         th:text="${file.key}">
                 </option>
             </select>
+            
+             <div th:if="${localFile != null and localFile != 0}" class="input-group-btn" id="fileResetDivTR" style=" padding-top: 4px;"><button  id="fileResetTR"  style=" background: none;
+            	border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localFile != null and localFile != 0}" class="input-group-btn" id="fileResetDivTR" style=" padding-top: 4px;  display: none;"><button  id="fileResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
 
-            <button th:if="${localFile != null and localFile != 0}"
-                    id="filereset"
-                    class="btn btn-light">
-                &#10227;
-            </button>
-
-            <button th:unless="${localFile != null and localFile != 0}"
-                    id="filereset"
-                    class="btn btn-light d-none">
-                &#10227;
-            </button>
+           
         </div>
     </div>
 
@@ -134,7 +125,7 @@
     <div class="col-6 col-md-2">
         <input type="button"
                value="Clear"
-               id="btnClearForm"
+               id="btnClearTriningResource"
                class="btn w-100 text-white"
                style="background:SlateBlue;">
     </div>

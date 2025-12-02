@@ -2931,6 +2931,268 @@ $(".deleteTrainingResource-btn").click(function(){
     
 
 
+  /**
+    function to load language and fileType by topic
+    author: Alok Kumar
+    
+     */
+
+	function loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId) {
+				$.ajax({
+					type : "GET",
+					url : projectPath+"loadLanAndFileTypeByTopic",
+					data : {
+						"topicId" : topicId,
+						"lanId":lanId,
+						"fileTypeId":fileTypeId
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+			            var html = '';
+			            html += '<option value="0">Select Language</option>';
+			           
+			                $.each(result, function (value, key) {
+			                    var selected = (lanId == key) ? "selected" : "";
+			                    html += `<option value="${key}" ${selected}>${value}</option>`;
+			                });
+			            
+			            $("#langNameTR").prop('disabled', false);
+			            $('#langNameTR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select File</option>';
+						$.each(result, function( value ,key ) {
+							var selected=(fileTypeId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputFileType").prop('disabled',false);
+						$('#inputFileType').html(html);
+						if (topicId != 0) {
+							$("#topicResetDivTR").show();
+						} else {
+						$("#topicResetDivTR").hide();
+						}
+						
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	}
+     
+    $( "#topicNameTR" ).change(function() {
+			
+				var topicId = $(this).val();
+				var lanId = $("#langNameTR").val();
+				var fileTypeId=$("#inputFileType").val();
+				loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
+				
+			});
+			
+			   $( "#topicResetTR" ).click(function() {
+			
+				var topicId = 0;
+				
+				$("#topicNameTR").val("0");
+				var lanId = $("#langNameTR").val();
+				var fileTypeId=$("#inputFileType").val();
+				
+				loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
+				return false;
+				
+			});
+			
+		
+      
+   
+    
+     	/* 
+     		Function to load Topic and FileType by language
+     		author:Alok Kumar
+     
+    	 */
+    	 
+    	 function loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId){
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadTopicAndFileTypeByLan",
+					data : {
+						"topicId" : topicId,
+						"lanId":lanId,
+						"fileTypeId":fileTypeId
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Topic</option>';
+						$.each(result , function(  value ,key) {
+							var selected=(topicId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#topicNameTR").prop('disabled',false);
+						$('#topicNameTR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select File</option>';
+						$.each(result, function(  value,key ) {
+							var selected=(fileTypeId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputFileType").prop('disabled',false);
+						$('#inputFileType').html(html);
+						if (lanId != 0) {
+							$("#lanResetDivTR").show();
+						} else {
+						$("#lanResetDivTR").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+		}
+
+     	 $( "#langNameTR" ).change(function() {
+				var lanId = $(this).val();
+				var topicId = $("#topicNameTR").val();
+				var fileTypeId=$("#inputFileType").val();
+				loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId);
+				
+			});
+			
+			$( "#lanResetTR" ).click(function() {
+				var lanId = 0;
+				$("#langNameTR").val("0");
+				var fileTypeId = $("#inputFileType").val();
+				var topicId=$("#topicNameTR").val();
+				loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId);
+				return false;
+				
+			});
+			
+			
+			
+				/* 
+     		Function to load Topic and Language by FileType
+     		author:Alok Kumar
+     
+    	 */
+    	 
+    	 function loadTopicAndLanByFileType(topicId, lanId, fileTypeId){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadTopicAndLanByFileType",
+					data : {
+						"topicId" : topicId,
+						"lanId":lanId,
+						"fileTypeId":fileTypeId
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Topic</option>';
+						$.each(result , function( value ,key ) {
+							var selected=(topicId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#topicNameTR").prop('disabled',false);
+						$('#topicNameTR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Language</option>';
+						$.each(result, function( value ,key ) {
+							var selected=(lanId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#langNameTR").prop('disabled',false);
+						$('#langNameTR').html(html);
+						
+						if (fileTypeId != 0) {
+							$("#fileResetDivTR").show();
+						} else {
+						$("#fileResetDivTR").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#inputFileType').change(function() {
+				var fileTypeId = $(this).val();
+				var topicId = $("#topicNameTR").val();
+				var lanId=$("#langNameTR").val();
+				loadTopicAndLanByFileType(topicId, lanId, fileTypeId);
+				
+				
+			});
+			
+			 $( "#fileResetTR" ).click(function() {
+			
+				var fileTypeId = 0;
+				$("#inputFileType").val("0");
+				var lanId = $("#langNameTR").val();
+				var topicId=$("#topicNameTR").val();
+				
+				loadTopicAndLanByFileType(topicId, lanId, fileTypeId);
+				
+				return false;
+				
+			});
+			
+			$( "#btnClearTriningResource" ).click(function() {
+				
+				 // Reset radio buttons
+    			 $("input[name='action']").prop("checked", false);
+				
+				var fileTypeId = 0;
+				$("#inputFileType").val("0");
+				var lanId =0; 
+				$("#langNameTR").val("0");
+				var topicId=0;
+				$("#topicNameTR").val("0");
+				
+				
+				
+				loadTopicAndLanByFileType(topicId, lanId, fileTypeId);
+				loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
+				loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId);
+				
+				return false;
+				
+			});
+			
+			
+			
+
+		
+
 /******************************** Training Resource End ****************************************/
 			
 			
