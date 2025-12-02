@@ -125,5 +125,54 @@
 	var projectPath='[(@{/})]';
 	
 </script>
+<script>
+document.getElementById("form1").addEventListener("submit", function (event) {
+    event.preventDefault(); // stop form
+
+    let topic = document.getElementById("topicNameTR").value;
+    let lang = document.getElementById("langNameTR").value;
+    let file = document.getElementById("inputFileType").value;
+    let action = document.querySelector('input[name="action"]:checked');
+
+    let errorBox = document.getElementById("formError");
+
+    // Function to show bootstrap alert
+    function showError(message) {
+        errorBox.textContent = message;
+        errorBox.classList.remove("d-none");
+        errorBox.scrollIntoView({ behavior: "smooth" });
+        // Auto-hide alert in 3 seconds
+        setTimeout(() => {
+            errorBox.classList.add("d-none");
+        }, 8000);
+    }
+
+    // Validation checks
+    if (topic === "0") {
+        showError("Please select Topic");
+        return false;
+    }
+
+    if (lang === "0") {
+        showError("Please select Language");
+        return false;
+    }
+
+    if (file === "0") {
+        showError("Please select File Type");
+        return false;
+    }
+
+    if (!action) {
+        showError("Please select an Action (View / Download / Share)");
+        return false;
+    }
+
+    // If all OK → remove alert and submit form
+    errorBox.classList.add("d-none");
+    this.submit();
+});
+</script>
+
 </body>
 </html>

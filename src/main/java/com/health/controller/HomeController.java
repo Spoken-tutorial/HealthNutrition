@@ -6055,8 +6055,8 @@ public class HomeController {
 
     @GetMapping("/trainingResource")
     public String viewAndDownloadTrainingResource(HttpServletRequest req,
-            @RequestParam(name = "topicName", required = false, defaultValue = "0") int topicId,
-            @RequestParam(name = "langName", required = false, defaultValue = "0") int lanId,
+            @RequestParam(name = "topicNameTR", required = false, defaultValue = "0") int topicId,
+            @RequestParam(name = "langNameTR", required = false, defaultValue = "0") int lanId,
             @RequestParam(name = "inputFileType", required = false, defaultValue = "0") int inputFileType,
 
             @RequestParam(name = "action", required = false, defaultValue = "") String action,
@@ -6091,7 +6091,7 @@ public class HomeController {
 
         model.addAttribute("userInfo", usr);
 
-        // getModelData(model, cat, topic, lan, query, false);
+        getModelTrainingResource(model, topicId, lanId, inputFileType);
         navigationLinkCheck(model);
 
         if (topicId != 0) {

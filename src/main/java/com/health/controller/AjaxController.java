@@ -1938,7 +1938,7 @@ public class AjaxController {
 
         }
 
-        return Collections.emptyMap();
+        return result;
     }
 
     private boolean isTrainingResourceFilePresent(TrainingResource tr, int id) {
