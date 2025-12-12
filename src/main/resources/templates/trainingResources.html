@@ -1,178 +1,235 @@
 <!DOCTYPE html>
 <html xmlns:th="https://thymeleaf.org">
-<html>
-<head th:replace="common/trail :: common-trail (pageTitle='Training Resource - Health And Nutrition')"> 
+	<html>
 
-<title>Training Resource - Health And Nutrition</title> 
+		<head th:replace="common/trail :: common-trail (pageTitle='Training Resource - Health And Nutrition')">
 
-</head>
-<body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
-	<section  id="loginSectionofTutorial">
-		<div class="px-md-3">
-			<div class="row header-top pt-2">
-				<div
-					class="col-sm-6 d-flex justify-content-center justify-content-md-start">
-					
+			<title>Training Resource - Health And Nutrition</title>
+
+		</head>
+
+		<body>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
+			<section id="loginSectionofTutorial">
+				<div class="px-md-3">
+					<div class="row header-top pt-2">
+						<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+
+						</div>
+						<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+							<div>
+								<p class="d-inline-block">
+									<span class="top-banner"> <a sec:authorize="isAnonymous()" th:href="@{/login}">Login
+											| New User</a> <a sec:authorize="isAuthenticated()"
+											th:href="@{/dashBoard}">My
+											Account</a>
+									</span>
+								</p>
+								<p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a
+											th:href="@{/logout}">Logout</a></span></p>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div
-					class="col-sm-6 d-flex justify-content-center justify-content-md-end">
-					<div>
-						<p class="d-inline-block">
-							<span class="top-banner"> <a sec:authorize="isAnonymous()"
-								th:href="@{/login}">Login | New User</a> <a
-								sec:authorize="isAuthenticated()" th:href="@{/dashBoard}">My
-									Account</a>
-							</span>
-						</p>
-						<p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a th:href="@{/logout}">Logout</a></span></p>
+			</section>
+			<nav th:replace="index.html :: navbar"></nav>
+			<div id="searchbarDivofTutorialContainer" class="container">
+				<div th:replace="common/commonItemsTrainingResource :: search_bar"></div>
+
+			</div>
+			<main id="tutorialPage" class=" p-4">
+				<section id="t-video">
+
+
+
+
+					<div class="row" id="OriginalMaodeRow">
+						<div class="col-md-8 p-2">
+
+
+
+
+						</div>
+
+					</div>
+
+
+
+				</section>
+
+
+
+			</main>
+			<br><br>
+			<br><br>
+
+
+
+			<footer class="footer" style="margin-bottom:0px;">
+				<div class="container">
+
+					<div class="row" height="50%">
+						<div class="col text-center justify-content" style=" padding-top:12px; height:50%;">
+							<p> <i class="fas fa-map-marker-alt contact-icon"></i> Spoken Tutorial Project,<br>
+								TCS Lab,Behind CAD Centre,<br>
+								IIT Bombay, Powai,<br>
+								Mumbai - 400076
+							</p>
+						</div>
+
+						<div class="col text-center" style=" padding-top:12px; height:50%;">
+
+							<p><a href="mailto:health@spoken-tutorial.org"><i
+										class="fas fa-envelope contact-icon mr-2"></i><span style="color:white;">
+										health@spoken-tutorial.org</span> </a></p>
+							<p><a href="tel:02225764229"><i class="fas fa-phone-alt contact-icon mr-2"></i><span
+										style="color:white;">022 2576 4229 </span> </a></p>
+
+						</div>
+
+						<div class="col  text-center " style="padding-top:10px; height:50%;">
+							<a href="https://www.iitb.ac.in/" target="_blank"> <img th:src="@{/image/iitb-logo.png}"
+									width="50%" height="50%" alt="IITB"> </img>
+								<p class="text-centre"><span style="color:white;">Developed at IIT-Bombay</span></p>
+							</a>
+
+						</div>
+
+						<div class="col   justify-content " style="padding-top:5px; height:30%; ">
+
+							<p><a href="https://www.youtube.com/channel/UCmyV3lKT1Gs1AfgtV8pp__Q"
+									class="fab fa-youtube fa-1x" style="color: #ed302f;" target="_blank"> <span
+										style="color:white; font-size: 14px;">ST Health YouTube Channel</span></a></p>
+							<p><a href="https://www.youtube.com/user/SpokenTutorialIITB" class="fab fa-youtube fa-1x"
+									style="color: #ed302f;" target="_blank"> <span
+										style="color: white; font-size: 14px;">ST YouTube Channel</span> </a> </p>
+							<p><a href="https://www.facebook.com/SpokenTutorial.org" class="fab fa-facebook-f fa-1x"
+									style="color: #3b5998;" target="_blank"> <span
+										style="color: white; font-size: 14px;"> ST Facebook Page</span> </a></p>
+							<p><a href="https://www.linkedin.com/company/spokentutorial?original_referer="
+									class="fab fa-linkedin-in fa-1x" style="color: #0082ca;" target="_blank"> <span
+										style="color:white; font-size: 14px;">ST LinkedIn Page</span> </a> </p>
+
+							<!-- <a href="#" class="fa fa-instagram"></a>    -->
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</footer>
+
+
+
+			<style>
+				@keyframes spin {
+					0% {
+						transform: rotate(0deg);
+					}
+
+					100% {
+						transform: rotate(360deg);
+					}
+				}
+			</style>
+
+
+			<div th:replace="common/trail :: body-bottom-scripts"></div>
+
+			<div class="modal fade" id="shareModal" tabindex="-1">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">Share File</h5>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+						<div class="modal-body">
+							<input type="text" id="shareLink"
+       th:value="${shareUrl != null} 
+                 ? @{${baseUrl} + '/shared-Training-Resource/' 
+                     + ${topicName} + '/' 
+                     + ${fileTypeString} + '/' 
+                     + ${langName} + '/' 
+                     + ${trId}}
+                 : ''"
+       class="form-control" readonly>
+
+
+
+						</div>
+						<div class="modal-footer">
+							<button type="button" id="copyShareLink" class="btn btn-primary">
+								Copy Link
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</section>
-	<nav th:replace="index.html :: navbar"></nav>
-	<div id="searchbarDivofTutorialContainer" class="container">
-	<div  th:replace="common/commonItemsTrainingResource :: search_bar"></div> 
-	
-	</div>
-	<main id="tutorialPage" class=" p-4">
-		<section id="t-video">
-			
-			
-			
-			
-			<div class="row" id="OriginalMaodeRow">
-			<div class="col-md-8 p-2">
-									
-			
-			
-			
-				</div>
-			
-			</div>
-			
 
 
-		</section>
-	
-	
 
-	</main>
-	 <br><br>
-	 <br><br>
-	
-	 
-	 
-	  <footer class="footer" style="margin-bottom:0px;">
-	  <div class="container" >
-	  
-	  <div class="row"  height="50%" >
-	   <div class="col text-center justify-content" style=" padding-top:12px; height:50%;"> <p> <i class="fas fa-map-marker-alt contact-icon" ></i> Spoken Tutorial Project,<br>
-			TCS Lab,Behind CAD Centre,<br>
-			IIT Bombay, Powai,<br>
-			Mumbai - 400076
-   			</p> 
-   	 </div>
-	  
-	  <div class="col text-center" style=" padding-top:12px; height:50%;"> 
-	
-	  		<p><a href="mailto:health@spoken-tutorial.org"><i class="fas fa-envelope contact-icon mr-2"></i><span style="color:white;"> health@spoken-tutorial.org</span> </a></p>
-		    <p><a href="tel:02225764229"><i class="fas fa-phone-alt contact-icon mr-2"></i><span style="color:white;">022 2576 4229 </span> </a></p>
-	  
-	   </div>
-	   
-	  <div class="col  text-center " style="padding-top:10px; height:50%;">
-		  <a href="https://www.iitb.ac.in/" target="_blank"> <img th:src="@{/image/iitb-logo.png}" width="50%" height="50%"  alt="IITB" > </img>	
-    	  <p class="text-centre"><span  style="color:white;">Developed at IIT-Bombay</span></p></a>
-	  
-	  </div>
-	  
-	  <div class="col   justify-content " style="padding-top:5px; height:30%; ">
-		   	
-		    <p><a href="https://www.youtube.com/channel/UCmyV3lKT1Gs1AfgtV8pp__Q" class="fab fa-youtube fa-1x" style="color: #ed302f;"  target="_blank"> <span  style="color:white; font-size: 14px;">ST Health YouTube Channel</span></a></p>
-		    <p><a href="https://www.youtube.com/user/SpokenTutorialIITB" class="fab fa-youtube fa-1x" style="color: #ed302f;" target="_blank"> <span  style="color: white; font-size: 14px;">ST YouTube Channel</span>  </a> </p>
-		    <p><a href="https://www.facebook.com/SpokenTutorial.org" class="fab fa-facebook-f fa-1x" style="color: #3b5998;" target="_blank"> <span  style="color: white; font-size: 14px;"> ST Facebook Page</span> </a></p>
-    		<p><a href="https://www.linkedin.com/company/spokentutorial?original_referer=" class="fab fa-linkedin-in fa-1x" style="color: #0082ca;" target="_blank">  <span  style="color:white; font-size: 14px;">ST LinkedIn Page</span> </a>  </p>
-    		
-    		<!-- <a href="#" class="fa fa-instagram"></a>    -->	
-   			
-	  </div>
-	 
-	  </div>
-	  
-	  </div>
-	
-    </footer>
-    
-		
-	
-	<style>
-	@keyframes spin {
-	    0% { transform: rotate(0deg); }
-	    100% { transform: rotate(360deg); }
-	}
-		
 
-	</style>
+			<script th:inline="javascript">
+				var projectPath = '[(@{/})]';
 
- 
-	<div th:replace="common/trail :: body-bottom-scripts"></div>
-	
+			</script>
 
- 
- <script th:inline="javascript">
-	var projectPath='[(@{/})]';
-	
-</script>
-<script>
-document.getElementById("form1").addEventListener("submit", function (event) {
-    event.preventDefault(); // stop form
+			<script th:if="${shareUrl != null}">
+				$(document).ready(function () {
+					$('#shareModal').modal('show');
+				});
+			</script>
 
-    let topic = document.getElementById("topicNameTR").value;
-    let lang = document.getElementById("langNameTR").value;
-    let file = document.getElementById("inputFileType").value;
-    let action = document.querySelector('input[name="action"]:checked');
+			<script>
+				document.getElementById("form1").addEventListener("submit", function (event) {
+					event.preventDefault(); // stop form
 
-    let errorBox = document.getElementById("formError");
+					let topic = document.getElementById("topicNameTR").value;
+					let lang = document.getElementById("langNameTR").value;
+					let file = document.getElementById("inputFileType").value;
+					let action = document.querySelector('input[name="action"]:checked');
 
-    // Function to show bootstrap alert
-    function showError(message) {
-        errorBox.textContent = message;
-        errorBox.classList.remove("d-none");
-        errorBox.scrollIntoView({ behavior: "smooth" });
-        // Auto-hide alert in 3 seconds
-        setTimeout(() => {
-            errorBox.classList.add("d-none");
-        }, 8000);
-    }
+					let errorBox = document.getElementById("formError");
 
-    // Validation checks
-    if (topic === "0") {
-        showError("Please select Topic");
-        return false;
-    }
+					// Function to show bootstrap alert
+					function showError(message) {
+						errorBox.textContent = message;
+						errorBox.classList.remove("d-none");
+						errorBox.scrollIntoView({behavior: "smooth"});
+						// Auto-hide alert in 3 seconds
+						setTimeout(() => {
+							errorBox.classList.add("d-none");
+						}, 8000);
+					}
 
-    if (lang === "0") {
-        showError("Please select Language");
-        return false;
-    }
+					// Validation checks
+					if (topic === "0") {
+						showError("Please select Topic");
+						return false;
+					}
 
-    if (file === "0") {
-        showError("Please select File Type");
-        return false;
-    }
+					if (lang === "0") {
+						showError("Please select Language");
+						return false;
+					}
 
-    if (!action) {
-        showError("Please select an Action (View / Download / Share)");
-        return false;
-    }
+					if (file === "0") {
+						showError("Please select File Type");
+						return false;
+					}
 
-    // If all OK → remove alert and submit form
-    errorBox.classList.add("d-none");
-    this.submit();
-});
-</script>
+					if (!action) {
+						showError("Please select an Action (View / Download / Share)");
+						return false;
+					}
 
-</body>
-</html>
+					// If all OK → remove alert and submit form
+					errorBox.classList.add("d-none");
+					this.submit();
+				});
+			</script>
+
+		</body>
+
+	</html>

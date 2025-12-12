@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1191,6 +1193,121 @@ public class ServiceUtility {
 
         return hasData;
 
+    }
+
+    public static Map<Integer, String> getFileTypeIdAndValue(int fileTypeId) {
+        Map<Integer, String> result = new HashMap<>();
+
+        switch (fileTypeId) {
+        case CommonData.DOC:
+            result.put(fileTypeId, "Doc");
+            break;
+        case CommonData.EXCEL:
+            result.put(fileTypeId, "Excel");
+            break;
+        case CommonData.IMAGE:
+            result.put(fileTypeId, "Image");
+            break;
+        case CommonData.PDF:
+            result.put(fileTypeId, "Pdf");
+            break;
+        default:
+            return null;
+        }
+
+        return result;
+    }
+
+    public static int getFileTypeIdByValue(String fileTypeValue) {
+
+        if (fileTypeValue == null) {
+            return 0;
+        }
+
+        switch (fileTypeValue) {
+        case "Doc":
+            return CommonData.DOC;
+        case "Excel":
+            return CommonData.EXCEL;
+        case "Image":
+            return CommonData.IMAGE;
+        case "Pdf":
+            return CommonData.PDF;
+        default:
+            return 0;
+        }
+    }
+
+    public static Map<Integer, String> getFileTypeIdAndValue(TrainingResource tr) {
+        Map<Integer, String> result = new HashMap<>();
+
+        if (isNotBlank(tr.getDocPath())) {
+            result.put(CommonData.DOC, "Doc");
+
+        }
+        if (isNotBlank(tr.getExcelPath())) {
+            result.put(CommonData.EXCEL, "Excel");
+
+        }
+        if (isNotBlank(tr.getImgPath())) {
+            result.put(CommonData.IMAGE, "Image");
+
+        }
+        if (isNotBlank(tr.getPdfPath())) {
+            result.put(CommonData.PDF, "Pdf");
+
+        }
+
+        return result;
+    }
+
+    public static boolean isTrainingResourceFilePresent(TrainingResource tr, int fileId) {
+        if (tr == null) {
+            return false;
+        }
+
+        switch (fileId) {
+        case CommonData.DOC:
+            return isNotBlank(tr.getDocPath());
+        case CommonData.EXCEL:
+            return isNotBlank(tr.getExcelPath());
+        case CommonData.IMAGE:
+            return isNotBlank(tr.getImgPath());
+        case CommonData.PDF:
+            return isNotBlank(tr.getPdfPath());
+        default:
+            return false;
+        }
+    }
+
+    public static String getTrainingResourceFilePath(TrainingResource tr, int fileId) {
+        if (tr == null) {
+            return "";
+        }
+
+        String path;
+        switch (fileId) {
+        case CommonData.DOC:
+            path = tr.getDocPath();
+            break;
+        case CommonData.EXCEL:
+            path = tr.getExcelPath();
+            break;
+        case CommonData.IMAGE:
+            path = tr.getImgPath();
+            break;
+        case CommonData.PDF:
+            path = tr.getPdfPath();
+            break;
+        default:
+            return "";
+        }
+
+        return isNotBlank(path) ? path : "";
+    }
+
+    public static boolean isNotBlank(String s) {
+        return s != null && !s.isEmpty();
     }
 
     /**

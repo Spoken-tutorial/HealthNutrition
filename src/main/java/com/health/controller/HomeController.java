@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -208,6 +210,9 @@ public class HomeController {
 
     @Value("${downloadTimeOut}")
     private long downloadTimeOut;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     private AtomicInteger downloadCount = new AtomicInteger(0);
 
@@ -2419,6 +2424,35 @@ public class HomeController {
         String res = ver.findWebFileofEnglish();
         return "redirect:/files/" + res;
 
+    }
+
+    @GetMapping("/shared-Training-Resource/{topicName}/{fileType}/{langName}/{trId}")
+    public String getShareLinkofTrainingResource(HttpServletRequest req, @PathVariable String topicName,
+            @PathVariable String fileType, @PathVariable String langName, @PathVariable int trId, Principal principal,
+            Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        int intFileType = ServiceUtility.getFileTypeIdByValue(fileType);
+        logger.info("FileType:{}", fileType);
+        logger.info("intFileType:{}", intFileType);
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(trId);
+
+        String filePath = "";
+
+        if (tr != null && intFileType != 0) {
+            filePath = ServiceUtility.getTrainingResourceFilePath(tr, intFileType);
+        }
+
+        String res = ServiceUtility.convertFilePathToUrl(filePath);
+
+        if (res == null || res.trim().isEmpty()) {
+
+            return "redirect:/error";
+        }
+
+        return "redirect:/files/" + res;
     }
 
     @GetMapping("/ResearchPaper/{id}")
@@ -6053,7 +6087,7 @@ public class HomeController {
         return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
     }
 
-    @GetMapping("/trainingResource")
+    @GetMapping("/Training-Resource")
     public String viewAndDownloadTrainingResource(HttpServletRequest req,
             @RequestParam(name = "topicNameTR", required = false, defaultValue = "0") int topicId,
             @RequestParam(name = "langNameTR", required = false, defaultValue = "0") int lanId,
@@ -6069,10 +6103,58 @@ public class HomeController {
         model.addAttribute("topic", topicId);
         model.addAttribute("lanId", lanId);
         model.addAttribute("inputFileType", inputFileType);
+        model.addAttribute("baseUrl", baseUrl);
+
+        navigationLinkCheck(model);
+
+        Topic topic = topicService.findById(topicId);
+        Language lan = lanService.getById(lanId);
+        if (topic == null || lan == null || inputFileType == 0) {
+            getModelTrainingResource(model);
+
+            model.addAttribute("error_msg", "Please select all fields");
+            return "trainingResources";
+
+        }
+        Topic tempTopic = topicService.findById(topicId);
+        String topicName = tempTopic.getTopicName().replace(" ", "_").replaceAll("_+", "_");
+        Language tempLan = lanService.getById(lanId);
+        String langName = tempLan.getLangName().replace(" ", "_").replaceAll("_+", "_");
+        model.addAttribute("topicName", topicName);
+        model.addAttribute("langName", langName);
+
+        Map<Integer, String> fileTypeAndValue = ServiceUtility.getFileTypeIdAndValue(inputFileType);
+        String fileTypeString = fileTypeAndValue.get(inputFileType);
+        model.addAttribute("fileTypeString", fileTypeString);
+
+        TopicLanMapping tlm = topicLanMapiingService.findByTopicAndLan(topic, lan);
+        List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(tlm);
+        if (trList.isEmpty() || trList.size() > 1) {
+            getModelTrainingResource(model);
+            model.addAttribute("error_msg", "Invalid Data");
+            return "trainingResources";
+        }
+
+        TrainingResource tr = trList.get(0);
+        int trId = tr.getTrainingResourceId();
+        model.addAttribute("trId", trId);
+        String filePath = ServiceUtility.getTrainingResourceFilePath(tr, inputFileType);
+        if (filePath.isEmpty()) {
+            getModelTrainingResource(model);
+            model.addAttribute("error_msg", "No File Found");
+            return "trainingResources";
+        }
+
+        String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
 
         if (action != null && !action.isEmpty() && action.equals("download")) {
-
             model.addAttribute("action", action);
+            try {
+
+                return "redirect:/downloadTrainingResource?filePath=" + URLEncoder.encode(finalUrl, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                logger.error("Error in Download Package", e);
+            }
         }
 
         if (action != null && !action.isEmpty() && action.equals("view")) {
@@ -6083,6 +6165,9 @@ public class HomeController {
         if (action != null && !action.isEmpty() && action.equals("share")) {
 
             model.addAttribute("action", action);
+
+            model.addAttribute("shareUrl", finalUrl);
+
         }
 
         Topic localTopic = null;
@@ -6092,7 +6177,6 @@ public class HomeController {
         model.addAttribute("userInfo", usr);
 
         getModelTrainingResource(model, topicId, lanId, inputFileType);
-        navigationLinkCheck(model);
 
         if (topicId != 0) {
             localTopic = topicService.findById(topicId);

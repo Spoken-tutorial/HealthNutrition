@@ -3,6 +3,9 @@ package com.health.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -150,6 +157,9 @@ public class AjaxController {
 
     @Autowired
     private PromoVideoService promoVideoService;
+
+    @Autowired
+    private TopicLanMappingService topicLanMapiingService;
 
     @Autowired
     private VideoResourceService videoResourceService;
@@ -1895,74 +1905,6 @@ public class AjaxController {
     /***************************************
      * Training Resource Start
      **********************************************************/
-    private Map<Integer, String> getFileTypeIdAndValue(int fileTypeId) {
-        Map<Integer, String> result = new HashMap<>();
-
-        switch (fileTypeId) {
-        case CommonData.DOC:
-            result.put(fileTypeId, "Doc");
-            break;
-        case CommonData.EXCEL:
-            result.put(fileTypeId, "Excel");
-            break;
-        case CommonData.IMAGE:
-            result.put(fileTypeId, "Image");
-            break;
-        case CommonData.PDF:
-            result.put(fileTypeId, "Pdf");
-            break;
-        default:
-            return null;
-        }
-
-        return result;
-    }
-
-    private Map<Integer, String> getFileTypeIdAndValue(TrainingResource tr) {
-        Map<Integer, String> result = new HashMap<>();
-
-        if (isNotBlank(tr.getDocPath())) {
-            result.put(CommonData.DOC, "Doc");
-
-        }
-        if (isNotBlank(tr.getExcelPath())) {
-            result.put(CommonData.EXCEL, "Excel");
-
-        }
-        if (isNotBlank(tr.getImgPath())) {
-            result.put(CommonData.IMAGE, "Image");
-
-        }
-        if (isNotBlank(tr.getPdfPath())) {
-            result.put(CommonData.PDF, "Pdf");
-
-        }
-
-        return result;
-    }
-
-    private boolean isTrainingResourceFilePresent(TrainingResource tr, int id) {
-        if (tr == null) {
-            return false;
-        }
-
-        switch (id) {
-        case CommonData.DOC:
-            return isNotBlank(tr.getDocPath());
-        case CommonData.EXCEL:
-            return isNotBlank(tr.getExcelPath());
-        case CommonData.IMAGE:
-            return isNotBlank(tr.getImgPath());
-        case CommonData.PDF:
-            return isNotBlank(tr.getPdfPath());
-        default:
-            return false;
-        }
-    }
-
-    private boolean isNotBlank(String s) {
-        return s != null && !s.isEmpty();
-    }
 
     @RequestMapping("/loadLanAndFileTypeByTopic")
     public @ResponseBody ArrayList<Map<String, Integer>> getLanAndFileTypeByTopic(
@@ -1977,7 +1919,8 @@ public class AjaxController {
 
         Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
         Language language = lanId != 0 ? langService.getById(lanId) : null;
-        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? getFileTypeIdAndValue(fileTypeId) : null;
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
 
         List<TopicLanMapping> localTopicList = new ArrayList<>();
         if (topic != null && language != null) {
@@ -2000,7 +1943,7 @@ public class AjaxController {
                 languages.put(lan.getLangName(), lan.getLanId());
 
                 // To find FileType
-                getFileTypeIdAndValue(temp).forEach((id, type) -> fileTypes.put(type, id));
+                ServiceUtility.getFileTypeIdAndValue(temp).forEach((id, type) -> fileTypes.put(type, id));
 
             }
         }
@@ -2026,7 +1969,8 @@ public class AjaxController {
 
         Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
         Language language = lanId != 0 ? langService.getById(lanId) : null;
-        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? getFileTypeIdAndValue(fileTypeId) : null;
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
 
         List<TopicLanMapping> tlm = language != null ? topicLanMappingService.findByLan(language)
                 : topicLanMappingService.findAll();
@@ -2036,7 +1980,7 @@ public class AjaxController {
             Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
             int id = entry.getKey();
             for (TrainingResource temp : trList) {
-                if (isTrainingResourceFilePresent(temp, id)) {
+                if (ServiceUtility.isTrainingResourceFilePresent(temp, id)) {
                     newtrList.add(temp);
                 }
             }
@@ -2051,7 +1995,7 @@ public class AjaxController {
             topics.put(topicTemp.getTopicName(), topicTemp.getTopicId());
 
             // To find FileType
-            getFileTypeIdAndValue(tr).forEach((id, type) -> fileTypes.put(type, id));
+            ServiceUtility.getFileTypeIdAndValue(tr).forEach((id, type) -> fileTypes.put(type, id));
 
         }
 
@@ -2078,7 +2022,8 @@ public class AjaxController {
         Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
         Language language = lanId != 0 ? langService.getById(lanId) : null;
 
-        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? getFileTypeIdAndValue(fileTypeId) : null;
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
 
         List<TopicLanMapping> localTopicList = new ArrayList<>();
         if (language != null) {
@@ -2093,7 +2038,7 @@ public class AjaxController {
             Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
             int id = entry.getKey();
             for (TrainingResource temp : trList) {
-                if (isTrainingResourceFilePresent(temp, id)) {
+                if (ServiceUtility.isTrainingResourceFilePresent(temp, id)) {
                     newtrList.add(temp);
                 }
             }
@@ -2118,6 +2063,42 @@ public class AjaxController {
 
         return arlist;
 
+    }
+
+    @GetMapping("/downloadTrainingResource")
+    public ResponseEntity<Resource> downloadTrainingResourcePost(@RequestParam(name = "filePath") String filePath) {
+
+        try {
+
+            String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+
+            Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), finalUrl);
+
+            if (!Files.exists(path)) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            Resource resource = new UrlResource(path.toUri());
+
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            String originalFilename = path.getFileName().toString();
+
+            String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+
+            String encodedFilename = URLEncoder.encode(safeFilename, "UTF-8").replace("+", "%20");
+
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
+                    .body(resource);
+
+        } catch (Exception e) {
+            logger.error("Error in download", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /***************************************
