@@ -3191,7 +3191,92 @@ $(".deleteTrainingResource-btn").click(function(){
 			
 			
 
-		
+	
+$(document).ready(function () {
+
+    $("#formTrainingResource").on("submit", function (e) {
+           // stop normal form submit
+
+        var topicId  = $("#topicNameTR").val();
+        var langId   = $("#langNameTR").val();
+        var fileType = $("#inputFileType").val();
+        var action   = $("input[name='action']:checked").val();
+
+        // Clear previous alert
+        $("#formError").addClass("d-none").text("");
+
+        // ---- Validation ----
+        if (!topicId || topicId == 0) {
+			e.preventDefault();
+            showError("Please select Topic");
+            return;
+        }
+        if (!langId || langId == 0) {
+			e.preventDefault();
+            showError("Please select Language");
+            return;
+        }
+        if (!fileType || fileType == 0) {
+			e.preventDefault();
+            showError("Please select File Type");
+            return;
+        }
+        if (!action) {
+			e.preventDefault();
+            showError("Please select an action (View / Download / Share)");
+            return;
+        }
+
+        // ---- Build Base URL ----
+        var baseUrl = "/Training-Resource" +
+            "?topicNameTR=" + encodeURIComponent(topicId) +
+            "&langNameTR=" + encodeURIComponent(langId) +
+            "&inputFileType=" + encodeURIComponent(fileType);
+
+        // ---- Actions ----
+        if (action === "download") {
+			e.preventDefault();
+            window.location.href = baseUrl + "&action=download";
+
+        } else if (action === "view") {
+            window.location.href = baseUrl + "&action=view";
+
+        } else if (action === "share") {
+           
+            $("#shareLink").val("loading......");
+            $("#shareModal").modal("show");
+        }
+    });
+
+    function showError(msg) {
+        $("#formError").removeClass("d-none").text(msg);
+    }
+
+    // Copy link button
+    $("#copyShareLink").click(function () {
+    var text = $("#shareLink").val();
+
+    if (navigator.clipboard) {
+        // Modern API (async, works in Chrome, Edge, Firefox, Safari)
+        navigator.clipboard.writeText(text).then(function () {
+            alert("Link copied to clipboard");
+        }).catch(function (err) {
+            console.error("Failed to copy: ", err);
+            alert("Unable to copy link");
+        });
+    } else {
+        // Fallback for older browsers
+        var copyText = document.getElementById("shareLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        alert("Link copied to clipboard");
+    }
+});
+
+
+});
+
 
 /******************************** Training Resource End ****************************************/
 			
