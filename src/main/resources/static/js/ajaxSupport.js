@@ -3195,17 +3195,15 @@ $(".deleteTrainingResource-btn").click(function(){
 $(document).ready(function () {
 
     $("#formTrainingResource").on("submit", function (e) {
-           // stop normal form submit
+         
 
         var topicId  = $("#topicNameTR").val();
         var langId   = $("#langNameTR").val();
         var fileType = $("#inputFileType").val();
         var action   = $("input[name='action']:checked").val();
 
-        // Clear previous alert
         $("#formError").addClass("d-none").text("");
 
-        // ---- Validation ----
         if (!topicId || topicId == 0) {
 			e.preventDefault();
             showError("Please select Topic");
@@ -3227,19 +3225,15 @@ $(document).ready(function () {
             return;
         }
 
-        // ---- Build Base URL ----
         var baseUrl = "/Training-Resource" +
             "?topicNameTR=" + encodeURIComponent(topicId) +
             "&langNameTR=" + encodeURIComponent(langId) +
             "&inputFileType=" + encodeURIComponent(fileType);
 
-        // ---- Actions ----
+      
         if (action === "download") {
 			e.preventDefault();
             window.location.href = baseUrl + "&action=download";
-
-        } else if (action === "view") {
-            window.location.href = baseUrl + "&action=view";
 
         } else if (action === "share") {
            
