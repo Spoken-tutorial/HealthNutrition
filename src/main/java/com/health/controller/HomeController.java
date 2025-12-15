@@ -6158,6 +6158,24 @@ public class HomeController {
         }
 
         if (action != null && !action.isEmpty() && action.equals("view")) {
+            List<String> filePaths = new ArrayList<>();
+            if (filePath.toLowerCase().endsWith(".zip")) {
+                try {
+                    filePaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+                } catch (IOException e) {
+                    logger.error("Zip Extraction or zip error", e);
+
+                    model.addAttribute("error_msg", "ZIP extraction failed. Please try again later.");
+                    return "trainingResources";
+
+                }
+            }
+
+            else {
+                filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+
+            }
+            model.addAttribute("filePaths", filePaths);
 
             model.addAttribute("action", action);
         }

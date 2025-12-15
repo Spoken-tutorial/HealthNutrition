@@ -110,7 +110,7 @@
 									class="fab fa-linkedin-in fa-1x" style="color: #0082ca;" target="_blank"> <span
 										style="color:white; font-size: 14px;">ST LinkedIn Page</span> </a> </p>
 
-							<!-- <a href="#" class="fa fa-instagram"></a>    -->
+
 
 						</div>
 
@@ -132,11 +132,84 @@
 						transform: rotate(360deg);
 					}
 				}
+
+
+				/* Control viewport height safely */
+				#imageSlider .carousel-inner {
+					min-height: 80vh;
+					background: #fff;
+				}
+
+
+				#imageSlider .carousel-item {
+					text-align: center;
+				}
+
+
+				.carousel-img {
+					max-width: 100%;
+					max-height: 90vh;
+					width: auto;
+					height: auto;
+					object-fit: contain;
+					display: inline-block;
+				}
+
+
+
+				.carousel-control-prev,
+				.carousel-control-next {
+					width: 8%;
+				}
+
+				.carousel-control-prev-icon,
+				.carousel-control-next-icon {
+					background-color: black;
+					border-radius: 50%;
+					width: 42px;
+					height: 42px;
+					background-size: 60% 60%;
+				}
+
+
+
+				.carousel-indicators li {
+					background-color: #bbb;
+				}
+
+				.carousel-indicators .active {
+					background-color: #000;
+				}
+
+
+
+				@media (max-width: 768px) {
+					.carousel-img {
+						max-height: 60vh;
+					}
+
+					.carousel-control-prev-icon,
+					.carousel-control-next-icon {
+						width: 36px;
+						height: 36px;
+					}
+				}
+
+				.topic-title {
+					color: #0d6efd;
+					font-weight: 600;
+				}
+
+				.meta-title {
+					color: #000;
+					font-weight: 500;
+				}
 			</style>
 
 
 			<div th:replace="common/trail :: body-bottom-scripts"></div>
 
+			<!-- === Share Link View Modal === -->
 			<div class="modal fade" id="shareModal" tabindex="-1">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content">
@@ -145,15 +218,13 @@
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
 						</div>
 						<div class="modal-body">
-							<input type="text" id="shareLink"
-       th:value="${shareUrl != null} 
+							<input type="text" id="shareLink" th:value="${shareUrl != null} 
                  ? @{${baseUrl} + '/shared-Training-Resource/' 
                      + ${topicName} + '/' 
                      + ${fileTypeString} + '/' 
                      + ${langName} + '/' 
                      + ${trId}}
-                 : ''"
-       class="form-control" readonly>
+                 : ''" class="form-control" readonly>
 
 
 
@@ -166,6 +237,93 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- === Image View Modal === -->
+			<div class="modal fade" id="viewImageModal" tabindex="-1">
+				<div class="modal-dialog modal-lg modal-dialog-centered">
+					<div class="modal-content">
+
+						<div class="modal-header">
+							<h5 class="modal-title">
+
+
+								<span class="topic-title" th:if="${topicName != null}"
+									th:text="${#strings.capitalizeWords(#strings.replace(topicName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${langName != null and topicName != null}"
+									th:text="' : 🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${langName != null and topicName == null}"
+									th:text="'🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${fileTypeString != null and langName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and langName == null and topicName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and topicName == null and langName == null}"
+									th:text="'📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+							</h5>
+
+
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+
+						<div class="modal-body">
+
+
+							<div id="imageSlider" class="carousel slide" data-ride="carousel" data-keyboard="true"
+								data-touch="true">
+
+
+								<ol class="carousel-indicators">
+									<th:block th:each="img, i : ${filePaths}">
+										<li th:data-target="'#imageSlider'" th:data-slide-to="${i.index}"
+											th:classappend="${i.index == 0} ? 'active'">
+										</li>
+									</th:block>
+								</ol>
+
+
+								<div class="carousel-inner">
+									<th:block th:each="img, i : ${filePaths}">
+										<div class="carousel-item" th:classappend="${i.index == 0} ? ' active'">
+											<img th:src="@{/files/}+@{${img}}" class="carousel-img" alt="Preview Image">
+
+										</div>
+									</th:block>
+								</div>
+
+
+								<a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
+									<span class="carousel-control-prev-icon"></span>
+								</a>
+								<a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
+									<span class="carousel-control-next-icon"></span>
+								</a>
+
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
 
 
 
@@ -181,9 +339,17 @@
 				});
 			</script>
 
+			<script th:if="${action == 'view' 
+               and fileTypeString == 'Image' 
+               and filePaths?.size() > 0}">
+				$(document).ready(function () {
+					$('#viewImageModal').modal('show');
+				});
+			</script>
+
 			<script>
 				document.getElementById("form1").addEventListener("submit", function (event) {
-					event.preventDefault(); // stop form
+					event.preventDefault();
 
 					let topic = document.getElementById("topicNameTR").value;
 					let lang = document.getElementById("langNameTR").value;
@@ -192,18 +358,18 @@
 
 					let errorBox = document.getElementById("formError");
 
-					// Function to show bootstrap alert
+
 					function showError(message) {
 						errorBox.textContent = message;
 						errorBox.classList.remove("d-none");
 						errorBox.scrollIntoView({behavior: "smooth"});
-						// Auto-hide alert in 3 seconds
+
 						setTimeout(() => {
 							errorBox.classList.add("d-none");
 						}, 8000);
 					}
 
-					// Validation checks
+
 					if (topic === "0") {
 						showError("Please select Topic");
 						return false;
@@ -224,7 +390,7 @@
 						return false;
 					}
 
-					// If all OK → remove alert and submit form
+
 					errorBox.classList.add("d-none");
 					this.submit();
 				});
