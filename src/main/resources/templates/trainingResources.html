@@ -239,7 +239,7 @@
 			</div>
 
 			<!-- === Image View Modal === -->
-			<div class="modal fade" id="viewImageModal" tabindex="-1">
+			<div class="modal fade" id="viewModal" tabindex="-1">
 				<div class="modal-dialog modal-lg modal-dialog-centered">
 					<div class="modal-content">
 
@@ -285,9 +285,17 @@
 						</div>
 
 						<div class="modal-body">
+							<div th:if="${fileTypeString == 'Pdf'}">
+							    <th:block th:each="pdf, stat : ${filePaths}">
+							        <span th:text="'Pdf ' + ${stat.count} + ': '"></span>
+							        <a th:href="@{'/files/' + ${pdf}}"  target="_blank">Click here to view</a>
+							        <br/>
+							    </th:block>
+							</div>
 
 
-							<div id="imageSlider" class="carousel slide" data-ride="carousel" data-keyboard="true"
+
+							<div th:if="${fileTypeString == 'Image'}" id="imageSlider" class="carousel slide" data-ride="carousel" data-keyboard="true"
 								data-touch="true">
 
 
@@ -340,10 +348,10 @@
 			</script>
 
 			<script th:if="${action == 'view' 
-               and fileTypeString == 'Image' 
+                
                and filePaths?.size() > 0}">
 				$(document).ready(function () {
-					$('#viewImageModal').modal('show');
+					$('#viewModal').modal('show');
 				});
 			</script>
 
