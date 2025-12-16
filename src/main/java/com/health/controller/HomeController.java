@@ -6105,6 +6105,22 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+        boolean authorizedUsr = false;
+        if (usr != null) {
+            Role role = roleService.findByname(CommonData.contributorRole);
+            int roleId = role.getRoleId();
+            Set<UserRole> usrRoles = usr.getUserRoles();
+
+            for (UserRole ur : usrRoles) {
+                if (ur.getRole().getRoleId() == roleId) {
+                    authorizedUsr = true;
+                    break;
+                }
+            }
+
+        }
+        model.addAttribute("authorizedUsr", authorizedUsr);
 
         model.addAttribute("topic", topicId);
         model.addAttribute("lanId", lanId);
@@ -6197,8 +6213,6 @@ public class HomeController {
         Topic localTopic = null;
         Language localLan = null;
         String localFile = null;
-
-        model.addAttribute("userInfo", usr);
 
         getModelTrainingResource(model, topicId, lanId, inputFileType);
 

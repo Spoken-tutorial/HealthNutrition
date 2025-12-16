@@ -136,6 +136,80 @@
 
 </section>
 </div>
+<div th:fragment="model_title">
+
+
+								<span class="topic-title" th:if="${topicName != null}"
+									th:text="${#strings.capitalizeWords(#strings.replace(topicName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${langName != null and topicName != null}"
+									th:text="' : 🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${langName != null and topicName == null}"
+									th:text="'🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${fileTypeString != null and langName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and langName == null and topicName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and topicName == null and langName == null}"
+									th:text="'📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+							</div>
+							
+<div th:fragment="tr_login" class="px-4 py-2">
+
+    <span class="d-block mb-2">
+        Only authorized users can access Doc or Excel files.
+    </span>
+
+    <form th:action="@{/login}" method="post" class="mt-2 mx-auto w-50">
+
+        <div class="form-group">
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   placeholder="Username"
+                   required />
+        </div>
+
+        <div class="form-group mt-2">
+            <input type="password"
+                   name="password"
+                   class="form-control"
+                   placeholder="Password"
+                   required />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm mt-2 w-100">
+            Login
+        </button>
+
+        <div class="mt-2 small-links text-center">
+            <a th:href="@{/forgot-password}" class="small">Forgot password?</a>
+            |
+            <a th:href="@{/register}" class="small">Register</a>
+        </div>
+
+    </form>
+
+</div>
+						
 
 </body>
 </html>

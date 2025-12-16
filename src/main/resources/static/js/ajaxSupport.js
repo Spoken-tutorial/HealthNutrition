@@ -3235,10 +3235,6 @@ $(document).ready(function () {
 			e.preventDefault();
             window.location.href = baseUrl + "&action=download";
 
-        } else if (action === "share") {
-           
-            $("#shareLink").val("loading......");
-            $("#shareModal").modal("show");
         }
     });
 
@@ -3248,7 +3244,7 @@ $(document).ready(function () {
 
     // Copy link button
     $("#copyShareLink").click(function () {
-    var text = $("#shareLink").val();
+    var text = $(".shareLink").val();
 
     if (navigator.clipboard) {
         // Modern API (async, works in Chrome, Edge, Firefox, Safari)
@@ -3260,7 +3256,7 @@ $(document).ready(function () {
         });
     } else {
         // Fallback for older browsers
-        var copyText = document.getElementById("shareLink");
+        var copyText = document.querySelector(".shareLink");
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
