@@ -1,409 +1,467 @@
 <!DOCTYPE html>
-<html xmlns:th="https://thymeleaf.org">
-	<html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-		<head th:replace="common/trail :: common-trail (pageTitle='Training Resource - Health And Nutrition')">
 
-			<title>Training Resource - Health And Nutrition</title>
+	<head th:replace="common/trail :: common-trail (pageTitle='Training Resource - Health And Nutrition')">
 
-		</head>
+		<title>Training Resource - Health And Nutrition</title>
 
-		<body>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
-			<section id="loginSectionofTutorial">
-				<div class="px-md-3">
-					<div class="row header-top pt-2">
-						<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+	</head>
 
-						</div>
-						<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
-							<div>
-								<p class="d-inline-block">
-									<span class="top-banner"> <a sec:authorize="isAnonymous()" th:href="@{/login}">Login
-											| New User</a> <a sec:authorize="isAuthenticated()"
-											th:href="@{/dashBoard}">My
-											Account</a>
-									</span>
-								</p>
-								<p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a
-											th:href="@{/logout}">Logout</a></span></p>
-							</div>
+	<body>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
+		<section id="loginSectionofTutorial">
+			<div class="px-md-3">
+				<div class="row header-top pt-2">
+					<div class="col-sm-6 d-flex justify-content-center justify-content-md-start">
+
+					</div>
+					<div class="col-sm-6 d-flex justify-content-center justify-content-md-end">
+						<div>
+							<p class="d-inline-block">
+								<span class="top-banner"> <a sec:authorize="isAnonymous()" th:href="@{/login}">Login
+										| New User</a> <a sec:authorize="isAuthenticated()" th:href="@{/dashBoard}">My
+										Account</a>
+								</span>
+							</p>
+							<p sec:authorize="isAuthenticated()" class="d-inline-block"><span class="top-banner"><a
+										th:href="@{/logout}">Logout</a></span></p>
 						</div>
 					</div>
 				</div>
+			</div>
+		</section>
+		<nav th:replace="index.html :: navbar"></nav>
+		<div id="searchbarDivofTutorialContainer" class="container">
+			<div th:replace="common/commonItemsTrainingResource :: search_bar"></div>
+
+		</div>
+		<main id="tutorialPage" class=" p-4">
+			<section id="t-video">
+
+
+
+
+				<div class="row" id="OriginalMaodeRow">
+					<div class="col-md-8 p-2">
+
+
+
+
+					</div>
+
+				</div>
+
+
+
 			</section>
-			<nav th:replace="index.html :: navbar"></nav>
-			<div id="searchbarDivofTutorialContainer" class="container">
-				<div th:replace="common/commonItemsTrainingResource :: search_bar"></div>
+
+
+
+		</main>
+		<br><br>
+		<br><br>
+
+
+
+		<footer class="footer" style="margin-bottom:0px;">
+			<div class="container">
+
+				<div class="row" height="50%">
+					<div class="col text-center justify-content" style=" padding-top:12px; height:50%;">
+						<p> <i class="fas fa-map-marker-alt contact-icon"></i> Spoken Tutorial Project,<br>
+							TCS Lab,Behind CAD Centre,<br>
+							IIT Bombay, Powai,<br>
+							Mumbai - 400076
+						</p>
+					</div>
+
+					<div class="col text-center" style=" padding-top:12px; height:50%;">
+
+						<p><a href="mailto:health@spoken-tutorial.org"><i
+									class="fas fa-envelope contact-icon mr-2"></i><span style="color:white;">
+									health@spoken-tutorial.org</span> </a></p>
+						<p><a href="tel:02225764229"><i class="fas fa-phone-alt contact-icon mr-2"></i><span
+									style="color:white;">022 2576 4229 </span> </a></p>
+
+					</div>
+
+					<div class="col  text-center " style="padding-top:10px; height:50%;">
+						<a href="https://www.iitb.ac.in/" target="_blank"> <img th:src="@{/image/iitb-logo.png}"
+								width="50%" height="50%" alt="IITB"> </img>
+							<p class="text-centre"><span style="color:white;">Developed at IIT-Bombay</span></p>
+						</a>
+
+					</div>
+
+					<div class="col   justify-content " style="padding-top:5px; height:30%; ">
+
+						<p><a href="https://www.youtube.com/channel/UCmyV3lKT1Gs1AfgtV8pp__Q"
+								class="fab fa-youtube fa-1x" style="color: #ed302f;" target="_blank"> <span
+									style="color:white; font-size: 14px;">ST Health YouTube Channel</span></a></p>
+						<p><a href="https://www.youtube.com/user/SpokenTutorialIITB" class="fab fa-youtube fa-1x"
+								style="color: #ed302f;" target="_blank"> <span style="color: white; font-size: 14px;">ST
+									YouTube Channel</span> </a> </p>
+						<p><a href="https://www.facebook.com/SpokenTutorial.org" class="fab fa-facebook-f fa-1x"
+								style="color: #3b5998;" target="_blank"> <span style="color: white; font-size: 14px;">
+									ST Facebook Page</span> </a></p>
+						<p><a href="https://www.linkedin.com/company/spokentutorial?original_referer="
+								class="fab fa-linkedin-in fa-1x" style="color: #0082ca;" target="_blank"> <span
+									style="color:white; font-size: 14px;">ST LinkedIn Page</span> </a> </p>
+
+
+
+					</div>
+
+				</div>
 
 			</div>
-			<main id="tutorialPage" class=" p-4">
-				<section id="t-video">
+
+		</footer>
 
 
 
-
-					<div class="row" id="OriginalMaodeRow">
-						<div class="col-md-8 p-2">
-
-
-
-
-						</div>
-
-					</div>
-
-
-
-				</section>
-
-
-
-			</main>
-			<br><br>
-			<br><br>
-
-
-
-			<footer class="footer" style="margin-bottom:0px;">
-				<div class="container">
-
-					<div class="row" height="50%">
-						<div class="col text-center justify-content" style=" padding-top:12px; height:50%;">
-							<p> <i class="fas fa-map-marker-alt contact-icon"></i> Spoken Tutorial Project,<br>
-								TCS Lab,Behind CAD Centre,<br>
-								IIT Bombay, Powai,<br>
-								Mumbai - 400076
-							</p>
-						</div>
-
-						<div class="col text-center" style=" padding-top:12px; height:50%;">
-
-							<p><a href="mailto:health@spoken-tutorial.org"><i
-										class="fas fa-envelope contact-icon mr-2"></i><span style="color:white;">
-										health@spoken-tutorial.org</span> </a></p>
-							<p><a href="tel:02225764229"><i class="fas fa-phone-alt contact-icon mr-2"></i><span
-										style="color:white;">022 2576 4229 </span> </a></p>
-
-						</div>
-
-						<div class="col  text-center " style="padding-top:10px; height:50%;">
-							<a href="https://www.iitb.ac.in/" target="_blank"> <img th:src="@{/image/iitb-logo.png}"
-									width="50%" height="50%" alt="IITB"> </img>
-								<p class="text-centre"><span style="color:white;">Developed at IIT-Bombay</span></p>
-							</a>
-
-						</div>
-
-						<div class="col   justify-content " style="padding-top:5px; height:30%; ">
-
-							<p><a href="https://www.youtube.com/channel/UCmyV3lKT1Gs1AfgtV8pp__Q"
-									class="fab fa-youtube fa-1x" style="color: #ed302f;" target="_blank"> <span
-										style="color:white; font-size: 14px;">ST Health YouTube Channel</span></a></p>
-							<p><a href="https://www.youtube.com/user/SpokenTutorialIITB" class="fab fa-youtube fa-1x"
-									style="color: #ed302f;" target="_blank"> <span
-										style="color: white; font-size: 14px;">ST YouTube Channel</span> </a> </p>
-							<p><a href="https://www.facebook.com/SpokenTutorial.org" class="fab fa-facebook-f fa-1x"
-									style="color: #3b5998;" target="_blank"> <span
-										style="color: white; font-size: 14px;"> ST Facebook Page</span> </a></p>
-							<p><a href="https://www.linkedin.com/company/spokentutorial?original_referer="
-									class="fab fa-linkedin-in fa-1x" style="color: #0082ca;" target="_blank"> <span
-										style="color:white; font-size: 14px;">ST LinkedIn Page</span> </a> </p>
-
-
-
-						</div>
-
-					</div>
-
-				</div>
-
-			</footer>
-
-
-
-			<style>
-				@keyframes spin {
-					0% {
-						transform: rotate(0deg);
-					}
-
-					100% {
-						transform: rotate(360deg);
-					}
+		<style>
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
 				}
 
-
-				/* Control viewport height safely */
-				#imageSlider .carousel-inner {
-					min-height: 80vh;
-					background: #fff;
+				100% {
+					transform: rotate(360deg);
 				}
+			}
 
 
-				#imageSlider .carousel-item {
-					text-align: center;
-				}
+			/* Control viewport height safely */
+			#imageSlider .carousel-inner {
+				min-height: 80vh;
+				background: #fff;
+			}
 
 
+			#imageSlider .carousel-item {
+				text-align: center;
+			}
+
+
+			.carousel-img {
+				max-width: 100%;
+				max-height: 90vh;
+				width: auto;
+				height: auto;
+				object-fit: contain;
+				display: inline-block;
+			}
+
+
+
+			.carousel-control-prev,
+			.carousel-control-next {
+				width: 8%;
+			}
+
+			.carousel-control-prev-icon,
+			.carousel-control-next-icon {
+				background-color: black;
+				border-radius: 50%;
+				width: 42px;
+				height: 42px;
+				background-size: 60% 60%;
+			}
+
+
+
+			.carousel-indicators li {
+				background-color: #bbb;
+			}
+
+			.carousel-indicators .active {
+				background-color: #000;
+			}
+
+
+
+			@media (max-width: 768px) {
 				.carousel-img {
-					max-width: 100%;
-					max-height: 90vh;
-					width: auto;
-					height: auto;
-					object-fit: contain;
-					display: inline-block;
-				}
-
-
-
-				.carousel-control-prev,
-				.carousel-control-next {
-					width: 8%;
+					max-height: 60vh;
 				}
 
 				.carousel-control-prev-icon,
 				.carousel-control-next-icon {
-					background-color: black;
-					border-radius: 50%;
-					width: 42px;
-					height: 42px;
-					background-size: 60% 60%;
+					width: 36px;
+					height: 36px;
 				}
+			}
+
+			.topic-title {
+				color: #0d6efd;
+				font-weight: 600;
+			}
+
+			.meta-title {
+				color: #000;
+				font-weight: 500;
+			}
+		</style>
 
 
+		<div th:replace="common/trail :: body-bottom-scripts"></div>
 
-				.carousel-indicators li {
-					background-color: #bbb;
-				}
+		<!-- === Share Link View Modal === -->
+		<div class="modal fade" id="shareModal" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
 
-				.carousel-indicators .active {
-					background-color: #000;
-				}
-
-
-
-				@media (max-width: 768px) {
-					.carousel-img {
-						max-height: 60vh;
-					}
-
-					.carousel-control-prev-icon,
-					.carousel-control-next-icon {
-						width: 36px;
-						height: 36px;
-					}
-				}
-
-				.topic-title {
-					color: #0d6efd;
-					font-weight: 600;
-				}
-
-				.meta-title {
-					color: #000;
-					font-weight: 500;
-				}
-			</style>
-
-
-			<div th:replace="common/trail :: body-bottom-scripts"></div>
-
-			<!-- === Share Link View Modal === -->
-			<div class="modal fade" id="shareModal" tabindex="-1">
-				<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title">Share File</h5>
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-						</div>
-						<div class="modal-body">
-							<input type="text" id="shareLink" th:value="${shareUrl != null} 
-                 ? @{${baseUrl} + '/shared-Training-Resource/' 
-                     + ${topicName} + '/' 
-                     + ${fileTypeString} + '/' 
-                     + ${langName} + '/' 
-                     + ${trId}}
-                 : ''" class="form-control" readonly>
-
-
-
-						</div>
-						<div class="modal-footer">
-							<button type="button" id="copyShareLink" class="btn btn-primary">
-								Copy Link
-							</button>
-						</div>
+					<div class="modal-header">
+						<h5 class="modal-title">Share File</h5>
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
 					</div>
-				</div>
-			</div>
 
-			<!-- === Image View Modal === -->
-			<div class="modal fade" id="viewModal" tabindex="-1">
-				<div class="modal-dialog modal-lg modal-dialog-centered">
-					<div class="modal-content">
+					<div class="modal-body">
 
-						<div class="modal-header">
-							<h5 class="modal-title">
-
-
-								<span class="topic-title" th:if="${topicName != null}"
-									th:text="${#strings.capitalizeWords(#strings.replace(topicName,'_',' '))}">
-								</span>
-
-
-								<span class="meta-title" th:if="${langName != null and topicName != null}"
-									th:text="' : 🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
-								</span>
-
-
-								<span class="meta-title" th:if="${langName != null and topicName == null}"
-									th:text="'🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
-								</span>
-
-
-								<span class="meta-title" th:if="${fileTypeString != null and langName != null}"
-									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
-								</span>
-
-
-								<span class="meta-title"
-									th:if="${fileTypeString != null and langName == null and topicName != null}"
-									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
-								</span>
-
-
-								<span class="meta-title"
-									th:if="${fileTypeString != null and topicName == null and langName == null}"
-									th:text="'📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
-								</span>
-
-							</h5>
-
-
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<!-- PDF / Image -->
+						<div th:if="${fileTypeString == 'Pdf' or fileTypeString == 'Image'}">
+							<input type="text" class="form-control shareLink" readonly th:value="${shareUrl != null}
+                             ? @{${baseUrl} + '/shared-Training-Resource/'
+                                 + ${topicName} + '/'
+                                 + ${fileTypeString} + '/'
+                                 + ${langName} + '/'
+                                 + ${trId}}
+                             : ''">
 						</div>
 
-						<div class="modal-body">
-							<div th:if="${fileTypeString == 'Pdf'}">
-							    <th:block th:each="pdf, stat : ${filePaths}">
-							        <span th:text="'Pdf ' + ${stat.count} + ': '"></span>
-							        <a th:href="@{'/files/' + ${pdf}}"  target="_blank">Click here to view</a>
-							        <br/>
-							    </th:block>
+						<!-- DOC / Excel -->
+						<div th:if="${fileTypeString == 'Doc' or fileTypeString == 'Excel'}">
+
+							<!-- Authorized -->
+							<div th:if="${usr != null and authorizedUsr}">
+								<input type="text" class="form-control shareLink" readonly th:value="${shareUrl != null}
+                                 ? @{${baseUrl} + '/shared-Training-Resource/'
+                                     + ${topicName} + '/'
+                                     + ${fileTypeString} + '/'
+                                     + ${langName} + '/'
+                                     + ${trId}}
+                                 : ''">
+							</div>
+
+							<!-- Logged in but not authorized -->
+							<div th:if="${usr != null and !authorizedUsr}">
+								<span>You are not authorized to access Doc or Excel files</span>
 							</div>
 
 
 
-							<div th:if="${fileTypeString == 'Image'}" id="imageSlider" class="carousel slide" data-ride="carousel" data-keyboard="true"
-								data-touch="true">
+						</div>
+
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" id="copyShareLink" class="btn btn-primary">
+							Copy Link
+						</button>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<!-- === Share and View Login Modal of Doc and Excel === -->
+		<div class="modal fade" id="docExcelLogin" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" th:replace="common/commonItemsTrainingResource :: model_title">
+						</h5>
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+					</div>
+					<!-- Not logged in -->
+					<div th:if="${usr == null}" class="login-box">
+						<div th:replace="common/commonItemsTrainingResource :: tr_login">
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- === Image View Modal === -->
+		<div class="modal fade" id="viewModal" tabindex="-1">
+			<div class="modal-dialog modal-lg modal-dialog-centered">
+				<div class="modal-content">
+
+					<div class="modal-header">
+						<h5 class="modal-title" th:replace="common/commonItemsTrainingResource :: model_title">
+						</h5>
 
 
-								<ol class="carousel-indicators">
-									<th:block th:each="img, i : ${filePaths}">
-										<li th:data-target="'#imageSlider'" th:data-slide-to="${i.index}"
-											th:classappend="${i.index == 0} ? 'active'">
-										</li>
-									</th:block>
-								</ol>
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+					</div>
+
+					<div class="modal-body">
+						<div th:if="${fileTypeString == 'Pdf'}">
+							<th:block th:each="pdf, stat : ${filePaths}">
+								<span th:text="'Pdf ' + ${stat.count} + ': '"></span>
+								<a th:href="@{'/files/' + ${pdf}}" target="_blank">Click here to view</a>
+								<br />
+							</th:block>
+						</div>
 
 
-								<div class="carousel-inner">
-									<th:block th:each="img, i : ${filePaths}">
-										<div class="carousel-item" th:classappend="${i.index == 0} ? ' active'">
-											<img th:src="@{/files/}+@{${img}}" class="carousel-img" alt="Preview Image">
+						<div th:if="${fileTypeString == 'Doc' or fileTypeString == 'Excel'}">
 
-										</div>
-									</th:block>
+							<!-- Authorized user -->
+							<div th:if="${usr != null and authorizedUsr}">
+								<th:block th:each="tempFile, stat : ${filePaths}">
+									<span th:text="|${fileTypeString} ${stat.count}: |"></span>
+									<a th:href="@{'/files/' + ${tempFile}}" target="_blank">
+										Click here to view
+									</a>
+									<br />
+								</th:block>
+							</div>
+
+							<!-- Logged in but NOT authorized -->
+							<div th:if="${usr != null and !authorizedUsr}">
+								<span>You are not authorized to access Doc or Excel files</span>
+							</div>
+
+
+
+						</div>
+
+					</div>
+
+
+
+					<div th:if="${fileTypeString == 'Image'}" id="imageSlider" class="carousel slide"
+						data-ride="carousel" data-keyboard="true" data-touch="true">
+
+
+						<ol class="carousel-indicators">
+							<th:block th:each="img, i : ${filePaths}">
+								<li th:data-target="'#imageSlider'" th:data-slide-to="${i.index}"
+									th:classappend="${i.index == 0} ? 'active'">
+								</li>
+							</th:block>
+						</ol>
+
+
+						<div class="carousel-inner">
+							<th:block th:each="img, i : ${filePaths}">
+								<div class="carousel-item" th:classappend="${i.index == 0} ? ' active'">
+									<img th:src="@{'/files/' + ${img}}"
+     class="carousel-img"
+     alt="Preview Image">
+
+
 								</div>
-
-
-								<a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
-									<span class="carousel-control-prev-icon"></span>
-								</a>
-								<a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
-									<span class="carousel-control-next-icon"></span>
-								</a>
-
-							</div>
-
+							</th:block>
 						</div>
+
+
+						<a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
+							<span class="carousel-control-prev-icon"></span>
+						</a>
+						<a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
+							<span class="carousel-control-next-icon"></span>
+						</a>
+
 					</div>
+
 				</div>
 			</div>
+		</div>
+		
 
 
 
 
 
-			<script th:inline="javascript">
-				var projectPath = '[(@{/})]';
+		<script th:inline="javascript">
+			var projectPath = '[(@{/})]';
 
-			</script>
+		</script>
 
-			<script th:if="${shareUrl != null}">
-				$(document).ready(function () {
-					$('#shareModal').modal('show');
-				});
-			</script>
-
-			<script th:if="${action == 'view' 
-                
-               and filePaths?.size() > 0}">
-				$(document).ready(function () {
-					$('#viewModal').modal('show');
-				});
-			</script>
-
-			<script>
-				document.getElementById("form1").addEventListener("submit", function (event) {
-					event.preventDefault();
-
-					let topic = document.getElementById("topicNameTR").value;
-					let lang = document.getElementById("langNameTR").value;
-					let file = document.getElementById("inputFileType").value;
-					let action = document.querySelector('input[name="action"]:checked');
-
-					let errorBox = document.getElementById("formError");
+		<script th:if="${shareUrl != null 
+               and action == 'share' 
+               and ((fileTypeString == 'Pdf' or fileTypeString == 'Image')
+                    or ((fileTypeString == 'Doc' or fileTypeString == 'Excel') and usr != null))}">
+						$(document).ready(function () {
+							$('#shareModal').modal('show');
+						});
+					</script>
 
 
-					function showError(message) {
-						errorBox.textContent = message;
-						errorBox.classList.remove("d-none");
-						errorBox.scrollIntoView({behavior: "smooth"});
-
-						setTimeout(() => {
-							errorBox.classList.add("d-none");
-						}, 8000);
-					}
+		<script th:if="${(fileTypeString == 'Doc' or fileTypeString == 'Excel') and usr == null}">
+			$(document).ready(function () {
+				$('#docExcelLogin').modal('show');
+			});
+		</script>
 
 
-					if (topic === "0") {
-						showError("Please select Topic");
-						return false;
-					}
 
-					if (lang === "0") {
-						showError("Please select Language");
-						return false;
-					}
-
-					if (file === "0") {
-						showError("Please select File Type");
-						return false;
-					}
-
-					if (!action) {
-						showError("Please select an Action (View / Download / Share)");
-						return false;
-					}
+		<script th:if="${action == 'view'
+               
+               and filePaths != null
+               and filePaths.size() > 0
+               and ((fileTypeString == 'Pdf' or fileTypeString == 'Image')
+                    or ((fileTypeString == 'Doc' or fileTypeString == 'Excel') and usr != null))}">
+						$(document).ready(function () {
+							$('#viewModal').modal('show');
+						});
+					</script>
 
 
-					errorBox.classList.add("d-none");
-					this.submit();
-				});
-			</script>
+		<script>
+			document.getElementById("form1").addEventListener("submit", function (event) {
+				event.preventDefault();
 
-		</body>
+				let topic = document.getElementById("topicNameTR").value;
+				let lang = document.getElementById("langNameTR").value;
+				let file = document.getElementById("inputFileType").value;
+				let action = document.querySelector('input[name="action"]:checked');
 
-	</html>
+				let errorBox = document.getElementById("formError");
+
+
+				function showError(message) {
+					errorBox.textContent = message;
+					errorBox.classList.remove("d-none");
+					errorBox.scrollIntoView({behavior: "smooth"});
+
+					setTimeout(() => {
+						errorBox.classList.add("d-none");
+					}, 8000);
+				}
+
+
+				if (topic === "0") {
+					showError("Please select Topic");
+					return false;
+				}
+
+				if (lang === "0") {
+					showError("Please select Language");
+					return false;
+				}
+
+				if (file === "0") {
+					showError("Please select File Type");
+					return false;
+				}
+
+				if (!action) {
+					showError("Please select an Action (View / Download / Share)");
+					return false;
+				}
+
+
+				errorBox.classList.add("d-none");
+				this.submit();
+			});
+		</script>
+
+	</body>
+
+</html>
