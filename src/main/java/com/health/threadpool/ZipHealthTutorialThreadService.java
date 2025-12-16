@@ -361,12 +361,6 @@ public class ZipHealthTutorialThreadService {
                             }
                         }
 
-//                        String topicNameForTutorial = "";
-//                        if (!resolution.isEmpty()) {
-//                            topicNameForTutorial = topicName + resolution;
-//                        } else {
-//                            topicNameForTutorial = topicName;
-//                        }
                         String finaltutorialName = "";
                         Path sourcePath;
 

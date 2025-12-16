@@ -189,11 +189,12 @@ public class ZipCreationThreadService {
                 for (WeekTitleVideo temp : weekTitleList) {
                     String weekName = temp.getWeek().getWeekName().replace(' ', '_');
 
-                    String title = ServiceUtility.sanitizetitle(temp.getTitle());
+                    // String title = ServiceUtility.sanitizetitle(temp.getTitle());
 
                     String tutorialPath = temp.getVideoResource().getVideoPath();
                     String thumbnailPath = temp.getVideoResource().getThumbnailPath();
                     String sessionName = temp.getVideoResource().getSessionName();
+                    String fileSessionName = sessionName.replace(" ", "_");
 
                     Path destInationDirectoryforLanAndWeek = Paths.get(destInationDirectory1.toString(), File.separator,
                             langName, File.separator, weekName, File.separator, sessionName);
@@ -214,11 +215,11 @@ public class ZipCreationThreadService {
                         Path webmSourcePath = replaceExtension(basePath, ".webm");
                         if (webmSourcePath.toFile().exists()) {
                             sourcePath = webmSourcePath;
-                            titleWithExtension = title + ".webm";
+                            titleWithExtension = fileSessionName + ".webm";
 
                         } else {
                             sourcePath = basePath; // replaceExtension(basePath, ".mp4");
-                            titleWithExtension = title + ".mp4";
+                            titleWithExtension = fileSessionName + ".mp4";
                         }
                         logger.info("video file name: {}", titleWithExtension);
                         Path destinationPath = destInationDirectoryforLanAndWeek.resolve(titleWithExtension);
@@ -277,15 +278,16 @@ public class ZipCreationThreadService {
                                 tutorialPath1);
                         Path basePath;
                         String resolution = "_480p";
-                        String resolutionSubtitle = resolution+CommonData.WITH_SUBTITLES;
+                        String resolutionSubtitle = resolution + CommonData.WITH_SUBTITLES;
                         String resolutionUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolution);
-                        String resolutionSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, resolutionSubtitle);
-                        String originalSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1, CommonData.WITH_SUBTITLES);
+                        String resolutionSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1,
+                                resolutionSubtitle);
+                        String originalSubtitleUrl = ServiceUtility.getVideoResolutionPath(tutorialPath1,
+                                CommonData.WITH_SUBTITLES);
 
                         if (resolutionUrl != null) {
                             Path resolutionPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                     resolutionUrl);
-                            
 
                             if (resolutionPath.toFile().exists()) {
                                 basePath = resolutionPath;
@@ -296,24 +298,24 @@ public class ZipCreationThreadService {
                         } else {
                             basePath = originalPath;
                         }
-                        
+
                         Path resolutionSubtitlePath;
                         Path originalSubtitlePath;
-                       
-                        if(resolutionSubtitleUrl!=null) {
-                             resolutionSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+
+                        if (resolutionSubtitleUrl != null) {
+                            resolutionSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                     resolutionSubtitleUrl);
-                             if(resolutionSubtitlePath.toFile().exists()) {
-                                 basePath = resolutionSubtitlePath;
-                             }
+                            if (resolutionSubtitlePath.toFile().exists()) {
+                                basePath = resolutionSubtitlePath;
+                            }
                         }
-                        
-                        if(originalSubtitleUrl!=null && resolutionUrl==null) {
+
+                        if (originalSubtitleUrl != null && resolutionUrl == null) {
                             originalSubtitlePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
                                     originalSubtitleUrl);
-                             if(originalSubtitlePath.toFile().exists()) {
-                                 basePath = originalSubtitlePath;
-                             }
+                            if (originalSubtitlePath.toFile().exists()) {
+                                basePath = originalSubtitlePath;
+                            }
                         }
 
                         String topicwithExtention;
@@ -477,7 +479,8 @@ public class ZipCreationThreadService {
 
                     String sessionName = weekTitleVideo.getVideoResource().getSessionName();
 
-                    String title = ServiceUtility.sanitizetitle(weekTitleVideo.getTitle());
+                    // String title = ServiceUtility.sanitizetitle(weekTitleVideo.getTitle());
+                    String fileSessionName = sessionName.replace(" ", "_");
 
                     String weekNameTemp = weekTitleVideo.getWeek().getWeekName().replace(' ', '_');
                     String tempTutorialPath = weekTitleVideo.getVideoResource().getVideoPath();
@@ -489,12 +492,12 @@ public class ZipCreationThreadService {
                     Path webmSourcePath = replaceExtension(basePath, ".webm");
                     if (webmSourcePath.toFile().exists()) {
                         sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator, sessionName,
-                                File.separator, title + ".webm");
+                                File.separator, fileSessionName + ".webm");
                         ;
 
                     } else {
                         sourcePath = Paths.get(langName, File.separator, weekNameTemp, File.separator, sessionName,
-                                File.separator, title + ".mp4");
+                                File.separator, fileSessionName + ".mp4");
 
                     }
 
