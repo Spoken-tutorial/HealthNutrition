@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.health.model.ContributorAssignedMultiUserTutorial;
+import com.health.model.ContributorAssignedTutorial;
 import com.health.model.User;
 import com.health.repository.ContributorAssignedMultiUserTutorialRepository;
 import com.health.service.ContributorAssignedMultiUserTutorialService;
@@ -60,6 +61,13 @@ public class ContributorAssignedMultiUserTutorialServiceImpl implements Contribu
     public List<ContributorAssignedMultiUserTutorial> getAllByuser(User usr) {
         // TODO Auto-generated method stub
         return conRepo.findAllByuser(usr);
+    }
+
+    @Override
+    public List<ContributorAssignedMultiUserTutorial> findByUserAndConAssignedTutorial(User user,
+            ContributorAssignedTutorial conAssignedTutorial) {
+
+        return conRepo.findByUserAndConAssignedTutorial(user, conAssignedTutorial);
     }
 
 }

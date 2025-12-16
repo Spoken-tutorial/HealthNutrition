@@ -97,21 +97,6 @@ public class Brouchure implements Serializable {
     /**
      * Topic category Mapped object to which it belongs
      */
-    @ManyToOne
-    @JoinColumn(name = "topicCat_id")
-    private TopicCategoryMapping topicCatId;
-
-    @ManyToOne
-    @JoinColumn(name = "cat_id")
-    private Category catId;
-
-    public Category getCatId() {
-        return catId;
-    }
-
-    public void setCatId(Category catId) {
-        this.catId = catId;
-    }
 
     public int getId() {
         return id;
@@ -135,14 +120,6 @@ public class Brouchure implements Serializable {
 
     public void setLan(Language lan) {
         this.lan = lan;
-    }
-
-    public TopicCategoryMapping getTopicCatId() {
-        return topicCatId;
-    }
-
-    public void setTopicCatId(TopicCategoryMapping topicCatId) {
-        this.topicCatId = topicCatId;
     }
 
     public boolean isShowOnHomepage() {

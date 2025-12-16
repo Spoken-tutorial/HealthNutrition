@@ -165,4 +165,10 @@ public class UserRoleServiceImpl implements UserRoleService {
         usrRoleRepo.deleteById(u.getUserRoleId());
     }
 
+    @Override
+    public void saveAll(List<UserRole> userRoles) {
+        usrRoleRepo.saveAll(userRoles);
+
+    }
+
 }

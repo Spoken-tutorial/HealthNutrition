@@ -128,9 +128,9 @@
 			<h5>Promotional Material</h5>
 		<a th:if="${docSearch.getViewUrl()!=null and docSearch.getViewUrl()!=''}" th:href="${docSearch.getDocumentUrl()}" target="_blank" style="color: black;text-decoration: none;">
 			<h4><span th:text="${docSearch.getTitle()}"></span></h4>	
-			<h4 style="color: #014F7A;font-size: 1rem;text-decoration: underline;" th:text="${docSearch.getTopic()}"></h4>
+			
 			<h6 style="color: #014F7A;font-size: 1rem;">
-			<span th:text="${docSearch.getCategory()}"></span>
+			
 			
 			<span>(</span><i th:text="${docSearch.getLanguage()}" class=""></i><span>)</span>
 			

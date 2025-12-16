@@ -55,10 +55,10 @@ font-weight:bold!important;
 							</div>
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-6">
+									<div class="col-lg-12">
 										<form class="form-horizontal"
 											th:action="@{/assignTutorialToContributor}" method="post">
-											<div class="form-group">
+											<div class="form-group" style="width: 50%;">
 
 												<label for="inputUserame">Select User *</label> <select
 													id="contributorId" class="form-control"
@@ -72,29 +72,56 @@ font-weight:bold!important;
 
 												</select>
 											</div>
-											<div class="form-group">
+											<div class="form-group"  style="width: 50%;">
 												<label for="lanId">Select Language *</label> <select id="lanId"
 													class="form-control" name="languageName"
 													required="required">
 													<option>Select Language</option>
 												</select>
 											</div>
-											<div class="form-group">
-												<label for="catgoryByContributor">Select Category *</label> <select
-													id="catgoryByContributor" class="form-control"
-													name="contributorCategory" required="required">
-													<option>Select Category</option>
+																						
+									<input type="hidden" id="lengthofCategory" name="lengthofCategory"  th:value="${catList.size()}"/>	
+										
+									<div th:each="cat,iter: ${catList}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									
+									
+										
+								        <div class="row">
+								            <div class="col-md-6">
+								              
+								               <div class="form-group">
+		               	                 		<label th:if="${iter.index == 0}" th:for="${'catId' + iter.index}">Select Category * </label>
+												<select th:id="${'catId' + iter.index}" class="form-control cat-select" name="catName" th:data-index="${iter.index}">
+			  									<option value="0">Select Category</option>
+			  									<option th:each="catitr : ${catList}" th:value="${catitr.getCategoryId()}" th:text="${catitr.getCatName()}"></option>
 												</select>
-											</div>
+		  									</div>
+								            
+								            </div>
+								            
+								            <div class="col-md-6">
+										      
+										        <div class="form-group">
+												<label th:if="${iter.index == 0}"  th:for="${'topic' + iter.index}">Select Topic * <span class="text-muted">(For multiple categories selection, press Ctrl key)</span>  </label>
+												<select th:id="${'topicId' + iter.index}" class="form-control topic-select" th:name="'topicName_' + ${iter.index}"  th:data-index="${iter.index}"  multiple="multiple" size="15">
+												 	</select>
+												</div>
+												
+								            </div>
+								            
+								           
+								        </div>
+								    
+									
+									
 
+									
 
-											<div class="form-group">
-												<label for="catgoryByContributor">Select Topic * <span class="text-muted">(For multiple topic selection, press Ctrl key)</span></label> <select
-													id="assignTopic" class="form-control select selectpicker"
-													name="inputTopic" required="required" multiple="multiple">
-												</select>
+									
+									<br>
+									</div>									  
+											<br>
 
-											</div>
 											<button id="submitContribution" type="submit"
 												class="btn btn-success">Submit</button>
 											&nbsp;&nbsp;&nbsp;
@@ -141,6 +168,47 @@ font-weight:bold!important;
 $(document).ready( function () {
     $('#myTable').DataTable();
 } );
+var divid = 0;
+
+function addListener(divid) {
+	var catSelect = document.getElementById("catId" + (divid - 1));
+	if (catSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	catSelect.addEventListener("change", function() {
+	  var selectedCat = catSelect.value;
+	  if (selectedCat !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+function setRequired(divid) {
+	
+	var topic = document.getElementById("topic" + divid);
+	
+	topic.required = (value != "");
+	
+	return false;
+}
+
+addRow(divid);
+
+
+
 </script>
 </body>
 </html>

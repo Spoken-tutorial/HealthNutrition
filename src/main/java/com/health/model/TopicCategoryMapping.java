@@ -69,9 +69,6 @@ public class TopicCategoryMapping implements Serializable {
     @OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
     private Set<TrainingTopic> trainingTopic = new HashSet<TrainingTopic>();
 
-    @OneToMany(mappedBy = "topicCatId", cascade = CascadeType.ALL)
-    private Set<Brouchure> brochures = new HashSet<Brouchure>();
-
     public int getTopicCategoryId() {
         return topicCategoryId;
     }
@@ -175,14 +172,6 @@ public class TopicCategoryMapping implements Serializable {
 
     public void setTrainingTopic(Set<TrainingTopic> trainingTopic) {
         this.trainingTopic = trainingTopic;
-    }
-
-    public Set<Brouchure> getBrochures() {
-        return brochures;
-    }
-
-    public void setBrochures(Set<Brouchure> brochures) {
-        this.brochures = brochures;
     }
 
     public int getOrder() {
