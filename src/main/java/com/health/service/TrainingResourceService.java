@@ -15,6 +15,8 @@ public interface TrainingResourceService {
 
     List<TrainingResource> findAll();
 
+    List<TrainingResource> findAllByStatusTrue();
+
     void save(TrainingResource trainingResource);
 
     void saveAll(List<TrainingResource> trainingResourceList);

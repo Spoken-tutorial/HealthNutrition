@@ -1992,10 +1992,13 @@ public class AjaxController {
         for (TrainingResource tr : trList) {
             // To find Topic
             Topic topicTemp = tr.getTopicLanMapping().getTopic();
+            int trTopicId = topicTemp.getTopicId();
             topics.put(topicTemp.getTopicName(), topicTemp.getTopicId());
 
             // To find FileType
-            ServiceUtility.getFileTypeIdAndValue(tr).forEach((id, type) -> fileTypes.put(type, id));
+            if (topicId == 0 || trTopicId == topicId) {
+                ServiceUtility.getFileTypeIdAndValue(tr).forEach((id, type) -> fileTypes.put(type, id));
+            }
 
         }
 
