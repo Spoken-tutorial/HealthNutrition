@@ -757,6 +757,7 @@ public class HomeController {
         List<ResearchPaper> researchPapersList = researchPaperService.findAllByShowOnHomePage();
         List<TutorialWithWeekAndPackage> trainingModuleTutorialList = tutorialWithWeekAndPackageService.findAll();
         List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        List<TrainingResource> trainingResourceList = trainingResourceService.findAllByStatusTrue();
 
         boolean eventFlag = !eventList.isEmpty();
         boolean testimonialFlag = !testimonialList.isEmpty();
@@ -766,6 +767,7 @@ public class HomeController {
         boolean researchPaperFlag = !researchPapersList.isEmpty();
         boolean traininngModuleFlag = !trainingModuleTutorialList.isEmpty();
         boolean citationFlag = !citationTuorials.isEmpty();
+        boolean trainingResourceFlag = !trainingResourceList.isEmpty();
 
         model.addAttribute("testimonialFlag", testimonialFlag);
         model.addAttribute("eventFlag", eventFlag);
@@ -775,6 +777,7 @@ public class HomeController {
         model.addAttribute("researchPaperFlag", researchPaperFlag);
         model.addAttribute("traininngModuleFlag", traininngModuleFlag);
         model.addAttribute("citationFlag", citationFlag);
+        model.addAttribute("trainingResourceFlag", trainingResourceFlag);
 
     }
 
@@ -946,6 +949,7 @@ public class HomeController {
 
         List<TutorialWithWeekAndPackage> trainingModuleTutorialList = tutorialWithWeekAndPackageService.findAll();
         List<Tutorial> citationTuorials = tutService.findAllEnabledEnglishTuorialsWithCitationNotNull();
+        List<TrainingResource> trainingResourceList = trainingResourceService.findAllByStatusTrue();
 
         boolean eventFlag = !events.isEmpty();
         boolean testimonialFlag = !testi.isEmpty();
@@ -955,6 +959,7 @@ public class HomeController {
         boolean researchPaperFlag = !researchPapers.isEmpty();
         boolean traininngModuleFlag = !trainingModuleTutorialList.isEmpty();
         boolean citationFlag = !citationTuorials.isEmpty();
+        boolean trainingResourceFlag = !trainingResourceList.isEmpty();
 
         model.addAttribute("testimonialFlag", testimonialFlag);
         model.addAttribute("eventFlag", eventFlag);
@@ -964,6 +969,7 @@ public class HomeController {
         model.addAttribute("researchPaperFlag", researchPaperFlag);
         model.addAttribute("traininngModuleFlag", traininngModuleFlag);
         model.addAttribute("citationFlag", citationFlag);
+        model.addAttribute("trainingResourceFlag", trainingResourceFlag);
 
         /************ Navigation Link Check Separate Code End ********/
 
