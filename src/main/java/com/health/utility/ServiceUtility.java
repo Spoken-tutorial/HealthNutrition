@@ -14,6 +14,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
@@ -478,9 +479,8 @@ public class ServiceUtility {
                     if (!entry.isDirectory()) {
                         Path outputFile = extractDir.resolve(entry.getName());
                         Files.createDirectories(outputFile.getParent());
-                        try (OutputStream out = Files.newOutputStream(outputFile)) {
-                            zipIn.transferTo(out);
-                        }
+                        Files.copy(zipIn, outputFile, StandardCopyOption.REPLACE_EXISTING);
+
                     }
                 }
             }
