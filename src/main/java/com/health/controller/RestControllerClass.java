@@ -24,6 +24,9 @@ import com.health.utility.ServiceUtility;
 @RestController
 public class RestControllerClass {
 
+    @Value("${git.commit.id}")
+    private String gitCommitId;
+
     @Value("${scriptmanager_api}")
     private String scriptmanager_api;
 
@@ -84,6 +87,11 @@ public class RestControllerClass {
             result.put("published", false);
             return result;
         }
+    }
+
+    @GetMapping("/check-deployment")
+    public String checkDeployment() {
+        return "git Commit Id: " + gitCommitId;
     }
 
 }
