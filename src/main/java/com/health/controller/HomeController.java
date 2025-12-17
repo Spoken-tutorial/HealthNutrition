@@ -6105,9 +6105,9 @@ public class HomeController {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
-        model.addAttribute("userInfo", usr);
+        model.addAttribute("usr", usr.getUsername());
         boolean authorizedUsr = false;
-        if (usr != null) {
+        if (usr.getUsername() != null) {
             Role role = roleService.findByname(CommonData.contributorRole);
             int roleId = role.getRoleId();
             Set<UserRole> usrRoles = usr.getUserRoles();
@@ -6171,12 +6171,19 @@ public class HomeController {
 
         if (action != null && !action.isEmpty() && action.equals("download")) {
             model.addAttribute("action", action);
-            try {
+            if ((fileTypeString.equals("Doc") || fileTypeString.equals("Excel")) && (usr == null || !authorizedUsr)) {
 
-                return "redirect:/downloadTrainingResource?filePath=" + URLEncoder.encode(finalUrl, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                logger.error("Error in Download Package", e);
+                model.addAttribute("error_msg", "Authentication Error");
+
+            } else {
+                try {
+
+                    return "redirect:/downloadTrainingResource?filePath=" + URLEncoder.encode(finalUrl, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("Error in Download Package", e);
+                }
             }
+
         }
 
         if (action != null && !action.isEmpty() && action.equals("view")) {
