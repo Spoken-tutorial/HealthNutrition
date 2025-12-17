@@ -4,12 +4,13 @@
 
 	<head th:replace="common/trail :: common-trail (pageTitle='Training Resource - Health And Nutrition')">
 
-		<title>Training Resource - Health And Nutrition</title>
+		<title>Training Resources - Health And Nutrition</title>
 
 	</head>
 
 	<body>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
 		<section id="loginSectionofTutorial">
 			<div class="px-md-3">
 				<div class="row header-top pt-2">
@@ -55,6 +56,7 @@
 
 
 			</section>
+			
 
 
 
@@ -245,13 +247,6 @@
                                  : ''">
 							</div>
 
-							<!-- Logged in but not authorized -->
-							<div th:if="${usr != null and !authorizedUsr}">
-								<span>You are not authorized to access Doc or Excel files</span>
-							</div>
-
-
-
 						</div>
 
 					</div>
@@ -266,8 +261,8 @@
 			</div>
 		</div>
 
-		<!-- === Share and View Login Modal of Doc and Excel === -->
-		<div class="modal fade" id="docExcelLogin" tabindex="-1">
+		<!-- ===  Doc and Excel Restriction=== -->
+		<div class="modal fade" id="docExcel" tabindex="-1">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -281,11 +276,15 @@
 						</div>
 
 					</div>
+					<div th:if="${usr != null and !authorizedUsr}">
+								<h5 class="text-danger px-3 pt-3">You are not authorized to access Doc or Excel files.</h5>
+								<br>
+							</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- === Image View Modal === -->
+		<!-- ===  View Modal === -->
 		<div class="modal fade" id="viewModal" tabindex="-1">
 			<div class="modal-dialog modal-lg modal-dialog-centered">
 				<div class="modal-content">
@@ -312,19 +311,13 @@
 
 							<!-- Authorized user -->
 							<div th:if="${usr != null and authorizedUsr}">
-								<th:block th:each="tempFile, stat : ${filePaths}">
-									<span th:text="|${fileTypeString} ${stat.count}: |"></span>
-									<a th:href="@{'/files/' + ${tempFile}}" target="_blank">
-										Click here to view
-									</a>
-									<br />
-								</th:block>
+							<h5 class="px-3 pt-3">
+						    Doc and Excel files cannot be viewed. Please download them.
+							</h5>
+
 							</div>
 
-							<!-- Logged in but NOT authorized -->
-							<div th:if="${usr != null and !authorizedUsr}">
-								<span>You are not authorized to access Doc or Excel files</span>
-							</div>
+							
 
 
 
@@ -386,16 +379,16 @@
 		<script th:if="${shareUrl != null 
                and action == 'share' 
                and ((fileTypeString == 'Pdf' or fileTypeString == 'Image')
-                    or ((fileTypeString == 'Doc' or fileTypeString == 'Excel') and usr != null))}">
+                    or ((fileTypeString == 'Doc' or fileTypeString == 'Excel') and authorizedUsr))}">
 						$(document).ready(function () {
 							$('#shareModal').modal('show');
 						});
 					</script>
 
 
-		<script th:if="${(fileTypeString == 'Doc' or fileTypeString == 'Excel') and usr == null}">
+		<script th:if="${(fileTypeString == 'Doc' or fileTypeString == 'Excel') and !authorizedUsr}">
 			$(document).ready(function () {
-				$('#docExcelLogin').modal('show');
+				$('#docExcel').modal('show');
 			});
 		</script>
 
@@ -406,7 +399,7 @@
                and filePaths != null
                and filePaths.size() > 0
                and ((fileTypeString == 'Pdf' or fileTypeString == 'Image')
-                    or ((fileTypeString == 'Doc' or fileTypeString == 'Excel') and usr != null))}">
+                    or ((fileTypeString == 'Doc' or fileTypeString == 'Excel') and authorizedUsr))}">
 						$(document).ready(function () {
 							$('#viewModal').modal('show');
 						});
@@ -414,7 +407,7 @@
 
 
 		<script>
-			document.getElementById("form1").addEventListener("submit", function (event) {
+			document.getElementById("formTrainingResource").addEventListener("submit", function (event) {
 				event.preventDefault();
 
 				let topic = document.getElementById("topicNameTR").value;
@@ -461,6 +454,11 @@
 				this.submit();
 			});
 		</script>
+		
+		<!-- Global user state -->
+<input type="hidden" id="usrValue" th:value="${usr != null}">
+<input type="hidden" id="authorizedUsrValue" th:value="${authorizedUsr}">
+<input type="hidden" id="fileTypeString" th:value="${fileTypeString}">
 
 	</body>
 

@@ -3201,6 +3201,9 @@ $(document).ready(function () {
         var langId   = $("#langNameTR").val();
         var fileType = $("#inputFileType").val();
         var action   = $("input[name='action']:checked").val();
+        const usrLoggedIn =$("#usrValue").val() == "true";
+		const authorizedUsr =$("#authorizedUsrValue").val() == "true";
+		var fileTypeString=$("#fileTypeString").val();
 
         $("#formError").addClass("d-none").text("");
 
@@ -3232,9 +3235,18 @@ $(document).ready(function () {
 
       
         if (action === "download") {
-			e.preventDefault();
+			if (fileTypeString === "Pdf" || fileTypeString === "Image") {
+            e.preventDefault();
             window.location.href = baseUrl + "&action=download";
-
+        }
+        
+		 if (fileTypeString === "Doc" || fileTypeString === "Excel") {
+			 if (usrLoggedIn && authorizedUsr) {
+               e.preventDefault();
+            window.location.href = baseUrl + "&action=download";
+            }
+			 	
+        }
         }
     });
 
