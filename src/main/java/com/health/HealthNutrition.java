@@ -38,6 +38,9 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Value("${git.commit.id}")
     private String gitCommitId;
 
+    @Value("${createdby}")
+    private String createdBy;
+
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
         return builder.sources(HealthNutrition.class);
@@ -51,6 +54,7 @@ public class HealthNutrition extends org.springframework.boot.web.servlet.suppor
     @Override
     public void run(String... args) throws Exception {
         logger.info("Starting application {}", gitCommitId);
+        logger.info("Checking application properties: created by {}", createdBy);
 
         try {
 
