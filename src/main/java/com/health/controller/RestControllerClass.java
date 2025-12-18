@@ -30,9 +30,6 @@ public class RestControllerClass {
     @Value("${git.commit.time:NA}")
     private String gitCommitTime;
 
-    @Value("${Build-Time:NA}")
-    private String buildTime;
-
     @Value("${scriptmanager_api}")
     private String scriptmanager_api;
 
