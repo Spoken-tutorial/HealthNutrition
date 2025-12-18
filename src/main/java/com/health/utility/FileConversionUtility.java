@@ -30,9 +30,6 @@ public class FileConversionUtility {
     @Value("${spring.applicationexternalPath.name}")
     private String mediaRoot;
 
-    @Value("${doc_to_pdf.command}")
-    private String doctoPdfCommand;
-
     public String convertDoctoPdf(String inputFilePath, String libreOfficeCommand) {
         String document = "";
         boolean shouldConvert = true;
