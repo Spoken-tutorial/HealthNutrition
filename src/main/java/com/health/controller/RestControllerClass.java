@@ -27,6 +27,12 @@ public class RestControllerClass {
     @Value("${git.commit.id}")
     private String gitCommitId;
 
+    @Value("${git.commit.time:NA}")
+    private String gitCommitTime;
+
+    @Value("${Build-Time:NA}")
+    private String buildTime;
+
     @Value("${scriptmanager_api}")
     private String scriptmanager_api;
 
@@ -91,7 +97,8 @@ public class RestControllerClass {
 
     @GetMapping("/check-deployment")
     public String checkDeployment() {
-        return "git Commit Id: " + gitCommitId;
+        return "Git Commit ID : " + gitCommitId + "<br>" + "Git Commit Time : " + gitCommitTime;
+
     }
 
 }
