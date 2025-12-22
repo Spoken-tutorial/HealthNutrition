@@ -401,9 +401,9 @@ public class HomeController {
 
     @Value("${scriptmanager_path}")
     private String scriptmanager_path;
-    // temp
-    // @Value("${doc_to_pdf.command}")
-    // private String doctoPdfCommand;
+
+    @Value("${doc_to_pdf.command}")
+    private String doctoPdfCommand;
 
     private static YouTube youtube;
 
@@ -5670,8 +5670,8 @@ public class HomeController {
                      */
                     if (!str.endsWith(".png") && !str.endsWith(".pdf")) {
                         finalFilePath.add(str);
-                        // String pdfPath = fileConversionUtility.convertDoctoPdf(str, doctoPdfCommand);
-                        // fileConversionUtility.generateThumbnailFromPdfAndSave(pdfPath);
+                        String pdfPath = fileConversionUtility.convertDoctoPdf(str, doctoPdfCommand);
+                        fileConversionUtility.generateThumbnailFromPdfAndSave(pdfPath);
                     }
 
                 }
