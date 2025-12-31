@@ -2667,7 +2667,7 @@ var clipboard = new ClipboardJS('#copyButtonViewPage', {
 							contentType : "application/json",
 							success : function(result) {
 
-								var html = '';
+								var html = '';								   
 								var len = result.length;
 	  	  			            $.each(result , function( key, value ) {
 		  	  			        html += '<option value=' + value + '>'
@@ -2808,6 +2808,46 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
 /************************************Assign Video End ********************************************** */
 
 /******************************** Trainig Resource Start ***************************************/
+
+  $("#catIdTR").change(function() {
+
+						var catId = $(this).find(":selected").val();
+						
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryforTR",
+							data : {
+								"catId" : catId,
+								
+								
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								html += '<option value="0">Select Topic</option>';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + value + '>'
+		  			               + key
+		  			               + '</option>';
+		  	  			        })
+	  	  			            
+								$("#topicIdTR").prop('disabled',false);
+								$('#topicIdTR').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
 
 $('.enableTrainingResource').click(function() {
 				

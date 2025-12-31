@@ -5392,7 +5392,8 @@ public class HomeController {
 
         model.addAttribute("languages", languages);
 
-        List<Topic> topics = getTopics();
+        List<Category> categories = catService.findAllEnabledCategories();
+        model.addAttribute("categories", categories);
         List<TrainingResource> trainingResourceList = new ArrayList<>();
         List<TrainingResource> tempResourceList = trainingResourceService.findAll();
         for (TrainingResource temp : tempResourceList) {
@@ -5400,7 +5401,7 @@ public class HomeController {
                 trainingResourceList.add(temp);
             }
         }
-        model.addAttribute("topics", topics);
+
         model.addAttribute("trainingResourceList", trainingResourceList);
 
         return "addTrainingResource";
@@ -5408,14 +5409,21 @@ public class HomeController {
 
     @PostMapping("/addTrainingResource")
     public String addTrainingResourcePost(HttpServletRequest req, Model model, Principal principal,
-            @RequestParam(name = "topicId") int topicId, @RequestParam("langName") List<Integer> lanIds,
-            @RequestParam(name = "file") List<MultipartFile> files) {
+            @RequestParam(name = "catIdTR") int catId, @RequestParam(name = "topicIdTR") int topicId,
+            @RequestParam("langName") List<Integer> lanIds, @RequestParam(name = "file") List<MultipartFile> files) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
         model.addAttribute("userInfo", usr);
 
         boolean viewSection = false;
+
+        if (catId == 0) {
+            model.addAttribute("error_msg", "Category should not be null");
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            return addTrainingResourceGet(req, principal, model);
+        }
 
         if (topicId == 0) {
             model.addAttribute("error_msg", "Topic should not be null");
@@ -5432,6 +5440,7 @@ public class HomeController {
         }
 
         Topic topic = topicService.findById(topicId);
+        Category cat = catService.findByid(catId);
 
         Timestamp dateAdded = ServiceUtility.getCurrentTime();
 
@@ -5472,6 +5481,7 @@ public class HomeController {
                         tr.setDateAdded(dateAdded);
                         tr.setTopicLanMapping(topicLanMapping);
                         tr.setUser(usr);
+                        tr.setCategory(cat);
                         trainingResourceService.save(tr); // Saved first to get exact Id
                         int trId = tr.getTrainingResourceId();
 
@@ -5708,7 +5718,13 @@ public class HomeController {
         Language lan = tr.getTopicLanMapping().getLan();
         List<Language> languages = getLanguages();
         languages.sort(Comparator.comparing(Language::getLangName));
-        List<Topic> topics = getTopics();
+        List<Topic> topics = new ArrayList<>();
+        Category cat = tr.getCategory();
+        Set<TopicCategoryMapping> tcmList = cat.getTopicCategoryMap();
+        for (TopicCategoryMapping temp : tcmList) {
+            topics.add(temp.getTopic());
+        }
+
         List<TrainingResource> trainingResourceList = new ArrayList<>();
         List<TrainingResource> tempTrainingResourceList = trainingResourceService.findAll();
         for (TrainingResource temp : tempTrainingResourceList) {

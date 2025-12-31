@@ -2104,6 +2104,25 @@ public class AjaxController {
         }
     }
 
+    @RequestMapping("/loadTopicByCategoryforTR")
+    public @ResponseBody TreeMap<String, Integer> loadTopicByCategoryforTR(@RequestParam(value = "catId") int catId) {
+        TreeMap<String, Integer> topicMaps = new TreeMap<>();
+
+        Category cat = catService.findByid(catId);
+
+        List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+
+        for (TopicCategoryMapping temp : tcm) {
+
+            Topic topic = temp.getTopic();
+
+            topicMaps.put(topic.getTopicName(), topic.getTopicId());
+
+        }
+
+        return topicMaps;
+    }
+
     /***************************************
      * Training Resource End
      *************************************************************/

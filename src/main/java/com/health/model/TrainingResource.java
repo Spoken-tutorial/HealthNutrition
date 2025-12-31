@@ -34,6 +34,10 @@ public class TrainingResource implements Serializable {
     @JoinColumn(name = "topic_lan_id")
     private TopicLanMapping topicLanMapping;
 
+    @ManyToOne
+    @JoinColumn(name = "cat_id")
+    private Category category;
+
     @Column(name = "pdf_path", length = 1000)
     private String pdfPath;
 
@@ -49,6 +53,14 @@ public class TrainingResource implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public int getTrainingResourceId() {
         return trainingResourceId;
