@@ -5806,6 +5806,12 @@ public class HomeController {
             model.addAttribute("error_msg", "TrainingResource doesn't exist");
             return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
         }
+        Category cat = oldTrainingResource.getCategory();
+
+        if (cat == null) {
+            model.addAttribute("error_msg", "Category doesn't exist in Training-Resource");
+            return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+        }
 
         boolean fileMatch = false;
 
@@ -5877,6 +5883,7 @@ public class HomeController {
         newTrainingResource.setDateAdded(dateAdded);
         newTrainingResource.setTopicLanMapping(topicLan);
         newTrainingResource.setUser(usr);
+        newTrainingResource.setCategory(cat);
 
         // To get exact Id of new trainining Resource Data
         if (newTrainingData) {
@@ -6029,6 +6036,7 @@ public class HomeController {
                 newTrainingResource.setDateAdded(dateAdded);
                 newTrainingResource.setTopicLanMapping(topicLan);
                 newTrainingResource.setUser(usr);
+                newTrainingResource.setCategory(cat);
 
                 if (fileMatch) {
                     newTrainingResource.setDateAdded(dateAdded);
@@ -6089,6 +6097,7 @@ public class HomeController {
 
                         newTrainingResource.setDateAdded(dateAdded);
                         newTrainingResource.setUser(usr);
+                        newTrainingResource.setCategory(cat);
                         trainingResourceService.save(newTrainingResource);
                         logger.info("2nd old data save is called");
                         trainingResourceService.save(oldTrainingResource);
