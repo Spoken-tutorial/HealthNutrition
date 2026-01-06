@@ -1142,6 +1142,29 @@ public class ServiceUtility {
 
     }
 
+    public static String getZipSizeInKB_OR_MB(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+        String result = "";
+        double fileSizeInMB = 0;
+        double fileSizeInKB = 0;
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            fileSizeInKB = fileSizeInBytes / (1024.0);
+            if (fileSizeInKB < 100) {
+                fileSizeInKB = new BigDecimal(fileSizeInKB).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                result = String.valueOf(fileSizeInKB) + " KB";
+            } else {
+                fileSizeInMB = fileSizeInKB / (1024.0);
+                fileSizeInMB = new BigDecimal(fileSizeInMB).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                result = String.valueOf(fileSizeInMB) + " MB";
+            }
+
+        }
+        return result;
+
+    }
+
     public static String getVideoResolutionPath(String VideoPath, String resolution) {
         int dotIndex = VideoPath.lastIndexOf('.');
 

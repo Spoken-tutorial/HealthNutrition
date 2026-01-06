@@ -2432,35 +2432,6 @@ public class HomeController {
 
     }
 
-    @GetMapping("/shared-Training-Resource/{topicName}/{fileType}/{langName}/{trId}")
-    public String getShareLinkofTrainingResource(HttpServletRequest req, @PathVariable String topicName,
-            @PathVariable String fileType, @PathVariable String langName, @PathVariable int trId, Principal principal,
-            Model model) {
-
-        User usr = getUser(principal);
-        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
-
-        int intFileType = ServiceUtility.getFileTypeIdByValue(fileType);
-        logger.info("FileType:{}", fileType);
-        logger.info("intFileType:{}", intFileType);
-        TrainingResource tr = trainingResourceService.findByTrainingResourceId(trId);
-
-        String filePath = "";
-
-        if (tr != null && intFileType != 0) {
-            filePath = ServiceUtility.getTrainingResourceFilePath(tr, intFileType);
-        }
-
-        String res = ServiceUtility.convertFilePathToUrl(filePath);
-
-        if (res == null || res.trim().isEmpty()) {
-
-            return "redirect:/error";
-        }
-
-        return "redirect:/files/" + res;
-    }
-
     @GetMapping("/ResearchPaper/{id}")
     public String getResearchPaper(HttpServletRequest req, @PathVariable int id, Principal principal, Model model) {
         User usr = getUser(principal);
@@ -6116,6 +6087,93 @@ public class HomeController {
         model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
 
         return trainingResourceEditGet(originalFileType, oldtrId, req, model, principal);
+    }
+
+    private String sharedTrainingResourceTemplate(String topicName, String fileType, String langName, int trId,
+            Principal principal, Model model) {
+
+        int intFileType = ServiceUtility.getFileTypeIdByValue(fileType);
+        logger.info("FileType:{}", fileType);
+        logger.info("intFileType:{}", intFileType);
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(trId);
+
+        boolean isZipFile = false;
+        String filePath = "";
+
+        if (tr != null && intFileType != 0) {
+            filePath = ServiceUtility.getTrainingResourceFilePath(tr, intFileType);
+        } else {
+            return "redirect:/error";
+        }
+
+        Topic topic = tr.getTopicLanMapping().getTopic();
+        Language lan = tr.getTopicLanMapping().getLan();
+        String topic_name = topic.getTopicName();
+        String lang_name = lan.getLangName();
+
+        model.addAttribute("topicName", topic_name);
+        model.addAttribute("langName", lang_name);
+        model.addAttribute("fileTypeString", fileType);
+
+        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
+        String fileName = path.getFileName().toString();
+
+        String fileSize = ServiceUtility.getZipSizeInKB_OR_MB(filePath, env);
+        model.addAttribute("fileName", fileName);
+        model.addAttribute("fileSizeInMb", fileSize);
+        if (filePath.toLowerCase().endsWith(".zip")) {
+
+            isZipFile = true;
+
+        }
+        navigationLinkCheck(model);
+        model.addAttribute("isZipFile", isZipFile);
+        String res = ServiceUtility.convertFilePathToUrl(filePath);
+        model.addAttribute("filePath", res);
+
+        if (res == null || res.trim().isEmpty()) {
+
+            return "redirect:/error";
+        }
+        if (isZipFile) {
+            return "sharedTrainingResource";
+        }
+
+        return "redirect:/files/" + res;
+    }
+
+    @GetMapping("/shared-Training-Resource/{topicName}/{fileType}/{langName}/{trId}")
+    public String getShareLinkofTrainingResource(HttpServletRequest req, @PathVariable String topicName,
+            @PathVariable String fileType, @PathVariable String langName, @PathVariable int trId, Principal principal,
+            Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        String res = sharedTrainingResourceTemplate(topicName, fileType, langName, trId, principal, model);
+        if (fileType.equals("Image") || fileType.equals("Pdf")) {
+            return res;
+        } else {
+            return "redirect:/error";
+        }
+
+    }
+
+    @GetMapping("/shared-training-resource-file/{topicName}/{fileType}/{langName}/{trId}")
+    public String getShareLinkofTrainingResourceDoc_Excel(HttpServletRequest req, @PathVariable String topicName,
+            @PathVariable String fileType, @PathVariable String langName, @PathVariable int trId, Principal principal,
+            Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        String res = sharedTrainingResourceTemplate(topicName, fileType, langName, trId, principal, model);
+        if (fileType.equals("Doc") || fileType.equals("Excel")) {
+            return "sharedTrainingResource";
+        } else {
+            return "redirect:/error";
+        }
+
     }
 
     @GetMapping("/Training-Resource")

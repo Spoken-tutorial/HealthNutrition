@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Download Training Resource - Health And Nutrition')">
+    <title>Training Resource - Health And Nutrition</title>
+
+   
+</head>
+
+<body>
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.7/plyr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+<section th:replace="index.html :: header-bar" ></section>
+<nav th:replace="index.html :: navbar"></nav>
+
+<div class="container my-4">
+
+    <h3 class="text-center resource-title mb-4">
+        Training Resource
+    </h3>
+
+    <!-- Alerts -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="alert alert-success text-center"
+                 role="alert"
+                 th:if="${success_msg}">
+                <span th:text="${success_msg}"></span>
+            </div>
+
+            <div class="alert alert-danger text-center"
+                 role="alert"
+                 th:if="${error_msg}">
+                <span th:text="${error_msg}"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Resource Card -->
+    <div class="row justify-content-center"
+         th:if="${(fileTypeString == 'Doc' or fileTypeString == 'Excel')
+                 or (fileTypeString == 'Pdf' and isZipFile)
+                 or (fileTypeString == 'Image' and isZipFile)}">
+
+        <div class="col-12 col-md-10 col-lg-8">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+
+                    <!-- Meta Information -->
+                    <div class="mb-3 text-center text-md-left">
+
+					    <span class="badge badge-primary meta-badge mr-2 mb-2 d-inline-block"
+					          th:if="${topicName != null}"
+					          th:text="'Topic : ' + ${#strings.capitalizeWords(#strings.replace(topicName,'_',' '))}">
+					    </span>
+					
+					    <span class="badge badge-info meta-badge mr-2 mb-2 d-inline-block"
+					          th:if="${langName != null}"
+					          th:text="'Language : ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
+					    </span>
+					
+					    <span class="badge badge-secondary meta-badge mb-2 d-inline-block"
+					          th:if="${fileTypeString != null}"
+					          th:text="'📁 : ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+					    </span>
+					
+					</div>
+
+
+                    <!-- File Details -->
+                    <div class="row mb-3">
+                        <div class="col-12 col-md-6">
+                            <strong>File Name:</strong>
+                            <div th:text="${fileName}"></div>
+                        </div>
+
+                        <div class="col-12 col-md-6 mt-2 mt-md-0">
+                            <strong>File Size:</strong>
+                            <div th:text="${fileSizeInMb}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Download Button -->
+                    <div class="text-center text-md-right">
+                        <a name="trdownload"
+                           class="btn btn-outline-primary btn-lg"
+                           target="_blank"
+                           th:href="@{/files/{path}(path=${filePath})}"
+                           th:id="'trdownload_' + ${fileTypeString.toLowerCase()}">
+                            <i class="fas fa-file-download mr-2"></i>
+                            Download
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Status Messages -->
+    <div class="row">
+        <div class="col text-center">
+            <div id="Success" class="text-success d-none">
+                Changes Updated Successfully
+            </div>
+
+            <div id="Failure" class="text-danger d-none">
+                Please Try Again
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+
+ <style>
+        .nav-tr {
+            border-right: 5px solid orange;
+            font-size: 0.9rem;
+        }
+
+        .nav-tr a {
+            color: #044F7A !important;
+            font-weight: bold !important;
+        }
+
+        .resource-title {
+            color: #014F7A;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+       .meta-badge {
+		    font-size: 1rem;   /* default is ~0.75rem */
+		    padding: 0.45rem 0.75rem;
+		    font-weight: 500;
+		}
+
+    </style>
+
+<script th:inline="javascript">
+    var projectPath = /*[[@{/}]]*/ '/';
+</script>
+
+</body>
+</html>

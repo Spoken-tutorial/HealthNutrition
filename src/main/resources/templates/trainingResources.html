@@ -239,7 +239,7 @@
 							<!-- Authorized -->
 							<div th:if="${usr != null and authorizedUsr}">
 								<input type="text" class="form-control shareLink" readonly th:value="${shareUrl != null}
-                                 ? @{${baseUrl} + '/shared-Training-Resource/'
+                                 ? @{${baseUrl} + '/shared-training-resource-file/'
                                      + ${topicName} + '/'
                                      + ${fileTypeString} + '/'
                                      + ${langName} + '/'
