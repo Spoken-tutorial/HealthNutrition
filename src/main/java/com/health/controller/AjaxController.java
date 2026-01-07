@@ -3,6 +3,9 @@ package com.health.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -70,8 +77,10 @@ import com.health.model.State;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
+import com.health.model.TopicLanMapping;
 import com.health.model.TraineeInformation;
 import com.health.model.TrainingInformation;
+import com.health.model.TrainingResource;
 import com.health.model.TrainingTopic;
 import com.health.model.Tutorial;
 import com.health.model.TutorialWithWeekAndPackage;
@@ -106,9 +115,11 @@ import com.health.service.RoleService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
 import com.health.service.TopicCategoryMappingService;
+import com.health.service.TopicLanMappingService;
 import com.health.service.TopicService;
 import com.health.service.TraineeInformationService;
 import com.health.service.TrainingInformationService;
+import com.health.service.TrainingResourceService;
 import com.health.service.TrainingTopicService;
 import com.health.service.TutorialService;
 import com.health.service.TutorialWithWeekAndPackageService;
@@ -148,6 +159,9 @@ public class AjaxController {
     private PromoVideoService promoVideoService;
 
     @Autowired
+    private TopicLanMappingService topicLanMapiingService;
+
+    @Autowired
     private VideoResourceService videoResourceService;
 
     @Autowired
@@ -161,6 +175,11 @@ public class AjaxController {
 
     @Autowired
     private PackageLanguageService packLanService;
+    @Autowired
+    private TrainingResourceService trainingResourceService;
+
+    @Autowired
+    private TopicLanMappingService topicLanMappingService;
 
     @Autowired
     private PackLanTutorialResourceService packLanTutorialResourceService;
@@ -649,6 +668,31 @@ public class AjaxController {
         } catch (Exception e) {
 
             logger.error("Error in Enable Disbale PacakgeAndPackLan: {}", packLan, e);
+            return false;
+        }
+
+    }
+
+    @GetMapping("/enableDisableTrainingResource")
+    public @ResponseBody boolean enableDisableTrainingResource(int trainingResourceId) {
+        TrainingResource tr = trainingResourceService.findByTrainingResourceId(trainingResourceId);
+
+        try {
+            if (tr.isStatus()) {
+                tr.setStatus(false);
+                trainingResourceService.save(tr);
+                return true;
+
+            } else {
+                tr.setStatus(true);
+                trainingResourceService.save(tr);
+                return true;
+
+            }
+
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Training Resource: {}", tr, e);
             return false;
         }
 
@@ -1494,6 +1538,42 @@ public class AjaxController {
 
     /******************* Course End *****************************/
 
+    @RequestMapping("/delete-trainingResource")
+    public ResponseEntity<String> deleteTrainingResource(@RequestParam("trainingResourceId") int trainingResourceId,
+            @RequestParam("fileType") String fileType) {
+
+        try {
+            TrainingResource tr = trainingResourceService.findByTrainingResourceId(trainingResourceId);
+            if (tr != null) {
+                switch (fileType.toLowerCase()) {
+                case "image":
+                    tr.setImgPath("");
+                    break;
+                case "pdf":
+                    tr.setPdfPath("");
+                    break;
+                case "doc":
+                    tr.setDocPath("");
+                    break;
+                case "excel":
+                    tr.setExcelPath("");
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Unsupported file type: " + fileType);
+                }
+
+                trainingResourceService.save(tr);
+                return ResponseEntity.ok("Deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Training resource not found");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in deleting training resource", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error in deleting!");
+        }
+    }
+
     @RequestMapping("/loadPromoVideoByLanguage")
     public @ResponseBody String getPathofPromoVideo(@RequestParam(value = "lanId") int lanId,
             @RequestParam(value = "promoId") int promoId) {
@@ -1821,6 +1901,231 @@ public class AjaxController {
         return arlist;
 
     }
+
+    /***************************************
+     * Training Resource Start
+     **********************************************************/
+
+    @RequestMapping("/loadLanAndFileTypeByTopic")
+    public @ResponseBody ArrayList<Map<String, Integer>> getLanAndFileTypeByTopic(
+            @RequestParam(value = "topicId") int topicId, @RequestParam(value = "lanId") int lanId,
+            @RequestParam(value = "fileTypeId") int fileTypeId) {
+
+        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+
+        Map<String, Integer> fileTypes = new TreeMap<>();
+
+        Map<String, Integer> languages = new TreeMap<>();
+
+        Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
+        Language language = lanId != 0 ? langService.getById(lanId) : null;
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
+
+        List<TopicLanMapping> localTopicList = new ArrayList<>();
+        if (topic != null && language != null) {
+            TopicLanMapping tlm = topicLanMappingService.findByTopicAndLan(topic, language);
+            if (tlm != null)
+                localTopicList.add(tlm);
+        } else if (topic != null) {
+            localTopicList = topicLanMappingService.findByTopic(topic);
+        } else {
+            localTopicList = topicLanMappingService.findAll();
+        }
+
+        List<TrainingResource> trList = trainingResourceService.findByTopicLanMappingInAndStatusTrue(localTopicList);
+
+        if (!trList.isEmpty()) {
+
+            for (TrainingResource temp : trList) {
+                // To find languages
+                Language lan = temp.getTopicLanMapping().getLan();
+                languages.put(lan.getLangName(), lan.getLanId());
+
+                // To find FileType
+                ServiceUtility.getFileTypeIdAndValue(temp).forEach((id, type) -> fileTypes.put(type, id));
+
+            }
+        }
+        arlist.add(languages);
+        arlist.add(fileTypes);
+
+        return arlist;
+
+    }
+
+    /*
+     * Function to load Topic and FileType by Lan Author: Alok Kumar
+     */
+
+    @RequestMapping("/loadTopicAndFileTypeByLan")
+    public @ResponseBody ArrayList<Map<String, Integer>> getTopicAndFileTypeByLan(
+            @RequestParam(value = "topicId") int topicId, @RequestParam(value = "lanId") int lanId,
+            @RequestParam(value = "fileTypeId") int fileTypeId) {
+        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+
+        Map<String, Integer> topics = new TreeMap<>();
+        Map<String, Integer> fileTypes = new TreeMap<>();
+
+        Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
+        Language language = lanId != 0 ? langService.getById(lanId) : null;
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
+
+        List<TopicLanMapping> tlm = language != null ? topicLanMappingService.findByLan(language)
+                : topicLanMappingService.findAll();
+        List<TrainingResource> trList = trainingResourceService.findByTopicLanMappingInAndStatusTrue(tlm);
+        List<TrainingResource> newtrList = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (TrainingResource temp : trList) {
+                if (ServiceUtility.isTrainingResourceFilePresent(temp, id)) {
+                    newtrList.add(temp);
+                }
+            }
+        }
+
+        if (!newtrList.isEmpty())
+            trList = newtrList;
+
+        for (TrainingResource tr : trList) {
+            // To find Topic
+            Topic topicTemp = tr.getTopicLanMapping().getTopic();
+            int trTopicId = topicTemp.getTopicId();
+            topics.put(topicTemp.getTopicName(), topicTemp.getTopicId());
+
+            // To find FileType
+            if (topicId == 0 || trTopicId == topicId) {
+                ServiceUtility.getFileTypeIdAndValue(tr).forEach((id, type) -> fileTypes.put(type, id));
+            }
+
+        }
+
+        arlist.add(topics);
+        arlist.add(fileTypes);
+
+        return arlist;
+
+    }
+
+    /*
+     * Function to load Topic and Language by FileType Author: Alok Kumar
+     */
+
+    @RequestMapping("/loadTopicAndLanByFileType")
+    public @ResponseBody ArrayList<Map<String, Integer>> getTopicAndLanByFileType(
+            @RequestParam(value = "topicId") int topicId, @RequestParam(value = "lanId") int lanId,
+            @RequestParam(value = "fileTypeId") int fileTypeId) {
+
+        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+        Map<String, Integer> topics = new TreeMap<>();
+        Map<String, Integer> languages = new TreeMap<>();
+
+        Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
+        Language language = lanId != 0 ? langService.getById(lanId) : null;
+
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
+
+        List<TopicLanMapping> localTopicList = new ArrayList<>();
+        if (language != null) {
+            localTopicList = topicLanMappingService.findByLan(language);
+        } else {
+            localTopicList = topicLanMappingService.findAll();
+        }
+
+        List<TrainingResource> trList = trainingResourceService.findByTopicLanMappingInAndStatusTrue(localTopicList);
+        List<TrainingResource> newtrList = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (TrainingResource temp : trList) {
+                if (ServiceUtility.isTrainingResourceFilePresent(temp, id)) {
+                    newtrList.add(temp);
+                }
+            }
+        }
+
+        if (!newtrList.isEmpty())
+            trList = newtrList;
+
+        for (TrainingResource tr : trList) {
+            // To find Topic
+            Topic topicTemp = tr.getTopicLanMapping().getTopic();
+            topics.put(topicTemp.getTopicName(), topicTemp.getTopicId());
+
+            // To find languages
+            Language lan = tr.getTopicLanMapping().getLan();
+            languages.put(lan.getLangName(), lan.getLanId());
+
+        }
+
+        arlist.add(topics);
+        arlist.add(languages);
+
+        return arlist;
+
+    }
+
+    @GetMapping("/downloadTrainingResource")
+    public ResponseEntity<Resource> downloadTrainingResourcePost(@RequestParam(name = "filePath") String filePath) {
+
+        try {
+
+            String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+
+            Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), finalUrl);
+
+            if (!Files.exists(path)) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            Resource resource = new UrlResource(path.toUri());
+
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            String originalFilename = path.getFileName().toString();
+
+            String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+
+            String encodedFilename = URLEncoder.encode(safeFilename, "UTF-8").replace("+", "%20");
+
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
+                    .body(resource);
+
+        } catch (Exception e) {
+            logger.error("Error in download", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @RequestMapping("/loadTopicByCategoryforTR")
+    public @ResponseBody TreeMap<String, Integer> loadTopicByCategoryforTR(@RequestParam(value = "catId") int catId) {
+        TreeMap<String, Integer> topicMaps = new TreeMap<>();
+
+        Category cat = catService.findByid(catId);
+
+        List<TopicCategoryMapping> tcm = topicCatService.findAllByCategory(cat);
+
+        for (TopicCategoryMapping temp : tcm) {
+
+            Topic topic = temp.getTopic();
+
+            topicMaps.put(topic.getTopicName(), topic.getTopicId());
+
+        }
+
+        return topicMaps;
+    }
+
+    /***************************************
+     * Training Resource End
+     *************************************************************/
 
     @RequestMapping("/loadTopicByCategoryInAssignContri")
     public @ResponseBody HashMap<Integer, String> getTopicByCategoryAssignContri(@RequestParam(value = "id") int id) {

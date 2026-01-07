@@ -163,6 +163,8 @@ public class CommonData {
 
     public static String uploadBrouchure = "Media/Content/Brochure/";
 
+    public static String uploadTrainingResource = "Media/Content/TrainingResource/";
+
     public static String uploadPromoVideo = "Media/Content/PromoVideo/";
 
     public static String uploadVersion = "Media/Content/Version/";
@@ -270,6 +272,18 @@ public class CommonData {
 
     public int HANDLER_DATA = 10000000;
 
+    public static final String PDF_EXTENSION = "pdf";
+    public static final String EXCEL_EXTENSION = "excel";
+    public static final String DOC_EXTENSION = "doc";
+    public static final String IMAGE_EXTENSION = "img";
+    public static final String ZIP_EXTENSION = "zip";
+    public static final String UNSUPPORTED_EXTENSION = "unsupported";
+
+    public static final int DOC = 1;
+    public static final int EXCEL = 2;
+    public static final int IMAGE = 3;
+    public static final int PDF = 4;
+
     public static final String STATUS = "status";
     public static final String STATUS_QUEUED = "queued";
     public static final String STATUS_PROCESSING = "processing";
@@ -294,6 +308,11 @@ public class CommonData {
     public static final String DOCUMENT_TYPE_FILES_OF_BROCHURE = "Files_Of_Brochure";
     public static final String DOCUMENT_TYPE_RESEARCHPAPER = "ResearchPaper";
 
+    public static final String Doc_OR_ZIP_OF_DOCS = "docOrZipOfDocs";
+    public static final String image_OR_ZIP_OF_IMAGES = "imageOrZipOfImages";
+    public static final String PDF_OR_ZIP_OF_PDFS = "pdfOrZipOfPdfs";
+    public static final String Excel_OR_ZIP_OF_EXCELS = "excelOrZipOfexcels";
+
     public static final String DOCUMENT_ID_TUTORIAL_TIMESCRIPT = "Tts";
     public static final String DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT = "Tos";
     public static final String DOCUMENT_ID_BROCHURE = "Bro";
@@ -316,6 +335,7 @@ public class CommonData {
     public static final Long TASK_SLEEP_TIME = 10L * 1000;
     public static final Long NO_TASK_SLEEP_TIME_FOR_DELETE = 60L * 1000 * 60;
     public static final Long TASK_SLEEP_TIME_FOR_DELETE = 60L * 1000 * 60;
+    public static final int TIME_UNIT_FOR_WAIT = 60;
 
 //	public static String SCRIPT_MANAGER_VIEW= "view/healthnutrition";
 
