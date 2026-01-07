@@ -6271,9 +6271,11 @@ public class HomeController {
 
         if (action != null && !action.isEmpty() && action.equals("view")) {
             List<String> filePaths = new ArrayList<>();
+            List<String> tempFilepPaths = new ArrayList<>();
             if (filePath.toLowerCase().endsWith(".zip")) {
                 try {
-                    filePaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+                    tempFilepPaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+                    filePaths = ServiceUtility.sortFilesIfAllNamesNumeric(tempFilepPaths);
                 } catch (IOException e) {
                     logger.error("Zip Extraction or zip error", e);
 

@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -495,6 +496,26 @@ public class ServiceUtility {
                         int indexToStart = p.indexOf("Media");
                         return convertFilePathToUrl(p.substring(indexToStart));
                     }).forEach(filePaths::add);
+        }
+
+        return filePaths;
+    }
+
+    public static List<String> sortFilesIfAllNamesNumeric(List<String> filePaths) {
+
+        if (filePaths == null || filePaths.isEmpty()) {
+            return filePaths;
+        }
+
+        boolean allNumeric = filePaths.stream().map(path -> Paths.get(path).getFileName().toString())
+                .map(name -> name.substring(0, name.lastIndexOf('.'))).allMatch(name -> name.matches("\\d+"));
+
+        if (allNumeric) {
+            Collections.sort(filePaths, Comparator.comparingInt(path -> {
+                String fileName = Paths.get(path).getFileName().toString();
+                String numberPart = fileName.substring(0, fileName.lastIndexOf('.'));
+                return Integer.parseInt(numberPart);
+            }));
         }
 
         return filePaths;
