@@ -5459,8 +5459,8 @@ public class HomeController {
                         Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trId), langName);
 
                         String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
-                        String docFolder = Paths.get(rootPath.toString(), "docs").toString();
-                        String excelFolder = Paths.get(rootPath.toString(), "excel").toString();
+                        String docFolder = Paths.get(rootPath.toString(), "docx_or_odt").toString();
+                        String excelFolder = Paths.get(rootPath.toString(), "excel_or_csv").toString();
                         String imageFolder = Paths.get(rootPath.toString(), "image").toString();
 
                         Set<String> extentions = new HashSet<>();
@@ -5871,8 +5871,8 @@ public class HomeController {
             Path rootPath = Paths.get(CommonData.uploadTrainingResource, String.valueOf(trIdInt), langName);
 
             String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
-            String docFolder = Paths.get(rootPath.toString(), "docs").toString();
-            String excelFolder = Paths.get(rootPath.toString(), "excel").toString();
+            String docFolder = Paths.get(rootPath.toString(), "docx_or_odt").toString();
+            String excelFolder = Paths.get(rootPath.toString(), "excel_or_csv").toString();
             String imageFolder = Paths.get(rootPath.toString(), "image").toString();
             boolean fileFlag = false;
 
@@ -6261,7 +6261,8 @@ public class HomeController {
             } else {
                 try {
 
-                    return "redirect:/downloadTrainingResource?filePath=" + URLEncoder.encode(finalUrl, "UTF-8");
+                    return "redirect:" + baseUrl + "/downloadTrainingResource?filePath="
+                            + URLEncoder.encode(finalUrl, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     logger.error("Error in Download Package", e);
                 }

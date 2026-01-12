@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 //import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1544,22 +1545,34 @@ public class AjaxController {
 
         try {
             TrainingResource tr = trainingResourceService.findByTrainingResourceId(trainingResourceId);
+            String filePath = "";
             if (tr != null) {
                 switch (fileType.toLowerCase()) {
                 case "image":
+                    filePath = tr.getImgPath();
                     tr.setImgPath("");
                     break;
                 case "pdf":
+                    filePath = tr.getPdfPath();
                     tr.setPdfPath("");
                     break;
                 case "doc":
+                    filePath = tr.getDocPath();
                     tr.setDocPath("");
                     break;
                 case "excel":
+                    filePath = tr.getExcelPath();
                     tr.setExcelPath("");
                     break;
                 default:
                     return ResponseEntity.badRequest().body("Unsupported file type: " + fileType);
+                }
+
+                if (!filePath.isEmpty() && filePath.endsWith(".zip")) {
+                    String extractDir = filePath.replace(".zip", "");
+
+                    Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
+                    FileUtils.deleteDirectory(extractDirPath.toFile());
                 }
 
                 trainingResourceService.save(tr);
