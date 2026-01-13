@@ -1936,6 +1936,8 @@ public class AjaxController {
                 : null;
 
         List<TopicLanMapping> localTopicList = new ArrayList<>();
+
+        // To find FileType
         if (topic != null && language != null) {
             TopicLanMapping tlm = topicLanMappingService.findByTopicAndLan(topic, language);
             if (tlm != null)
@@ -1951,15 +1953,40 @@ public class AjaxController {
         if (!trList.isEmpty()) {
 
             for (TrainingResource temp : trList) {
-                // To find languages
-                Language lan = temp.getTopicLanMapping().getLan();
-                languages.put(lan.getLangName(), lan.getLanId());
 
-                // To find FileType
                 ServiceUtility.getFileTypeIdAndValue(temp).forEach((id, type) -> fileTypes.put(type, id));
 
             }
         }
+
+        // to find language
+        if (topic != null) {
+            localTopicList = topicLanMappingService.findByTopic(topic);
+        } else {
+            localTopicList = topicLanMappingService.findAll();
+        }
+
+        trList = trainingResourceService.findByTopicLanMappingInAndStatusTrue(localTopicList);
+        List<TrainingResource> newtrList1 = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (TrainingResource temp : trList) {
+                if (ServiceUtility.isTrainingResourceFilePresent(temp, id)) {
+                    newtrList1.add(temp);
+                }
+            }
+        }
+        if (!newtrList1.isEmpty())
+            trList = newtrList1;
+
+        for (TrainingResource tr : trList) {
+
+            Language lan = tr.getTopicLanMapping().getLan();
+            languages.put(lan.getLangName(), lan.getLanId());
+
+        }
+
         arlist.add(languages);
         arlist.add(fileTypes);
 
@@ -2068,7 +2095,32 @@ public class AjaxController {
             Topic topicTemp = tr.getTopicLanMapping().getTopic();
             topics.put(topicTemp.getTopicName(), topicTemp.getTopicId());
 
-            // To find languages
+        }
+
+        // to find Languages
+
+        if (topic != null) {
+            localTopicList = topicLanMappingService.findByTopic(topic);
+        } else {
+            localTopicList = topicLanMappingService.findAll();
+        }
+
+        trList = trainingResourceService.findByTopicLanMappingInAndStatusTrue(localTopicList);
+        List<TrainingResource> newtrList1 = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (TrainingResource temp : trList) {
+                if (ServiceUtility.isTrainingResourceFilePresent(temp, id)) {
+                    newtrList1.add(temp);
+                }
+            }
+        }
+        if (!newtrList1.isEmpty())
+            trList = newtrList1;
+
+        for (TrainingResource tr : trList) {
+
             Language lan = tr.getTopicLanMapping().getLan();
             languages.put(lan.getLangName(), lan.getLanId());
 

@@ -2470,7 +2470,10 @@ public class HomeController {
 
         }
         String res = tut.getTimeScript();
-        return "redirect:/files/" + res;
+
+        String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+
+        return "redirect:" + normalizedBaseUrl + "/files/" + res;
 
     }
 
@@ -2542,7 +2545,9 @@ public class HomeController {
             res = tut.getSlide();
         }
 
-        return "redirect:/files/" + res;
+        String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+
+        return "redirect:" + normalizedBaseUrl + "/files/" + res;
 
     }
 
@@ -6212,8 +6217,8 @@ public class HomeController {
 
         navigationLinkCheck(model);
 
-        Topic topic = topicService.findById(topicId);
-        Language lan = lanService.getById(lanId);
+        Topic topic = topicId != 0 ? topicService.findById(topicId) : null;
+        Language lan = lanId != 0 ? lanService.getById(lanId) : null;
         if (topic == null || lan == null || inputFileType == 0) {
             getModelTrainingResource(model);
 
@@ -6261,7 +6266,10 @@ public class HomeController {
             } else {
                 try {
 
-                    return "redirect:" + baseUrl + "/downloadTrainingResource?filePath="
+                    String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1)
+                            : baseUrl;
+
+                    return "redirect:" + normalizedBaseUrl + "/downloadTrainingResource?filePath="
                             + URLEncoder.encode(finalUrl, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     logger.error("Error in Download Package", e);
