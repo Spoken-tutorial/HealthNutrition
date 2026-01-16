@@ -2404,7 +2404,10 @@ public class HomeController {
 
         }
         String res = fileBro.getWebPath();
-        return "redirect:/files/" + res;
+
+        String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+
+        return "redirect:" + normalizedBaseUrl + "/files/" + res;
 
     }
 
@@ -2423,12 +2426,15 @@ public class HomeController {
             broService.save(bro);
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("Error in  count Resource Visit of TimeScript: {}", bro, e);
 
         }
         String res = ver.findWebFileofEnglish();
-        return "redirect:/files/" + res;
+
+        String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+
+        return "redirect:" + normalizedBaseUrl + "/files/" + res;
 
     }
 
@@ -2444,12 +2450,15 @@ public class HomeController {
             researchPaperService.save(researchPaper);
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             logger.error("Error in  count Resource Visit of TimeScript: {}", researchPaper, e);
 
         }
         String res = researchPaper.getResearchPaperPath();
-        return "redirect:/files/" + res;
+
+        String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+
+        return "redirect:" + normalizedBaseUrl + "/files/" + res;
 
     }
 
