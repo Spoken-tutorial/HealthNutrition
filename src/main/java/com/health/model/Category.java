@@ -86,6 +86,17 @@ public class Category implements Comparable<Category>, Serializable {
     @OneToMany(mappedBy = "cat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<UserRole> userRoles = new HashSet<UserRole>();
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private Set<TrainingResource> trainingResources = new HashSet<TrainingResource>();
+
+    public Set<TrainingResource> getTrainingResources() {
+        return trainingResources;
+    }
+
+    public void setTrainingResources(Set<TrainingResource> trainingResources) {
+        this.trainingResources = trainingResources;
+    }
+
     public int getCategoryId() {
         return categoryId;
     }

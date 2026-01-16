@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +14,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
@@ -21,13 +23,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
@@ -37,6 +47,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -58,6 +70,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.health.model.TrainingResource;
 import com.health.model.User;
 import com.health.repository.UserRepository;
 import com.health.threadpool.TimeoutOutputStream;
@@ -376,6 +389,170 @@ public class ServiceUtility {
         }
 
         return true;
+    }
+
+    /*
+     * check FileExtention of Training Resource
+     * 
+     */
+
+    public static String checkFileExtensions(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        if (filename == null) {
+            return CommonData.UNSUPPORTED_EXTENSION;
+        }
+
+        String lowerCaseFilename = filename.toLowerCase();
+
+        if (lowerCaseFilename.endsWith(".pdf")) {
+            return CommonData.PDF_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".csv") || lowerCaseFilename.endsWith(".ods")
+                || lowerCaseFilename.endsWith(".xlsx")) {
+            return CommonData.EXCEL_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".docx") || lowerCaseFilename.endsWith(".odt")
+                || lowerCaseFilename.endsWith(".rtf")) {
+            return CommonData.DOC_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".png") || lowerCaseFilename.endsWith(".jpg")
+                || lowerCaseFilename.endsWith(".jpeg")) {
+            return CommonData.IMAGE_EXTENSION;
+        } else if (lowerCaseFilename.endsWith(".zip")) {
+            return CommonData.ZIP_EXTENSION;
+        } else {
+            return CommonData.UNSUPPORTED_EXTENSION;
+        }
+    }
+
+    /**
+     * Check file extentions of zip for training Resource
+     * 
+     * @throws IOException
+     * @throws FileNotFoundException
+     * 
+     */
+
+    public static Set<String> checkFileExtentionsInZip(MultipartFile file) {
+        Set<String> extensions = new HashSet<>();
+
+        try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    String ext = FilenameUtils.getExtension(entry.getName()).toLowerCase();
+                    if (ext.equals("pdf")) {
+                        extensions.add(CommonData.PDF_EXTENSION);
+                    } else if (ext.equals("csv") || ext.equals("ods") || ext.equals("xlsx")) {
+                        extensions.add(CommonData.EXCEL_EXTENSION);
+                    } else if (ext.equals("png") || ext.equals("jpg") || ext.equals("jpeg")) {
+                        extensions.add(CommonData.IMAGE_EXTENSION);
+                    } else if (ext.equals("docx") || ext.equals("odt") || ext.equals("rtf")) {
+                        extensions.add(CommonData.DOC_EXTENSION);
+                    }
+
+                    else {
+                        extensions.add(CommonData.UNSUPPORTED_EXTENSION);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception Error in checkFileExtentionsINZip", e);
+        }
+
+        logger.info("Extensions found in zip: {}", extensions);
+
+        return extensions;
+
+    }
+
+    public static List<String> extractZipIfNeeded(String zipFilePathStr, Environment env) throws IOException {
+
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipFilePathStr);
+        String zipFileName = zipFilePath.getFileName().toString();
+        String folderName = zipFileName.substring(0, zipFileName.lastIndexOf('.'));
+        Path extractDir = zipFilePath.getParent().resolve(folderName);
+
+        List<String> filePaths = new ArrayList<>();
+
+        if (!Files.exists(extractDir)) {
+            Files.createDirectories(extractDir);
+            try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(zipFilePath))) {
+                ZipEntry entry;
+                while ((entry = zipIn.getNextEntry()) != null) {
+                    if (!entry.isDirectory()) {
+                        Path outputFile = extractDir.resolve(entry.getName());
+                        Files.createDirectories(outputFile.getParent());
+                        Files.copy(zipIn, outputFile, StandardCopyOption.REPLACE_EXISTING);
+
+                    }
+                }
+            }
+        }
+
+        // Collect all file paths from the folder (whether just extracted or already
+        // existed)
+        try (Stream<Path> files = Files.walk(extractDir)) {
+            files.filter(Files::isRegularFile).map(Path::toString).filter(p -> p.contains("Media")) // ensure "Media"
+                                                                                                    // exists in path
+                    .map(p -> {
+                        int indexToStart = p.indexOf("Media");
+                        return convertFilePathToUrl(p.substring(indexToStart));
+                    }).forEach(filePaths::add);
+        }
+
+        return filePaths;
+    }
+
+    public static List<String> sortFilesIfAllNamesNumeric(List<String> filePaths) {
+
+        if (filePaths == null || filePaths.isEmpty()) {
+            return filePaths;
+        }
+
+        boolean allNumeric = filePaths.stream().map(path -> Paths.get(path).getFileName().toString())
+                .map(name -> name.substring(0, name.lastIndexOf('.'))).allMatch(name -> name.matches("\\d+"));
+
+        if (allNumeric) {
+            Collections.sort(filePaths, Comparator.comparingInt(path -> {
+                String fileName = Paths.get(path).getFileName().toString();
+                String numberPart = fileName.substring(0, fileName.lastIndexOf('.'));
+                return Integer.parseInt(numberPart);
+            }));
+        }
+
+        return filePaths;
+    }
+
+    public static Set<String> checkFileExtentionsInZip(ZipFile zip) {
+        Set<String> extensions = new HashSet<>();
+
+        try {
+
+            for (Enumeration e = zip.entries(); e.hasMoreElements();) {
+                ZipEntry entry = (ZipEntry) e.nextElement();
+                if (!entry.isDirectory()) {
+                    String ext = FilenameUtils.getExtension(entry.getName()).toLowerCase();
+                    if (ext.equals("pdf")) {
+                        extensions.add(CommonData.PDF_EXTENSION);
+                    } else if (ext.equals("csv") || ext.equals("ods") || ext.equals("xlsx")) {
+                        extensions.add(CommonData.EXCEL_EXTENSION);
+                    } else if (ext.equals("png") || ext.equals("jpg") || ext.equals("jpeg")) {
+                        extensions.add(CommonData.IMAGE_EXTENSION);
+                    } else if (ext.equals("docx") || ext.equals("odt") || ext.equals("rtf")) {
+                        extensions.add(CommonData.DOC_EXTENSION);
+                    }
+
+                    else {
+                        extensions.add(CommonData.UNSUPPORTED_EXTENSION);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception Error in checkFileExtentionsINZip", e);
+        }
+
+        logger.info("Extensions found in zip: {}", extensions);
+
+        return extensions;
+
     }
 
     /**
@@ -930,11 +1107,6 @@ public class ServiceUtility {
         });
     }
 
-    /*
-     * dowanload Manager
-     * 
-     */
-
     public static String downloadManager(String zipUrl, AtomicInteger downloadCount, int downloadLimit,
             long downloadTimeOut, Environment env, HttpServletResponse response) {
         String message = "Please try again after 30 minutes.";
@@ -991,6 +1163,29 @@ public class ServiceUtility {
 
     }
 
+    public static String getZipSizeInKB_OR_MB(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+        String result = "";
+        double fileSizeInMB = 0;
+        double fileSizeInKB = 0;
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            fileSizeInKB = fileSizeInBytes / (1024.0);
+            if (fileSizeInKB < 100) {
+                fileSizeInKB = new BigDecimal(fileSizeInKB).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                result = String.valueOf(fileSizeInKB) + " KB";
+            } else {
+                fileSizeInMB = fileSizeInKB / (1024.0);
+                fileSizeInMB = new BigDecimal(fileSizeInMB).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                result = String.valueOf(fileSizeInMB) + " MB";
+            }
+
+        }
+        return result;
+
+    }
+
     public static String getVideoResolutionPath(String VideoPath, String resolution) {
         int dotIndex = VideoPath.lastIndexOf('.');
 
@@ -1000,6 +1195,163 @@ public class ServiceUtility {
         String videoResolutionPath = base + resolution + extension;
         return videoResolutionPath;
 
+    }
+
+    public static String copyFileAndGetRelativePath(File sourceFile, String destinationFolder, String fileName,
+            Environment env) throws IOException {
+
+        logger.info("destination Folder: {}", destinationFolder);
+        logger.info("fileName: {}", fileName);
+
+        Path destinationFolderPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                destinationFolder);
+        boolean flag = createFolder(destinationFolderPath);
+
+        Path destinationPath = destinationFolderPath.resolve(fileName);
+
+        File destinationFile = destinationPath.toFile();
+
+        if (flag && sourceFile.exists() && sourceFile.isFile()) {
+            FileUtils.copyFile(sourceFile, destinationFile);
+            logger.info("file is copied");
+        }
+
+        String temp = destinationPath.toString();
+        int indexToStart = temp.indexOf("Media");
+        String document = temp.substring(indexToStart, temp.length());
+        String resultantPath = convertFilePathToUrl(document);
+        logger.info("resultant Path: {}", resultantPath);
+
+        return resultantPath;
+    }
+
+    public static boolean hasAnyResourceFile(TrainingResource tr) {
+        boolean hasData = true;
+        if ((tr.getPdfPath() == null || tr.getPdfPath().isEmpty())
+                && (tr.getDocPath() == null || tr.getDocPath().isEmpty())
+                && (tr.getExcelPath() == null || tr.getExcelPath().isEmpty())
+                && (tr.getImgPath() == null || tr.getImgPath().isEmpty())) {
+
+            hasData = false;
+        }
+
+        return hasData;
+
+    }
+
+    public static Map<Integer, String> getFileTypeIdAndValue(int fileTypeId) {
+        Map<Integer, String> result = new HashMap<>();
+
+        switch (fileTypeId) {
+        case CommonData.DOC:
+            result.put(fileTypeId, "Doc");
+            break;
+        case CommonData.EXCEL:
+            result.put(fileTypeId, "Excel");
+            break;
+        case CommonData.IMAGE:
+            result.put(fileTypeId, "Image");
+            break;
+        case CommonData.PDF:
+            result.put(fileTypeId, "Pdf");
+            break;
+        default:
+            return null;
+        }
+
+        return result;
+    }
+
+    public static int getFileTypeIdByValue(String fileTypeValue) {
+
+        if (fileTypeValue == null) {
+            return 0;
+        }
+
+        switch (fileTypeValue) {
+        case "Doc":
+            return CommonData.DOC;
+        case "Excel":
+            return CommonData.EXCEL;
+        case "Image":
+            return CommonData.IMAGE;
+        case "Pdf":
+            return CommonData.PDF;
+        default:
+            return 0;
+        }
+    }
+
+    public static Map<Integer, String> getFileTypeIdAndValue(TrainingResource tr) {
+        Map<Integer, String> result = new HashMap<>();
+
+        if (isNotBlank(tr.getDocPath())) {
+            result.put(CommonData.DOC, "Doc");
+
+        }
+        if (isNotBlank(tr.getExcelPath())) {
+            result.put(CommonData.EXCEL, "Excel");
+
+        }
+        if (isNotBlank(tr.getImgPath())) {
+            result.put(CommonData.IMAGE, "Image");
+
+        }
+        if (isNotBlank(tr.getPdfPath())) {
+            result.put(CommonData.PDF, "Pdf");
+
+        }
+
+        return result;
+    }
+
+    public static boolean isTrainingResourceFilePresent(TrainingResource tr, int fileId) {
+        if (tr == null) {
+            return false;
+        }
+
+        switch (fileId) {
+        case CommonData.DOC:
+            return isNotBlank(tr.getDocPath());
+        case CommonData.EXCEL:
+            return isNotBlank(tr.getExcelPath());
+        case CommonData.IMAGE:
+            return isNotBlank(tr.getImgPath());
+        case CommonData.PDF:
+            return isNotBlank(tr.getPdfPath());
+        default:
+            return false;
+        }
+    }
+
+    public static String getTrainingResourceFilePath(TrainingResource tr, int fileId) {
+        if (tr == null) {
+            return "";
+        }
+
+        String path;
+        switch (fileId) {
+        case CommonData.DOC:
+            path = tr.getDocPath();
+            break;
+        case CommonData.EXCEL:
+            path = tr.getExcelPath();
+            break;
+        case CommonData.IMAGE:
+            path = tr.getImgPath();
+            break;
+        case CommonData.PDF:
+            path = tr.getPdfPath();
+            break;
+        default:
+            return "";
+        }
+
+        return isNotBlank(path) ? path : "";
+    }
+
+    public static boolean isNotBlank(String s) {
+        return s != null && !s.isEmpty();
     }
 
     /**
