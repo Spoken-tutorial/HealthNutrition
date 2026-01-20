@@ -47,6 +47,17 @@ public class State implements Comparable<State>, Serializable {
     @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Event> events = new HashSet<Event>();
 
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<StateDistrictMapping> stateDistrictMappings = new HashSet<StateDistrictMapping>();
+
+    public Set<StateDistrictMapping> getStateDistrictMappings() {
+        return stateDistrictMappings;
+    }
+
+    public void setStateDistrictMappings(Set<StateDistrictMapping> stateDistrictMappings) {
+        this.stateDistrictMappings = stateDistrictMappings;
+    }
+
     public int getId() {
         return id;
     }
