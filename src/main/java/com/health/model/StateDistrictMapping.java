@@ -4,7 +4,10 @@ package com.health.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -39,9 +43,8 @@ public class StateDistrictMapping implements Serializable {
     @JoinColumn(name = "district_id")
     private District district;
 
-    // @OneToMany(mappedBy = "topicLanMapping", cascade = CascadeType.ALL)
-    // private Set<TrainingResource> trainingResources = new
-    // HashSet<TrainingResource>();
+    @OneToMany(mappedBy = "stateDistrictMapping", cascade = CascadeType.ALL)
+    private Set<ProjectReport> projectReports = new HashSet<ProjectReport>();
 
     public boolean isStatus() {
         return status;
@@ -57,6 +60,14 @@ public class StateDistrictMapping implements Serializable {
 
     public void setStateDisId(int stateDisId) {
         this.stateDisId = stateDisId;
+    }
+
+    public Set<ProjectReport> getProjectReports() {
+        return projectReports;
+    }
+
+    public void setProjectReports(Set<ProjectReport> projectReports) {
+        this.projectReports = projectReports;
     }
 
     public State getState() {
@@ -81,6 +92,18 @@ public class StateDistrictMapping implements Serializable {
 
     public void setDateAdded(Timestamp dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public StateDistrictMapping(Timestamp dateAdded, State state, District district) {
+
+        this.dateAdded = dateAdded;
+        this.state = state;
+        this.district = district;
+
+    }
+
+    public StateDistrictMapping() {
+
     }
 
     public static Comparator<StateDistrictMapping> SortByStateName = new Comparator<StateDistrictMapping>() {
