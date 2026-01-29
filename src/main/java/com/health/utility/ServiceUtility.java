@@ -430,12 +430,25 @@ public class ServiceUtility {
      * 
      */
 
+    public static boolean isOsGeneratedEntry(String name) {
+        name = name.replace("\\", "/"); // normalize paths
+        return name.contains("__MACOSX/") || name.endsWith(".DS_Store") || name.startsWith("._") || name.contains("/._")
+                || name.endsWith("Thumbs.db") || name.endsWith("desktop.ini");
+    }
+
     public static Set<String> checkFileExtentionsInZip(MultipartFile file) {
         Set<String> extensions = new HashSet<>();
 
         try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
+
+                String entryName = entry.getName();
+
+                if (isOsGeneratedEntry(entryName)) {
+                    continue;
+                }
+
                 if (!entry.isDirectory()) {
                     String ext = FilenameUtils.getExtension(entry.getName()).toLowerCase();
                     if (ext.equals("pdf")) {
@@ -501,24 +514,37 @@ public class ServiceUtility {
         return filePaths;
     }
 
-    public static List<String> sortFilesIfAllNamesNumeric(List<String> filePaths) {
+    public static List<String> sortFilePathsNumericOtherwiseLexical(List<String> filePaths) {
 
         if (filePaths == null || filePaths.isEmpty()) {
             return filePaths;
         }
+        List<String> cleanedFilePaths = new ArrayList<>();
+        for (String tempFile : filePaths) {
+            if (!isOsGeneratedEntry(tempFile)) {
+                cleanedFilePaths.add(tempFile);
+            }
 
-        boolean allNumeric = filePaths.stream().map(path -> Paths.get(path).getFileName().toString())
+        }
+
+        if (cleanedFilePaths.isEmpty()) {
+            return cleanedFilePaths;
+        }
+
+        boolean allNumeric = cleanedFilePaths.stream().map(path -> Paths.get(path).getFileName().toString())
                 .map(name -> name.substring(0, name.lastIndexOf('.'))).allMatch(name -> name.matches("\\d+"));
 
         if (allNumeric) {
-            Collections.sort(filePaths, Comparator.comparingInt(path -> {
+            Collections.sort(cleanedFilePaths, Comparator.comparingInt(path -> {
                 String fileName = Paths.get(path).getFileName().toString();
                 String numberPart = fileName.substring(0, fileName.lastIndexOf('.'));
                 return Integer.parseInt(numberPart);
             }));
+        } else {
+            Collections.sort(cleanedFilePaths);
         }
 
-        return filePaths;
+        return cleanedFilePaths;
     }
 
     public static Set<String> checkFileExtentionsInZip(ZipFile zip) {
@@ -528,6 +554,12 @@ public class ServiceUtility {
 
             for (Enumeration e = zip.entries(); e.hasMoreElements();) {
                 ZipEntry entry = (ZipEntry) e.nextElement();
+                String entryName = entry.getName();
+
+                if (isOsGeneratedEntry(entryName)) {
+                    continue;
+                }
+
                 if (!entry.isDirectory()) {
                     String ext = FilenameUtils.getExtension(entry.getName()).toLowerCase();
                     if (ext.equals("pdf")) {

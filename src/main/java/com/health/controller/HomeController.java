@@ -5587,6 +5587,7 @@ public class HomeController {
 
         TrainingResource tr = trainingResourceService.findByTrainingResourceId(id);
         List<String> filePaths = new ArrayList<>();
+        List<String> tempFilepPaths = new ArrayList<>();
 
         if (tr == null) {
 
@@ -5617,7 +5618,9 @@ public class HomeController {
 
         if (filePath.toLowerCase().endsWith(".zip")) {
             try {
-                filePaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+
+                tempFilepPaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+                filePaths = ServiceUtility.sortFilePathsNumericOtherwiseLexical(tempFilepPaths);
             } catch (IOException e) {
                 logger.error("Zip Extraction or zip error", e);
 
@@ -6293,7 +6296,7 @@ public class HomeController {
             if (filePath.toLowerCase().endsWith(".zip")) {
                 try {
                     tempFilepPaths = ServiceUtility.extractZipIfNeeded(filePath, env);
-                    filePaths = ServiceUtility.sortFilesIfAllNamesNumeric(tempFilepPaths);
+                    filePaths = ServiceUtility.sortFilePathsNumericOtherwiseLexical(tempFilepPaths);
                 } catch (IOException e) {
                     logger.error("Zip Extraction or zip error", e);
 
