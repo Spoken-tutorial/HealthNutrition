@@ -5454,6 +5454,8 @@ public class HomeController {
 
                         List<TrainingResource> trList = trainingResourceService.findByTopicLanMapping(topicLanMapping);
                         TrainingResource tr = null;
+                        boolean oldTRFlag = false;
+                        String oldPath = "";
 
                         if (trList.isEmpty()) {
                             tr = new TrainingResource();
@@ -5461,6 +5463,7 @@ public class HomeController {
 
                         } else {
                             tr = trList.get(0);
+                            oldTRFlag = true;
                         }
 
                         tr.setDateAdded(dateAdded);
@@ -5492,21 +5495,33 @@ public class HomeController {
                         }
 
                         else if (fileExtention.equals(CommonData.PDF_EXTENSION)) {
+                            if (oldTRFlag) {
+                                oldPath = tr.getPdfPath();
+                            }
                             document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                             tr.setPdfPath(document);
                         }
 
                         else if (fileExtention.equals(CommonData.DOC_EXTENSION)) {
+                            if (oldTRFlag) {
+                                oldPath = tr.getDocPath();
+                            }
                             document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                             tr.setDocPath(document);
                         }
 
                         else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)) {
+                            if (oldTRFlag) {
+                                oldPath = tr.getExcelPath();
+                            }
                             document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                             tr.setExcelPath(document);
                         }
 
                         else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)) {
+                            if (oldTRFlag) {
+                                oldPath = tr.getImgPath();
+                            }
                             document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                             tr.setImgPath(document);
                         }
@@ -5517,21 +5532,33 @@ public class HomeController {
                             if (extentions.size() == 1) {
                                 for (String ext : extentions) {
                                     if (ext.equals(CommonData.PDF_EXTENSION)) {
+                                        if (oldTRFlag) {
+                                            oldPath = tr.getPdfPath();
+                                        }
                                         document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                                         tr.setPdfPath(document);
                                     }
 
                                     else if (ext.equals(CommonData.DOC_EXTENSION)) {
+                                        if (oldTRFlag) {
+                                            oldPath = tr.getDocPath();
+                                        }
                                         document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                                         tr.setDocPath(document);
                                     }
 
                                     else if (ext.equals(CommonData.EXCEL_EXTENSION)) {
+                                        if (oldTRFlag) {
+                                            oldPath = tr.getExcelPath();
+                                        }
                                         document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                                         tr.setExcelPath(document);
                                     }
 
                                     else if (ext.equals(CommonData.IMAGE_EXTENSION)) {
+                                        if (oldTRFlag) {
+                                            oldPath = tr.getImgPath();
+                                        }
                                         document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                                         tr.setImgPath(document);
                                     }
@@ -5555,6 +5582,16 @@ public class HomeController {
                                 model.addAttribute("viewSection", viewSection);
                                 return addTrainingResourceGet(req, principal, model);
                             }
+
+                        }
+
+                        if (oldPath != null && oldPath.endsWith(".zip")) {
+
+                            String extractDir = oldPath.replace(".zip", "");
+
+                            Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    extractDir);
+                            FileUtils.deleteDirectory(extractDirPath.toFile());
 
                         }
                         tr.setUser(usr);
@@ -6293,10 +6330,28 @@ public class HomeController {
         if (action != null && !action.isEmpty() && action.equals("view")) {
             List<String> filePaths = new ArrayList<>();
             List<String> tempFilepPaths = new ArrayList<>();
+            List<String> sortedFilePaths = new ArrayList<>();
             if (filePath.toLowerCase().endsWith(".zip")) {
                 try {
                     tempFilepPaths = ServiceUtility.extractZipIfNeeded(filePath, env);
-                    filePaths = ServiceUtility.sortFilePathsNumericOtherwiseLexical(tempFilepPaths);
+                    sortedFilePaths = ServiceUtility.sortFilePathsNumericOtherwiseLexical(tempFilepPaths);
+
+                    if (fileTypeString.equals("Doc") || fileTypeString.equals("Excel")) {
+                        for (String str : sortedFilePaths) {
+                            if (!str.endsWith(".png") && !str.endsWith(".pdf")) {
+                                filePaths.add(str);
+                            }
+                        }
+                    } else if (fileTypeString.equals("Pdf")) {
+                        for (String str : sortedFilePaths) {
+                            if (!str.endsWith(".png")) {
+                                filePaths.add(str);
+                            }
+                        }
+                    } else {
+                        filePaths.addAll(sortedFilePaths);
+                    }
+
                 } catch (IOException e) {
                     logger.error("Zip Extraction or zip error", e);
 
