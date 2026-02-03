@@ -96,6 +96,7 @@ import com.health.model.ContributorAssignedMultiUserTutorial;
 import com.health.model.ContributorAssignedTutorial;
 import com.health.model.Course;
 import com.health.model.CourseCatTopicMapping;
+import com.health.model.District;
 import com.health.model.DocumentSearch;
 import com.health.model.Event;
 import com.health.model.FeedbackMasterTrainer;
@@ -110,11 +111,13 @@ import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
 import com.health.model.PostQuestionaire;
+import com.health.model.ProjectReport;
 import com.health.model.PromoVideo;
 import com.health.model.Question;
 import com.health.model.ResearchPaper;
 import com.health.model.SpokenVideo;
 import com.health.model.State;
+import com.health.model.StateDistrictMapping;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
@@ -157,11 +160,13 @@ import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
 import com.health.service.PostQuestionaireService;
+import com.health.service.ProjectReportService;
 import com.health.service.PromoVideoService;
 import com.health.service.QuestionService;
 import com.health.service.ResearchPaperService;
 import com.health.service.RoleService;
 import com.health.service.SpokenVideoService;
+import com.health.service.StateDistrictMappingService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
 import com.health.service.TopicCategoryMappingService;
@@ -263,6 +268,12 @@ public class HomeController {
 
     @Autowired
     private LanguageService lanService;
+
+    @Autowired
+    private ProjectReportService projectReportService;
+
+    @Autowired
+    private StateDistrictMappingService stateDistrictMappingService;
 
     @Autowired
     private CategoryService catService;
@@ -6475,6 +6486,253 @@ public class HomeController {
 
         return "trainingResources";
     }
+
+    /************************ Project Report Start ******************************/
+
+    @GetMapping("/addProjectReport")
+    public String addProjectReportGet(HttpServletRequest req, Principal principal, Model model) {
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        List<State> states = stateService.findAll();
+        states.sort(Comparator.comparing(State::getStateName));
+        model.addAttribute("states", states);
+
+        List<ProjectReport> projectReportList = new ArrayList<>();
+        List<ProjectReport> tempProjectReportList = projectReportService.findAll();
+        for (ProjectReport temp : tempProjectReportList) {
+            if (ServiceUtility.hasAnyProjectReportFile(temp)) {
+                projectReportList.add(temp);
+            }
+        }
+
+        model.addAttribute("projectReportList", projectReportList);
+
+        return "addProjectReport";
+    }
+
+    @PostMapping("/addProjectReport")
+    public String addProjectReportPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam(name = "stateIdPR") int stateId,
+            @RequestParam(name = "districtIdPR") List<Integer> districtIds,
+            @RequestParam(name = "filePR") List<MultipartFile> files) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        boolean viewSection = false;
+
+        if (stateId == 0) {
+            model.addAttribute("error_msg", "State should not be null");
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            return addProjectReportGet(req, principal, model);
+        }
+
+        if (districtIds.isEmpty() || files.isEmpty()) {
+            viewSection = true;
+            model.addAttribute("viewSection", viewSection);
+            model.addAttribute("error_msg", "District and Files should not be null");
+            return addProjectReportGet(req, principal, model);
+        }
+
+        State state = stateService.findById(stateId);
+        String stateName = state.getStateName();
+
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+
+        Set<District> addedDistrict = new HashSet<>();
+
+        try {
+
+            for (int i = 0; i < districtIds.size(); i++) {
+                if (i < files.size())
+                    logger.info("File: {}", files.get(i));
+                if (districtIds.get(i) != 0 && !files.get(i).isEmpty()) {
+
+                    District district = districtService.findById(districtIds.get(i));
+
+                    if (district != null) {
+                        String districtName = district.getDistrictName();
+                        StateDistrictMapping stateDistrictMapping = stateDistrictMappingService
+                                .findByStateAndDistrict(state, district);
+
+                        boolean addedDistrictFlag = addedDistrict.add(district);
+
+                        if (stateDistrictMapping == null && addedDistrictFlag) {
+                            stateDistrictMapping = new StateDistrictMapping(dateAdded, state, district);
+
+                            stateDistrictMappingService.save(stateDistrictMapping);
+                            logger.info(" iter:{}  stateDistrictMapping :{}", i, stateDistrictMapping);
+                        }
+
+                        List<ProjectReport> prList = projectReportService
+                                .findByStateDistrictMapping(stateDistrictMapping);
+                        ProjectReport pr = null;
+                        boolean oldPRFlag = false;
+                        String oldPath = "";
+
+                        if (prList.isEmpty()) {
+                            pr = new ProjectReport();
+                            logger.info("iter:{} ProjectReport  :{}", i, pr);
+
+                        } else {
+                            pr = prList.get(0);
+                            oldPRFlag = true;
+                        }
+
+                        pr.setDateAdded(dateAdded);
+                        pr.setStateDistrictMapping(stateDistrictMapping);
+                        pr.setUser(usr);
+
+                        projectReportService.save(pr); // Saved first to get exact Id
+                        int prId = pr.getProjectReportId();
+
+                        Path rootPath = Paths.get(CommonData.uploadProjectReport, String.valueOf(prId), stateName,
+                                districtName);
+
+                        String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
+                        String docFolder = Paths.get(rootPath.toString(), "docx_or_odt").toString();
+                        String excelFolder = Paths.get(rootPath.toString(), "excel_or_csv").toString();
+                        String imageFolder = Paths.get(rootPath.toString(), "image").toString();
+
+                        Set<String> extentions = new HashSet<>();
+                        String document = "";
+
+                        MultipartFile file = files.get(i);
+
+                        String fileExtention = ServiceUtility.checkFileExtensions(file);
+
+                        if (fileExtention.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                            model.addAttribute("error_msg", "Unsupported file Error at District:" + districtName);
+                            viewSection = true;
+                            model.addAttribute("viewSection", viewSection);
+                            return addProjectReportGet(req, principal, model);
+                        }
+
+                        else if (fileExtention.equals(CommonData.PDF_EXTENSION)) {
+                            if (oldPRFlag) {
+                                oldPath = pr.getPdfPath();
+                            }
+                            document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                            pr.setPdfPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.DOC_EXTENSION)) {
+                            if (oldPRFlag) {
+                                oldPath = pr.getDocPath();
+                            }
+                            document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                            pr.setDocPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)) {
+                            if (oldPRFlag) {
+                                oldPath = pr.getExcelPath();
+                            }
+                            document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                            pr.setExcelPath(document);
+                        }
+
+                        else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)) {
+                            if (oldPRFlag) {
+                                oldPath = pr.getImgPath();
+                            }
+                            document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                            pr.setImgPath(document);
+                        }
+
+                        if (fileExtention.equals(CommonData.ZIP_EXTENSION)) {
+
+                            extentions = ServiceUtility.checkFileExtentionsInZip(file);
+                            if (extentions.size() == 1) {
+                                for (String ext : extentions) {
+                                    if (ext.equals(CommonData.PDF_EXTENSION)) {
+                                        if (oldPRFlag) {
+                                            oldPath = pr.getPdfPath();
+                                        }
+                                        document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                                        pr.setPdfPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.DOC_EXTENSION)) {
+                                        if (oldPRFlag) {
+                                            oldPath = pr.getDocPath();
+                                        }
+                                        document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                                        pr.setDocPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.EXCEL_EXTENSION)) {
+                                        if (oldPRFlag) {
+                                            oldPath = pr.getExcelPath();
+                                        }
+                                        document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                                        pr.setExcelPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.IMAGE_EXTENSION)) {
+                                        if (oldPRFlag) {
+                                            oldPath = pr.getImgPath();
+                                        }
+                                        document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                                        pr.setImgPath(document);
+                                    }
+
+                                    else if (ext.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                                        viewSection = true;
+                                        model.addAttribute("viewSection", viewSection);
+                                        model.addAttribute("error_msg",
+                                                "Unsupported file Error at District:" + districtName);
+
+                                        return addProjectReportGet(req, principal, model);
+                                    }
+
+                                }
+                            }
+
+                            else {
+                                model.addAttribute("error_msg",
+                                        "Zip contains different types of files Error at language:" + districtName);
+                                viewSection = true;
+                                model.addAttribute("viewSection", viewSection);
+                                return addProjectReportGet(req, principal, model);
+                            }
+
+                        }
+
+                        if (oldPath != null && oldPath.endsWith(".zip")) {
+
+                            String extractDir = oldPath.replace(".zip", "");
+
+                            Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+                                    extractDir);
+                            FileUtils.deleteDirectory(extractDirPath.toFile());
+
+                        }
+                        pr.setUser(usr);
+                        projectReportService.save(pr);
+
+                    }
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            model.addAttribute("error_msg", "Some errors occurred, please contact the Admin");
+            logger.error("Error:", e);
+            return addProjectReportGet(req, principal, model);
+        }
+
+        model.addAttribute("viewSection", viewSection);
+        model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        return addProjectReportGet(req, principal, model);
+    }
+
+    /************************ Project Report End ********************************/
 
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,

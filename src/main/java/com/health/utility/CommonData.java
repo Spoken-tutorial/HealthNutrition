@@ -165,6 +165,8 @@ public class CommonData {
 
     public static String uploadTrainingResource = "Media/Content/TrainingResource/";
 
+    public static String uploadProjectReport = "Media/Content/ProjectReport/";
+
     public static String uploadPromoVideo = "Media/Content/PromoVideo/";
 
     public static String uploadVersion = "Media/Content/Version/";
