@@ -3268,7 +3268,7 @@ $(document).ready(function () {
             return;
         }
 
-        var baseUrl = "/Training-Resource" +
+        var baseUrl = "/Training-Resources" +
             "?topicNameTR=" + encodeURIComponent(topicId) +
             "&langNameTR=" + encodeURIComponent(langId) +
             "&inputFileType=" + encodeURIComponent(fileType);

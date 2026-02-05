@@ -5430,6 +5430,8 @@ public class HomeController {
         Timestamp dateAdded = ServiceUtility.getCurrentTime();
 
         Set<Language> addedLan = new HashSet<>();
+        Map<String, Set<String>> ErrorsforExistingFiles = new LinkedHashMap<>();
+        boolean savedFlag = false;
 
         try {
 
@@ -5441,6 +5443,9 @@ public class HomeController {
 
                     if (language != null) {
                         String langName = language.getLangName();
+                        Set<String> existingFiles = ErrorsforExistingFiles.computeIfAbsent(langName,
+                                k -> new LinkedHashSet<>());
+
                         TopicLanMapping topicLanMapping = topicLanMapiingService.findByTopicAndLan(topic, language);
 
                         boolean addedLanFlag = addedLan.add(language);
@@ -5497,6 +5502,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.PDF_EXTENSION)) {
                             if (oldTRFlag) {
                                 oldPath = tr.getPdfPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.PDF_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                             tr.setPdfPath(document);
@@ -5505,6 +5514,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.DOC_EXTENSION)) {
                             if (oldTRFlag) {
                                 oldPath = tr.getDocPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.DOC_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                             tr.setDocPath(document);
@@ -5513,6 +5526,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)) {
                             if (oldTRFlag) {
                                 oldPath = tr.getExcelPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.EXCEL_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                             tr.setExcelPath(document);
@@ -5521,6 +5538,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)) {
                             if (oldTRFlag) {
                                 oldPath = tr.getImgPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.IMAGE_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                             tr.setImgPath(document);
@@ -5534,6 +5555,10 @@ public class HomeController {
                                     if (ext.equals(CommonData.PDF_EXTENSION)) {
                                         if (oldTRFlag) {
                                             oldPath = tr.getPdfPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.PDF_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                                         tr.setPdfPath(document);
@@ -5542,6 +5567,10 @@ public class HomeController {
                                     else if (ext.equals(CommonData.DOC_EXTENSION)) {
                                         if (oldTRFlag) {
                                             oldPath = tr.getDocPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.DOC_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                                         tr.setDocPath(document);
@@ -5550,6 +5579,10 @@ public class HomeController {
                                     else if (ext.equals(CommonData.EXCEL_EXTENSION)) {
                                         if (oldTRFlag) {
                                             oldPath = tr.getExcelPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.EXCEL_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                                         tr.setExcelPath(document);
@@ -5558,6 +5591,10 @@ public class HomeController {
                                     else if (ext.equals(CommonData.IMAGE_EXTENSION)) {
                                         if (oldTRFlag) {
                                             oldPath = tr.getImgPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.IMAGE_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                                         tr.setImgPath(document);
@@ -5585,6 +5622,11 @@ public class HomeController {
 
                         }
 
+                        if (oldPath != null && !oldPath.trim().isEmpty()) {
+
+                            continue;
+                        }
+
                         if (oldPath != null && oldPath.endsWith(".zip")) {
 
                             String extractDir = oldPath.replace(".zip", "");
@@ -5596,6 +5638,7 @@ public class HomeController {
                         }
                         tr.setUser(usr);
                         trainingResourceService.save(tr);
+                        savedFlag = true;
 
                     }
 
@@ -5610,7 +5653,25 @@ public class HomeController {
         }
 
         model.addAttribute("viewSection", viewSection);
-        model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        StringBuilder errorMsg = new StringBuilder();
+
+        for (Map.Entry<String, Set<String>> entry : ErrorsforExistingFiles.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                errorMsg.append(entry.getKey()).append(": ").append(String.join(", ", entry.getValue())).append("<br>");
+            }
+        }
+
+        if (errorMsg.length() > 0) {
+
+            String finalErrorMessage = "The following files types already exist. To update them, please go to the Edit section.”:<br>"
+                    + errorMsg.toString();
+            model.addAttribute("error_msg", finalErrorMessage);
+        }
+
+        if (savedFlag) {
+            model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        }
+
         return addTrainingResourceGet(req, principal, model);
     }
 
@@ -6183,6 +6244,7 @@ public class HomeController {
         navigationLinkCheck(model);
         model.addAttribute("isZipFile", isZipFile);
         String res = ServiceUtility.convertFilePathToUrl(filePath);
+
         model.addAttribute("filePath", res);
 
         if (res == null || res.trim().isEmpty()) {
@@ -6192,7 +6254,7 @@ public class HomeController {
         if (isZipFile) {
             return "sharedTrainingResource";
         }
-
+        res = ServiceUtility.convertFilePathToUrlWithUTFforBrowserRedirect(filePath);
         return "redirect:/files/" + res;
     }
 
@@ -6231,6 +6293,20 @@ public class HomeController {
     }
 
     @GetMapping("/Training-Resource")
+    public String oldTrainingResource(HttpServletRequest req,
+            @RequestParam(name = "topicNameTR", required = false, defaultValue = "0") int topicId,
+            @RequestParam(name = "langNameTR", required = false, defaultValue = "0") int lanId,
+            @RequestParam(name = "inputFileType", required = false, defaultValue = "0") int inputFileType,
+
+            @RequestParam(name = "action", required = false, defaultValue = "") String action,
+
+            Principal principal, Model model) {
+
+        return viewAndDownloadTrainingResource(req, topicId, lanId, inputFileType, action, principal, model);
+
+    }
+
+    @GetMapping("/Training-Resources")
     public String viewAndDownloadTrainingResource(HttpServletRequest req,
             @RequestParam(name = "topicNameTR", required = false, defaultValue = "0") int topicId,
             @RequestParam(name = "langNameTR", required = false, defaultValue = "0") int lanId,
