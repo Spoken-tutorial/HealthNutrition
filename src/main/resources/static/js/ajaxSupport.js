@@ -100,47 +100,82 @@ $(document).ready(function() {
 					
 			    
 			    $(".timeScriptFetchData").click(function(){
-  					var tut_id=$(this).attr('value');
+  					var tutorialId = $(this).val();
+					var topicName = $(this).data("topic");
+					var languageName = $(this).data("language");
   						
-  					$('#tutorialId').prop('value',tut_id);
+  					$("#tutorialId").val(tutorialId);
+				     $("#exampleModalLabelScript").html(
+				        '<span class="text-dark">Upload TimeScript - </span>' +
+				        '<span style="color:#fd7e14; font-weight:600;">' + topicName + '</span>' +
+				        ' (' +
+				        '<span style="color:#6f42c1; font-weight:600;">' + languageName + '</span>' +
+				        ')'
+				    );
+
+				    
   					$('#uploadTimescript').modal('show');
   				}) 
   				
   				
-  				$('#timeScript').click(function() {
-  					
-  					var TutorialID=$("#tutorialId").val();
-
-						var form = $('#upload-file-form-script')[0];
-						var formData = new FormData(form);
-						formData.append('id',TutorialID);
-
-						$.ajax({
-							type : "POST",
-							url : projectPath+"addTimeScript",
-							data : formData,
-							enctype : 'multipart/form-data',
-							processData : false,
-							contentType : false,
-							cache : false,
-							success : function(result) {
-							
-								$('#viewScript').html(result);
-						
-								var result = "Script updated successfully";
-								showStatus(SUCCESS,result);
-								$('.upload-status').hide();
-							},
-
-							error : function(err) {
-								console.log("not working. ERROR: "+ JSON.stringify(err));
-								var result = "Error";
-								showStatus(ERROR,result);
-							}
-						});
-
-					});
+  			$('#timeScript').click(function () {
+			
+			    var TutorialID = $("#tutorialId").val();
+			    var fileInput = $("#uploadsScriptFile")[0];
+			
 			    
+			    if (!fileInput || fileInput.files.length === 0) {
+			
+			        $(".alert-msg")
+			            .removeClass("alert-success")
+			            .addClass("alert-danger")
+			            .html("Please select a file before uploading.")
+			            .show();
+			            
+			             setTimeout(function () {
+			                $('#uploadTimescript').modal('hide');
+			                $(".alert-msg").hide();
+			                location.reload();
+			            }, 1500);
+			
+			        return; 
+			    }
+			
+			    var form = $('#upload-file-form-script')[0];
+			    var formData = new FormData(form);
+			    formData.append('id', TutorialID);
+			
+			    $.ajax({
+			        type: "POST",
+			        url: projectPath + "addTimeScript",
+			        data: formData,
+			        processData: false,
+			        contentType: false,
+			        success: function (response) {
+			
+			            $(".alert-msg")
+			                .removeClass("alert-danger")
+			                .addClass("alert-success")
+			                .html("Script updated successfully")
+			                .show();
+			
+			            setTimeout(function () {
+			                $('#uploadTimescript').modal('hide');
+			                $(".alert-msg").hide();
+			                location.reload();
+			            }, 1500);
+			        },
+			        error: function () {
+			
+			            $(".alert-msg")
+			                .removeClass("alert-success")
+			                .addClass("alert-danger")
+			                .html("Error while uploading script")
+			                .show();
+			        }
+			    });
+			
+			});
 			    
 			    
 /**********************************end***********************************************************/

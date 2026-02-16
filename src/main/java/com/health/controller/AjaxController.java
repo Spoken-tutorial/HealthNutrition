@@ -3611,22 +3611,19 @@ public class AjaxController {
     public @ResponseBody String addTimeScript(@RequestParam(value = "id") int tutorialId,
             @RequestParam(value = "uploadsScriptFile") MultipartFile File, Principal principal) {
 
-        // User usr = new User();
-
-        // if (principal != null) {
-
-        // usr = usrservice.findByUsername(principal.getName());
-        // }
-
-        if (tutorialId != 0) {
+        if (tutorialId != 0 && File != null && !File.isEmpty()) {
             Tutorial tut = tutService.getById(tutorialId);
 
             try {
 
                 String folder = CommonData.uploadDirectoryTutorial + tut.getTutorialId() + "/TimeScript";
                 String document = ServiceUtility.uploadMediaFile(File, env, folder);
-
+                String fileName = "";
+                fileName = File.getOriginalFilename();
                 tut.setTimeScript(document);
+                tutService.save(tut);
+                logger.info("Tutorial Id: {}, Timed Script:{}", tutorialId, fileName);
+
                 if (tut.isStatus() && tut.isAddedQueue()) {
                     taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.UPDATE_DOCUMENT);
                 }
@@ -3634,7 +3631,6 @@ public class AjaxController {
                 else if (tut.isStatus()) {
                     taskProcessingService.addUpdateDeleteTutorial(tut, CommonData.ADD_DOCUMENT);
                 }
-                tutService.save(tut);
 
                 return CommonData.Script_SAVE_SUCCESS_MSG;
 
@@ -3642,6 +3638,8 @@ public class AjaxController {
                 logger.error("Time Script: Upload Error {}", tut, e);
             }
 
+        } else if (File == null || File.isEmpty()) {
+            logger.info("Tutorial Id: {}, Timed Script:{}", tutorialId, "File Not Found");
         }
         return CommonData.SCRIPT_UPLOAD_ERROR;
 
