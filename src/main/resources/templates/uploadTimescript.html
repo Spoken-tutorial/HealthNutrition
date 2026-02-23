@@ -73,10 +73,11 @@
 												style="color: maroon;" class="fas fa-check-circle"></i></td>
 											<td>
 												<button type="button"
-													class="btn btn-info timeScriptFetchData"
-													th:value="${componenettutorial.getTutorialId()}"
-													data-whatever="@mdo">
-													<i style="color: blue;" class="fas fa-upload"></i>
+												        class="btn btn-info timeScriptFetchData"
+												        th:value="${componenettutorial.getTutorialId()}"
+												        th:data-topic="${componenettutorial.getConAssignedTutorial().getTopicCatId().getTopic().getTopicName()}"
+												        th:data-language="${componenettutorial.getConAssignedTutorial().getLan().getLangName()}">
+												    <i style="color: blue;" class="fas fa-upload"></i>
 												</button>
 											</td>
 										</tr>
@@ -113,10 +114,10 @@
 							<form id="upload-file-form-script">
 								<div class="form-group">
 									<div class="custom-file">
-										<label class="custom-file-label" for="uploadsScriptId">Choose
+										<label class="custom-file-label" for="uploadsScriptFile">Choose
 											file...</label>
 										<input type="file" class="custom-file-input"
-											id="uploadScriptFile" name="uploadsScriptFile"
+											id="uploadsScriptFile" name="uploadsScriptFile"
 											placeholder="uploadFile" accept=".pdf, .doc, .docx, .odt, .ppt, .pptx" required="required"></input>
 										<div class="invalid-feedback">Example invalid custom
 											file feedback</div>
@@ -149,7 +150,36 @@
 		var projectPath='[(@{/})]';
 		$(document).ready( function () {
 		    $('#tableId').DataTable();
+		    
+		     $("#timeScript").click(function () {
+
+			        $(this)
+			            .html('<span class="spinner-border spinner-border-sm mr-2"></span> Uploading...')
+			            .prop("disabled", true);
+			
+			    });
+		    
+		     $(document).on("change", ".custom-file-input", function () {
+
+			        var fileName = this.files.length ? this.files[0].name : "Choose file...";
+			
+			        $(this)
+			            .closest(".custom-file")
+			            .find(".custom-file-label")
+			            .text(fileName);
+			    });
+			
+			
+			   
+			    $('#uploadTimescript').on('hidden.bs.modal', function () {
+			
+			        $(this).find('.custom-file-input').val('');
+			        $(this).find('.custom-file-label').text('Choose file...');
+			    });
+		    
 		} );
+		
+		
 		
 	</script>
 </body>

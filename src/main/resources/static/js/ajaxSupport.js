@@ -100,47 +100,82 @@ $(document).ready(function() {
 					
 			    
 			    $(".timeScriptFetchData").click(function(){
-  					var tut_id=$(this).attr('value');
+  					var tutorialId = $(this).val();
+					var topicName = $(this).data("topic");
+					var languageName = $(this).data("language");
   						
-  					$('#tutorialId').prop('value',tut_id);
+  					$("#tutorialId").val(tutorialId);
+				     $("#exampleModalLabelScript").html(
+				        '<span class="text-dark">Upload TimeScript - </span>' +
+				        '<span style="color:#fd7e14; font-weight:600;">' + topicName + '</span>' +
+				        ' (' +
+				        '<span style="color:#6f42c1; font-weight:600;">' + languageName + '</span>' +
+				        ')'
+				    );
+
+				    
   					$('#uploadTimescript').modal('show');
   				}) 
   				
   				
-  				$('#timeScript').click(function() {
-  					
-  					var TutorialID=$("#tutorialId").val();
-
-						var form = $('#upload-file-form-script')[0];
-						var formData = new FormData(form);
-						formData.append('id',TutorialID);
-
-						$.ajax({
-							type : "POST",
-							url : projectPath+"addTimeScript",
-							data : formData,
-							enctype : 'multipart/form-data',
-							processData : false,
-							contentType : false,
-							cache : false,
-							success : function(result) {
-							
-								$('#viewScript').html(result);
-						
-								var result = "Script updated successfully";
-								showStatus(SUCCESS,result);
-								$('.upload-status').hide();
-							},
-
-							error : function(err) {
-								console.log("not working. ERROR: "+ JSON.stringify(err));
-								var result = "Error";
-								showStatus(ERROR,result);
-							}
-						});
-
-					});
+  			$('#timeScript').click(function () {
+			
+			    var TutorialID = $("#tutorialId").val();
+			    var fileInput = $("#uploadsScriptFile")[0];
+			
 			    
+			    if (!fileInput || fileInput.files.length === 0) {
+			
+			        $(".alert-msg")
+			            .removeClass("alert-success")
+			            .addClass("alert-danger")
+			            .html("Please select a file before uploading.")
+			            .show();
+			            
+			             setTimeout(function () {
+			                $('#uploadTimescript').modal('hide');
+			                $(".alert-msg").hide();
+			                location.reload();
+			            }, 1500);
+			
+			        return; 
+			    }
+			
+			    var form = $('#upload-file-form-script')[0];
+			    var formData = new FormData(form);
+			    formData.append('id', TutorialID);
+			
+			    $.ajax({
+			        type: "POST",
+			        url: projectPath + "addTimeScript",
+			        data: formData,
+			        processData: false,
+			        contentType: false,
+			        success: function (response) {
+			
+			            $(".alert-msg")
+			                .removeClass("alert-danger")
+			                .addClass("alert-success")
+			                .html("Script updated successfully")
+			                .show();
+			
+			            setTimeout(function () {
+			                $('#uploadTimescript').modal('hide');
+			                $(".alert-msg").hide();
+			                location.reload();
+			            }, 1500);
+			        },
+			        error: function () {
+			
+			            $(".alert-msg")
+			                .removeClass("alert-success")
+			                .addClass("alert-danger")
+			                .html("Error while uploading script")
+			                .show();
+			        }
+			    });
+			
+			});
 			    
 			    
 /**********************************end***********************************************************/
@@ -2667,7 +2702,7 @@ var clipboard = new ClipboardJS('#copyButtonViewPage', {
 							contentType : "application/json",
 							success : function(result) {
 
-								var html = '';
+								var html = '';								   
 								var len = result.length;
 	  	  			            $.each(result , function( key, value ) {
 		  	  			        html += '<option value=' + value + '>'
@@ -2806,6 +2841,521 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
 
     
 /************************************Assign Video End ********************************************** */
+
+/******************************** Trainig Resource Start ***************************************/
+
+  $("#catIdTR").change(function() {
+
+						var catId = $(this).find(":selected").val();
+						
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadTopicByCategoryforTR",
+							data : {
+								"catId" : catId,
+								
+								
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								html += '<option value="0">Select Topic</option>';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + value + '>'
+		  			               + key
+		  			               + '</option>';
+		  	  			        })
+	  	  			            
+								$("#topicIdTR").prop('disabled',false);
+								$('#topicIdTR').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+$('.enableTrainingResource').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableTrainingResource",
+					data : {
+						"trainingResourceId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				$('#'+test_id).addClass('fas fa-times-circle');
+			   				$('#'+test_id).removeClass('fas fa-check-circle');
+			   				$('#'+test_id).css({"color": "red"});
+			   				$('#Success').css({"display": "block"});
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+			
+			$('.disableTrainingResource').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableTrainingResource",
+					data : {
+						"trainingResourceId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				
+			   				$('#'+test_id).addClass('fas fa-check-circle');
+			   				$('#'+test_id).removeClass('fas fa-times-circle');
+			   				$('#'+test_id).css({"color": "green"});
+			   				$('#Success').css({"display": "block"});
+			   				
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+		
+
+
+$(".deleteTrainingResource-btn").click(function(){
+    var row = $(this).closest("tr");
+    var trainingResourceId = $(this).data("trainingresourceid"); 
+    var topicName = $(this).data("topicname");
+    var langName = $(this).data("langname");
+    var fileName = $(this).data("filename");
+    var fileType = $(this).data("filetype");
+    
+
+    Swal.fire({
+        title: "Are you sure?",
+        html: "<b>Do you want to delete this Training Resource?</b><br><br>" +
+              "<b>Topic:</b> " + topicName + "<br>" +
+              "<b>Language:</b> " + langName + "<br>" +
+              "<b>file Type:</b> " + fileType + "<br>" +
+              "<b>file Name:</b> " + fileName,
+             
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        dangerMode: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/delete-trainingResource/",
+                data: {
+                   
+                   
+                    "trainingResourceId": trainingResourceId,
+                    "fileType": fileType
+                },
+                type: "DELETE",
+                success: function(result) {
+                    Swal.fire("Deleted!", "Deleted successfully!", "success");
+                   $("#" + fileType + trainingResourceId).text("Deleted");
+                },
+                error: function(err) {
+                    Swal.fire("Error!", "Error in deleting!", "error");
+                }
+            });
+        }
+    });
+});
+    
+
+
+  /**
+    function to load language and fileType by topic
+    author: Alok Kumar
+    
+     */
+
+	function loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId) {
+				$.ajax({
+					type : "GET",
+					url : projectPath+"loadLanAndFileTypeByTopic",
+					data : {
+						"topicId" : topicId,
+						"lanId":lanId,
+						"fileTypeId":fileTypeId
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+			            var html = '';
+			            html += '<option value="0">Select Language</option>';
+			           
+			                $.each(result, function (value, key) {
+			                    var selected = (lanId == key) ? "selected" : "";
+			                    html += `<option value="${key}" ${selected}>${value}</option>`;
+			                });
+			            
+			            $("#langNameTR").prop('disabled', false);
+			            $('#langNameTR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select File</option>';
+						$.each(result, function( value ,key ) {
+							var selected=(fileTypeId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputFileType").prop('disabled',false);
+						$('#inputFileType').html(html);
+						if (topicId != 0) {
+							$("#topicResetDivTR").show();
+						} else {
+						$("#topicResetDivTR").hide();
+						}
+						
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	}
+     
+    $( "#topicNameTR" ).change(function() {
+			
+				var topicId = $(this).val();
+				var lanId = $("#langNameTR").val();
+				var fileTypeId=$("#inputFileType").val();
+				loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
+				
+			});
+			
+			   $( "#topicResetTR" ).click(function() {
+			
+				var topicId = 0;
+				
+				$("#topicNameTR").val("0");
+				var lanId = $("#langNameTR").val();
+				var fileTypeId=$("#inputFileType").val();
+				
+				loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
+				return false;
+				
+			});
+			
+		
+      
+   
+    
+     	/* 
+     		Function to load Topic and FileType by language
+     		author:Alok Kumar
+     
+    	 */
+    	 
+    	 function loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId){
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadTopicAndFileTypeByLan",
+					data : {
+						"topicId" : topicId,
+						"lanId":lanId,
+						"fileTypeId":fileTypeId
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Topic</option>';
+						$.each(result , function(  value ,key) {
+							var selected=(topicId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#topicNameTR").prop('disabled',false);
+						$('#topicNameTR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select File</option>';
+						$.each(result, function(  value,key ) {
+							var selected=(fileTypeId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputFileType").prop('disabled',false);
+						$('#inputFileType').html(html);
+						if (lanId != 0) {
+							$("#lanResetDivTR").show();
+						} else {
+						$("#lanResetDivTR").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+		}
+
+     	 $( "#langNameTR" ).change(function() {
+				var lanId = $(this).val();
+				var topicId = $("#topicNameTR").val();
+				var fileTypeId=$("#inputFileType").val();
+				loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId);
+				
+			});
+			
+			$( "#lanResetTR" ).click(function() {
+				var lanId = 0;
+				$("#langNameTR").val("0");
+				var fileTypeId = $("#inputFileType").val();
+				var topicId=$("#topicNameTR").val();
+				loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId);
+				return false;
+				
+			});
+			
+			
+			
+				/* 
+     		Function to load Topic and Language by FileType
+     		author:Alok Kumar
+     
+    	 */
+    	 
+    	 function loadTopicAndLanByFileType(topicId, lanId, fileTypeId){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadTopicAndLanByFileType",
+					data : {
+						"topicId" : topicId,
+						"lanId":lanId,
+						"fileTypeId":fileTypeId
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Topic</option>';
+						$.each(result , function( value ,key ) {
+							var selected=(topicId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#topicNameTR").prop('disabled',false);
+						$('#topicNameTR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Language</option>';
+						$.each(result, function( value ,key ) {
+							var selected=(lanId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#langNameTR").prop('disabled',false);
+						$('#langNameTR').html(html);
+						
+						if (fileTypeId != 0) {
+							$("#fileResetDivTR").show();
+						} else {
+						$("#fileResetDivTR").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#inputFileType').change(function() {
+				var fileTypeId = $(this).val();
+				var topicId = $("#topicNameTR").val();
+				var lanId=$("#langNameTR").val();
+				loadTopicAndLanByFileType(topicId, lanId, fileTypeId);
+				
+				
+			});
+			
+			 $( "#fileResetTR" ).click(function() {
+			
+				var fileTypeId = 0;
+				$("#inputFileType").val("0");
+				var lanId = $("#langNameTR").val();
+				var topicId=$("#topicNameTR").val();
+				
+				loadTopicAndLanByFileType(topicId, lanId, fileTypeId);
+				
+				return false;
+				
+			});
+			
+			$( "#btnClearTriningResource" ).click(function() {
+				
+				 // Reset radio buttons
+    			 $("input[name='action']").prop("checked", false);
+				
+				var fileTypeId = 0;
+				$("#inputFileType").val("0");
+				var lanId =0; 
+				$("#langNameTR").val("0");
+				var topicId=0;
+				$("#topicNameTR").val("0");
+				
+				
+				
+				loadTopicAndLanByFileType(topicId, lanId, fileTypeId);
+				loadLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
+				loadTopicAndFileTypeByLan(topicId, lanId, fileTypeId);
+				
+				return false;
+				
+			});
+			
+			
+			
+
+	
+$(document).ready(function () {
+
+    $("#formTrainingResource").on("submit", function (e) {
+         
+
+        var topicId  = $("#topicNameTR").val();
+        var langId   = $("#langNameTR").val();
+        var fileType = $("#inputFileType").val();
+        var action   = $("input[name='action']:checked").val();
+        const usrLoggedIn =$("#usrValue").val() == "true";
+		const authorizedUsr =$("#authorizedUsrValue").val() == "true";
+		var fileTypeString=$("#fileTypeString").val();
+
+        $("#formError").addClass("d-none").text("");
+
+        if (!topicId || topicId == 0) {
+			e.preventDefault();
+            showError("Please select Topic");
+            return;
+        }
+        if (!langId || langId == 0) {
+			e.preventDefault();
+            showError("Please select Language");
+            return;
+        }
+        if (!fileType || fileType == 0) {
+			e.preventDefault();
+            showError("Please select File Type");
+            return;
+        }
+        if (!action) {
+			e.preventDefault();
+            showError("Please select an action (View / Download / Share)");
+            return;
+        }
+
+        var baseUrl = "/Training-Resources" +
+            "?topicNameTR=" + encodeURIComponent(topicId) +
+            "&langNameTR=" + encodeURIComponent(langId) +
+            "&inputFileType=" + encodeURIComponent(fileType);
+
+      
+        if (action === "download") {
+			if (fileTypeString === "Pdf" || fileTypeString === "Image") {
+            e.preventDefault();
+            window.location.href = baseUrl + "&action=download";
+        }
+        
+		 if (fileTypeString === "Doc" || fileTypeString === "Excel") {
+			 if (usrLoggedIn && authorizedUsr) {
+               e.preventDefault();
+            window.location.href = baseUrl + "&action=download";
+            }
+			 	
+        }
+        }
+    });
+
+    function showError(msg) {
+        $("#formError").removeClass("d-none").text(msg);
+    }
+
+    // Copy link button
+    $("#copyShareLink").click(function () {
+    var text = $(".shareLink").val();
+
+    if (navigator.clipboard) {
+        // Modern API (async, works in Chrome, Edge, Firefox, Safari)
+        navigator.clipboard.writeText(text).then(function () {
+            alert("Link copied to clipboard");
+        }).catch(function (err) {
+            console.error("Failed to copy: ", err);
+            alert("Unable to copy link");
+        });
+    } else {
+        // Fallback for older browsers
+        var copyText = document.querySelector(".shareLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        alert("Link copied to clipboard");
+    }
+});
+
+
+});
+
+
+/******************************** Training Resource End ****************************************/
 			
 			
 /***************** changes made by om prakash *********************************************/

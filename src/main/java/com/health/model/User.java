@@ -181,6 +181,10 @@ public class User implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
+    private Set<TrainingResource> trainingResources = new HashSet<TrainingResource>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Topic> topics = new HashSet<Topic>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -330,6 +334,14 @@ public class User implements UserDetails, Serializable {
 
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    public Set<TrainingResource> getTrainingResources() {
+        return trainingResources;
+    }
+
+    public void setTrainingResources(Set<TrainingResource> trainingResources) {
+        this.trainingResources = trainingResources;
     }
 
     @Override

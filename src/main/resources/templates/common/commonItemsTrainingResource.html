@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<body>
+
+<div th:fragment="my_fragment2(data_id, data_class)">
+    <p th:class="${data_id}" th:id="${data_class}"></p>
+</div>
+
+<div th:fragment="search_bar">
+<section id="search-bar" class="container my-4">
+<h1 class="text-center" style="color: #014F7A;font-size:1.8rem;"> Training-Resources</h1>
+<div id="formError" class="alert alert-danger d-none" role="alert"></div>
+
+
+<form th:action="@{/Training-Resources}" class="w-100 mt-5" name="selectOption" id="formTrainingResource">
+
+<div class="row ">
+
+    <!-- Topic -->
+    <div class="col-12 col-md-4 mb-3 input-group">
+        <div class="input-group">
+            <select class="form-control selectedValue" id="topicNameTR" name="topicNameTR">
+                <option value="0">Select Topic</option>
+                <option th:each="topic : ${topics}"
+                        th:selected="${topic.value==localTopic}"
+                        th:value="${topic.value}"
+                        th:text="${topic.key}">
+                </option>
+            </select>
+            
+            <div th:if="${localTopic != null and localTopic != 0}" class="input-group-btn" id="topicResetDivTR" style=" padding-top: 4px;"><button  id="topicResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localTopic != null and localTopic != 0}" class="input-group-btn" id="topicResetDivTR" style=" padding-top: 4px;  display: none;"><button  id="topicResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+
+       
+        </div>
+    </div>
+
+
+    <!-- Language -->
+    <div class="col-12 col-md-4 mb-3">
+        <div class="input-group input-group">
+            <select class="form-control" id="langNameTR" name="langNameTR">
+                <option value="0">Select Language</option>
+                <option th:each="lan : ${languages}"
+                        th:selected="${lan.value==localLan}"
+                        th:value="${lan.value}"
+                        th:text="${lan.key}">
+                </option>
+            </select>
+            
+            <div th:if="${localLan != null and localLan != 0}" class="input-group-btn" id="lanResetDivTR" style=" padding-top: 4px;"><button  id="lanResetTR"  style=" background: none;
+            	border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localLan != null and localLan != 0}" class="input-group-btn" id="lanResetDivTR" style=" padding-top: 4px;  display: none;"><button  id="lanResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+
+        </div>
+    </div>
+
+
+    <!-- File type -->
+    <div class="col-12 col-md-4 mb-3 input-group">
+        <div class="input-group">
+            <select class="form-control" id="inputFileType" name="inputFileType">
+                <option value="0">Select File</option>
+                <option th:each="file : ${fileTypes}"
+                        th:selected="${file.value==localFile}"
+                        th:value="${file.value}"
+                        th:text="${file.key}">
+                </option>
+            </select>
+            
+             <div th:if="${localFile != null and localFile != 0}" class="input-group-btn" id="fileResetDivTR" style=" padding-top: 4px;"><button  id="fileResetTR"  style=" background: none;
+            	border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localFile != null and localFile != 0}" class="input-group-btn" id="fileResetDivTR" style=" padding-top: 4px;  display: none;"><button  id="fileResetTR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+
+           
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Action Buttons (View / Download / Share) -->
+<div class="row  mt-2 justify-content-center">
+    <div class="col-4 col-md-2">
+        <label class="form-check">
+            <input class="form-check-input" type="radio" name="action" value="view">
+            <span class="form-check-label">View</span>
+        </label>
+    </div>
+
+    <div class="col-4 col-md-2">
+        <label class="form-check">
+            <input class="form-check-input" type="radio" name="action" value="download">
+            <span class="form-check-label">Download</span>
+        </label>
+    </div>
+
+    <div class="col-4 col-md-2">
+        <label class="form-check">
+            <input class="form-check-input" type="radio" name="action" value="share">
+            <span class="form-check-label">Share</span>
+        </label>
+    </div>
+</div>
+
+
+<!-- Submit + Clear Buttons -->
+<div class="row  mt-2 justify-content-center">
+
+    <div class="col-6 col-md-2">
+        <button type="submit" class="btn w-100 text-white"
+                style="background:#1C7871;">
+            Submit
+        </button>
+    </div>
+
+    <div class="col-6 col-md-2">
+        <input type="button"
+               value="Clear"
+               id="btnClearTriningResource"
+               class="btn w-100 text-white"
+               style="background:SlateBlue;">
+    </div>
+
+</div>
+
+</form>
+
+</section>
+</div>
+<div th:fragment="model_title">
+
+
+								<span class="topic-title" th:if="${topicName != null}"
+									th:text="${#strings.capitalizeWords(#strings.replace(topicName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${langName != null and topicName != null}"
+									th:text="' : 🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${langName != null and topicName == null}"
+									th:text="'🌐 ' + ${#strings.capitalizeWords(#strings.replace(langName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${fileTypeString != null and langName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and langName == null and topicName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and topicName == null and langName == null}"
+									th:text="'📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+							</div>
+							
+<!--div th:fragment="tr_login" class="px-4 py-2">
+
+    <span class="d-block mb-2">
+        Only authorized users can access Doc or Excel files.
+    </span>
+
+    <form th:action="@{/login_trainingResource}" method="post" class="mt-2 mx-auto w-50">
+
+        <div class="form-group">
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   placeholder="Username"
+                   required />
+        </div>
+
+        <div class="form-group mt-2">
+            <input type="password"
+                   name="password"
+                   class="form-control"
+                   placeholder="Password"
+                   required />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm mt-2 w-100">
+            Login
+        </button>
+
+        <div class="mt-2 small-links text-center">
+            <a th:href="@{/forgetPassword}" class="small">Forgot password?</a>
+            |
+            <a th:href="@{/newUser}" class="small">Register</a>
+        </div>
+
+    </form>
+
+</div-->
+<div th:fragment="tr_login" class="px-4 py-2 text-center">
+
+    <span class="d-block mb-3">
+        Only authorized users can access Doc or Excel files.
+    </span>
+
+    <a th:href="@{/login}"
+       class="btn btn-primary btn-sm px-4">
+        Login
+    </a>
+
+    <div class="mt-3 small-links">
+        <a th:href="@{/forgetPassword}" class="small">Forgot password?</a>
+        |
+        <a th:href="@{/newUser}" class="small">Register</a>
+    </div>
+
+</div>
+
+						
+
+</body>
+</html>
