@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head th:replace="common/trail :: common-trail (pageTitle='Add Project Report - Admin - Health And Nutrition')"></head>
+<style>
+.nav-add_project_report{
+border-right: 5px solid orange;
+font-size:0.9rem;
+/* text-decoration: underline; */
+}
+.nav-add_project_report a{
+color: #044F7A!important;
+font-weight:bold!important;
+}
+
+
+    
+   
+</style>
+<body>
+	<div th:replace="common/sidebar :: top_header"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-lg-2 pr-0">
+				<div th:replace="common/sidebar :: contributor_sidebar"></div>
+			</div>
+			<div class="col-md-9 col-lg-10 p-md-5">
+				<div>
+					<div class="alert alert-success" role="alert"
+						th:if="${success_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:text="${success_msg}"></span>
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-danger" role="alert" th:if="${error_msg}">
+						<div id="#test" class="">
+							<div>
+								<span th:utext="${error_msg}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#add" role="tab" aria-controls="home"
+						aria-selected="true">Add</a></li>
+					<li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
+						aria-selected="false">Training Report View</a></li>
+						
+				
+   
+
+
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active py-3" id="add"
+						role="tabpanel" aria-labelledby="home-tab">
+						<div class="card">
+							<div class="card-header">
+								<h4>Add Project Report </h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-8">
+							
+										<form th:action="@{/addProjectReport}" method="post"
+											enctype="multipart/form-data" id="inputForm">
+											<div id="rawData">
+												
+											</div>
+											
+											    <div class="form-group">
+													<label for="catIdTR"><b>Select State *</b></label> <select id="stateIdPR"
+														class="form-control package_input" name="stateIdPR" required="required">
+
+															<option value='0'>Select State</option>
+														
+															<option th:each="state: ${states}" th:value="${state.getId()}" th:text="${state.getStateName()}">
+														</option>
+								
+													</select>
+
+											</div>
+											 
+											  
+											  <!--div class="form-group">
+													<label for="topicIdTR"><b>Select Topic *</b></label> <select id="topicIdTR"
+														class="form-control package_input" name="topicIdTR" required="required">
+
+															<option value='0'>Select Topic</option>
+														
+								
+													</select>
+
+											</div-->
+							
+							
+
+											
+										 <input type="hidden" id="lengthofDistrict" name="lengthofDistrict"  th:value="${districts.size()}"/>	
+										
+									<div th:each="dis,iter: ${districts}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									
+									<div class="container">
+										
+								        <div class="row">
+								            <div class="col-md-5">
+								              
+								               <div class="form-group">
+		               	                 		<label th:if="${iter.index == 0}" th:for="${'districtIdPR' + iter.index}">Select District </label>
+												<select th:id="${'districtIdPR' + iter.index}" class="form-control district-select" name="districtIdPR" th:data-index="${iter.index}">
+			  									<option value="0">Select District</option>
+			  									<option th:each="disitr : ${districts}" th:value="${disitr.getId()}" th:text="${disitr.getDistrictName()}"></option>
+												</select>
+		  									</div>
+								            
+								            </div>
+								            
+								         
+								            
+								            <div class="col-md-7">
+												
+								            <div class="form-group">
+
+												<label th:if="${iter.index == 0}" th:for="${'filePR' + iter.index}">Upload File</label> 
+												<input type="file" class="form-control" th:id="${'filePR' + iter.index}" name="filePR" th:data-index="${iter.index}" accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.odt,.xlsx,.csv,.zip"  onchange="validate_file_size(this,734003200)"/>
+												<small> (.jpg or .png or .pdf or .docx or .odt or .xlsx or .csv  or .zip Only)</small> 
+												<small>Max file size : 700 MB</small>
+
+											</div>
+												
+								            </div>
+								        </div>
+								    </div>
+									
+									
+
+									
+
+									
+									<br>
+									</div>									  
+											<br>
+																        
+									        
+											
+											<button type="submit" class="btn  btn-success"  style="float:left;  margin-left:15px; margin-right:40px;">Submit</button>
+										</form>
+										
+									
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade py-3" id="view" role="tabpanel"
+						aria-labelledby="profile-tab">
+						<table class="table table-striped" id="myTable"  data-order='[[ 0, "desc" ]]'>
+						
+							
+							<thead>
+								<tr>
+									<th scope="col">Date Added</th>
+									<th scope="col">State</th>
+									<th scope="col">District</th>
+									<th scope="col">Enable/Disable</th>
+									<th scope="col">Pdf File</th>
+									<th scope="col">Doc File</th>
+									<th scope="col">Excel File</th>
+									<th scope="col">Image File</th>
+									
+									 
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="temp : ${projectReportList}">
+								 <td scope="row"><span th:text = "${temp.getDateAdded()}"></span></td>
+								 <td><span th:text = "${temp.getStateDistrictMapping().getState().getStateName()}"></span></td>
+								  <td><span th:text = "${temp.getStateDistrictMapping().getDistrict().getDistrictName()}"></span></td>
+							      <td>
+	  		
+						   			<div th:if="${temp.isStatus()}">
+						   				<a class="disableProjetcReport" th:value="${temp.getProjectReportId()}" title="Click to Disable Project Report "><i class="fas fa-times-circle" th:id="${temp.getProjectReportId()}" style="color:red"></i></a>
+						   			</div>
+						   			<div th:unless="${temp.isStatus()}">
+						   				<a class="enableProjetcReport" th:value="${temp.getProjectReportId()}" title="Click to Enable Project Report"><i class="fas fa-check-circle" th:id="${temp.getProjectReportId()}" style="color:green"></i> </a>
+						   			</div>
+						   		
+						  			</td>
+						  				
+						  			<td>
+									    <div th:id="${'pdf'+ temp.getProjectReportId()}">
+									        <span th:text="${temp.getPdfFileNameWithorWitoutZip()}"></span><br>
+									
+									        <!-- Actions if PDF exists -->
+									        <div th:if="${temp.getPdfFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{'/projectReportAdminView/pdfOrZipOfPdfs/' + ${temp.getProjectReportId()}}" 
+									               title="View PDF">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/projectReport/edit/pdfOrZipOfPdfs/' + ${temp.getProjectReportId()}}" 
+									               title="Edit Pdf">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteProjectReport-btn"
+									                    th:data-projectreportid="${temp.getProjectReportId()}"
+									                    th:data-statename="${temp.getStateDistrictMapping().getState().getStateName()}"
+									                    th:data-districtname="${temp.getStateDistrictMapping().getDistrict().getDistrictName()}"
+									                    th:data-filename="${temp.getPdfFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'pdf'"
+									                    title="Delete Pdf">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no PDF -->
+									        <div th:if="${temp.getPdfFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Pdf available
+									        </div>
+									    </div>
+									</td>
+
+									
+									<td>
+										
+										<div th:id="${'doc'+ temp.getProjectReportId()}">
+									        <span th:text="${temp.getDocFileNameWithorWitoutZip()}"></span><br>
+									
+									        <!-- Actions if Doc exists -->
+									        <div th:if="${temp.getDocFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{${'/projectReportAdminView/docOrZipOfDocs/' + temp.getProjectReportId()}}" 
+									               title="View Doc">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/projectReport/edit/docOrZipOfDocs/' + ${temp.getProjectReportId()}}" 
+									               title="Edit Doc">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteProjectReport-btn"
+									                    th:data-projectreportid="${temp.getProjectReportId()}"
+									                    th:data-statename="${temp.getStateDistrictMapping().getState().getStateName()}"
+									                    th:data-districtname="${temp.getStateDistrictMapping().getDistrict().getDistrictName()}"
+									                    th:data-filename="${temp.getDocFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'doc'"
+									                    title="Delete Doc">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no Doc -->
+									        <div th:if="${temp.getDocFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Doc available
+									        </div>
+									    </div>
+						                 
+									</td>
+									
+									<td>
+										
+										<div th:id="${'excel'+ temp.getProjectReportId()}">
+									        <span th:text="${temp.getExcelFileNameWithorWitoutZip()}"></span><br>
+									
+									        <!-- Actions if Excel exists -->
+									        <div th:if="${temp.getExcelFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{${'/projectReportAdminView/excelOrZipOfexcels/' + temp.getProjectReportId()}}" 
+									               title="View Excel">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/projectReport/edit/excelOrZipOfexcels/' + ${temp.getProjectReportId()}}" 
+									               title="Edit Excel">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteProjectReport-btn"
+									                    th:data-projectreportid="${temp.getProjectReportId()}"
+									                    th:data-statename="${temp.getStateDistrictMapping().getState().getStateName()}"
+									                    th:data-districtname="${temp.getStateDistrictMapping().getDistrict().getDistrictName()}"
+									                    th:data-filename="${temp.getExcelFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'excel'"
+									                    title="Delete Excel">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no Excel-->
+									        <div th:if="${temp.getExcelFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Excel available
+									        </div>
+									    </div>
+						            
+						                 
+									</td>
+									
+									<td>
+										 <div th:id="${'image'+ temp.getProjectReportId()}">
+									        <span th:text="${temp.getImageFileNameWithorWitoutZip()}"></span><br>
+									
+									
+									        <!-- Actions if Image exists -->
+									        <div th:if="${temp.getImageFileNameWithorWitoutZip() != 'NA'}" class="mt-2 d-flex gap-2">
+									            <a class="btn btn-sm btn-primary " 
+									               th:href="@{${'/projectReportAdminView/imageOrZipOfImages/' + temp.getProjectReportId()}}" 
+									               title="View Image">
+									                <i class="bi bi-eye"></i> View
+									            </a>
+												&ensp;
+									            <a class="btn btn-sm btn-warning me-2" 
+									               th:href="@{'/projectReport/edit/imageOrZipOfImages/' + ${temp.getProjectReportId()}}" 
+									               title="Edit Image">
+									                <i class="bi bi-pencil-square"></i> Edit
+									            </a>
+												&ensp;
+									            <button class="btn btn-sm btn-danger deleteProjectReport-btn"
+									                    th:data-projectreportid="${temp.getProjectReportId()}"
+									                    th:data-statename="${temp.getStateDistrictMapping().getState().getStateName()}"
+									                    th:data-districtname="${temp.getStateDistrictMapping().getDistrict().getDistrictName()}"
+									                    th:data-filename="${temp.getImageFileNameWithorWitoutZip()}"
+									                    th:data-filetype="'image'"
+									                    title="Delete Image">
+									                <i class="bi bi-trash"></i> Delete
+									            </button>
+									        </div>
+									
+									        <!-- Message if no Image-->
+									        <div th:if="${temp.getImageFileNameWithorWitoutZip() == 'NA'}" class="text-muted mt-2">
+									            <i class="bi bi-file-earmark-excel"></i> No Image available
+									        </div>
+									    </div>
+						            
+						                
+									</td>
+							
+							   
+							     
+								  
+							    </tr>
+
+							</tbody>
+						</table >
+						</div>
+						
+												
+						
+
+						
+					</div>
+
+
+
+				</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+	<div th:replace="common/trail :: body-bottom-scripts"></div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script type="text/javascript">
+$(document).ready( function () {
+	
+    $('#myTable').DataTable();
+    
+     
+    
+   
+} );
+
+var divid = 0;
+
+function addListener(divid) {
+	var disSelect = document.getElementById("districtIdPR" + (divid - 1));
+	if (disSelect === null) {
+		console.log("divid=", divid);
+		return;
+	}
+	disSelect.addEventListener("change", function() {
+	  var selecteddis = disSelect.value;
+	  if (selecteddis !== "") {
+	    addRow(divid);
+	  }
+	});
+	
+}
+
+function addRow(divid) {
+	var fileInputDiv = document.getElementById("fileInputDiv" + divid);
+	if (fileInputDiv == null) {
+		console.log("none", divid);
+		return;
+	}
+    fileInputDiv.style.display = "block";
+    divid += 1;
+    addListener(divid);
+}
+
+function setRequired(divid) {
+	var stateName = document.getElementById("stateIdPR" + divid).value;
+	var dis = document.getElementById("districtIdPR" + divid);
+	var title = document.getElementById("fileId" + divid);
+	
+	title.required = (value != "");
+	return false;
+}
+
+addRow(divid);
+
+
+</script>
+
+	<script th:inline="javascript">
+	
+		var projectPath='[(@{/})]';
+	</script>
+</body>
+
+</html>
