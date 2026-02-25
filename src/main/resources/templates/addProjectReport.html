@@ -99,7 +99,7 @@ font-weight:bold!important;
 							
 							
 
-											
+										 <input type="hidden" id="allDistrict" name="allDistrict"  th:value="${allDisId}"/>	
 										 <input type="hidden" id="lengthofDistrict" name="lengthofDistrict"  th:value="${districts.size()}"/>	
 										
 									<div th:each="dis,iter: ${districts}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >

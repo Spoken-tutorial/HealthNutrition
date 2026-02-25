@@ -6671,6 +6671,10 @@ public class HomeController {
         states.sort(Comparator.comparing(State::getStateName));
         model.addAttribute("states", states);
 
+        Optional<District> allDis = districtService.findByDistrictNameIgnoreCase(CommonData.ALL_DISTRICTS);
+
+        allDis.ifPresent(dis -> model.addAttribute("allDisId", dis.getId()));
+
         List<ProjectReport> projectReportList = new ArrayList<>();
         List<ProjectReport> tempProjectReportList = projectReportService.findAll();
         for (ProjectReport temp : tempProjectReportList) {
