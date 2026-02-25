@@ -1,5 +1,8 @@
 package com.health.repository;
 
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.State;
@@ -21,5 +24,8 @@ public interface StateRepository extends CrudRepository<State, Integer> {
      * @return State object
      */
     State findBystateName(String name);
+
+    @Query("SELECT s FROM State s ORDER BY s.stateName")
+    List<State> findAllOrderByName();
 
 }
