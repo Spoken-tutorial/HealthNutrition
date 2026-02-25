@@ -48,7 +48,7 @@ font-weight:bold!important;
 						aria-selected="true">Add</a></li>
 					<li class="nav-item"><a th:if="${viewSection !=false}" class="nav-link" id="profile-tab"
 						data-toggle="tab" href="#view" role="tab" aria-controls="profile"
-						aria-selected="false">Training Report View</a></li>
+						aria-selected="false">Project Report View</a></li>
 						
 				
    
@@ -73,7 +73,7 @@ font-weight:bold!important;
 											</div>
 											
 											    <div class="form-group">
-													<label for="catIdTR"><b>Select State *</b></label> <select id="stateIdPR"
+													<label for="stateIdPR"><b>Select State *</b></label> <select id="stateIdPR"
 														class="form-control package_input" name="stateIdPR" required="required">
 
 															<option value='0'>Select State</option>
@@ -86,23 +86,14 @@ font-weight:bold!important;
 											</div>
 											 
 											  
-											  <!--div class="form-group">
-													<label for="topicIdTR"><b>Select Topic *</b></label> <select id="topicIdTR"
-														class="form-control package_input" name="topicIdTR" required="required">
-
-															<option value='0'>Select Topic</option>
-														
-								
-													</select>
-
-											</div-->
+											 
 							
 							
 
 										 <input type="hidden" id="allDistrict" name="allDistrict"  th:value="${allDisId}"/>	
-										 <input type="hidden" id="lengthofDistrict" name="lengthofDistrict"  th:value="${districts.size()}"/>	
+										 	
 										
-									<div th:each="dis,iter: ${districts}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
+									<div th:each="dis,iter: ${#numbers.sequence(0,9)}" th:id="${'fileInputDiv' + iter.index}" th:style="${'display: ' + (iter.first ? 'block' : 'none')}" >
 									
 									<div class="container">
 										
@@ -111,9 +102,9 @@ font-weight:bold!important;
 								              
 								               <div class="form-group">
 		               	                 		<label th:if="${iter.index == 0}" th:for="${'districtIdPR' + iter.index}">Select District </label>
-												<select th:id="${'districtIdPR' + iter.index}" class="form-control district-select" name="districtIdPR" th:data-index="${iter.index}">
+												<select th:id="${'districtIdPR' + iter.index}" class="form-control district-select-pr" name="districtIdPR" th:data-index="${iter.index}">
 			  									<option value="0">Select District</option>
-			  									<option th:each="disitr : ${districts}" th:value="${disitr.getId()}" th:text="${disitr.getDistrictName()}"></option>
+			  									
 												</select>
 		  									</div>
 								            

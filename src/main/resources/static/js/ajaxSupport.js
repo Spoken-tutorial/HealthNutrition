@@ -3356,6 +3356,54 @@ $(document).ready(function () {
 
 
 /******************************** Training Resource End ****************************************/
+
+
+/******************************** Project Report Start *****************************/
+
+ $("#stateIdPR").change(function() {
+
+						var stateId = $(this).find(":selected").val();
+						var allDisId = $("#allDistrict").val();
+						
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadDistrictByStateforPR",
+							data : {
+								"stateId" : stateId,
+								"allDisId" : allDisId,
+								
+								
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								html += '<option value="0">Select District</option>';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + value + '>'
+		  			               + key
+		  			               + '</option>';
+		  	  			        })
+	  	  			            
+								$(".district-select-pr").prop('disabled',false);
+								$('.district-select-pr').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+
+
+/******************************** Project Report End *******************************/
 			
 			
 /***************** changes made by om prakash *********************************************/
