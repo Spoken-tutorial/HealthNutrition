@@ -11,7 +11,7 @@ import com.health.model.StateDistrictMapping;
 
 public interface StateDistrictMappingRepository extends JpaRepository<StateDistrictMapping, Integer> {
 
-    StateDistrictMapping findByStateDisId(int topicLanId);
+    StateDistrictMapping findByStateDisId(int stateDisId);
 
     List<StateDistrictMapping> findByDistrict(District district);
 
