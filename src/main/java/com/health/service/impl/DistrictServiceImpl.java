@@ -77,4 +77,10 @@ public class DistrictServiceImpl implements DistrictService {
         return local;
     }
 
+    @Override
+    public Optional<District> findByDistrictNameIgnoreCase(String districtName) {
+
+        return distRepo.findByDistrictNameIgnoreCase(districtName);
+    }
+
 }
