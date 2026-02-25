@@ -6501,7 +6501,9 @@ public class HomeController {
 
         Optional<District> allDis = districtService.findByDistrictNameIgnoreCase(CommonData.ALL_DISTRICTS);
 
-        allDis.ifPresent(dis -> model.addAttribute("allDisId", dis.getId()));
+        int allDisId = allDis.map(District::getId).orElse(0);
+
+        model.addAttribute("allDisId", allDisId);
 
         List<ProjectReport> projectReportList = new ArrayList<>();
         List<ProjectReport> tempProjectReportList = projectReportService.findAll();
@@ -6555,7 +6557,7 @@ public class HomeController {
 
             for (int i = 0; i < districtIds.size(); i++) {
                 if (i < files.size())
-                    logger.info("File: {}", files.get(i));
+                    logger.info("File: {}", files.get(i).getOriginalFilename());
                 if (districtIds.get(i) != 0 && !files.get(i).isEmpty()) {
 
                     District district = districtService.findById(districtIds.get(i));

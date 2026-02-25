@@ -41,10 +41,10 @@ public class State implements Comparable<State>, Serializable {
      */
     private Timestamp dateAdded;
 
-    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<District> Districts = new HashSet<District>();
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<District> districts = new HashSet<District>();
 
-    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Event> events = new HashSet<Event>();
 
     @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -83,11 +83,11 @@ public class State implements Comparable<State>, Serializable {
     }
 
     public Set<District> getDistricts() {
-        return Districts;
+        return districts;
     }
 
     public void setDistricts(Set<District> districts) {
-        Districts = districts;
+        this.districts = districts;
     }
 
     @Override

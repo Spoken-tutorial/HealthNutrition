@@ -2192,6 +2192,38 @@ public class AjaxController {
      * Training Resource End
      *************************************************************/
 
+    /**********************************
+     * Projet Report Start
+     *************************/
+
+    @RequestMapping("/loadDistrictByStateforPR")
+    public @ResponseBody TreeMap<String, Integer> loadDistrictByStateforPR(@RequestParam(value = "stateId") int stateId,
+            @RequestParam(value = "allDisId") int allDisId) {
+        TreeMap<String, Integer> districtMaps = new TreeMap<>();
+
+        if (allDisId != 0) {
+            District allDistrict = disService.findById(allDisId);
+            if (allDistrict != null)
+                districtMaps.put(allDistrict.getDistrictName(), allDistrict.getId());
+
+        }
+
+        State state = stateService.findById(stateId);
+        if (state != null) {
+            List<District> disList = disService.findAllByState(state);
+            for (District temp : disList) {
+
+                districtMaps.put(temp.getDistrictName(), temp.getId());
+
+            }
+
+        }
+
+        return districtMaps;
+    }
+
+    /********************************** Projet Report End *************************/
+
     @RequestMapping("/loadTopicByCategoryInAssignContri")
     public @ResponseBody HashMap<Integer, String> getTopicByCategoryAssignContri(@RequestParam(value = "id") int id) {
 

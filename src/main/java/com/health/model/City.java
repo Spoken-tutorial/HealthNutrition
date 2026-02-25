@@ -46,7 +46,7 @@ public class City implements Comparable<City>, Serializable {
     @JoinColumn(name = "district_id")
     private District district;
 
-    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Event> events = new HashSet<Event>();
 
     public int getId() {

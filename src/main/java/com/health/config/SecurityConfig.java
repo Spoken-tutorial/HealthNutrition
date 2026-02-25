@@ -74,6 +74,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/enableDisableCourseCatTopic", "/delete-category-topic-from-course", "/createCourse",
             "/courseName/edit/**", "/updateCourseName",
 
+            "/addProjectReport", "/projectReportAdminView/**", "/projectReport/edit/**", "/enableDisableProjectReport",
+            "/delete-projectReport",
+
 //			"/unpublishTutorial/**"
 
     };
@@ -102,6 +105,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**", "/updateCourseName",
             "/addTrainingResource", "/trainingReource/view/**", "/trainingReourceAdminView/**",
             "/trainingReource/edit/**", "/enableDisableTrainingResource", "/delete-trainingResource",
+            "/addProjectReport", "/projectReportAdminView/**", "/projectReport/edit/**", "/enableDisableProjectReport",
+            "/delete-projectReport",
 
     };
 

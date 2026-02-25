@@ -1,6 +1,5 @@
 package com.health.service.impl;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,10 +59,8 @@ public class DistrictServiceImpl implements DistrictService {
      */
     @Override
     public List<District> findAll() {
-        // TODO Auto-generated method stub
-        List<District> local = (List<District>) distRepo.findAll();
-        Collections.sort(local);
-        return local;
+
+        return distRepo.findAllOrderByName();
     }
 
     /**
@@ -71,10 +68,8 @@ public class DistrictServiceImpl implements DistrictService {
      */
     @Override
     public List<District> findAllByState(State state) {
-        // TODO Auto-generated method stub
-        List<District> local = distRepo.findAllBystate(state);
-        Collections.sort(local);
-        return local;
+
+        return distRepo.findAllByStateOrderByDistrictNameAsc(state);
     }
 
     @Override
