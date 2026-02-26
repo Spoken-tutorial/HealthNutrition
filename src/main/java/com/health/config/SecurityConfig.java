@@ -46,20 +46,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/tutorial_view/**", "/getConsultantDetails/**", "/reset/**", "/resetPassword/**", "/getCatAndLan/**",
             "/getTopicOnCatAndLan/**", "/getRolesOnCatLanUser/**", "/getTutorial/**", "/statistics", "/statistics/**",
             "/tutCountOnCat/**", "/tutCountOnLan/**", "/cdContentInfo/**", "/getContributorByTutLanUser/**",
-            "/showConsultant/**", "/showLanguages/**", "/unpublishTutorial/**", "/loadTopicByCategory/**",
-            "/loadLanguageByCategoryTopic/**", "/loadTopicAndLanguageByCategory/**",
-            "/loadCategoryAndLanguageByTopic/**", "/loadCategoryAndTopicByLanguage/**", "/tutorialsSearch/**",
-            "/tutorialsSearch1/**", "/checkTutorial/**", "/Slide/**", "/TimeScript/**", "/OriginalScript/**",
-            "/Brochure-English/**", "/Brochure/**", "/ResearchPaper/**", "/downloads",
-            "/loadLanguageByCategoryResource", "/autosuggest/**", "/loadLanguageAndTopicByCategoryResource",
-            "/loadTutorialCountByTopicAndLanguage", "/loadTutorialCountByTopics", "/downloadResources", "/citations",
-            "/api/scriptPublished/**", "/loadLanguageByPackage/**", "/promoVideoView/**", "/trainingModules/**",
-            "/downloadTrainingModules", "/loadMessageByPackageAndLan/**", "/loadLanguageByWeek/**",
-            "/loadWeekByLanguage/**", "/trainingTutorials/**", "/hstTrainingModuleView/**", "/downloadManager/**",
-            "/downloadManagerforhst/**", "/downloadHealthTutorials/**", "/Training-Resource/**",
-            "/Training-Resources/**", "/loadLanAndFileTypeByTopic/**", "/loadTopicAndFileTypeByLan/**",
-            "/loadTopicAndLanByFileType/**", "/downloadTrainingResource/**", "/shared-Training-Resource/**",
-            "/shared-training-resource-file/**", "/check-deployment" };
+            "/showConsultant/**", "/showLanguages/**", "/loadTopicByCategory/**", "/loadLanguageByCategoryTopic/**",
+            "/loadTopicAndLanguageByCategory/**", "/loadCategoryAndLanguageByTopic/**",
+            "/loadCategoryAndTopicByLanguage/**", "/tutorialsSearch/**", "/tutorialsSearch1/**", "/checkTutorial/**",
+            "/Slide/**", "/TimeScript/**", "/OriginalScript/**", "/Brochure-English/**", "/Brochure/**",
+            "/ResearchPaper/**", "/downloads", "/loadLanguageByCategoryResource", "/autosuggest/**",
+            "/loadLanguageAndTopicByCategoryResource", "/loadTutorialCountByTopicAndLanguage",
+            "/loadTutorialCountByTopics", "/downloadResources", "/citations", "/api/scriptPublished/**",
+            "/loadLanguageByPackage/**", "/promoVideoView/**", "/trainingModules/**", "/downloadTrainingModules",
+            "/loadMessageByPackageAndLan/**", "/loadLanguageByWeek/**", "/loadWeekByLanguage/**",
+            "/trainingTutorials/**", "/hstTrainingModuleView/**", "/downloadManager/**", "/downloadManagerforhst/**",
+            "/downloadHealthTutorials/**", "/Training-Resource/**", "/Training-Resources/**",
+            "/loadLanAndFileTypeByTopic/**", "/loadTopicAndFileTypeByLan/**", "/loadTopicAndLanByFileType/**",
+            "/downloadTrainingResource/**", "/shared-Training-Resource/**", "/shared-training-resource-file/**",
+            "/check-deployment" };
 
     /**
      * url matcher for SUPERADMIN
@@ -67,17 +67,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String[] SUPERUSER_URL = { "/addCategory/**", "/updateCategory/**", "/category/edit/**",
             "/addOrganizationRole/**", "/organization_role/edit/**", "/update_organization_role/**", "/addLanguage/**",
             "/language/edit/**", "/updateLanguage/**", "/addRole/**", "/addTopic/**", "/topic/edit/**",
-            "/updateTopic/**", "/uploadQuestion/**", "/question/edit/**", "/updateQuestion/**", "/addBrochure/**",
-            "/addCarousel/**", "/approveRole/**", "/assignTutorialToContributor/**", "/assignContributor/edit/**",
-            "/enableRoleById/**", "/deleteMasterRole/**", "/viewTrainee/**", "/details/**", "/tutorialStatus/**",
-            "/users/**", "/unpublishTopic/**", "/clearAllCaches/**", "/addConsultant/**",
-            "/enableDisableCourseCatTopic", "/delete-category-topic-from-course", "/createCourse",
-            "/courseName/edit/**", "/updateCourseName",
-
-            "/addProjectReport", "/projectReportAdminView/**", "/projectReport/edit/**", "/enableDisableProjectReport",
-            "/delete-projectReport",
-
-//			"/unpublishTutorial/**"
+            "/updateTopic/**", "/uploadQuestion/**", "/question/edit/**", "/updateQuestion/**", "/approveRole/**",
+            "/assignTutorialToContributor/**", "/assignContributor/edit/**", "/enableRoleById/**",
+            "/deleteMasterRole/**", "/viewTrainee/**", "/details/**", "/tutorialStatus/**", "/users/**",
+            "/unpublishTopic/**", "/clearAllCaches/**",
 
     };
 
@@ -98,15 +91,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String[] CONTRIBUTOR_URL = { "/uploadTutorial/**", "/addOutline/**", "/addKeyword**",
             "/addPreRequisticWhenNotRequired/**", "/addPreRequistic/**", "/addVideo/**", "/addSlide/**",
             "/addScript/**", "/listTutorialForContributorReview/**", "/Contributor/review/**", "/uploadTimescript/**",
-            "/addLiveTutorial", "/updateLiveTutorial", "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource",
-            "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
-
-            "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/enableDisableCourseCatTopic",
-            "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**", "/updateCourseName",
-            "/addTrainingResource", "/trainingReource/view/**", "/trainingReourceAdminView/**",
-            "/trainingReource/edit/**", "/enableDisableTrainingResource", "/delete-trainingResource",
-            "/addProjectReport", "/projectReportAdminView/**", "/projectReport/edit/**", "/enableDisableProjectReport",
-            "/delete-projectReport",
 
     };
 
@@ -171,7 +155,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**",
                         "/addCitation/**", "/citation/edit/**", "/enableDisableCourseCatTopic",
                         "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**",
-                        "/updateCourseName", "/addTrainingResource")
+                        "/enableDisablePromoVideo", "/enableDisablePacakgeLanguage", "/enableDisableResearchPaper",
+                        "/enableDisableEvent", "/enableDisableCarousel", "/updateCourseName", "/addTrainingResource",
+                        "/updateCitation", "/updateConsultant", "/updateSpokenVideo", "/updateTrainingResource",
+                        "/updateEvent", "/updatePromoVideo", "/updateBrochure", "/updateResearchPaper",
+                        "/updateCarousel", "/updateTestimonial", "/addLiveTutorial", "/updateLiveTutorial",
+                        "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource", "/trainingReource/view/**",
+                        "/trainingReourceAdminView/**", "/trainingReource/edit/**", "/enableDisableTrainingResource",
+                        "/delete-trainingResource", "/addProjectReport", "/projectReportAdminView/**",
+                        "/projectReport/edit/**", "/enableDisableProjectReport", "/delete-projectReport"
+
+                )
 
                 .hasAnyAuthority("SUPER_USER", "CONTRIBUTOR").antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
                 .authenticated().and().exceptionHandling().accessDeniedPage("/access-denied");
