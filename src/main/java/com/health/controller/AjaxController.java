@@ -72,6 +72,7 @@ import com.health.model.PackLanTutorialResource;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
+import com.health.model.ProjectReport;
 import com.health.model.PromoVideo;
 import com.health.model.ResearchPaper;
 import com.health.model.State;
@@ -110,6 +111,7 @@ import com.health.service.PackLanTutorialResourceService;
 import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
+import com.health.service.ProjectReportService;
 import com.health.service.PromoVideoService;
 import com.health.service.ResearchPaperService;
 import com.health.service.RoleService;
@@ -292,6 +294,9 @@ public class AjaxController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private ProjectReportService projectReportService;
 
     @Value("${downloadLimit}")
     private int downloadLimit;
@@ -2220,6 +2225,31 @@ public class AjaxController {
         }
 
         return districtMaps;
+    }
+
+    @GetMapping("/enableDisableProjectReport")
+    public @ResponseBody boolean enableDisableProjectReport(int projectReportId) {
+        ProjectReport pr = projectReportService.findByProjectReportId(projectReportId);
+
+        try {
+            if (pr.isStatus()) {
+                pr.setStatus(false);
+                projectReportService.save(pr);
+                return true;
+
+            } else {
+                pr.setStatus(true);
+                projectReportService.save(pr);
+                return true;
+
+            }
+
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Project Report: {}", pr, e);
+            return false;
+        }
+
     }
 
     /********************************** Projet Report End *************************/
