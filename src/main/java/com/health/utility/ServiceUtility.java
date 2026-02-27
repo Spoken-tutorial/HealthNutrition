@@ -74,6 +74,7 @@ import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.health.model.ProjectReport;
 import com.health.model.TrainingResource;
 import com.health.model.User;
 import com.health.repository.UserRepository;
@@ -1259,6 +1260,20 @@ public class ServiceUtility {
         logger.info("resultant Path: {}", resultantPath);
 
         return resultantPath;
+    }
+
+    public static boolean hasAnyProjectReportFile(ProjectReport pr) {
+        boolean hasData = true;
+        if ((pr.getPdfPath() == null || pr.getPdfPath().isEmpty())
+                && (pr.getDocPath() == null || pr.getDocPath().isEmpty())
+                && (pr.getExcelPath() == null || pr.getExcelPath().isEmpty())
+                && (pr.getImgPath() == null || pr.getImgPath().isEmpty())) {
+
+            hasData = false;
+        }
+
+        return hasData;
+
     }
 
     public static boolean hasAnyResourceFile(TrainingResource tr) {

@@ -1,6 +1,7 @@
 package com.health.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.health.model.District;
 import com.health.model.State;
@@ -44,5 +45,7 @@ public interface DistrictService {
      * @return list of District object
      */
     List<District> findAllByState(State state);
+
+    Optional<District> findByDistrictNameIgnoreCase(String districtName);
 
 }

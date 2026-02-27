@@ -3356,6 +3356,174 @@ $(document).ready(function () {
 
 
 /******************************** Training Resource End ****************************************/
+
+
+/******************************** Project Report Start *****************************/
+
+ $("#stateIdPR").change(function() {
+
+						var stateId = $(this).find(":selected").val();
+						var allDisId = $("#allDistrict").val();
+						
+
+						$.ajax({
+							type : "GET",
+							url : projectPath+"loadDistrictByStateforPR",
+							data : {
+								"stateId" : stateId,
+								"allDisId" : allDisId,
+								
+								
+							},
+							contentType : "application/json",
+							success : function(result) {
+
+								var html = '';
+								html += '<option value="0">Select District</option>';
+								var len = result.length;
+	  	  			            $.each(result , function( key, value ) {
+		  	  			        html += '<option value=' + value + '>'
+		  			               + key
+		  			               + '</option>';
+		  	  			        })
+	  	  			            
+								$(".district-select-pr").prop('disabled',false);
+								$('.district-select-pr').html(html);
+
+							},
+
+							error : function(err) {
+								console.log("not working. ERROR: "+ JSON.stringify(err));
+
+							}
+
+						});
+
+					});
+
+$('.enableProjetcReport').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableProjectReport",
+					data : {
+						"projectReportId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				$('#'+test_id).addClass('fas fa-times-circle');
+			   				$('#'+test_id).removeClass('fas fa-check-circle');
+			   				$('#'+test_id).css({"color": "red"});
+			   				$('#Success').css({"display": "block"});
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+			
+			$('.disableProjetcReport').click(function() {
+				
+				var test_id=$(this).attr('value');
+				
+				$('#Success').css({"display": "none"});
+				$('#Failure').css({"display": "none"});
+			
+				$.ajax({
+					type : "GET",
+					url : projectPath+"enableDisableProjectReport",
+					data : {
+						"projectReportId" : test_id
+					},
+					contentType : "application/json",
+					success : function(data) {
+						if(data){
+			   				
+			   				$('#'+test_id).addClass('fas fa-check-circle');
+			   				$('#'+test_id).removeClass('fas fa-times-circle');
+			   				$('#'+test_id).css({"color": "green"});
+			   				$('#Success').css({"display": "block"});
+			   				
+			   	
+			   			}else{
+			   				$('#Failure').css({"display": "block"});
+			   			}
+					},
+
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+
+				});
+
+			});
+			
+			
+			
+	$(".deleteProjectReport-btn").click(function(){
+    var row = $(this).closest("tr");
+    var projectReportId = $(this).data("projectreportid"); 
+    var stateName = $(this).data("statename");
+    var districtName = $(this).data("districtname");
+    var fileName = $(this).data("filename");
+    var fileType = $(this).data("filetype");
+    
+
+    Swal.fire({
+        title: "Are you sure?",
+        html: "<b>Do you want to delete this Project Report?</b><br><br>" +
+              "<b>State:</b> " + stateName + "<br>" +
+              "<b>District:</b> " + districtName + "<br>" +
+              "<b>file Type:</b> " + fileType + "<br>" +
+              "<b>file Name:</b> " + fileName,
+             
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        dangerMode: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/delete-projectReport/",
+                data: {
+                   
+                   
+                    "projectReportId": projectReportId,
+                    "fileType": fileType
+                },
+                type: "DELETE",
+                success: function(result) {
+                    Swal.fire("Deleted!", "Deleted successfully!", "success");
+                   $("#" + fileType + projectReportId).text("Deleted");
+                },
+                error: function(err) {
+                    Swal.fire("Error!", "Error in deleting!", "error");
+                }
+            });
+        }
+    });
+});
+    
+
+			
+
+/******************************** Project Report End *******************************/
 			
 			
 /***************** changes made by om prakash *********************************************/

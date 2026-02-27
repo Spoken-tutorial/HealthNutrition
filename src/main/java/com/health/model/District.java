@@ -50,11 +50,22 @@ public class District implements Comparable<District>, Serializable {
     @JoinColumn(name = "state_id")
     private State state;
 
-    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<City> cities = new HashSet<City>();
 
-    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<Event> events = new HashSet<Event>();
+
+    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<StateDistrictMapping> stateDistrictMappings = new HashSet<StateDistrictMapping>();
+
+    public Set<StateDistrictMapping> getStateDistrictMappings() {
+        return stateDistrictMappings;
+    }
+
+    public void setStateDistrictMappings(Set<StateDistrictMapping> stateDistrictMappings) {
+        this.stateDistrictMappings = stateDistrictMappings;
+    }
 
     public int getId() {
         return id;
