@@ -6546,6 +6546,7 @@ public class HomeController {
 
         State state = stateService.findById(stateId);
         String stateName = state.getStateName();
+        String state_dir = stateName.replace(" ", "_");
 
         Timestamp dateAdded = ServiceUtility.getCurrentTime();
 
@@ -6610,8 +6611,10 @@ public class HomeController {
                         projectReportService.save(pr); // Saved first to get exact Id
                         int prId = pr.getProjectReportId();
 
-                        Path rootPath = Paths.get(CommonData.uploadProjectReport, String.valueOf(prId), stateName,
-                                districtName);
+                        String district_dir = districtName.replace(" ", "_");
+
+                        Path rootPath = Paths.get(CommonData.uploadProjectReport, String.valueOf(prId), state_dir,
+                                district_dir);
 
                         String pdfFolder = Paths.get(rootPath.toString(), "pdf").toString();
                         String docFolder = Paths.get(rootPath.toString(), "docx_or_odt").toString();
