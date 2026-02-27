@@ -3473,6 +3473,55 @@ $('.enableProjetcReport').click(function() {
 
 			});
 			
+			
+			
+	$(".deleteProjectReport-btn").click(function(){
+    var row = $(this).closest("tr");
+    var projectReportId = $(this).data("projectreportid"); 
+    var stateName = $(this).data("statename");
+    var districtName = $(this).data("districtname");
+    var fileName = $(this).data("filename");
+    var fileType = $(this).data("filetype");
+    
+
+    Swal.fire({
+        title: "Are you sure?",
+        html: "<b>Do you want to delete this Project Report?</b><br><br>" +
+              "<b>State:</b> " + stateName + "<br>" +
+              "<b>District:</b> " + districtName + "<br>" +
+              "<b>file Type:</b> " + fileType + "<br>" +
+              "<b>file Name:</b> " + fileName,
+             
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        dangerMode: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/delete-projectReport/",
+                data: {
+                   
+                   
+                    "projectReportId": projectReportId,
+                    "fileType": fileType
+                },
+                type: "DELETE",
+                success: function(result) {
+                    Swal.fire("Deleted!", "Deleted successfully!", "success");
+                   $("#" + fileType + projectReportId).text("Deleted");
+                },
+                error: function(err) {
+                    Swal.fire("Error!", "Error in deleting!", "error");
+                }
+            });
+        }
+    });
+});
+    
+
+			
 
 /******************************** Project Report End *******************************/
 			
