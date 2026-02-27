@@ -2252,6 +2252,54 @@ public class AjaxController {
 
     }
 
+    @RequestMapping("/delete-projectReport")
+    public ResponseEntity<String> deleteProjectReport(@RequestParam("projectReportId") int projectReportId,
+            @RequestParam("fileType") String fileType) {
+
+        try {
+            ProjectReport pr = projectReportService.findByProjectReportId(projectReportId);
+            String filePath = "";
+            if (pr != null) {
+                switch (fileType.toLowerCase()) {
+                case "image":
+                    filePath = pr.getImgPath();
+                    pr.setImgPath("");
+                    break;
+                case "pdf":
+                    filePath = pr.getPdfPath();
+                    pr.setPdfPath("");
+                    break;
+                case "doc":
+                    filePath = pr.getDocPath();
+                    pr.setDocPath("");
+                    break;
+                case "excel":
+                    filePath = pr.getExcelPath();
+                    pr.setExcelPath("");
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Unsupported file type: " + fileType);
+                }
+
+                if (!filePath.isEmpty() && filePath.endsWith(".zip")) {
+                    String extractDir = filePath.replace(".zip", "");
+
+                    Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
+                    FileUtils.deleteDirectory(extractDirPath.toFile());
+                }
+
+                projectReportService.save(pr);
+                return ResponseEntity.ok("Deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Project Report not found");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in deleting project report", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error in deleting!");
+        }
+    }
+
     /********************************** Projet Report End *************************/
 
     @RequestMapping("/loadTopicByCategoryInAssignContri")

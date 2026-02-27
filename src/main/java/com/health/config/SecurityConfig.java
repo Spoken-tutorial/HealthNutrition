@@ -149,21 +149,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/addBrochure/**", "/addCarousel/**", "/addConsultant/**", "/addEvent/**",
                         "/addTestimonial/**", "/addPromoVideo/**", "/addResearchPaper/**", "/brochure/edit/**",
                         "/promoVideo/edit/**", "/carousel/edit/**", "/event/edit/**", "/testimonial/edit/**",
-                        "/createPackage", "/packageName/edit/**", "/updatePackageName", "/weekTitleVideo/editTitle/**",
+                        "/createPackage/**", "/packageName/edit/**", "/updatePackageName/**",
+                        "/weekTitleVideo/editTitle/**",
 
-                        "/updateTitle", "/weekTitleVideo/editWeek/**", "/updateWeek", "/researchPaper/edit/**",
+                        "/updateTitle/**", "/weekTitleVideo/editWeek/**", "/updateWeek/**", "/researchPaper/edit/**",
                         "/enableDisableBrouchure/**", "/enableDisableConsultant/**", "/enableDisableTestimonial/**",
-                        "/addCitation/**", "/citation/edit/**", "/enableDisableCourseCatTopic",
-                        "/delete-category-topic-from-course", "/createCourse", "/courseName/edit/**",
-                        "/enableDisablePromoVideo", "/enableDisablePacakgeLanguage", "/enableDisableResearchPaper",
-                        "/enableDisableEvent", "/enableDisableCarousel", "/updateCourseName", "/addTrainingResource",
-                        "/updateCitation", "/updateConsultant", "/updateSpokenVideo", "/updateTrainingResource",
-                        "/updateEvent", "/updatePromoVideo", "/updateBrochure", "/updateResearchPaper",
-                        "/updateCarousel", "/updateTestimonial", "/addLiveTutorial", "/updateLiveTutorial",
-                        "/addSpokenVideo", "/spokenVideo/edit/**", "/addVideoResource", "/trainingReource/view/**",
-                        "/trainingReourceAdminView/**", "/trainingReource/edit/**", "/enableDisableTrainingResource",
-                        "/delete-trainingResource", "/addProjectReport", "/projectReportAdminView/**",
-                        "/projectReport/edit/**", "/enableDisableProjectReport", "/delete-projectReport"
+                        "/addCitation/**", "/citation/edit/**", "/enableDisableCourseCatTopic/**",
+                        "/delete-category-topic-from-course/**", "/createCourse/**", "/courseName/edit/**",
+                        "/enableDisablePromoVideo/**", "/enableDisablePacakgeLanguage/**",
+                        "/enableDisableResearchPaper/**", "/enableDisableEvent/**", "/enableDisableCarousel/**",
+                        "/updateCourseName/**", "/addTrainingResource/**", "/updateCitation/**", "/updateConsultant/**",
+                        "/updateSpokenVideo/**", "/updateTrainingResource/**", "/updateEvent/**",
+                        "/updatePromoVideo/**", "/updateBrochure/**", "/updateResearchPaper/**", "/updateCarousel/**",
+                        "/updateTestimonial/**", "/addLiveTutorial/**", "/updateLiveTutorial/**", "/addSpokenVideo/**",
+                        "/spokenVideo/edit/**", "/addVideoResource/**", "/trainingReource/view/**",
+                        "/trainingReourceAdminView/**", "/trainingReource/edit/**", "/enableDisableTrainingResource/**",
+                        "/delete-trainingResource/**", "/addProjectReport/**", "/projectReportAdminView/**",
+                        "/projectReport/edit/**", "/enableDisableProjectReport/**", "/delete-projectReport/**"
 
                 )
 
