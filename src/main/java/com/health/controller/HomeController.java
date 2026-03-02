@@ -6973,6 +6973,73 @@ public class HomeController {
         return addProjectReportGet(req, principal, model);
     }
 
+    @GetMapping("/projectReport/edit/{fileType}/{id}")
+    public String projectReportEditGet(@PathVariable String fileType, @PathVariable int id, HttpServletRequest req,
+            Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        ProjectReport pr = projectReportService.findByProjectReportId(id);
+
+        if (pr == null) {
+
+            return "redirect:/addProjectReport";
+        }
+        State state = pr.getStateDistrictMapping().getState();
+        District district = pr.getStateDistrictMapping().getDistrict();
+        List<State> states = stateService.findAll();
+
+        List<ProjectReport> projectReportList = new ArrayList<>();
+        List<ProjectReport> tempProjectReportList = projectReportService.findAll();
+        for (ProjectReport temp : tempProjectReportList) {
+            if (ServiceUtility.hasAnyProjectReportFile(temp)) {
+                projectReportList.add(temp);
+            }
+        }
+        model.addAttribute("states", states);
+        model.addAttribute("projectReportList", projectReportList);
+        model.addAttribute("ProjectReport", pr);
+        model.addAttribute("state", state);
+        model.addAttribute("district", district);
+
+        model.addAttribute("id", id);
+        String filePath = "";
+
+        if (fileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+            filePath = pr.getDocPath();
+            model.addAttribute("fileType", "Doc");
+
+        }
+
+        else if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+            filePath = pr.getPdfPath();
+            model.addAttribute("fileType", "Pdf");
+        }
+
+        else if (fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            filePath = pr.getImgPath();
+            model.addAttribute("fileType", "Image");
+        }
+
+        else if (fileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+            filePath = pr.getExcelPath();
+            model.addAttribute("fileType", "Excel");
+        }
+
+        if (filePath.toLowerCase().endsWith(".zip")) {
+            model.addAttribute("zipFile", filePath);
+        }
+
+        else {
+            model.addAttribute("nonZipFile", filePath);
+
+        }
+
+        return "updateProjectReport";
+    }
+
     /************************ Project Report End ********************************/
 
     @GetMapping("/trainingModules")
