@@ -90,7 +90,7 @@
                         <a name="trdownload"
                            class="btn btn-outline-primary btn-lg"
                            target="_blank"
-                           th:href="@{/files/{path}(path=${filePath})}"
+                            th:href="@{/downloadTrainingResource(fileType=${fileTypeString}, token=${token})}"
                            th:id="'trdownload_' + ${fileTypeString.toLowerCase()}">
                             <i class="fas fa-file-download mr-2"></i>
                             Download

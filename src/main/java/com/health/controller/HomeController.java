@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -6285,6 +6283,7 @@ public class HomeController {
         model.addAttribute("topicName", topic_name);
         model.addAttribute("langName", lang_name);
         model.addAttribute("fileTypeString", fileType);
+        model.addAttribute("token", token);
 
         Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
         String fileName = path.getFileName().toString();
@@ -6522,9 +6521,14 @@ public class HomeController {
                     String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1)
                             : baseUrl;
 
-                    return "redirect:" + normalizedBaseUrl + "/downloadTrainingResource?filePath="
-                            + URLEncoder.encode(finalUrl, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
+                    // return "redirect:" + normalizedBaseUrl +
+                    // "/downloadTrainingResource?filePath="
+                    // + URLEncoder.encode(finalUrl, "UTF-8");
+
+                    return "redirect:" + normalizedBaseUrl + "/downloadTrainingResource?fileType=" + fileTypeString
+                            + "&token=" + token;
+
+                } catch (Exception e) {
                     logger.error("Error in Download Package", e);
                 }
             }

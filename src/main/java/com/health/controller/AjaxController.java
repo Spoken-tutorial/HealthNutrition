@@ -2133,10 +2133,79 @@ public class AjaxController {
 
     }
 
+    /*
+     * @GetMapping("/downloadTrainingResource") public ResponseEntity<Resource>
+     * downloadTrainingResourcePost(@RequestParam(name = "filePath") String
+     * filePath) {
+     * 
+     * try {
+     * 
+     * String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+     * 
+     * Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+     * finalUrl);
+     * 
+     * if (!Files.exists(path)) { return
+     * ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); }
+     * 
+     * Resource resource = new UrlResource(path.toUri());
+     * 
+     * String contentType = Files.probeContentType(path); if (contentType == null) {
+     * contentType = "application/octet-stream"; }
+     * 
+     * String originalFilename = path.getFileName().toString();
+     * 
+     * String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+     * 
+     * String encodedFilename = URLEncoder.encode(safeFilename,
+     * "UTF-8").replace("+", "%20");
+     * 
+     * return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+     * .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" +
+     * encodedFilename) .body(resource);
+     * 
+     * } catch (Exception e) { logger.error("Error in download", e); return
+     * ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build(); } }
+     */
+
     @GetMapping("/downloadTrainingResource")
-    public ResponseEntity<Resource> downloadTrainingResourcePost(@RequestParam(name = "filePath") String filePath) {
+    public ResponseEntity<Resource> downloadTrainingResource(@RequestParam(name = "fileType") String fileTypeString,
+            @RequestParam(name = "token") String token) {
 
         try {
+
+            int fileType = ServiceUtility.getFileTypeIdByValue(fileTypeString);
+            TrainingResource tr = null;
+
+            if (fileType == CommonData.DOC) {
+                tr = trainingResourceService.findByDocToken(token);
+            } else if (fileType == CommonData.EXCEL) {
+                tr = trainingResourceService.findByExcelToken(token);
+            } else if (fileType == CommonData.PDF) {
+                tr = trainingResourceService.findByPdfToken(token);
+            } else if (fileType == CommonData.IMAGE) {
+                tr = trainingResourceService.findByImgToken(token);
+            }
+
+            if (tr == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            String filePath = null;
+
+            if (fileType == CommonData.DOC) {
+                filePath = tr.getDocPath();
+            } else if (fileType == CommonData.EXCEL) {
+                filePath = tr.getExcelPath();
+            } else if (fileType == CommonData.PDF) {
+                filePath = tr.getPdfPath();
+            } else if (fileType == CommonData.IMAGE) {
+                filePath = tr.getImgPath();
+            }
+
+            if (filePath == null || filePath.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
 
             String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
 
@@ -2164,7 +2233,7 @@ public class AjaxController {
                     .body(resource);
 
         } catch (Exception e) {
-            logger.error("Error in download", e);
+            logger.error("Error while downloading training resource", e);
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
         }
     }
