@@ -17,4 +17,15 @@ public interface TrainingResourceRepository extends JpaRepository<TrainingResour
 
     List<TrainingResource> findAllByStatusTrue();
 
+    TrainingResource findByPdfToken(String pdfToken);
+
+    TrainingResource findByDocToken(String docToken);
+
+    TrainingResource findByExcelToken(String excelToken);
+
+    TrainingResource findByImgToken(String docToken);
+
+    boolean existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(String pdfToken, String docToken, String excelToken,
+            String imgToken);
+
 }

@@ -21,4 +21,15 @@ public interface TrainingResourceService {
 
     void saveAll(List<TrainingResource> trainingResourceList);
 
+    TrainingResource findByPdfToken(String pdfToken);
+
+    TrainingResource findByDocToken(String docToken);
+
+    TrainingResource findByExcelToken(String excelToken);
+
+    TrainingResource findByImgToken(String imgToken);
+
+    boolean existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(String pdfToken, String docToken, String excelToken,
+            String imgToken);
+
 }

@@ -18,12 +18,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -77,6 +79,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.health.model.TrainingResource;
 import com.health.model.User;
 import com.health.repository.UserRepository;
+import com.health.service.TrainingResourceService;
 import com.health.threadpool.TimeoutOutputStream;
 
 /**
@@ -99,6 +102,9 @@ public class ServiceUtility {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private TrainingResourceService trainingResourceService;
 
     public static Timestamp getCurrentTime() { // Current Date
 
@@ -1259,6 +1265,13 @@ public class ServiceUtility {
         logger.info("resultant Path: {}", resultantPath);
 
         return resultantPath;
+    }
+
+    public static String generateToken() {
+        byte[] bytes = new byte[8];
+        new SecureRandom().nextBytes(bytes);
+
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).substring(0, 10);
     }
 
     public static boolean hasAnyResourceFile(TrainingResource tr) {
