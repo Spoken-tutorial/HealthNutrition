@@ -3,6 +3,7 @@ package com.health.model;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.health.utility.CommonData;
 
 @Entity
 @Table(name = "training_resource")
@@ -208,6 +211,13 @@ public class TrainingResource implements Serializable {
 
     public void setDateAdded(Timestamp dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public boolean isAfterImplementationDate() {
+
+        LocalDate resourceDate = this.dateAdded.toLocalDateTime().toLocalDate();
+
+        return !resourceDate.isBefore(CommonData.IMPL_DATE_TRAINING_RESOURCE);
     }
 
     public TrainingResource(Timestamp dateAdded, TopicLanMapping topicLanMapping, Category category, String pdfPath,

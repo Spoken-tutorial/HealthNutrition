@@ -228,8 +228,8 @@
                              ? @{${baseUrl} + '/shared-Training-Resource/'
                                  + ${topicName} + '/'
                                  + ${fileTypeString} + '/'
-                                 + ${langName} + '/'
-                                 + ${trId}}
+                                 + ${langName} 
+                                 + '?token=' + ${token}}
                              : ''">
 						</div>
 
@@ -242,8 +242,8 @@
                                  ? @{${baseUrl} + '/shared-training-resource-file/'
                                      + ${topicName} + '/'
                                      + ${fileTypeString} + '/'
-                                     + ${langName} + '/'
-                                     + ${trId}}
+                                     + ${langName} 
+                                     + '?token=' + ${token}}
                                  : ''">
 							</div>
 
