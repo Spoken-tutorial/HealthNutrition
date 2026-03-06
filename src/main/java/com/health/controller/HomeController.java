@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +30,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -6300,7 +6304,7 @@ public class HomeController {
         model.addAttribute("isZipFile", isZipFile);
         String res = ServiceUtility.convertFilePathToUrl(filePath);
 
-        model.addAttribute("filePath", res);
+        // model.addAttribute("filePath", res);
 
         if (res == null || res.trim().isEmpty()) {
 
@@ -6310,7 +6314,17 @@ public class HomeController {
             return "sharedTrainingResource";
         }
         res = ServiceUtility.convertFilePathToUrlWithUTFforBrowserRedirect(filePath);
-        return "redirect:/files/" + res;
+        String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        String encodedFileName = "";
+        try {
+            encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+
+            logger.error("Exception", e);
+        }
+
+        return "redirect:" + normalizedBaseUrl + "/training-resources/view-share/" + topicName + "/" + langName + "/"
+                + fileType + "/" + token + "/" + 0 + "/" + encodedFileName;
     }
 
     @GetMapping("/shared-Training-Resource/{topicName}/{fileType}/{langName}/{trId}")
@@ -6498,7 +6512,6 @@ public class HomeController {
         } else if (fileTypeString.equals("Image")) {
             token = tr.getImgToken();
         }
-        model.addAttribute("token", token);
 
         String filePath = ServiceUtility.getTrainingResourceFilePath(tr, inputFileType);
         if (filePath.isEmpty()) {
@@ -6508,10 +6521,23 @@ public class HomeController {
         }
 
         String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+        boolean allowed = true;
+
+        if ((fileTypeString.equals("Doc") || fileTypeString.equals("Excel")) && (usr == null || !authorizedUsr)) {
+
+            allowed = false;
+
+        }
+
+        if (allowed) {
+            model.addAttribute("token", token);
+        } else {
+            model.addAttribute("token", "");
+        }
 
         if (action != null && !action.isEmpty() && action.equals("download")) {
             model.addAttribute("action", action);
-            if ((fileTypeString.equals("Doc") || fileTypeString.equals("Excel")) && (usr == null || !authorizedUsr)) {
+            if (!allowed) {
 
                 model.addAttribute("error_msg", "Authentication Error");
 
@@ -6573,7 +6599,22 @@ public class HomeController {
                 filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
 
             }
-            model.addAttribute("filePaths", filePaths);
+            List<String> fileNames = new ArrayList<>();
+            for (String str : filePaths) {
+
+                Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), str);
+                String fileName = path.getFileName().toString();
+
+                fileNames.add(fileName);
+
+            }
+            List<Integer> pageIndexes = IntStream.range(0, filePaths.size()).boxed().collect(Collectors.toList());
+
+            if (allowed) {
+                model.addAttribute("pageIndexes", pageIndexes);
+                // model.addAttribute("filePaths", filePaths);
+                model.addAttribute("fileNames", fileNames);
+            }
 
             model.addAttribute("action", action);
         }
@@ -6581,8 +6622,8 @@ public class HomeController {
         if (action != null && !action.isEmpty() && action.equals("share")) {
 
             model.addAttribute("action", action);
-
-            model.addAttribute("shareUrl", finalUrl);
+            if (allowed)
+                model.addAttribute("shareUrl", finalUrl);
 
         }
 
