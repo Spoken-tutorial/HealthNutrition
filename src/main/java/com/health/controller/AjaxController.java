@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -42,6 +43,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -2133,10 +2135,79 @@ public class AjaxController {
 
     }
 
+    /*
+     * @GetMapping("/downloadTrainingResource") public ResponseEntity<Resource>
+     * downloadTrainingResourcePost(@RequestParam(name = "filePath") String
+     * filePath) {
+     * 
+     * try {
+     * 
+     * String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+     * 
+     * Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+     * finalUrl);
+     * 
+     * if (!Files.exists(path)) { return
+     * ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); }
+     * 
+     * Resource resource = new UrlResource(path.toUri());
+     * 
+     * String contentType = Files.probeContentType(path); if (contentType == null) {
+     * contentType = "application/octet-stream"; }
+     * 
+     * String originalFilename = path.getFileName().toString();
+     * 
+     * String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+     * 
+     * String encodedFilename = URLEncoder.encode(safeFilename,
+     * "UTF-8").replace("+", "%20");
+     * 
+     * return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+     * .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" +
+     * encodedFilename) .body(resource);
+     * 
+     * } catch (Exception e) { logger.error("Error in download", e); return
+     * ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build(); } }
+     */
+
     @GetMapping("/downloadTrainingResource")
-    public ResponseEntity<Resource> downloadTrainingResourcePost(@RequestParam(name = "filePath") String filePath) {
+    public ResponseEntity<Resource> downloadTrainingResource(@RequestParam(name = "fileType") String fileTypeString,
+            @RequestParam(name = "token") String token) {
 
         try {
+
+            int fileType = ServiceUtility.getFileTypeIdByValue(fileTypeString);
+            TrainingResource tr = null;
+
+            if (fileType == CommonData.DOC) {
+                tr = trainingResourceService.findByDocToken(token);
+            } else if (fileType == CommonData.EXCEL) {
+                tr = trainingResourceService.findByExcelToken(token);
+            } else if (fileType == CommonData.PDF) {
+                tr = trainingResourceService.findByPdfToken(token);
+            } else if (fileType == CommonData.IMAGE) {
+                tr = trainingResourceService.findByImgToken(token);
+            }
+
+            if (tr == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            String filePath = null;
+
+            if (fileType == CommonData.DOC) {
+                filePath = tr.getDocPath();
+            } else if (fileType == CommonData.EXCEL) {
+                filePath = tr.getExcelPath();
+            } else if (fileType == CommonData.PDF) {
+                filePath = tr.getPdfPath();
+            } else if (fileType == CommonData.IMAGE) {
+                filePath = tr.getImgPath();
+            }
+
+            if (filePath == null || filePath.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
 
             String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
 
@@ -2164,7 +2235,80 @@ public class AjaxController {
                     .body(resource);
 
         } catch (Exception e) {
-            logger.error("Error in download", e);
+            logger.error("Error while downloading training resource", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/training-resources/view-share/{topic}/{lang}/{fileType}/{token}/{page}/{fileName}")
+    public ResponseEntity<Resource> viewOrSharePdfOrImage(@PathVariable String topic, @PathVariable String lang,
+            @PathVariable String fileType, @PathVariable String token, @PathVariable int page,
+            @PathVariable String fileName) {
+
+        try {
+
+            int fileTypeId = ServiceUtility.getFileTypeIdByValue(fileType);
+
+            TrainingResource tr = null;
+            if (fileTypeId == CommonData.PDF) {
+                tr = trainingResourceService.findByPdfToken(token);
+            } else if (fileTypeId == CommonData.IMAGE) {
+                tr = trainingResourceService.findByImgToken(token);
+            }
+
+            if (tr == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String filePath = ServiceUtility.getTrainingResourceFilePath(tr, fileTypeId);
+
+            List<String> filePaths = new ArrayList<>();
+            if (filePath.toLowerCase().endsWith(".zip")) {
+                List<String> extracted = ServiceUtility.extractZipIfNeeded(filePath, env);
+                List<String> sorted = ServiceUtility.sortFilePathsNumericOtherwiseLexical(extracted);
+
+                if (fileType.equalsIgnoreCase("Pdf")) {
+                    for (String str : sorted) {
+                        if (!str.endsWith(".png")) {
+                            filePaths.add(str);
+                        }
+                    }
+                } else {
+                    filePaths.addAll(sorted);
+                }
+
+            } else {
+                filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+            }
+
+            if (page < 0 || page >= filePaths.size()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String finalFilePath = filePaths.get(page);
+            Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), finalFilePath);
+
+            if (!Files.exists(path)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            String originalFilename = path.getFileName().toString();
+            String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+            String encodedFilename = URLEncoder.encode(safeFilename, "UTF-8").replace("+", "%20");
+
+            InputStreamResource resource = new InputStreamResource(Files.newInputStream(path));
+
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename*=UTF-8''" + encodedFilename)
+                    .body(resource);
+
+        } catch (Exception e) {
+            logger.error("Error viewing shared file", e);
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -3,6 +3,7 @@ package com.health.model;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.health.utility.CommonData;
 
 @Entity
 @Table(name = "training_resource")
@@ -49,6 +52,18 @@ public class TrainingResource implements Serializable {
 
     @Column(name = "img_path", length = 1000)
     private String imgPath;
+
+    @Column(unique = true, length = 1000)
+    private String pdfToken;
+
+    @Column(unique = true, length = 1000)
+    private String docToken;
+
+    @Column(unique = true, length = 1000)
+    private String imgToken;
+
+    @Column(unique = true, length = 1000)
+    private String excelToken;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -126,6 +141,38 @@ public class TrainingResource implements Serializable {
         this.user = user;
     }
 
+    public String getPdfToken() {
+        return pdfToken;
+    }
+
+    public void setPdfToken(String pdfToken) {
+        this.pdfToken = pdfToken;
+    }
+
+    public String getDocToken() {
+        return docToken;
+    }
+
+    public void setDocToken(String docToken) {
+        this.docToken = docToken;
+    }
+
+    public String getImgToken() {
+        return imgToken;
+    }
+
+    public void setImgToken(String imgToken) {
+        this.imgToken = imgToken;
+    }
+
+    public String getExcelToken() {
+        return excelToken;
+    }
+
+    public void setExcelToken(String excelToken) {
+        this.excelToken = excelToken;
+    }
+
     public String getPdfFileNameWithorWitoutZip() {
         if (pdfPath == null || pdfPath.trim().isEmpty()) {
             return "NA";
@@ -164,6 +211,31 @@ public class TrainingResource implements Serializable {
 
     public void setDateAdded(Timestamp dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public boolean isAfterImplementationDate() {
+
+        LocalDate resourceDate = this.dateAdded.toLocalDateTime().toLocalDate();
+
+        return !resourceDate.isBefore(CommonData.IMPL_DATE_TRAINING_RESOURCE);
+    }
+
+    public TrainingResource(Timestamp dateAdded, TopicLanMapping topicLanMapping, Category category, String pdfPath,
+            String docPath, String excelPath, String imgPath, String pdfToken, String docToken, String imgToken,
+            String excelToken, User user) {
+        super();
+        this.dateAdded = dateAdded;
+        this.topicLanMapping = topicLanMapping;
+        this.category = category;
+        this.pdfPath = pdfPath;
+        this.docPath = docPath;
+        this.excelPath = excelPath;
+        this.imgPath = imgPath;
+        this.pdfToken = pdfToken;
+        this.docToken = docToken;
+        this.imgToken = imgToken;
+        this.excelToken = excelToken;
+        this.user = user;
     }
 
     public TrainingResource(Timestamp dateAdded, TopicLanMapping topicLanMapping, String pdfPath, String docPath,
