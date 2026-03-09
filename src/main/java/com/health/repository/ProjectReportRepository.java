@@ -18,4 +18,15 @@ public interface ProjectReportRepository extends JpaRepository<ProjectReport, In
 
     List<ProjectReport> findAllByStatusTrue();
 
+    ProjectReport findByPdfToken(String pdfToken);
+
+    ProjectReport findByDocToken(String docToken);
+
+    ProjectReport findByExcelToken(String excelToken);
+
+    ProjectReport findByImgToken(String docToken);
+
+    boolean existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(String pdfToken, String docToken, String excelToken,
+            String imgToken);
+
 }
