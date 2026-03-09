@@ -316,7 +316,10 @@ public class CommonData {
     public static final String image_OR_ZIP_OF_IMAGES = "imageOrZipOfImages";
     public static final String PDF_OR_ZIP_OF_PDFS = "pdfOrZipOfPdfs";
     public static final String Excel_OR_ZIP_OF_EXCELS = "excelOrZipOfexcels";
+
     public static final LocalDate IMPL_DATE_TRAINING_RESOURCE = LocalDate.of(2026, 3, 5);
+
+    public static final String ALL_DISTRICTS = "All Districts";
 
     public static final String DOCUMENT_ID_TUTORIAL_TIMESCRIPT = "Tts";
     public static final String DOCUMENT_ID_TUTORIAL_ORIGINAL_SCRIPT = "Tos";

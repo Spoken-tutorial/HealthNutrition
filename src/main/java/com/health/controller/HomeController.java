@@ -6716,6 +6716,8 @@ public class HomeController {
         Timestamp dateAdded = ServiceUtility.getCurrentTime();
 
         Set<District> addedDistrict = new HashSet<>();
+        Map<String, Set<String>> ErrorsforExistingFiles = new LinkedHashMap<>();
+        boolean savedFlag = false;
 
         try {
 
@@ -6728,6 +6730,18 @@ public class HomeController {
 
                     if (district != null) {
                         String districtName = district.getDistrictName();
+                        if (!CommonData.ALL_DISTRICTS.equalsIgnoreCase(districtName)) {
+                            int tempStateId = district.getState().getId();
+                            if (stateId != tempStateId) {
+                                viewSection = true;
+                                model.addAttribute("viewSection", viewSection);
+                                model.addAttribute("error_msg", "District does not belong to the selected state");
+                                return addProjectReportGet(req, principal, model);
+                            }
+                        }
+
+                        Set<String> existingFiles = ErrorsforExistingFiles.computeIfAbsent(districtName,
+                                k -> new LinkedHashSet<>());
                         StateDistrictMapping stateDistrictMapping = stateDistrictMappingService
                                 .findByStateAndDistrict(state, district);
 
@@ -6787,6 +6801,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.PDF_EXTENSION)) {
                             if (oldPRFlag) {
                                 oldPath = pr.getPdfPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.PDF_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                             pr.setPdfPath(document);
@@ -6795,6 +6813,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.DOC_EXTENSION)) {
                             if (oldPRFlag) {
                                 oldPath = pr.getDocPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.DOC_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                             pr.setDocPath(document);
@@ -6803,6 +6825,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)) {
                             if (oldPRFlag) {
                                 oldPath = pr.getExcelPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.EXCEL_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                             pr.setExcelPath(document);
@@ -6811,6 +6837,10 @@ public class HomeController {
                         else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)) {
                             if (oldPRFlag) {
                                 oldPath = pr.getImgPath();
+                                if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                    existingFiles.add(CommonData.IMAGE_EXTENSION);
+                                    continue;
+                                }
                             }
                             document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                             pr.setImgPath(document);
@@ -6824,6 +6854,10 @@ public class HomeController {
                                     if (ext.equals(CommonData.PDF_EXTENSION)) {
                                         if (oldPRFlag) {
                                             oldPath = pr.getPdfPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.PDF_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
                                         pr.setPdfPath(document);
@@ -6832,6 +6866,10 @@ public class HomeController {
                                     else if (ext.equals(CommonData.DOC_EXTENSION)) {
                                         if (oldPRFlag) {
                                             oldPath = pr.getDocPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.DOC_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, docFolder);
                                         pr.setDocPath(document);
@@ -6840,6 +6878,10 @@ public class HomeController {
                                     else if (ext.equals(CommonData.EXCEL_EXTENSION)) {
                                         if (oldPRFlag) {
                                             oldPath = pr.getExcelPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.EXCEL_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
                                         pr.setExcelPath(document);
@@ -6848,6 +6890,10 @@ public class HomeController {
                                     else if (ext.equals(CommonData.IMAGE_EXTENSION)) {
                                         if (oldPRFlag) {
                                             oldPath = pr.getImgPath();
+                                            if (oldPath != null && !oldPath.trim().isEmpty()) {
+                                                existingFiles.add(CommonData.IMAGE_EXTENSION);
+                                                continue;
+                                            }
                                         }
                                         document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
                                         pr.setImgPath(document);
@@ -6875,17 +6921,14 @@ public class HomeController {
 
                         }
 
-                        if (oldPath != null && oldPath.endsWith(".zip")) {
+                        if (oldPath != null && !oldPath.trim().isEmpty()) {
 
-                            String extractDir = oldPath.replace(".zip", "");
-
-                            Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
-                                    extractDir);
-                            FileUtils.deleteDirectory(extractDirPath.toFile());
-
+                            continue;
                         }
+
                         pr.setUser(usr);
                         projectReportService.save(pr);
+                        savedFlag = true;
 
                     }
 
@@ -6900,7 +6943,24 @@ public class HomeController {
         }
 
         model.addAttribute("viewSection", viewSection);
-        model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        StringBuilder errorMsg = new StringBuilder();
+
+        for (Map.Entry<String, Set<String>> entry : ErrorsforExistingFiles.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                errorMsg.append(entry.getKey()).append(": ").append(String.join(", ", entry.getValue())).append("<br>");
+            }
+        }
+
+        if (errorMsg.length() > 0) {
+
+            String finalErrorMessage = "The following files types already exist. To update them, please go to the Edit section.”:<br>"
+                    + errorMsg.toString();
+            model.addAttribute("error_msg", finalErrorMessage);
+        }
+
+        if (savedFlag) {
+            model.addAttribute("success_msg", CommonData.RECORD_SAVE_SUCCESS_MSG);
+        }
         return addProjectReportGet(req, principal, model);
     }
 
