@@ -22,4 +22,15 @@ public interface ProjectReportService {
 
     void saveAll(List<ProjectReport> projectReportList);
 
+    ProjectReport findByPdfToken(String pdfToken);
+
+    ProjectReport findByDocToken(String docToken);
+
+    ProjectReport findByExcelToken(String excelToken);
+
+    ProjectReport findByImgToken(String imgToken);
+
+    boolean existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(String pdfToken, String docToken, String excelToken,
+            String imgToken);
+
 }

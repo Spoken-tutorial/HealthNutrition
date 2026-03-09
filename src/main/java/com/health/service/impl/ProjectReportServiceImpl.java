@@ -64,4 +64,35 @@ public class ProjectReportServiceImpl implements ProjectReportService {
 
     }
 
+    @Override
+    public ProjectReport findByPdfToken(String pdfToken) {
+
+        return repo.findByPdfToken(pdfToken);
+    }
+
+    @Override
+    public ProjectReport findByDocToken(String docToken) {
+
+        return repo.findByDocToken(docToken);
+    }
+
+    @Override
+    public ProjectReport findByExcelToken(String excelToken) {
+
+        return repo.findByExcelToken(excelToken);
+    }
+
+    @Override
+    public ProjectReport findByImgToken(String imgToken) {
+
+        return repo.findByImgToken(imgToken);
+    }
+
+    @Override
+    public boolean existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(String pdfToken, String docToken, String excelToken,
+            String imgToken) {
+
+        return repo.existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(pdfToken, docToken, excelToken, imgToken);
+    }
+
 }

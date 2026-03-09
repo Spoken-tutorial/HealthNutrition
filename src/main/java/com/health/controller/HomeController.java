@@ -6661,6 +6661,22 @@ public class HomeController {
 
     /************************ Project Report Start ******************************/
 
+    private String generateUniqueTokenForProjectReport() {
+
+        final int MAX_ATTEMPTS = 10;
+
+        for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+
+            String token = ServiceUtility.generateToken();
+
+            if (!projectReportService.existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(token, token, token, token)) {
+                return token;
+            }
+        }
+
+        throw new IllegalStateException("Token not generated after " + MAX_ATTEMPTS + " attempts");
+    }
+
     @GetMapping("/addProjectReport")
     public String addProjectReportGet(HttpServletRequest req, Principal principal, Model model) {
         User usr = getUser(principal);

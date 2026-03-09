@@ -43,6 +43,18 @@ public class ProjectReport implements Serializable {
     @Column(name = "img_path", length = 1000)
     private String imgPath;
 
+    @Column(unique = true, length = 1000)
+    private String pdfToken;
+
+    @Column(unique = true, length = 1000)
+    private String docToken;
+
+    @Column(unique = true, length = 1000)
+    private String imgToken;
+
+    @Column(unique = true, length = 1000)
+    private String excelToken;
+
     @ManyToOne
     @JoinColumn(name = "state_district_id")
     private StateDistrictMapping stateDistrictMapping;
@@ -53,6 +65,38 @@ public class ProjectReport implements Serializable {
 
     public int getProjectReportId() {
         return projectReportId;
+    }
+
+    public String getPdfToken() {
+        return pdfToken;
+    }
+
+    public void setPdfToken(String pdfToken) {
+        this.pdfToken = pdfToken;
+    }
+
+    public String getDocToken() {
+        return docToken;
+    }
+
+    public void setDocToken(String docToken) {
+        this.docToken = docToken;
+    }
+
+    public String getImgToken() {
+        return imgToken;
+    }
+
+    public void setImgToken(String imgToken) {
+        this.imgToken = imgToken;
+    }
+
+    public String getExcelToken() {
+        return excelToken;
+    }
+
+    public void setExcelToken(String excelToken) {
+        this.excelToken = excelToken;
     }
 
     public void setProjectReportId(int projectReportId) {
@@ -153,6 +197,23 @@ public class ProjectReport implements Serializable {
 
     public void setDateAdded(Timestamp dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public ProjectReport(Timestamp dateAdded, String pdfPath, String docPath, String excelPath, String imgPath,
+            String pdfToken, String docToken, String imgToken, String excelToken,
+            StateDistrictMapping stateDistrictMapping, User user) {
+        super();
+        this.dateAdded = dateAdded;
+        this.pdfPath = pdfPath;
+        this.docPath = docPath;
+        this.excelPath = excelPath;
+        this.imgPath = imgPath;
+        this.pdfToken = pdfToken;
+        this.docToken = docToken;
+        this.imgToken = imgToken;
+        this.excelToken = excelToken;
+        this.stateDistrictMapping = stateDistrictMapping;
+        this.user = user;
     }
 
     public ProjectReport(Timestamp dateAdded, StateDistrictMapping stateDistrictMapping, String pdfPath, String docPath,
