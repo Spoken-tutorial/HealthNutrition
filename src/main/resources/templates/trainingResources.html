@@ -135,7 +135,7 @@
 			}
 
 
-			/* Control viewport height safely */
+			
 			#imageSlider .carousel-inner {
 				min-height: 80vh;
 				background: #fff;
@@ -228,8 +228,8 @@
                              ? @{${baseUrl} + '/shared-Training-Resource/'
                                  + ${topicName} + '/'
                                  + ${fileTypeString} + '/'
-                                 + ${langName} + '/'
-                                 + ${trId}}
+                                 + ${langName} 
+                                 + '?token=' + ${token}}
                              : ''">
 						</div>
 
@@ -242,8 +242,8 @@
                                  ? @{${baseUrl} + '/shared-training-resource-file/'
                                      + ${topicName} + '/'
                                      + ${fileTypeString} + '/'
-                                     + ${langName} + '/'
-                                     + ${trId}}
+                                     + ${langName} 
+                                     + '?token=' + ${token}}
                                  : ''">
 							</div>
 
@@ -299,12 +299,14 @@
 
 					<div class="modal-body">
 						<div th:if="${fileTypeString == 'Pdf'}">
-							<th:block th:each="pdf, stat : ${filePaths}">
-								<span th:text="'Pdf ' + ${stat.count} + ': '"></span>
-								<a th:href="@{'/files/' + ${pdf}}" target="_blank">Click here to view</a>
-								<br />
-							</th:block>
-						</div>
+					    <th:block th:each="stat, iter : ${fileNames}">
+					        <span th:text="'Pdf ' + (${iter.index} + 1) + ': '"></span>
+					        <a th:href="@{/training-resources/view-share/{topic}/{lang}/{fileType}/{token}/{page}/{fileName}(topic=${topicName},lang=${langName},fileType=${fileTypeString},token=${token},page=${iter.index},fileName=${stat})}" target="_blank">
+					            Click here to view
+					        </a>
+					        <br />
+					    </th:block>
+					</div>
 
 
 						<div th:if="${fileTypeString == 'Doc' or fileTypeString == 'Excel'}">
@@ -332,7 +334,7 @@
 
 
 						<ol class="carousel-indicators">
-							<th:block th:each="img, i : ${filePaths}">
+							<th:block th:each="x, i : ${fileNames}">
 								<li th:data-target="'#imageSlider'" th:data-slide-to="${i.index}"
 									th:classappend="${i.index == 0} ? 'active'">
 								</li>
@@ -341,11 +343,18 @@
 
 
 						<div class="carousel-inner">
-							<th:block th:each="img, i : ${filePaths}">
+							<th:block th:each="x, i : ${fileNames}">
 								<div class="carousel-item" th:classappend="${i.index == 0} ? ' active'">
-									<img th:src="@{'/files/' + ${img}}"
-     class="carousel-img"
-     alt="Preview Image">
+									
+            <img th:src="@{/training-resources/view-share/{topic}/{lang}/{fileType}/{token}/{page}/{fileName}
+                (topic=${topicName},
+                 lang=${langName},
+                 fileType=${fileTypeString},
+                 token=${token},
+                 page=${i.index},
+                 fileName=${x})}"
+                 class="carousel-img"
+                 alt="Preview Image">
 
 
 								</div>
@@ -396,8 +405,8 @@
 
 		<script th:if="${action == 'view'
                
-               and filePaths != null
-               and filePaths.size() > 0
+               and fileNames != null
+               and fileNames.size() > 0
                and ((fileTypeString == 'Pdf' or fileTypeString == 'Image')
                     or ((fileTypeString == 'Doc' or fileTypeString == 'Excel') and authorizedUsr))}">
 						$(document).ready(function () {
@@ -455,7 +464,7 @@
 			});
 		</script>
 		
-		<!-- Global user state -->
+		
 <input type="hidden" id="usrValue" th:value="${usr != null}">
 <input type="hidden" id="authorizedUsrValue" th:value="${authorizedUsr}">
 <input type="hidden" id="fileTypeString" th:value="${fileTypeString}">

@@ -1,9 +1,9 @@
+
 package com.health.model;
 
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,32 +14,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.health.utility.CommonData;
-
 @Entity
-@Table(name = "training_resource")
-public class TrainingResource implements Serializable {
+@Table(name = "project_report")
+public class ProjectReport implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "training_res_id", nullable = false, updatable = false)
-    private int trainingResourceId;
+    @Column(name = "project_rep_id", nullable = false, updatable = false)
+    private int projectReportId;
 
     @Column(name = "date_added", nullable = false)
     private Timestamp dateAdded;
 
     @Column(name = "status", nullable = false)
     private boolean status = true;
-
-    @ManyToOne
-    @JoinColumn(name = "topic_lan_id")
-    private TopicLanMapping topicLanMapping;
-
-    @ManyToOne
-    @JoinColumn(name = "cat_id")
-    private Category category;
 
     @Column(name = "pdf_path", length = 1000)
     private String pdfPath;
@@ -66,23 +56,59 @@ public class TrainingResource implements Serializable {
     private String excelToken;
 
     @ManyToOne
+    @JoinColumn(name = "state_district_id")
+    private StateDistrictMapping stateDistrictMapping;
+
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Category getCategory() {
-        return category;
+    public int getProjectReportId() {
+        return projectReportId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public String getPdfToken() {
+        return pdfToken;
     }
 
-    public int getTrainingResourceId() {
-        return trainingResourceId;
+    public void setPdfToken(String pdfToken) {
+        this.pdfToken = pdfToken;
     }
 
-    public void setTrainingResourceId(int trainingResourceId) {
-        this.trainingResourceId = trainingResourceId;
+    public String getDocToken() {
+        return docToken;
+    }
+
+    public void setDocToken(String docToken) {
+        this.docToken = docToken;
+    }
+
+    public String getImgToken() {
+        return imgToken;
+    }
+
+    public void setImgToken(String imgToken) {
+        this.imgToken = imgToken;
+    }
+
+    public String getExcelToken() {
+        return excelToken;
+    }
+
+    public void setExcelToken(String excelToken) {
+        this.excelToken = excelToken;
+    }
+
+    public void setProjectReportId(int projectReportId) {
+        this.projectReportId = projectReportId;
+    }
+
+    public StateDistrictMapping getStateDistrictMapping() {
+        return stateDistrictMapping;
+    }
+
+    public void setStateDistrictMapping(StateDistrictMapping stateDistrictMapping) {
+        this.stateDistrictMapping = stateDistrictMapping;
     }
 
     public boolean isStatus() {
@@ -91,14 +117,6 @@ public class TrainingResource implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
-    }
-
-    public TopicLanMapping getTopicLanMapping() {
-        return topicLanMapping;
-    }
-
-    public void setTopicLanMapping(TopicLanMapping topicLanMapping) {
-        this.topicLanMapping = topicLanMapping;
     }
 
     public String getPdfPath() {
@@ -141,38 +159,6 @@ public class TrainingResource implements Serializable {
         this.user = user;
     }
 
-    public String getPdfToken() {
-        return pdfToken;
-    }
-
-    public void setPdfToken(String pdfToken) {
-        this.pdfToken = pdfToken;
-    }
-
-    public String getDocToken() {
-        return docToken;
-    }
-
-    public void setDocToken(String docToken) {
-        this.docToken = docToken;
-    }
-
-    public String getImgToken() {
-        return imgToken;
-    }
-
-    public void setImgToken(String imgToken) {
-        this.imgToken = imgToken;
-    }
-
-    public String getExcelToken() {
-        return excelToken;
-    }
-
-    public void setExcelToken(String excelToken) {
-        this.excelToken = excelToken;
-    }
-
     public String getPdfFileNameWithorWitoutZip() {
         if (pdfPath == null || pdfPath.trim().isEmpty()) {
             return "NA";
@@ -213,20 +199,11 @@ public class TrainingResource implements Serializable {
         this.dateAdded = dateAdded;
     }
 
-    public boolean isAfterImplementationDate() {
-
-        LocalDate resourceDate = this.dateAdded.toLocalDateTime().toLocalDate();
-
-        return !resourceDate.isBefore(CommonData.IMPL_DATE_TRAINING_RESOURCE);
-    }
-
-    public TrainingResource(Timestamp dateAdded, TopicLanMapping topicLanMapping, Category category, String pdfPath,
-            String docPath, String excelPath, String imgPath, String pdfToken, String docToken, String imgToken,
-            String excelToken, User user) {
+    public ProjectReport(Timestamp dateAdded, String pdfPath, String docPath, String excelPath, String imgPath,
+            String pdfToken, String docToken, String imgToken, String excelToken,
+            StateDistrictMapping stateDistrictMapping, User user) {
         super();
         this.dateAdded = dateAdded;
-        this.topicLanMapping = topicLanMapping;
-        this.category = category;
         this.pdfPath = pdfPath;
         this.docPath = docPath;
         this.excelPath = excelPath;
@@ -235,21 +212,22 @@ public class TrainingResource implements Serializable {
         this.docToken = docToken;
         this.imgToken = imgToken;
         this.excelToken = excelToken;
+        this.stateDistrictMapping = stateDistrictMapping;
         this.user = user;
     }
 
-    public TrainingResource(Timestamp dateAdded, TopicLanMapping topicLanMapping, String pdfPath, String docPath,
+    public ProjectReport(Timestamp dateAdded, StateDistrictMapping stateDistrictMapping, String pdfPath, String docPath,
             String excelPath, String imgPath) {
 
         this.dateAdded = dateAdded;
-        this.topicLanMapping = topicLanMapping;
+        this.stateDistrictMapping = stateDistrictMapping;
         this.pdfPath = pdfPath;
         this.docPath = docPath;
         this.excelPath = excelPath;
         this.imgPath = imgPath;
     }
 
-    public TrainingResource() {
+    public ProjectReport() {
 
     }
 

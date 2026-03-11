@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -42,6 +43,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,6 +74,7 @@ import com.health.model.PackLanTutorialResource;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
+import com.health.model.ProjectReport;
 import com.health.model.PromoVideo;
 import com.health.model.ResearchPaper;
 import com.health.model.State;
@@ -110,6 +113,7 @@ import com.health.service.PackLanTutorialResourceService;
 import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
+import com.health.service.ProjectReportService;
 import com.health.service.PromoVideoService;
 import com.health.service.ResearchPaperService;
 import com.health.service.RoleService;
@@ -292,6 +296,9 @@ public class AjaxController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private ProjectReportService projectReportService;
 
     @Value("${downloadLimit}")
     private int downloadLimit;
@@ -2133,10 +2140,79 @@ public class AjaxController {
 
     }
 
+    /*
+     * @GetMapping("/downloadTrainingResource") public ResponseEntity<Resource>
+     * downloadTrainingResourcePost(@RequestParam(name = "filePath") String
+     * filePath) {
+     * 
+     * try {
+     * 
+     * String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+     * 
+     * Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+     * finalUrl);
+     * 
+     * if (!Files.exists(path)) { return
+     * ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); }
+     * 
+     * Resource resource = new UrlResource(path.toUri());
+     * 
+     * String contentType = Files.probeContentType(path); if (contentType == null) {
+     * contentType = "application/octet-stream"; }
+     * 
+     * String originalFilename = path.getFileName().toString();
+     * 
+     * String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+     * 
+     * String encodedFilename = URLEncoder.encode(safeFilename,
+     * "UTF-8").replace("+", "%20");
+     * 
+     * return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+     * .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" +
+     * encodedFilename) .body(resource);
+     * 
+     * } catch (Exception e) { logger.error("Error in download", e); return
+     * ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build(); } }
+     */
+
     @GetMapping("/downloadTrainingResource")
-    public ResponseEntity<Resource> downloadTrainingResourcePost(@RequestParam(name = "filePath") String filePath) {
+    public ResponseEntity<Resource> downloadTrainingResource(@RequestParam(name = "fileType") String fileTypeString,
+            @RequestParam(name = "token") String token) {
 
         try {
+
+            int fileType = ServiceUtility.getFileTypeIdByValue(fileTypeString);
+            TrainingResource tr = null;
+
+            if (fileType == CommonData.DOC) {
+                tr = trainingResourceService.findByDocToken(token);
+            } else if (fileType == CommonData.EXCEL) {
+                tr = trainingResourceService.findByExcelToken(token);
+            } else if (fileType == CommonData.PDF) {
+                tr = trainingResourceService.findByPdfToken(token);
+            } else if (fileType == CommonData.IMAGE) {
+                tr = trainingResourceService.findByImgToken(token);
+            }
+
+            if (tr == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            String filePath = null;
+
+            if (fileType == CommonData.DOC) {
+                filePath = tr.getDocPath();
+            } else if (fileType == CommonData.EXCEL) {
+                filePath = tr.getExcelPath();
+            } else if (fileType == CommonData.PDF) {
+                filePath = tr.getPdfPath();
+            } else if (fileType == CommonData.IMAGE) {
+                filePath = tr.getImgPath();
+            }
+
+            if (filePath == null || filePath.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
 
             String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
 
@@ -2164,7 +2240,80 @@ public class AjaxController {
                     .body(resource);
 
         } catch (Exception e) {
-            logger.error("Error in download", e);
+            logger.error("Error while downloading training resource", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/training-resources/view-share/{topic}/{lang}/{fileType}/{token}/{page}/{fileName}")
+    public ResponseEntity<Resource> viewOrSharePdfOrImage(@PathVariable String topic, @PathVariable String lang,
+            @PathVariable String fileType, @PathVariable String token, @PathVariable int page,
+            @PathVariable String fileName) {
+
+        try {
+
+            int fileTypeId = ServiceUtility.getFileTypeIdByValue(fileType);
+
+            TrainingResource tr = null;
+            if (fileTypeId == CommonData.PDF) {
+                tr = trainingResourceService.findByPdfToken(token);
+            } else if (fileTypeId == CommonData.IMAGE) {
+                tr = trainingResourceService.findByImgToken(token);
+            }
+
+            if (tr == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String filePath = ServiceUtility.getTrainingResourceFilePath(tr, fileTypeId);
+
+            List<String> filePaths = new ArrayList<>();
+            if (filePath.toLowerCase().endsWith(".zip")) {
+                List<String> extracted = ServiceUtility.extractZipIfNeeded(filePath, env);
+                List<String> sorted = ServiceUtility.sortFilePathsNumericOtherwiseLexical(extracted);
+
+                if (fileType.equalsIgnoreCase("Pdf")) {
+                    for (String str : sorted) {
+                        if (!str.endsWith(".png")) {
+                            filePaths.add(str);
+                        }
+                    }
+                } else {
+                    filePaths.addAll(sorted);
+                }
+
+            } else {
+                filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+            }
+
+            if (page < 0 || page >= filePaths.size()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String finalFilePath = filePaths.get(page);
+            Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), finalFilePath);
+
+            if (!Files.exists(path)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            String originalFilename = path.getFileName().toString();
+            String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+            String encodedFilename = URLEncoder.encode(safeFilename, "UTF-8").replace("+", "%20");
+
+            InputStreamResource resource = new InputStreamResource(Files.newInputStream(path));
+
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename*=UTF-8''" + encodedFilename)
+                    .body(resource);
+
+        } catch (Exception e) {
+            logger.error("Error viewing shared file", e);
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -2191,6 +2340,111 @@ public class AjaxController {
     /***************************************
      * Training Resource End
      *************************************************************/
+
+    /**********************************
+     * Projet Report Start
+     *************************/
+
+    @RequestMapping("/loadDistrictByStateforPR")
+    public @ResponseBody TreeMap<String, Integer> loadDistrictByStateforPR(@RequestParam(value = "stateId") int stateId,
+            @RequestParam(value = "allDisId") int allDisId) {
+        TreeMap<String, Integer> districtMaps = new TreeMap<>();
+
+        if (allDisId != 0) {
+            District allDistrict = disService.findById(allDisId);
+            if (allDistrict != null)
+                districtMaps.put(allDistrict.getDistrictName(), allDistrict.getId());
+
+        }
+
+        State state = stateService.findById(stateId);
+        if (state != null) {
+            List<District> disList = disService.findAllByState(state);
+            for (District temp : disList) {
+
+                districtMaps.put(temp.getDistrictName(), temp.getId());
+
+            }
+
+        }
+
+        return districtMaps;
+    }
+
+    @GetMapping("/enableDisableProjectReport")
+    public @ResponseBody boolean enableDisableProjectReport(int projectReportId) {
+        ProjectReport pr = projectReportService.findByProjectReportId(projectReportId);
+
+        try {
+            if (pr.isStatus()) {
+                pr.setStatus(false);
+                projectReportService.save(pr);
+                return true;
+
+            } else {
+                pr.setStatus(true);
+                projectReportService.save(pr);
+                return true;
+
+            }
+
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Project Report: {}", pr, e);
+            return false;
+        }
+
+    }
+
+    @RequestMapping("/delete-projectReport")
+    public ResponseEntity<String> deleteProjectReport(@RequestParam("projectReportId") int projectReportId,
+            @RequestParam("fileType") String fileType) {
+
+        try {
+            ProjectReport pr = projectReportService.findByProjectReportId(projectReportId);
+            String filePath = "";
+            if (pr != null) {
+                switch (fileType.toLowerCase()) {
+                case "image":
+                    filePath = pr.getImgPath();
+                    pr.setImgPath("");
+                    break;
+                case "pdf":
+                    filePath = pr.getPdfPath();
+                    pr.setPdfPath("");
+                    break;
+                case "doc":
+                    filePath = pr.getDocPath();
+                    pr.setDocPath("");
+                    break;
+                case "excel":
+                    filePath = pr.getExcelPath();
+                    pr.setExcelPath("");
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Unsupported file type: " + fileType);
+                }
+
+                if (!filePath.isEmpty() && filePath.endsWith(".zip")) {
+                    String extractDir = filePath.replace(".zip", "");
+
+                    Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
+                    FileUtils.deleteDirectory(extractDirPath.toFile());
+                }
+
+                projectReportService.save(pr);
+                return ResponseEntity.ok("Deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Project Report not found");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in deleting project report", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error in deleting!");
+        }
+    }
+
+    /********************************** Projet Report End *************************/
 
     @RequestMapping("/loadTopicByCategoryInAssignContri")
     public @ResponseBody HashMap<Integer, String> getTopicByCategoryAssignContri(@RequestParam(value = "id") int id) {
