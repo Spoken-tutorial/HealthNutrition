@@ -7056,6 +7056,372 @@ public class HomeController {
         return "updateProjectReport";
     }
 
+    @PostMapping("/updateProjectReport")
+    public String updateProjectReportPost(HttpServletRequest req, Model model, Principal principal,
+            @RequestParam("file") MultipartFile file) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        model.addAttribute("userInfo", usr);
+
+        String prId = req.getParameter("prId");
+        String stateId = req.getParameter("stateId");
+        String districtId = req.getParameter("districtId");
+        String fileType = req.getParameter("fileType");
+        int prIdInt = Integer.parseInt(prId);
+        int stateIdInt = Integer.parseInt(stateId);
+        int districtIdInt = Integer.parseInt(districtId);
+        int oldprId = prIdInt;
+
+        ProjectReport oldProjectReport = projectReportService.findByProjectReportId(prIdInt);
+        String originalFileType = "";
+        String oldPath = "";
+
+        boolean fileMatch = false;
+        String token = "";
+
+        if (oldProjectReport == null) {
+            model.addAttribute("error_msg", "Project Report doesn't exist");
+            return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+        }
+
+        if (fileType.equals("Doc")) {
+            originalFileType = CommonData.Doc_OR_ZIP_OF_DOCS;
+            if (oldProjectReport != null) {
+                oldPath = oldProjectReport.getDocPath();
+                token = oldProjectReport.getDocToken();
+            }
+        }
+
+        else if (fileType.equals("Pdf")) {
+            originalFileType = CommonData.PDF_OR_ZIP_OF_PDFS;
+            if (oldProjectReport != null) {
+                oldPath = oldProjectReport.getPdfPath();
+                token = oldProjectReport.getPdfToken();
+            }
+        }
+
+        else if (fileType.equals("Image")) {
+            originalFileType = CommonData.image_OR_ZIP_OF_IMAGES;
+            if (oldProjectReport != null) {
+                oldPath = oldProjectReport.getImgPath();
+                token = oldProjectReport.getImgToken();
+            }
+
+        } else if (fileType.equals("Excel")) {
+            originalFileType = CommonData.Excel_OR_ZIP_OF_EXCELS;
+            if (oldProjectReport != null) {
+                oldPath = oldProjectReport.getExcelPath();
+                token = oldProjectReport.getExcelToken();
+            }
+        }
+
+        State state = stateService.findById(stateIdInt);
+        District district = districtService.findById(districtIdInt);
+        if (state == null || district == null) {
+            model.addAttribute("error_msg", "state or distrct missing");
+            return projectReportEditGet(fileType, oldprId, req, model, principal);
+        }
+        String districtName = district.getDistrictName();
+        if (!CommonData.ALL_DISTRICTS.equalsIgnoreCase(districtName)) {
+            int tempStateId = district.getState().getId();
+            if (stateIdInt != tempStateId) {
+                model.addAttribute("error_msg", "District doesn't belong to selected state");
+                return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+            }
+        }
+
+        StateDistrictMapping stateDistrict = stateDistrictMappingService.findByStateAndDistrict(state, district);
+        Timestamp dateAdded = ServiceUtility.getCurrentTime();
+
+        if (oldPath == null || oldPath.isEmpty()) {
+            model.addAttribute("error_msg",
+                    "The data has already moved to another Project Report. Please check the View section to edit.");
+            return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+        }
+
+        ProjectReport newProjectReport;
+        boolean newProjectData = true;
+
+        if (stateDistrict != null) {
+            List<ProjectReport> prList = projectReportService.findByStateDistrictMapping(stateDistrict);
+
+            if (prList.isEmpty()) {
+                newProjectReport = new ProjectReport();
+                logger.info("new Project Report Data");
+
+            } else if (!prList.contains(oldProjectReport)) {
+                newProjectReport = prList.get(0);
+                logger.info("new Project Report Data from prList");
+            } else {
+                newProjectData = false;
+                newProjectReport = oldProjectReport;
+                logger.info("old Project Report data");
+            }
+        } else {
+
+            stateDistrict = new StateDistrictMapping(dateAdded, state, district);
+
+            stateDistrictMappingService.save(stateDistrict);
+            newProjectReport = new ProjectReport();
+
+        }
+
+        newProjectReport.setStateDistrictMapping(stateDistrict);
+        newProjectReport.setUser(usr);
+
+        // To get exact Id of new project Report Data
+        if (newProjectData) {
+            newProjectReport.setDateAdded(dateAdded);
+            projectReportService.save(newProjectReport);
+            prIdInt = newProjectReport.getProjectReportId();
+            token = generateUniqueTokenForProjectReport();
+
+        }
+
+        try {
+
+            String district_dir = districtName.replace(" ", "_");
+            String stateName = state.getStateName();
+            String state_dir = stateName.replace(" ", "_");
+
+            Path rootPath = Paths.get(CommonData.uploadProjectReport, String.valueOf(prId), state_dir, district_dir);
+
+            String pdfFolder = Paths.get(rootPath.toString(), "pdf", token).toString();
+            String docFolder = Paths.get(rootPath.toString(), "docx_or_odt", token).toString();
+            String excelFolder = Paths.get(rootPath.toString(), "excel_or_csv", token).toString();
+            String imageFolder = Paths.get(rootPath.toString(), "image", token).toString();
+            boolean fileFlag = false;
+
+            if (!file.isEmpty()) {
+                fileFlag = true;
+
+                Set<String> extentions = new HashSet<>();
+                String document = "";
+
+                String fileExtention = ServiceUtility.checkFileExtensions(file);
+
+                if (fileExtention.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+                    model.addAttribute("error_msg", "Unsupported file");
+
+                    return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+                }
+
+                else if (fileExtention.equals(CommonData.PDF_EXTENSION)
+                        && originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                    newProjectReport.setPdfPath(document);
+                    newProjectReport.setPdfToken(token);
+                    if (newProjectData)
+                        oldProjectReport.setPdfPath("");
+                    fileMatch = true;
+                }
+
+                else if (fileExtention.equals(CommonData.DOC_EXTENSION)
+                        && originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                    newProjectReport.setDocPath(document);
+                    newProjectReport.setDocToken(token);
+                    if (newProjectData)
+                        oldProjectReport.setDocPath("");
+                    fileMatch = true;
+                }
+
+                else if (fileExtention.equals(CommonData.EXCEL_EXTENSION)
+                        && originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                    newProjectReport.setExcelPath(document);
+                    newProjectReport.setExcelToken(token);
+                    if (newProjectData)
+                        oldProjectReport.setExcelPath("");
+                    fileMatch = true;
+                }
+
+                else if (fileExtention.equals(CommonData.IMAGE_EXTENSION)
+                        && originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+                    document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                    newProjectReport.setImgPath(document);
+                    newProjectReport.setImgToken(token);
+                    if (newProjectData)
+                        oldProjectReport.setImgPath("");
+                    fileMatch = true;
+                }
+
+                if (fileExtention.equals(CommonData.ZIP_EXTENSION)) {
+
+                    extentions = ServiceUtility.checkFileExtentionsInZip(file);
+                    if (extentions.size() == 1) {
+                        for (String ext : extentions) {
+                            if (ext.equals(CommonData.PDF_EXTENSION)
+                                    && originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, pdfFolder);
+                                newProjectReport.setPdfPath(document);
+                                newProjectReport.setPdfToken(token);
+                                if (newProjectData) {
+                                    oldProjectReport.setPdfPath("");
+                                }
+
+                                fileMatch = true;
+
+                            }
+
+                            else if (ext.equals(CommonData.DOC_EXTENSION)
+                                    && originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, docFolder);
+                                newProjectReport.setDocPath(document);
+                                newProjectReport.setDocToken(token);
+                                if (newProjectData) {
+                                    oldProjectReport.setDocPath("");
+                                }
+
+                                fileMatch = true;
+                            }
+
+                            else if (ext.equals(CommonData.EXCEL_EXTENSION)
+                                    && originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, excelFolder);
+                                newProjectReport.setExcelPath(document);
+                                newProjectReport.setExcelToken(token);
+                                if (newProjectData) {
+                                    oldProjectReport.setExcelPath("");
+                                }
+
+                                fileMatch = true;
+                            }
+
+                            else if (ext.equals(CommonData.IMAGE_EXTENSION)
+                                    && originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+                                document = ServiceUtility.uploadMediaFile(file, env, imageFolder);
+                                newProjectReport.setImgPath(document);
+                                newProjectReport.setImgToken(token);
+                                if (newProjectData) {
+                                    oldProjectReport.setImgPath("");
+                                }
+
+                                fileMatch = true;
+
+                            }
+
+                            else if (ext.equals(CommonData.UNSUPPORTED_EXTENSION)) {
+
+                                model.addAttribute("error_msg", "Unsupported file Error ");
+
+                                return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+                            }
+
+                        }
+                    }
+
+                    else {
+                        model.addAttribute("error_msg", "Zip contains different types of files Error");
+
+                        return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+                    }
+
+                }
+
+                if (oldPath != null && oldPath.endsWith(".zip")) {
+
+                    String extractDir = oldPath.replace(".zip", "");
+
+                    Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
+                    FileUtils.deleteDirectory(extractDirPath.toFile());
+
+                }
+                if (newProjectData) {
+                    newProjectReport.setDateAdded(dateAdded);
+                }
+
+                newProjectReport.setStateDistrictMapping(stateDistrict);
+                newProjectReport.setUser(usr);
+
+                if (fileMatch) {
+                    if (newProjectData) {
+                        newProjectReport.setDateAdded(dateAdded);
+                    }
+                    newProjectReport.setStateDistrictMapping(stateDistrict);
+                    projectReportService.save(newProjectReport);
+                    if (newProjectData) {
+                        logger.info("1st old data save is called");
+                        oldProjectReport.setUser(usr);
+                        projectReportService.save(oldProjectReport);
+                    }
+                } else {
+                    model.addAttribute("error_msg", "Please upload a file of the same type. E.g., DOC for DOC type.");
+                    return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+                }
+            }
+
+            // File Empty
+            else {
+                if (newProjectData && !fileFlag && oldPath != null && !oldPath.isEmpty()) {
+
+                    Path sourcePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), oldPath);
+                    File sourceFile = sourcePath.toFile();
+                    String fileName = sourcePath.getFileName().toString();
+
+                    String document = "";
+
+                    if (sourceFile.exists()) {
+                        if (originalFileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, docFolder, fileName, env);
+
+                            newProjectReport.setDocPath(document);
+                            newProjectReport.setDocToken(token);
+                            oldProjectReport.setDocPath("");
+
+                        } else if (originalFileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, excelFolder, fileName,
+                                    env);
+
+                            newProjectReport.setExcelPath(document);
+                            newProjectReport.setExcelToken(token);
+                            oldProjectReport.setExcelPath("");
+
+                        } else if (originalFileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, pdfFolder, fileName, env);
+
+                            newProjectReport.setPdfPath(document);
+                            newProjectReport.setPdfToken(token);
+                            oldProjectReport.setPdfPath("");
+
+                        } else if (originalFileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+
+                            document = ServiceUtility.copyFileAndGetRelativePath(sourceFile, imageFolder, fileName,
+                                    env);
+                            newProjectReport.setImgPath(document);
+                            newProjectReport.setImgToken(token);
+                            oldProjectReport.setImgPath("");
+
+                        }
+
+                        newProjectReport.setDateAdded(dateAdded);
+                        newProjectReport.setUser(usr);
+
+                        projectReportService.save(newProjectReport);
+                        logger.info("2nd old data save is called");
+                        projectReportService.save(oldProjectReport);
+                    }
+
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception while updating Project Report: {} {} {}", state, district, file, e);
+            model.addAttribute("error_msg", CommonData.RECORD_ERROR);
+
+            return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+        }
+
+        model.addAttribute("success_msg", CommonData.RECORD_UPDATE_SUCCESS_MSG);
+
+        return projectReportEditGet(originalFileType, oldprId, req, model, principal);
+    }
+
     /************************ Project Report End ********************************/
 
     @GetMapping("/trainingModules")
