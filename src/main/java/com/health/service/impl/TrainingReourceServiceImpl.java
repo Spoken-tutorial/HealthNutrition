@@ -62,4 +62,35 @@ public class TrainingReourceServiceImpl implements TrainingResourceService {
         return repo.findAllByStatusTrue();
     }
 
+    @Override
+    public TrainingResource findByPdfToken(String pdfToken) {
+
+        return repo.findByPdfToken(pdfToken);
+    }
+
+    @Override
+    public TrainingResource findByDocToken(String docToken) {
+
+        return repo.findByDocToken(docToken);
+    }
+
+    @Override
+    public TrainingResource findByExcelToken(String excelToken) {
+
+        return repo.findByExcelToken(excelToken);
+    }
+
+    @Override
+    public TrainingResource findByImgToken(String imgToken) {
+
+        return repo.findByImgToken(imgToken);
+    }
+
+    @Override
+    public boolean existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(String pdfToken, String docToken, String excelToken,
+            String imgToken) {
+
+        return repo.existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(pdfToken, docToken, excelToken, imgToken);
+    }
+
 }

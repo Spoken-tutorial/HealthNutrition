@@ -43,6 +43,7 @@ import com.health.model.FilesofBrouchure;
 import com.health.model.QueueManagement;
 import com.health.model.ResearchPaper;
 import com.health.model.TopicCategoryMapping;
+import com.health.model.TrainingResource;
 import com.health.model.Tutorial;
 import com.health.model.Version;
 import com.health.repository.QueueManagementRepository;
@@ -55,6 +56,7 @@ import com.health.service.FilesofBrouchureService;
 import com.health.service.QueueManagementService;
 import com.health.service.ResearchPaperService;
 import com.health.service.TopicCategoryMappingService;
+import com.health.service.TrainingResourceService;
 import com.health.service.TutorialService;
 import com.health.utility.CommonData;
 import com.health.utility.ServiceUtility;
@@ -78,6 +80,9 @@ public class TaskProcessingService {
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
+
+    @Autowired
+    private TrainingResourceService trainingResourceService;
 
     @Autowired
     private QueueManagementService queueService;
@@ -962,4 +967,51 @@ public class TaskProcessingService {
         logger.info("stopping QueueProcessor thread");
         taskExecutor.shutdown();
     }
+
+    private String generateUniqueTokenForTrainingResource() {
+
+        final int MAX_ATTEMPTS = 10;
+
+        for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+
+            String token = ServiceUtility.generateToken();
+
+            if (!trainingResourceService.existsByPdfTokenOrDocTokenOrExcelTokenOrImgToken(token, token, token, token)) {
+                return token;
+            }
+        }
+
+        throw new IllegalStateException("Token not generated after " + MAX_ATTEMPTS + " attempts");
+    }
+
+    public void addTokenInTrainingResource() {
+
+        List<TrainingResource> trList = trainingResourceService.findAll();
+
+        for (TrainingResource temp : trList) {
+
+            if ((temp.getPdfToken() == null || temp.getPdfToken().isEmpty())
+                    && (temp.getPdfPath() != null && !temp.getPdfPath().isEmpty())) {
+                temp.setPdfToken(generateUniqueTokenForTrainingResource());
+            }
+
+            if ((temp.getDocToken() == null || temp.getDocToken().isEmpty())
+                    && (temp.getDocPath() != null && !temp.getDocPath().isEmpty())) {
+                temp.setDocToken(generateUniqueTokenForTrainingResource());
+            }
+
+            if ((temp.getExcelToken() == null || temp.getExcelToken().isEmpty())
+                    && (temp.getExcelPath() != null && !temp.getExcelPath().isEmpty())) {
+                temp.setExcelToken(generateUniqueTokenForTrainingResource());
+            }
+
+            if ((temp.getImgToken() == null || temp.getImgToken().isEmpty())
+                    && (temp.getImgPath() != null && !temp.getImgPath().isEmpty())) {
+                temp.setImgToken(generateUniqueTokenForTrainingResource());
+            }
+
+            trainingResourceService.save(temp);
+        }
+    }
+
 }
