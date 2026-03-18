@@ -47,7 +47,7 @@
 								</div>
 								<div class="card-body">
 									<div th:if="${fileType == 'Image'}">
-										<div class="row g-4 mb-4"> <!-- g-4 adds padding between columns and rows -->
+										<div class="row g-4 mb-4"> 
 											<div class="col-md-3 mb-4" th:each="path : ${filePaths}">
 												<div class="card image-card h-100 text-center p-2">
 													<!-- Image -->
@@ -76,7 +76,7 @@
 										<div class="row">
 											<div class="col-md-3 mb-4" th:each="path : ${filePaths}">
 
-												<!-- ✅ PDF: Preview + File Name + Download -->
+												<!--  PDF: Preview + File Name + Download -->
 												<div th:if="${fileType == 'Pdf'}">
 													<div class="card p-3">
 														<!-- File Name -->
@@ -97,7 +97,7 @@
 													</div>
 												</div>
 
-												<!-- ✅ Word: File Name + Icon + Download -->
+												<!--  Word: File Name + Icon + Download -->
 												<div th:if="${fileType == 'Doc'}">
 													<div class="card p-3 d-flex align-items-start">
 														<h6
@@ -114,7 +114,7 @@
 													</div>
 												</div>
 
-												<!-- ✅ Excel: File Name + Icon + Download -->
+												<!--  Excel: File Name + Icon + Download -->
 												<div th:if="${fileType == 'Excel'}">
 													<div class="card p-3 d-flex align-items-start">
 														<h6

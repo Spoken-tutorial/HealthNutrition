@@ -7440,6 +7440,123 @@ public class HomeController {
 
         return projectReportEditGet(originalFileType, oldprId, req, model, principal);
     }
+    
+    
+    
+    
+    @GetMapping("/projectReportAdminView/{fileType}/{id}")
+    public String projectReportViewforAdmin(@PathVariable String fileType, @PathVariable int id,
+            HttpServletRequest req, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        ProjectReport pr = projectReportService.findByProjectReportId(id);
+        List<String> filePaths = new ArrayList<>();
+        List<String> tempFilepPaths = new ArrayList<>();
+
+        if (pr == null) {
+
+            return "redirect:/addProjectReport";
+        }
+        String filePath = "";
+
+        if (fileType.equals(CommonData.Doc_OR_ZIP_OF_DOCS)) {
+            filePath = pr.getDocPath();
+            model.addAttribute("fileType", "Doc");
+
+        }
+
+        else if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+            filePath = pr.getPdfPath();
+            model.addAttribute("fileType", "Pdf");
+        }
+
+        else if (fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            filePath = pr.getImgPath();
+            model.addAttribute("fileType", "Image");
+        }
+
+        else if (fileType.equals(CommonData.Excel_OR_ZIP_OF_EXCELS)) {
+            filePath = pr.getExcelPath();
+            model.addAttribute("fileType", "Excel");
+        }
+
+        if (filePath.toLowerCase().endsWith(".zip")) {
+            try {
+
+                tempFilepPaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+                filePaths = ServiceUtility.sortFilePathsNumericOtherwiseLexical(tempFilepPaths);
+            } catch (IOException e) {
+                logger.error("Zip Extraction or zip error", e);
+
+                return "redirect:/addProjectReport";
+
+            }
+        }
+
+        else {
+            filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+
+        }
+
+        // Conversion of doc/excel to pdf and pdf to thumbnails.
+        List<String> finalFilePath = new ArrayList<>();
+
+        if (!fileType.equals(CommonData.image_OR_ZIP_OF_IMAGES)) {
+            if (fileType.equals(CommonData.PDF_OR_ZIP_OF_PDFS)) {
+                for (String str : filePaths) {
+
+                    /*
+                     * Here we check png beacuse parent folder may have alreday created thumnails
+                     * and their paths have been added in filePaths from extractZipIfNeeded function
+                     * if zip is alreday extracted then that folder is used for pdf and thumnails
+                     * too.
+                     * 
+                     */
+                    if (!str.endsWith(".png")) {
+                        finalFilePath.add(str);
+                        fileConversionUtility.generateThumbnailFromPdfAndSave(str);
+                    }
+
+                }
+            }
+
+            else {
+                // Intially we convert both doc and excel using same libreoffice cmd
+                for (String str : filePaths) {
+                    /*
+                     * Here we check png and pdf beacuse parent folder may have alreday created
+                     * thumnails and pdfs and their respective paths have been added in filePaths
+                     * from extractZipIfNeeded function if zip is alreday extracted then that folder
+                     * is used for pdf and thumnails too.
+                     * 
+                     */
+                    if (!str.endsWith(".png") && !str.endsWith(".pdf")) {
+                        finalFilePath.add(str);
+                        String pdfPath = fileConversionUtility.convertDoctoPdf(str, doctoPdfCommand);
+                        fileConversionUtility.generateThumbnailFromPdfAndSave(pdfPath);
+                    }
+
+                }
+            }
+        } else {
+            finalFilePath.addAll(filePaths);
+        }
+
+        model.addAttribute("projectReport", pr);
+        model.addAttribute("filePaths", finalFilePath);
+
+        for (String str : filePaths) {
+            logger.info("file Path :{}", str);
+        }
+
+        return "projectReportViewAdmin";
+    }
+
+    
+    
 
     /************************ Project Report End ********************************/
 
