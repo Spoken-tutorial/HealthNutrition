@@ -135,17 +135,17 @@
 
 
 								<span class="state-title" th:if="${stateName != null}"
-									th:text="${#strings.capitalizeWords(#strings.replace(stateName,'_',' '))}">
+									th:text="'🏛️ '+ ${#strings.capitalizeWords(#strings.replace(stateName,'_',' '))}">
 								</span>
 
 
 								<span class="meta-title" th:if="${districtName != null and stateName != null}"
-									th:text="' : 🌐 ' + ${#strings.capitalizeWords(#strings.replace(districtName,'_',' '))}">
+									th:text="' : 📍 ' + ${#strings.capitalizeWords(#strings.replace(districtName,'_',' '))}">
 								</span>
 
 
 								<span class="meta-title" th:if="${districtName != null and stateName == null}"
-									th:text="'🌐 ' + ${#strings.capitalizeWords(#strings.replace(districtName,'_',' '))}">
+									th:text="'📍 ' + ${#strings.capitalizeWords(#strings.replace(districtName,'_',' '))}">
 								</span>
 
 
