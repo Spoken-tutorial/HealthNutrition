@@ -7440,13 +7440,10 @@ public class HomeController {
 
         return projectReportEditGet(originalFileType, oldprId, req, model, principal);
     }
-    
-    
-    
-    
+
     @GetMapping("/projectReportAdminView/{fileType}/{id}")
-    public String projectReportViewforAdmin(@PathVariable String fileType, @PathVariable int id,
-            HttpServletRequest req, Model model, Principal principal) {
+    public String projectReportViewforAdmin(@PathVariable String fileType, @PathVariable int id, HttpServletRequest req,
+            Model model, Principal principal) {
 
         User usr = getUser(principal);
         logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
@@ -7555,8 +7552,216 @@ public class HomeController {
         return "projectReportViewAdmin";
     }
 
-    
-    
+    @GetMapping("/Project-Reports")
+    public String viewAndDownloadProjectReport(HttpServletRequest req,
+            @RequestParam(name = "stateNamePR", required = false, defaultValue = "0") int stateId,
+            @RequestParam(name = "districtNamePR", required = false, defaultValue = "0") int districtId,
+            @RequestParam(name = "inputFileTypePR", required = false, defaultValue = "0") int inputFileType,
+
+            @RequestParam(name = "action", required = false, defaultValue = "") String action,
+
+            Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("usr", usr.getUsername());
+        boolean authorizedUsr = false;
+        if (usr.getUsername() != null) {
+            Role role = roleService.findByname(CommonData.contributorRole);
+            int roleId = role.getRoleId();
+            Set<UserRole> usrRoles = usr.getUserRoles();
+
+            for (UserRole ur : usrRoles) {
+                if (ur.getRole().getRoleId() == roleId) {
+                    authorizedUsr = true;
+                    break;
+                }
+            }
+
+        }
+        model.addAttribute("authorizedUsr", authorizedUsr);
+
+        model.addAttribute("stateId", stateId);
+        model.addAttribute("districtId", districtId);
+        model.addAttribute("inputFileType", inputFileType);
+        model.addAttribute("baseUrl", baseUrl);
+
+        navigationLinkCheck(model);
+
+        State state = stateId != 0 ? stateService.findById(stateId) : null;
+        District district = districtId != 0 ? districtService.findById(districtId) : null;
+        if (state == null || district == null || inputFileType == 0) {
+            // getModelTrainingResource(model);
+
+            model.addAttribute("error_msg", "Please select all fields");
+            return "projectReports";
+
+        }
+        State tempstate = stateService.findById(stateId);
+        String stateName = tempstate.getStateName().replace(" ", "_").replaceAll("_+", "_");
+        District tempDistrict = districtService.findById(districtId);
+        String districtName = tempDistrict.getDistrictName().replace(" ", "_").replaceAll("_+", "_");
+        model.addAttribute("stateName", stateName);
+        model.addAttribute("districtName", districtName);
+
+        Map<Integer, String> fileTypeAndValue = ServiceUtility.getFileTypeIdAndValue(inputFileType);
+        String fileTypeString = fileTypeAndValue.get(inputFileType);
+        model.addAttribute("fileTypeString", fileTypeString);
+
+        StateDistrictMapping sdm = stateDistrictMappingService.findByStateAndDistrict(state, district);
+        List<ProjectReport> prList = projectReportService.findByStateDistrictMapping(sdm);
+        if (prList.isEmpty() || prList.size() > 1) {
+            // getModelTrainingResource(model);
+            model.addAttribute("error_msg", "Invalid Data");
+            return "projectReports";
+        }
+
+        ProjectReport pr = prList.get(0);
+        int prId = pr.getProjectReportId();
+        model.addAttribute("prId", prId);
+
+        String token = "";
+        if (fileTypeString.equals("Doc")) {
+            token = pr.getDocToken();
+        } else if (fileTypeString.equals("Excel")) {
+            token = pr.getExcelToken();
+        } else if (fileTypeString.equals("Pdf")) {
+            token = pr.getPdfToken();
+        } else if (fileTypeString.equals("Image")) {
+            token = pr.getImgToken();
+        }
+
+        String filePath = ServiceUtility.getProjectReportFilePath(pr, inputFileType);
+        if (filePath.isEmpty()) {
+            // getModelTrainingResource(model);
+            model.addAttribute("error_msg", "No File Found");
+            return "projectReports";
+        }
+
+        String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+        boolean allowed = true;
+
+        if ((fileTypeString.equals("Doc") || fileTypeString.equals("Excel")) && (usr == null || !authorizedUsr)) {
+
+            allowed = false;
+
+        }
+
+        if (allowed) {
+            model.addAttribute("token", token);
+        } else {
+            model.addAttribute("token", "");
+        }
+
+        if (action != null && !action.isEmpty() && action.equals("download")) {
+            model.addAttribute("action", action);
+            if (!allowed) {
+
+                model.addAttribute("error_msg", "Authentication Error");
+
+            } else {
+                try {
+
+                    String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1)
+                            : baseUrl;
+
+                    return "redirect:" + normalizedBaseUrl + "/downloadProjectReport?fileType=" + fileTypeString
+                            + "&token=" + token;
+
+                } catch (Exception e) {
+                    logger.error("Error in Download Project Report", e);
+                }
+            }
+
+        }
+
+        if (action != null && !action.isEmpty() && action.equals("view")) {
+            List<String> filePaths = new ArrayList<>();
+            List<String> tempFilepPaths = new ArrayList<>();
+            List<String> sortedFilePaths = new ArrayList<>();
+            if (filePath.toLowerCase().endsWith(".zip")) {
+                try {
+                    tempFilepPaths = ServiceUtility.extractZipIfNeeded(filePath, env);
+                    sortedFilePaths = ServiceUtility.sortFilePathsNumericOtherwiseLexical(tempFilepPaths);
+
+                    if (fileTypeString.equals("Doc") || fileTypeString.equals("Excel")) {
+                        for (String str : sortedFilePaths) {
+                            if (!str.endsWith(".png") && !str.endsWith(".pdf")) {
+                                filePaths.add(str);
+                            }
+                        }
+                    } else if (fileTypeString.equals("Pdf")) {
+                        for (String str : sortedFilePaths) {
+                            if (!str.endsWith(".png")) {
+                                filePaths.add(str);
+                            }
+                        }
+                    } else {
+                        filePaths.addAll(sortedFilePaths);
+                    }
+
+                } catch (IOException e) {
+                    logger.error("Zip Extraction or zip error", e);
+
+                    model.addAttribute("error_msg", "ZIP extraction failed. Please try again later.");
+                    return "projectReports";
+
+                }
+            }
+
+            else {
+                filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+
+            }
+            List<String> fileNames = new ArrayList<>();
+            for (String str : filePaths) {
+
+                Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), str);
+                String fileName = path.getFileName().toString();
+
+                fileNames.add(fileName);
+
+            }
+            List<Integer> pageIndexes = IntStream.range(0, filePaths.size()).boxed().collect(Collectors.toList());
+
+            if (allowed) {
+                model.addAttribute("pageIndexes", pageIndexes);
+                // model.addAttribute("filePaths", filePaths);
+                model.addAttribute("fileNames", fileNames);
+            }
+
+            model.addAttribute("action", action);
+        }
+
+        if (action != null && !action.isEmpty() && action.equals("share")) {
+
+            model.addAttribute("action", action);
+            if (allowed)
+                model.addAttribute("shareUrl", finalUrl);
+
+        }
+
+        State localState = null;
+        District localDistrict = null;
+        String localFile = null;
+
+        // getModelTrainingResource(model, topicId, lanId, inputFileType);
+
+        if (stateId != 0) {
+            localState = stateService.findById(stateId);
+            model.addAttribute("stateforQuery", localState);
+        }
+        if (districtId != 0) {
+            localDistrict = districtService.findById(districtId);
+            model.addAttribute("districtforQuery", localDistrict);
+        }
+        if (inputFileType != 0) {
+
+            model.addAttribute("fileTypeQuery", localFile);
+        }
+
+        return "trainingResources";
+    }
 
     /************************ Project Report End ********************************/
 

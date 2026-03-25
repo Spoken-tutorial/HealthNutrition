@@ -1414,6 +1414,32 @@ public class ServiceUtility {
         return isNotBlank(path) ? path : "";
     }
 
+    public static String getProjectReportFilePath(ProjectReport pr, int fileId) {
+        if (pr == null) {
+            return "";
+        }
+
+        String path;
+        switch (fileId) {
+        case CommonData.DOC:
+            path = pr.getDocPath();
+            break;
+        case CommonData.EXCEL:
+            path = pr.getExcelPath();
+            break;
+        case CommonData.IMAGE:
+            path = pr.getImgPath();
+            break;
+        case CommonData.PDF:
+            path = pr.getPdfPath();
+            break;
+        default:
+            return "";
+        }
+
+        return isNotBlank(path) ? path : "";
+    }
+
     public static boolean isNotBlank(String s) {
         return s != null && !s.isEmpty();
     }
