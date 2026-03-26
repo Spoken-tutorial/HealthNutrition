@@ -1369,6 +1369,29 @@ public class ServiceUtility {
         return result;
     }
 
+    public static Map<Integer, String> getFileTypeIdAndValueforProjectReport(ProjectReport pr) {
+        Map<Integer, String> result = new HashMap<>();
+
+        if (isNotBlank(pr.getDocPath())) {
+            result.put(CommonData.DOC, "Doc");
+
+        }
+        if (isNotBlank(pr.getExcelPath())) {
+            result.put(CommonData.EXCEL, "Excel");
+
+        }
+        if (isNotBlank(pr.getImgPath())) {
+            result.put(CommonData.IMAGE, "Image");
+
+        }
+        if (isNotBlank(pr.getPdfPath())) {
+            result.put(CommonData.PDF, "Pdf");
+
+        }
+
+        return result;
+    }
+
     public static boolean isTrainingResourceFilePresent(TrainingResource tr, int fileId) {
         if (tr == null) {
             return false;
@@ -1383,6 +1406,25 @@ public class ServiceUtility {
             return isNotBlank(tr.getImgPath());
         case CommonData.PDF:
             return isNotBlank(tr.getPdfPath());
+        default:
+            return false;
+        }
+    }
+
+    public static boolean isProjectReportFilePresent(ProjectReport pr, int fileId) {
+        if (pr == null) {
+            return false;
+        }
+
+        switch (fileId) {
+        case CommonData.DOC:
+            return isNotBlank(pr.getDocPath());
+        case CommonData.EXCEL:
+            return isNotBlank(pr.getExcelPath());
+        case CommonData.IMAGE:
+            return isNotBlank(pr.getImgPath());
+        case CommonData.PDF:
+            return isNotBlank(pr.getPdfPath());
         default:
             return false;
         }
