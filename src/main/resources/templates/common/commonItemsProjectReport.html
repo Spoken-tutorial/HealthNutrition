@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<body>
+
+<div th:fragment="my_fragment2(data_id, data_class)">
+    <p th:class="${data_id}" th:id="${data_class}"></p>
+</div>
+
+<div th:fragment="search_bar">
+<section id="search-bar" class="container my-4">
+<h1 class="text-center" style="color: #014F7A;font-size:1.8rem;"> Project-Reports</h1>
+<div id="formError" class="alert alert-danger d-none" role="alert"></div>
+
+
+<form th:action="@{/Project-Reports}" class="w-100 mt-5" name="selectOption" id="formProjectReport">
+
+<div class="row ">
+
+    
+    <div class="col-12 col-md-4 mb-3 input-group">
+        <div class="input-group">
+            <select class="form-control selectedValue" id="stateNamePR" name="stateNamePR">
+                <option value="0">Select State</option>
+                <option th:each="state : ${states}"
+                        th:selected="${state.value==localState}"
+                        th:value="${state.value}"
+                        th:text="${state.key}">
+                </option>
+            </select>
+            
+            <div th:if="${localState != null and localState != 0}" class="input-group-btn" id="stateResetDivPR" style=" padding-top: 4px;"><button  id="stateResetPR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localState != null and localState != 0}" class="input-group-btn" id="stateResetDivPR" style=" padding-top: 4px;  display: none;"><button  id="stateResetPR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+
+       
+        </div>
+    </div>
+
+
+  
+    <div class="col-12 col-md-4 mb-3">
+        <div class="input-group input-group">
+            <select class="form-control" id="districtNamePR" name="districtNamePR">
+                <option value="0">Select District</option>
+                <option th:each="dis : ${districts}"
+                        th:selected="${dis.value==localDistrict}"
+                        th:value="${dis.value}"
+                        th:text="${dis.key}">
+                </option>
+            </select>
+            
+            <div th:if="${localDistrict != null and localDistrict != 0}" class="input-group-btn" id="districtResetDivPR" style=" padding-top: 4px;"><button  id="districtResetPR"  style=" background: none;
+            	border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localDistrict != null and localDistrict != 0}" class="input-group-btn" id="districtResetDivPR" style=" padding-top: 4px;  display: none;"><button  id="districtResetPR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+
+        </div>
+    </div>
+
+
+    <!-- File type -->
+    <div class="col-12 col-md-4 mb-3 input-group">
+        <div class="input-group">
+            <select class="form-control" id="inputFileTypePR" name="inputFileTypePR">
+                <option value="0">Select File</option>
+                <option th:each="file : ${fileTypes}"
+                        th:selected="${file.value==localFile}"
+                        th:value="${file.value}"
+                        th:text="${file.key}">
+                </option>
+            </select>
+            
+             <div th:if="${localFile != null and localFile != 0}" class="input-group-btn" id="fileResetDivPR" style=" padding-top: 4px;"><button  id="fileResetPR"  style=" background: none;
+            	border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+             <div th:unless="${localFile != null and localFile != 0}" class="input-group-btn" id="fileResetDivPR" style=" padding-top: 4px;  display: none;"><button  id="fileResetPR"  style=" background: none;
+            border: none;" > <span style="font-size:20px;">&#10227;</span></button></div>
+
+           
+        </div>
+    </div>
+
+</div>
+
+
+<div class="row  mt-2 justify-content-center">
+    <div class="col-4 col-md-2">
+        <label class="form-check">
+            <input class="form-check-input" type="radio" name="action" value="view">
+            <span class="form-check-label">View</span>
+        </label>
+    </div>
+
+    <div class="col-4 col-md-2">
+        <label class="form-check">
+            <input class="form-check-input" type="radio" name="action" value="download">
+            <span class="form-check-label">Download</span>
+        </label>
+    </div>
+
+    <div class="col-4 col-md-2">
+        <label class="form-check">
+            <input class="form-check-input" type="radio" name="action" value="share">
+            <span class="form-check-label">Share</span>
+        </label>
+    </div>
+</div>
+
+
+
+<div class="row  mt-2 justify-content-center">
+
+    <div class="col-6 col-md-2">
+        <button type="submit" class="btn w-100 text-white"
+                style="background:#1C7871;">
+            Submit
+        </button>
+    </div>
+
+    <div class="col-6 col-md-2">
+        <input type="button"
+               value="Clear"
+               id="btnClearProjectReport"
+               class="btn w-100 text-white"
+               style="background:SlateBlue;">
+    </div>
+
+</div>
+
+</form>
+
+</section>
+</div>
+<div th:fragment="model_title">
+
+
+								<span class="state-title" th:if="${stateName != null}"
+									th:text="'🏛️ '+ ${#strings.capitalizeWords(#strings.replace(stateName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${districtName != null and stateName != null}"
+									th:text="' : 📍 ' + ${#strings.capitalizeWords(#strings.replace(districtName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${districtName != null and stateName == null}"
+									th:text="'📍 ' + ${#strings.capitalizeWords(#strings.replace(districtName,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title" th:if="${fileTypeString != null and districtName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and districtName == null and stateName != null}"
+									th:text="' : 📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+
+								<span class="meta-title"
+									th:if="${fileTypeString != null and stateName == null and districtName == null}"
+									th:text="'📁 ' + ${#strings.capitalizeWords(#strings.replace(fileTypeString,'_',' '))}">
+								</span>
+
+							</div>
+							
+
+<div th:fragment="tr_login" class="px-4 py-2 text-center">
+
+    <span class="d-block mb-3">
+        Only authorized users can access Doc or Excel files.
+    </span>
+
+    <a th:href="@{/login}"
+       class="btn btn-primary btn-sm px-4">
+        Login
+    </a>
+
+    <div class="mt-3 small-links">
+        <a th:href="@{/forgetPassword}" class="small">Forgot password?</a>
+        |
+        <a th:href="@{/newUser}" class="small">Register</a>
+    </div>
+
+</div>
+
+						
+
+</body>
+</html>
