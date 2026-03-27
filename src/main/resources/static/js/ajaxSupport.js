@@ -3521,6 +3521,354 @@ $('.enableProjetcReport').click(function() {
 });
     
 
+/**
+    function to load district and fileType by state
+    author: Alok Kumar
+    
+     */
+
+	function loadDistrictAndFileTypeByState(stateId, districId, fileTypeId) {
+				$.ajax({
+					type : "GET",
+					url : projectPath+"loadDistrictAndFileTypeByState",
+					data : {
+						"stateId" : stateId,
+						"districId":districId,
+						"fileTypeId":fileTypeId
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+			            var html = '';
+			            html += '<option value="0">Select Distric</option>';
+			           
+			                $.each(result, function (value, key) {
+			                    var selected = (districId == key) ? "selected" : "";
+			                    html += `<option value="${key}" ${selected}>${value}</option>`;
+			                });
+			            
+			            $("#districNamePR").prop('disabled', false);
+			            $('#districNamePR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select File</option>';
+						$.each(result, function( value ,key ) {
+							var selected=(fileTypeId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputFileTypePR").prop('disabled',false);
+						$('#inputFileTypePR').html(html);
+						if (stateId != 0) {
+							$("#stateResetDivPR").show();
+						} else {
+						$("#stateResetDivPR").hide();
+						}
+						
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	}
+     
+    $( "#stateNamePR" ).change(function() {
+			
+				var stateId = $(this).val();
+				var districId = $("#districtNamePR").val();
+				var fileTypeId=$("#inputFileTypePR").val();
+				loadDistrictAndFileTypeByState(stateId, districId, fileTypeId);
+				
+			});
+			
+			   $( "#stateResetPR" ).click(function() {
+			
+				var stateId = 0;
+				
+				$("#stateNamePR").val("0");
+				var districId = $("#districtNamePR").val();
+				var fileTypeId=$("#inputFileTypePR").val();
+				
+				loadDistrictAndFileTypeByState(stateId, districId, fileTypeId);
+				return false;
+				
+			});
+			
+		
+      
+   
+    
+     	/* 
+     		Function to load state and fileType by district
+     		author:Alok Kumar
+     
+    	 */
+    	 
+    	 function loadStateAndFileTypeByDistrict(stateId, districtId, fileTypeId){
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadStateAndFileTypeByDistrict",
+					data : {
+						"stateId" : stateId,
+						"districtId":districtId,
+						"fileTypeId":fileTypeId
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select State</option>';
+						$.each(result , function(  value ,key) {
+							var selected=(stateId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#stateNamePR").prop('disabled',false);
+						$('#stateNamePR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select File</option>';
+						$.each(result, function(  value,key ) {
+							var selected=(fileTypeId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#inputFileTypePR").prop('disabled',false);
+						$('#inputFileTypePR').html(html);
+						if (districtId != 0) {
+							$("#districtResetDivPR").show();
+						} else {
+						$("#districtResetDivPR").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+		}
+
+     	 $( "#districtNamePR" ).change(function() {
+				var districtId = $(this).val();
+				var stateId = $("#stateNamePR").val();
+				var fileTypeId=$("#inputFileTypePR").val();
+				loadStateAndFileTypeByDistrict(stateId, districtId, fileTypeId);
+				
+			});
+			
+			$( "#districtResetPR" ).click(function() {
+				var districtId = 0;
+				$("#districtNamePR").val("0");
+				var fileTypeId = $("#inputFileTypePR").val();
+				var stateId=$("#stateNamePR").val();
+				loadStateAndFileTypeByDistrict(stateId, districtId, fileTypeId);
+				return false;
+				
+			});
+			
+			
+			
+				/* 
+     		Function to load State and District by FileType
+     		author:Alok Kumar
+     
+    	 */
+    	 
+    	 function loadStateAndDistrictByFileType(stateId, districtId, fileTypeId){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"loadStateAndDistrictByFileType",
+					data : {
+						"stateId" : stateId,
+						"districtId":districtId,
+						"fileTypeId":fileTypeId
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select State</option>';
+						$.each(result , function( value ,key ) {
+							var selected=(stateId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#stateNamePR").prop('disabled',false);
+						$('#stateNamePR').html(html);
+						
+						result= resultarlist[1];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select District</option>';
+						$.each(result, function( value ,key ) {
+							var selected=(districtId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#districtNamePR").prop('disabled',false);
+						$('#districtNamePR').html(html);
+						
+						if (fileTypeId != 0) {
+							$("#fileResetDivPR").show();
+						} else {
+						$("#fileResetDivPR").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#inputFileTypePR').change(function() {
+				var fileTypeId = $(this).val();
+				var stateId = $("#stateNamePR").val();
+				var districtId=$("#districtNamePR").val();
+				loadStateAndDistrictByFileType(stateId, districtId, fileTypeId)
+				
+				
+			});
+			
+			 $( "#fileResetPR" ).click(function() {
+			
+				var fileTypeId = 0;
+				$("#inputFileTypePR").val("0");
+				var districtId = $("#districtNamePR").val();
+				var stateId=$("#stateNamePR").val();
+				
+				loadStateAndDistrictByFileType(stateId, districtId, fileTypeId)
+				
+				return false;
+				
+			});
+			
+			$( "#btnClearProjectReport" ).click(function() {
+				
+				 
+    			 $("input[name='action']").prop("checked", false);
+				
+				var fileTypeId = 0;
+				$("#inputFileTypePR").val("0");
+				var districtId =0; 
+				$("#districtNamePR").val("0");
+				var stateId=0;
+				$("#stateNamePR").val("0");
+				
+				
+				
+				loadStateAndDistrictByFileType(stateId, districtId, fileTypeId);
+				loadDistrictAndFileTypeByState(stateId, districId, fileTypeId);
+				loadStateAndFileTypeByDistrict(stateId, districtId, fileTypeId);
+				
+				return false;
+				
+			});
+			
+			
+			
+
+	
+$(document).ready(function () {
+
+    $("#formProjectReport").on("submit", function (e) {
+         
+
+        var stateId  = $("#stateNamePR").val();
+        var districtId   = $("#districtNamePR").val();
+        var fileType = $("#inputFileTypePR").val();
+        var action   = $("input[name='action']:checked").val();
+        const usrLoggedIn =$("#usrValuePR").val() == "true";
+		const authorizedUsr =$("#authorizedUsrValuePR").val() == "true";
+		var fileTypeString=$("#fileTypeStringPR").val();
+
+        $("#formErrorPR").addClass("d-none").text("");
+
+        if (!stateId || stateId == 0) {
+			e.preventDefault();
+            showError("Please select State");
+            return;
+        }
+        if (!districtId || districtId == 0) {
+			e.preventDefault();
+            showError("Please select District");
+            return;
+        }
+        if (!fileType || fileType == 0) {
+			e.preventDefault();
+            showError("Please select File Type");
+            return;
+        }
+        if (!action) {
+			e.preventDefault();
+            showError("Please select an action (View / Download / Share)");
+            return;
+        }
+
+        var baseUrl = "/Project-Reports" +
+            "?stateNamePR=" + encodeURIComponent(stateId) +
+            "&districtNamePR=" + encodeURIComponent(districtId) +
+            "&inputFileTypePR=" + encodeURIComponent(fileType);
+
+      
+        if (action === "download") {
+			if (fileTypeString === "Pdf" || fileTypeString === "Image") {
+            e.preventDefault();
+            window.location.href = baseUrl + "&action=download";
+        }
+        
+		 if (fileTypeString === "Doc" || fileTypeString === "Excel") {
+			 if (usrLoggedIn && authorizedUsr) {
+               e.preventDefault();
+            window.location.href = baseUrl + "&action=download";
+            }
+			 	
+        }
+        }
+    });
+
+    function showError(msg) {
+        $("#formErrorPR").removeClass("d-none").text(msg);
+    }
+
+  
+    $("#copyShareLinkPR").click(function () {
+    var text = $(".shareLink").val();
+
+    if (navigator.clipboard) {
+        
+        navigator.clipboard.writeText(text).then(function () {
+            alert("Link copied to clipboard");
+        }).catch(function (err) {
+            console.error("Failed to copy: ", err);
+            alert("Unable to copy link");
+        });
+    } else {
+       
+        var copyText = document.querySelector(".shareLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        alert("Link copied to clipboard");
+    }
+});
+
+
+});
+
 			
 
 /******************************** Project Report End *******************************/
