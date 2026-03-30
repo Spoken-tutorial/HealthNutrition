@@ -1,6 +1,5 @@
 package com.health.service.impl;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -60,10 +59,9 @@ public class StateServiceImpl implements StateService {
      */
     @Override
     public List<State> findAll() {
-        // TODO Auto-generated method stub
-        List<State> local = (List<State>) stateRepo.findAll();
-        Collections.sort(local);
-        return local;
+
+        return stateRepo.findAllOrderByName();
+
     }
 
     /**

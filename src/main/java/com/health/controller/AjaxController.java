@@ -74,9 +74,11 @@ import com.health.model.PackLanTutorialResource;
 import com.health.model.PackageContainer;
 import com.health.model.PackageLanguage;
 import com.health.model.PathofPromoVideo;
+import com.health.model.ProjectReport;
 import com.health.model.PromoVideo;
 import com.health.model.ResearchPaper;
 import com.health.model.State;
+import com.health.model.StateDistrictMapping;
 import com.health.model.Testimonial;
 import com.health.model.Topic;
 import com.health.model.TopicCategoryMapping;
@@ -112,9 +114,11 @@ import com.health.service.PackLanTutorialResourceService;
 import com.health.service.PackageContainerService;
 import com.health.service.PackageLanguageService;
 import com.health.service.PathofPromoVideoService;
+import com.health.service.ProjectReportService;
 import com.health.service.PromoVideoService;
 import com.health.service.ResearchPaperService;
 import com.health.service.RoleService;
+import com.health.service.StateDistrictMappingService;
 import com.health.service.StateService;
 import com.health.service.TestimonialService;
 import com.health.service.TopicCategoryMappingService;
@@ -294,6 +298,12 @@ public class AjaxController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private ProjectReportService projectReportService;
+
+    @Autowired
+    private StateDistrictMappingService stateDistrictMappingService;
 
     @Value("${downloadLimit}")
     private int downloadLimit;
@@ -2335,6 +2345,332 @@ public class AjaxController {
     /***************************************
      * Training Resource End
      *************************************************************/
+
+    /**********************************
+     * Projet Report Start
+     *************************/
+
+    @RequestMapping("/loadDistrictByStateforPR")
+    public @ResponseBody TreeMap<String, Integer> loadDistrictByStateforPR(@RequestParam(value = "stateId") int stateId,
+            @RequestParam(value = "allDisId") int allDisId) {
+        TreeMap<String, Integer> districtMaps = new TreeMap<>();
+
+        if (allDisId != 0) {
+            District allDistrict = disService.findById(allDisId);
+            if (allDistrict != null)
+                districtMaps.put(allDistrict.getDistrictName(), allDistrict.getId());
+
+        }
+
+        State state = stateService.findById(stateId);
+        if (state != null) {
+            List<District> disList = disService.findAllByState(state);
+            for (District temp : disList) {
+
+                districtMaps.put(temp.getDistrictName(), temp.getId());
+
+            }
+
+        }
+
+        return districtMaps;
+    }
+
+    @GetMapping("/enableDisableProjectReport")
+    public @ResponseBody boolean enableDisableProjectReport(int projectReportId) {
+        ProjectReport pr = projectReportService.findByProjectReportId(projectReportId);
+
+        try {
+            if (pr.isStatus()) {
+                pr.setStatus(false);
+                projectReportService.save(pr);
+                return true;
+
+            } else {
+                pr.setStatus(true);
+                projectReportService.save(pr);
+                return true;
+
+            }
+
+        } catch (Exception e) {
+
+            logger.error("Error in Enable Disbale Project Report: {}", pr, e);
+            return false;
+        }
+
+    }
+
+    @RequestMapping("/delete-projectReport")
+    public ResponseEntity<String> deleteProjectReport(@RequestParam("projectReportId") int projectReportId,
+            @RequestParam("fileType") String fileType) {
+
+        try {
+            ProjectReport pr = projectReportService.findByProjectReportId(projectReportId);
+            String filePath = "";
+            if (pr != null) {
+                switch (fileType.toLowerCase()) {
+                case "image":
+                    filePath = pr.getImgPath();
+                    pr.setImgPath("");
+                    break;
+                case "pdf":
+                    filePath = pr.getPdfPath();
+                    pr.setPdfPath("");
+                    break;
+                case "doc":
+                    filePath = pr.getDocPath();
+                    pr.setDocPath("");
+                    break;
+                case "excel":
+                    filePath = pr.getExcelPath();
+                    pr.setExcelPath("");
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Unsupported file type: " + fileType);
+                }
+
+                if (!filePath.isEmpty() && filePath.endsWith(".zip")) {
+                    String extractDir = filePath.replace(".zip", "");
+
+                    Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
+                    FileUtils.deleteDirectory(extractDirPath.toFile());
+                }
+
+                projectReportService.save(pr);
+                return ResponseEntity.ok("Deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Project Report not found");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in deleting project report", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error in deleting!");
+        }
+    }
+
+    /*
+     * Function to load District and FileType by State Author: Alok Kumar
+     */
+
+    @RequestMapping("/loadDistrictAndFileTypeByState")
+    public @ResponseBody ArrayList<Map<String, Integer>> getDistrictAndFileTypeByState(
+            @RequestParam(value = "stateId") int stateId, @RequestParam(value = "districtId") int districtId,
+            @RequestParam(value = "fileTypeId") int fileTypeId) {
+
+        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+
+        Map<String, Integer> fileTypes = new TreeMap<>();
+
+        Map<String, Integer> districts = new TreeMap<>();
+
+        State state = stateId != 0 ? stateService.findById(stateId) : null;
+        District district = districtId != 0 ? disService.findById(districtId) : null;
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
+
+        List<StateDistrictMapping> localStateDistrictList = new ArrayList<>();
+
+        // To find FileTypes
+        if (state != null && district != null) {
+            StateDistrictMapping sdm = stateDistrictMappingService.findByStateAndDistrict(state, district);
+            if (sdm != null)
+                localStateDistrictList.add(sdm);
+        } else if (state != null) {
+            localStateDistrictList = stateDistrictMappingService.findByState(state);
+        } else {
+            localStateDistrictList = stateDistrictMappingService.findAll();
+        }
+
+        List<ProjectReport> prList = projectReportService
+                .findByStateDistrictMappingInAndStatusTrue(localStateDistrictList);
+
+        if (!prList.isEmpty()) {
+
+            for (ProjectReport temp : prList) {
+
+                ServiceUtility.getFileTypeIdAndValueforProjectReport(temp)
+                        .forEach((id, type) -> fileTypes.put(type, id));
+
+            }
+        }
+
+        // to find districts
+        if (state != null) {
+            localStateDistrictList = stateDistrictMappingService.findByState(state);
+        } else {
+            localStateDistrictList = stateDistrictMappingService.findAll();
+        }
+
+        prList = projectReportService.findByStateDistrictMappingInAndStatusTrue(localStateDistrictList);
+        List<ProjectReport> newprList1 = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (ProjectReport temp : prList) {
+                if (ServiceUtility.isProjectReportFilePresent(temp, id)) {
+                    newprList1.add(temp);
+                }
+            }
+        }
+        if (!newprList1.isEmpty())
+            prList = newprList1;
+
+        for (ProjectReport pr : prList) {
+
+            District dis = pr.getStateDistrictMapping().getDistrict();
+            districts.put(dis.getDistrictName(), dis.getId());
+
+        }
+
+        arlist.add(districts);
+        arlist.add(fileTypes);
+
+        return arlist;
+
+    }
+
+    /*
+     * Function to load State and FileType by District Author: Alok Kumar
+     */
+
+    @RequestMapping("/loadStateAndFileTypeByDistrict")
+    public @ResponseBody ArrayList<Map<String, Integer>> getStateAndFileTypeByDistrict(
+            @RequestParam(value = "stateId") int stateId, @RequestParam(value = "districtId") int districtId,
+            @RequestParam(value = "fileTypeId") int fileTypeId) {
+        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+
+        Map<String, Integer> states = new TreeMap<>();
+        Map<String, Integer> fileTypes = new TreeMap<>();
+
+        State state = stateId != 0 ? stateService.findById(stateId) : null;
+        District district = districtId != 0 ? disService.findById(districtId) : null;
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
+
+        List<StateDistrictMapping> sdm = district != null ? stateDistrictMappingService.findByDistrict(district)
+                : stateDistrictMappingService.findAll();
+        List<ProjectReport> prList = projectReportService.findByStateDistrictMappingInAndStatusTrue(sdm);
+        List<ProjectReport> newprList = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (ProjectReport temp : prList) {
+                if (ServiceUtility.isProjectReportFilePresent(temp, id)) {
+                    newprList.add(temp);
+                }
+            }
+        }
+
+        if (!newprList.isEmpty())
+            prList = newprList;
+
+        for (ProjectReport pr : prList) {
+            // To find State
+            State stateTemp = pr.getStateDistrictMapping().getState();
+            int prStateId = stateTemp.getId();
+            states.put(stateTemp.getStateName(), stateTemp.getId());
+
+            // To find FileType
+            if (stateId == 0 || prStateId == stateId) {
+                ServiceUtility.getFileTypeIdAndValueforProjectReport(pr).forEach((id, type) -> fileTypes.put(type, id));
+            }
+
+        }
+
+        arlist.add(states);
+        arlist.add(fileTypes);
+
+        return arlist;
+
+    }
+
+    /*
+     * Function to load State and District by FileType Author: Alok Kumar
+     */
+
+    @RequestMapping("/loadStateAndDistrictByFileType")
+    public @ResponseBody ArrayList<Map<String, Integer>> getStateAndDistrictByFileType(
+            @RequestParam(value = "stateId") int stateId, @RequestParam(value = "districtId") int districtId,
+            @RequestParam(value = "fileTypeId") int fileTypeId) {
+
+        ArrayList<Map<String, Integer>> arlist = new ArrayList<>();
+        Map<String, Integer> states = new TreeMap<>();
+        Map<String, Integer> districts = new TreeMap<>();
+
+        State state = stateId != 0 ? stateService.findById(stateId) : null;
+        District district = districtId != 0 ? disService.findById(districtId) : null;
+
+        Map<Integer, String> fileTypeIdAndValue = fileTypeId != 0 ? ServiceUtility.getFileTypeIdAndValue(fileTypeId)
+                : null;
+
+        List<StateDistrictMapping> localstateDistrictList = new ArrayList<>();
+        if (district != null) {
+            localstateDistrictList = stateDistrictMappingService.findByDistrict(district);
+        } else {
+            localstateDistrictList = stateDistrictMappingService.findAll();
+        }
+
+        List<ProjectReport> prList = projectReportService
+                .findByStateDistrictMappingInAndStatusTrue(localstateDistrictList);
+        List<ProjectReport> newprList = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (ProjectReport temp : prList) {
+                if (ServiceUtility.isProjectReportFilePresent(temp, id)) {
+                    newprList.add(temp);
+                }
+            }
+        }
+
+        if (!newprList.isEmpty())
+            prList = newprList;
+
+        for (ProjectReport pr : prList) {
+            // To find State
+            State stateTemp = pr.getStateDistrictMapping().getState();
+            states.put(stateTemp.getStateName(), stateTemp.getId());
+
+        }
+
+        // to find districts
+
+        if (state != null) {
+            localstateDistrictList = stateDistrictMappingService.findByState(state);
+        } else {
+            localstateDistrictList = stateDistrictMappingService.findAll();
+        }
+
+        prList = projectReportService.findByStateDistrictMappingInAndStatusTrue(localstateDistrictList);
+        List<ProjectReport> newprList1 = new ArrayList<>();
+        if (fileTypeIdAndValue != null && !fileTypeIdAndValue.isEmpty()) {
+            Map.Entry<Integer, String> entry = fileTypeIdAndValue.entrySet().iterator().next();
+            int id = entry.getKey();
+            for (ProjectReport temp : prList) {
+                if (ServiceUtility.isProjectReportFilePresent(temp, id)) {
+                    newprList1.add(temp);
+                }
+            }
+        }
+        if (!newprList1.isEmpty())
+            prList = newprList1;
+
+        for (ProjectReport pr : prList) {
+
+            District dis = pr.getStateDistrictMapping().getDistrict();
+            districts.put(dis.getDistrictName(), dis.getId());
+
+        }
+
+        arlist.add(states);
+        arlist.add(districts);
+
+        return arlist;
+
+    }
+
+    /********************************** Projet Report End *************************/
 
     @RequestMapping("/loadTopicByCategoryInAssignContri")
     public @ResponseBody HashMap<Integer, String> getTopicByCategoryAssignContri(@RequestParam(value = "id") int id) {
