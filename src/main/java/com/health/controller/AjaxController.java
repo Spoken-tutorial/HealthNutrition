@@ -2670,6 +2670,76 @@ public class AjaxController {
 
     }
 
+    @GetMapping("/downloadProjectReport")
+    public ResponseEntity<Resource> downloadProjectReport(@RequestParam(name = "fileType") String fileTypeString,
+            @RequestParam(name = "token") String token) {
+
+        try {
+
+            int fileType = ServiceUtility.getFileTypeIdByValue(fileTypeString);
+            ProjectReport pr = null;
+
+            if (fileType == CommonData.DOC) {
+                pr = projectReportService.findByDocToken(token);
+            } else if (fileType == CommonData.EXCEL) {
+                pr = projectReportService.findByExcelToken(token);
+            } else if (fileType == CommonData.PDF) {
+                pr = projectReportService.findByPdfToken(token);
+            } else if (fileType == CommonData.IMAGE) {
+                pr = projectReportService.findByImgToken(token);
+            }
+
+            if (pr == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            String filePath = null;
+
+            if (fileType == CommonData.DOC) {
+                filePath = pr.getDocPath();
+            } else if (fileType == CommonData.EXCEL) {
+                filePath = pr.getExcelPath();
+            } else if (fileType == CommonData.PDF) {
+                filePath = pr.getPdfPath();
+            } else if (fileType == CommonData.IMAGE) {
+                filePath = pr.getImgPath();
+            }
+
+            if (filePath == null || filePath.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+
+            Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), finalUrl);
+
+            if (!Files.exists(path)) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
+
+            Resource resource = new UrlResource(path.toUri());
+
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            String originalFilename = path.getFileName().toString();
+
+            String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+
+            String encodedFilename = URLEncoder.encode(safeFilename, "UTF-8").replace("+", "%20");
+
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
+                    .body(resource);
+
+        } catch (Exception e) {
+            logger.error("Error while downloading training resource", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     /********************************** Projet Report End *************************/
 
     @RequestMapping("/loadTopicByCategoryInAssignContri")
