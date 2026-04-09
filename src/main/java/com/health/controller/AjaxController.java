@@ -2740,6 +2740,79 @@ public class AjaxController {
         }
     }
 
+    @GetMapping("/project-reports/view-share/{state}/{district}/{fileType}/{token}/{page}/{fileName}")
+    public ResponseEntity<Resource> viewOrSharePdfOrImageForPR(@PathVariable String state,
+            @PathVariable String district, @PathVariable String fileType, @PathVariable String token,
+            @PathVariable int page, @PathVariable String fileName) {
+
+        try {
+
+            int fileTypeId = ServiceUtility.getFileTypeIdByValue(fileType);
+
+            ProjectReport pr = null;
+            if (fileTypeId == CommonData.PDF) {
+                pr = projectReportService.findByPdfToken(token);
+            } else if (fileTypeId == CommonData.IMAGE) {
+                pr = projectReportService.findByImgToken(token);
+            }
+
+            if (pr == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String filePath = ServiceUtility.getProjectReportFilePath(pr, fileTypeId);
+
+            List<String> filePaths = new ArrayList<>();
+            if (filePath.toLowerCase().endsWith(".zip")) {
+                List<String> extracted = ServiceUtility.extractZipIfNeeded(filePath, env);
+                List<String> sorted = ServiceUtility.sortFilePathsNumericOtherwiseLexical(extracted);
+
+                if (fileType.equalsIgnoreCase("Pdf")) {
+                    for (String str : sorted) {
+                        if (!str.endsWith(".png")) {
+                            filePaths.add(str);
+                        }
+                    }
+                } else {
+                    filePaths.addAll(sorted);
+                }
+
+            } else {
+                filePaths.add(ServiceUtility.convertFilePathToUrl(filePath));
+            }
+
+            if (page < 0 || page >= filePaths.size()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String finalFilePath = filePaths.get(page);
+            Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), finalFilePath);
+
+            if (!Files.exists(path)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            String originalFilename = path.getFileName().toString();
+            String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+            String encodedFilename = URLEncoder.encode(safeFilename, "UTF-8").replace("+", "%20");
+
+            InputStreamResource resource = new InputStreamResource(Files.newInputStream(path));
+
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename*=UTF-8''" + encodedFilename)
+                    .body(resource);
+
+        } catch (Exception e) {
+            logger.error("Error viewing shared file", e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     /********************************** Projet Report End *************************/
 
     @RequestMapping("/loadTopicByCategoryInAssignContri")
