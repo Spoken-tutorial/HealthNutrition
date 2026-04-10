@@ -7794,6 +7794,113 @@ public class HomeController {
         return "projectReports";
     }
 
+    private String sharedProjectreportTemplate(String stateName, String fileType, String districtName, String token,
+            Principal principal, Model model) {
+
+        int intFileType = ServiceUtility.getFileTypeIdByValue(fileType);
+        logger.info("FileType:{}", fileType);
+        logger.info("intFileType:{}", intFileType);
+
+        ProjectReport pr = null;
+        if (intFileType == CommonData.DOC) {
+            pr = projectReportService.findByDocToken(token);
+        } else if (intFileType == CommonData.EXCEL) {
+            pr = projectReportService.findByExcelToken(token);
+        } else if (intFileType == CommonData.PDF) {
+            pr = projectReportService.findByPdfToken(token);
+        } else if (intFileType == CommonData.IMAGE) {
+            pr = projectReportService.findByImgToken(token);
+        }
+
+        boolean isZipFile = false;
+        String filePath = "";
+
+        if (pr != null && intFileType != 0) {
+            filePath = ServiceUtility.getProjectReportFilePath(pr, intFileType);
+        } else {
+            return "redirect:/error";
+        }
+
+        State state = pr.getStateDistrictMapping().getState();
+        District district = pr.getStateDistrictMapping().getDistrict();
+        String state_name = state.getStateName();
+        String district_name = district.getDistrictName();
+
+        model.addAttribute("stateName", state_name);
+        model.addAttribute("districtName", district_name);
+        model.addAttribute("fileTypeString", fileType);
+        model.addAttribute("token", token);
+
+        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
+        String fileName = path.getFileName().toString();
+
+        String fileSize = ServiceUtility.getZipSizeInKB_OR_MB(filePath, env);
+        model.addAttribute("fileName", fileName);
+        model.addAttribute("fileSizeInMb", fileSize);
+        if (filePath.toLowerCase().endsWith(".zip")) {
+
+            isZipFile = true;
+
+        }
+        navigationLinkCheck(model);
+        model.addAttribute("isZipFile", isZipFile);
+        String res = ServiceUtility.convertFilePathToUrl(filePath);
+
+        if (res == null || res.trim().isEmpty()) {
+
+            return "redirect:/error";
+        }
+        if (isZipFile) {
+            return "sharedProjectReport";
+        }
+        res = ServiceUtility.convertFilePathToUrlWithUTFforBrowserRedirect(filePath);
+        String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        String encodedFileName = "";
+        try {
+            encodedFileName = URLEncoder.encode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+
+            logger.error("Exception", e);
+        }
+
+        return "redirect:" + normalizedBaseUrl + "/project-reports/view-share/" + stateName + "/" + districtName + "/"
+                + fileType + "/" + token + "/" + 0 + "/" + encodedFileName;
+    }
+
+    @GetMapping("/shared-Project-Report/{stateName}/{fileType}/{districtName}")
+    public String getShareLinkofProjectReportByToken(HttpServletRequest req, @PathVariable String stateName,
+            @PathVariable String fileType, @PathVariable String districtName, @RequestParam String token,
+            Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        String res = sharedProjectreportTemplate(stateName, fileType, districtName, token, principal, model);
+        if (fileType.equals("Image") || fileType.equals("Pdf")) {
+            return res;
+        } else {
+            return "redirect:/error";
+        }
+
+    }
+
+    @GetMapping("/shared-project-report-file/{stateName}/{fileType}/{districtName}")
+    public String getShareLinkofProjectReportDoc_ExcelByToken(HttpServletRequest req, @PathVariable String stateName,
+            @PathVariable String fileType, @PathVariable String districtName, @RequestParam String token,
+            Principal principal, Model model) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+
+        String res = sharedProjectreportTemplate(stateName, fileType, districtName, token, principal, model);
+        if (fileType.equals("Doc") || fileType.equals("Excel")) {
+            return "sharedProjectReport";
+        } else {
+            return "redirect:/error";
+        }
+
+    }
+
     /************************ Project Report End ********************************/
 
     @GetMapping("/trainingModules")
