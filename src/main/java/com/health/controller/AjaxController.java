@@ -1553,9 +1553,11 @@ public class AjaxController {
 
     @RequestMapping("/delete-trainingResource")
     public ResponseEntity<String> deleteTrainingResource(@RequestParam("trainingResourceId") int trainingResourceId,
-            @RequestParam("fileType") String fileType) {
+            @RequestParam("fileType") String fileType, Principal principal) {
 
         try {
+            User usr = getUser(principal);
+            String userName = usr.getUsername();
             TrainingResource tr = trainingResourceService.findByTrainingResourceId(trainingResourceId);
             String filePath = "";
             if (tr != null) {
@@ -1586,7 +1588,9 @@ public class AjaxController {
                     Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
                     FileUtils.deleteDirectory(extractDirPath.toFile());
                 }
-
+                if (userName != null) {
+                    tr.setUser(usr);
+                }
                 trainingResourceService.save(tr);
                 return ResponseEntity.ok("Deleted successfully");
             } else {
@@ -2403,9 +2407,11 @@ public class AjaxController {
 
     @RequestMapping("/delete-projectReport")
     public ResponseEntity<String> deleteProjectReport(@RequestParam("projectReportId") int projectReportId,
-            @RequestParam("fileType") String fileType) {
+            @RequestParam("fileType") String fileType, Principal principal) {
 
         try {
+            User usr = getUser(principal);
+            String userName = usr.getUsername();
             ProjectReport pr = projectReportService.findByProjectReportId(projectReportId);
             String filePath = "";
             if (pr != null) {
@@ -2436,7 +2442,9 @@ public class AjaxController {
                     Path extractDirPath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), extractDir);
                     FileUtils.deleteDirectory(extractDirPath.toFile());
                 }
-
+                if (userName != null) {
+                    pr.setUser(usr);
+                }
                 projectReportService.save(pr);
                 return ResponseEntity.ok("Deleted successfully");
             } else {
