@@ -76,6 +76,7 @@ import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.health.model.ProjectReport;
 import com.health.model.TrainingResource;
 import com.health.model.User;
 import com.health.repository.UserRepository;
@@ -1274,6 +1275,20 @@ public class ServiceUtility {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).substring(0, 10);
     }
 
+    public static boolean hasAnyProjectReportFile(ProjectReport pr) {
+        boolean hasData = true;
+        if ((pr.getPdfPath() == null || pr.getPdfPath().isEmpty())
+                && (pr.getDocPath() == null || pr.getDocPath().isEmpty())
+                && (pr.getExcelPath() == null || pr.getExcelPath().isEmpty())
+                && (pr.getImgPath() == null || pr.getImgPath().isEmpty())) {
+
+            hasData = false;
+        }
+
+        return hasData;
+
+    }
+
     public static boolean hasAnyResourceFile(TrainingResource tr) {
         boolean hasData = true;
         if ((tr.getPdfPath() == null || tr.getPdfPath().isEmpty())
@@ -1354,6 +1369,29 @@ public class ServiceUtility {
         return result;
     }
 
+    public static Map<Integer, String> getFileTypeIdAndValueforProjectReport(ProjectReport pr) {
+        Map<Integer, String> result = new HashMap<>();
+
+        if (isNotBlank(pr.getDocPath())) {
+            result.put(CommonData.DOC, "Doc");
+
+        }
+        if (isNotBlank(pr.getExcelPath())) {
+            result.put(CommonData.EXCEL, "Excel");
+
+        }
+        if (isNotBlank(pr.getImgPath())) {
+            result.put(CommonData.IMAGE, "Image");
+
+        }
+        if (isNotBlank(pr.getPdfPath())) {
+            result.put(CommonData.PDF, "Pdf");
+
+        }
+
+        return result;
+    }
+
     public static boolean isTrainingResourceFilePresent(TrainingResource tr, int fileId) {
         if (tr == null) {
             return false;
@@ -1368,6 +1406,25 @@ public class ServiceUtility {
             return isNotBlank(tr.getImgPath());
         case CommonData.PDF:
             return isNotBlank(tr.getPdfPath());
+        default:
+            return false;
+        }
+    }
+
+    public static boolean isProjectReportFilePresent(ProjectReport pr, int fileId) {
+        if (pr == null) {
+            return false;
+        }
+
+        switch (fileId) {
+        case CommonData.DOC:
+            return isNotBlank(pr.getDocPath());
+        case CommonData.EXCEL:
+            return isNotBlank(pr.getExcelPath());
+        case CommonData.IMAGE:
+            return isNotBlank(pr.getImgPath());
+        case CommonData.PDF:
+            return isNotBlank(pr.getPdfPath());
         default:
             return false;
         }
@@ -1391,6 +1448,32 @@ public class ServiceUtility {
             break;
         case CommonData.PDF:
             path = tr.getPdfPath();
+            break;
+        default:
+            return "";
+        }
+
+        return isNotBlank(path) ? path : "";
+    }
+
+    public static String getProjectReportFilePath(ProjectReport pr, int fileId) {
+        if (pr == null) {
+            return "";
+        }
+
+        String path;
+        switch (fileId) {
+        case CommonData.DOC:
+            path = pr.getDocPath();
+            break;
+        case CommonData.EXCEL:
+            path = pr.getExcelPath();
+            break;
+        case CommonData.IMAGE:
+            path = pr.getImgPath();
+            break;
+        case CommonData.PDF:
+            path = pr.getPdfPath();
             break;
         default:
             return "";
