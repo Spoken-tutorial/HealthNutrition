@@ -76,6 +76,7 @@ import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.health.model.ProjectReport;
 import com.health.model.TrainingResource;
 import com.health.model.User;
 import com.health.repository.UserRepository;
@@ -239,6 +240,22 @@ public class ServiceUtility {
         return path;
     }
 
+    private static String uploadLargeFile(MultipartFile uploadFile, String pathToUpload) throws Exception {
+
+        String fileName = uploadFile.getOriginalFilename();
+        Path filePath = Paths.get(pathToUpload, fileName);
+
+        Files.createDirectories(filePath.getParent());
+
+        try (InputStream inputStream = uploadFile.getInputStream()) {
+            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        logger.info("File Name Path: {}", filePath.toString());
+
+        return filePath.toString();
+    }
+
     public static int extractInteger(String str) {
 
         String numberStr = str.replaceAll("\\D+", ""); // \\D+ matches all non-digit characters
@@ -261,6 +278,21 @@ public class ServiceUtility {
         MultipartFile renamedFile = new RenamedMultipartFile(file, newFileName);
         createFolder(env.getProperty("spring.applicationexternalPath.name") + folder);
         String pathtoUploadPoster = ServiceUtility.uploadFile(renamedFile,
+                env.getProperty("spring.applicationexternalPath.name") + folder);
+        int indexToStart = pathtoUploadPoster.indexOf("Media");
+
+        String document = pathtoUploadPoster.substring(indexToStart, pathtoUploadPoster.length());
+        return document;
+
+    }
+
+    public static String uploadLargeMediaFile(MultipartFile file, Environment env, String folder) throws Exception {
+
+        String fileName = file.getOriginalFilename();
+        String newFileName = sanitizeFilename(fileName);
+        MultipartFile renamedFile = new RenamedMultipartFile(file, newFileName);
+        createFolder(env.getProperty("spring.applicationexternalPath.name") + folder);
+        String pathtoUploadPoster = ServiceUtility.uploadLargeFile(renamedFile,
                 env.getProperty("spring.applicationexternalPath.name") + folder);
         int indexToStart = pathtoUploadPoster.indexOf("Media");
 
@@ -1228,6 +1260,34 @@ public class ServiceUtility {
 
     }
 
+    public static boolean isFileLargerThan100Mb(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            long sizeLimit = 100L * 1024 * 1024;
+            return fileSizeInBytes > sizeLimit;
+
+        }
+        return false;
+
+    }
+
+    public static boolean isFileLargerThan50Mb(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            long sizeLimit = 50L * 1024 * 1024;
+            return fileSizeInBytes > sizeLimit;
+
+        }
+        return false;
+
+    }
+
     public static String getVideoResolutionPath(String VideoPath, String resolution) {
         int dotIndex = VideoPath.lastIndexOf('.');
 
@@ -1272,6 +1332,52 @@ public class ServiceUtility {
         new SecureRandom().nextBytes(bytes);
 
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).substring(0, 10);
+    }
+
+    public static boolean hasAnyProjectReportFile(ProjectReport pr) {
+        boolean hasData = true;
+        if ((pr.getPdfPath() == null || pr.getPdfPath().isEmpty())
+                && (pr.getDocPath() == null || pr.getDocPath().isEmpty())
+                && (pr.getExcelPath() == null || pr.getExcelPath().isEmpty())
+                && (pr.getImgPath() == null || pr.getImgPath().isEmpty())) {
+
+            hasData = false;
+        }
+
+        return hasData;
+
+    }
+
+    public static String downloadFileUpTo100MB(String filePath, Environment env, HttpServletResponse response) {
+
+        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
+        File file = path.toFile();
+
+        if (!file.exists()) {
+            throw new RuntimeException("File not found");
+        }
+
+        try (OutputStream os = response.getOutputStream();
+                InputStream is = new BufferedInputStream(new FileInputStream(path.toFile()));) {
+
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader("Content-Disposition", "attachment; filename=" + ServiceUtility.getZipfileName(path));
+            response.setContentLengthLong(Files.size(path));
+
+            byte[] buffer = new byte[16384];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+
+                os.write(buffer, 0, length);
+
+            }
+            os.flush();
+
+        } catch (Exception e) {
+            logger.info("Exception:{}", e.getMessage());
+        }
+        return null;
     }
 
     public static boolean hasAnyResourceFile(TrainingResource tr) {
@@ -1354,6 +1460,29 @@ public class ServiceUtility {
         return result;
     }
 
+    public static Map<Integer, String> getFileTypeIdAndValueforProjectReport(ProjectReport pr) {
+        Map<Integer, String> result = new HashMap<>();
+
+        if (isNotBlank(pr.getDocPath())) {
+            result.put(CommonData.DOC, "Doc");
+
+        }
+        if (isNotBlank(pr.getExcelPath())) {
+            result.put(CommonData.EXCEL, "Excel");
+
+        }
+        if (isNotBlank(pr.getImgPath())) {
+            result.put(CommonData.IMAGE, "Image");
+
+        }
+        if (isNotBlank(pr.getPdfPath())) {
+            result.put(CommonData.PDF, "Pdf");
+
+        }
+
+        return result;
+    }
+
     public static boolean isTrainingResourceFilePresent(TrainingResource tr, int fileId) {
         if (tr == null) {
             return false;
@@ -1371,6 +1500,30 @@ public class ServiceUtility {
         default:
             return false;
         }
+    }
+
+    public static boolean isProjectReportFilePresent(ProjectReport pr, int fileId) {
+        if (pr == null) {
+            return false;
+        }
+
+        switch (fileId) {
+        case CommonData.DOC:
+            return isNotBlank(pr.getDocPath());
+        case CommonData.EXCEL:
+            return isNotBlank(pr.getExcelPath());
+        case CommonData.IMAGE:
+            return isNotBlank(pr.getImgPath());
+        case CommonData.PDF:
+            return isNotBlank(pr.getPdfPath());
+        default:
+            return false;
+        }
+    }
+
+    public static boolean isProjectReportFilePresentforAnyFile(ProjectReport pr) {
+        return pr != null && (isNotBlank(pr.getDocPath()) || isNotBlank(pr.getExcelPath())
+                || isNotBlank(pr.getImgPath()) || isNotBlank(pr.getPdfPath()));
     }
 
     public static String getTrainingResourceFilePath(TrainingResource tr, int fileId) {
@@ -1391,6 +1544,32 @@ public class ServiceUtility {
             break;
         case CommonData.PDF:
             path = tr.getPdfPath();
+            break;
+        default:
+            return "";
+        }
+
+        return isNotBlank(path) ? path : "";
+    }
+
+    public static String getProjectReportFilePath(ProjectReport pr, int fileId) {
+        if (pr == null) {
+            return "";
+        }
+
+        String path;
+        switch (fileId) {
+        case CommonData.DOC:
+            path = pr.getDocPath();
+            break;
+        case CommonData.EXCEL:
+            path = pr.getExcelPath();
+            break;
+        case CommonData.IMAGE:
+            path = pr.getImgPath();
+            break;
+        case CommonData.PDF:
+            path = pr.getPdfPath();
             break;
         default:
             return "";

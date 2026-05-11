@@ -1,7 +1,9 @@
 package com.health.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.health.model.District;
@@ -39,6 +41,13 @@ public interface DistrictRepository extends CrudRepository<District, Integer> {
      * @param state state object
      * @return list of District object
      */
-    List<District> findAllBystate(State state);
+    List<District> findAllByState(State state);
+
+    Optional<District> findByDistrictNameIgnoreCase(String districtName);
+
+    @Query("SELECT d FROM District d ORDER BY d.districtName")
+    List<District> findAllOrderByName();
+
+    List<District> findAllByStateOrderByDistrictNameAsc(State state);
 
 }
