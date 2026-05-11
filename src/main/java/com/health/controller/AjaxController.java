@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 //import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -2521,6 +2522,14 @@ public class AjaxController {
                 }
             }
         }
+
+        else {
+            for (ProjectReport temp : prList) {
+                if (ServiceUtility.isProjectReportFilePresentforAnyFile(temp)) {
+                    newprList1.add(temp);
+                }
+            }
+        }
         if (!newprList1.isEmpty())
             prList = newprList1;
 
@@ -2565,6 +2574,14 @@ public class AjaxController {
             int id = entry.getKey();
             for (ProjectReport temp : prList) {
                 if (ServiceUtility.isProjectReportFilePresent(temp, id)) {
+                    newprList.add(temp);
+                }
+            }
+        }
+
+        else {
+            for (ProjectReport temp : prList) {
+                if (ServiceUtility.isProjectReportFilePresentforAnyFile(temp)) {
                     newprList.add(temp);
                 }
             }
@@ -2678,9 +2695,75 @@ public class AjaxController {
 
     }
 
+    /*
+     * @GetMapping("/downloadProjectReport") public ResponseEntity<Resource>
+     * downloadProjectReport(@RequestParam(name = "fileType") String fileTypeString,
+     * 
+     * @RequestParam(name = "token") String token) {
+     * 
+     * try {
+     * 
+     * int fileType = ServiceUtility.getFileTypeIdByValue(fileTypeString);
+     * ProjectReport pr = null;
+     * 
+     * if (fileType == CommonData.DOC) { pr =
+     * projectReportService.findByDocToken(token); } else if (fileType ==
+     * CommonData.EXCEL) { pr = projectReportService.findByExcelToken(token); } else
+     * if (fileType == CommonData.PDF) { pr =
+     * projectReportService.findByPdfToken(token); } else if (fileType ==
+     * CommonData.IMAGE) { pr = projectReportService.findByImgToken(token); }
+     * 
+     * if (pr == null) { return
+     * ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); }
+     * 
+     * String filePath = null;
+     * 
+     * if (fileType == CommonData.DOC) { filePath = pr.getDocPath(); } else if
+     * (fileType == CommonData.EXCEL) { filePath = pr.getExcelPath(); } else if
+     * (fileType == CommonData.PDF) { filePath = pr.getPdfPath(); } else if
+     * (fileType == CommonData.IMAGE) { filePath = pr.getImgPath(); }
+     * 
+     * if (filePath == null || filePath.trim().isEmpty()) { return
+     * ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); }
+     * 
+     * String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
+     * 
+     * Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"),
+     * finalUrl);
+     * 
+     * if (!Files.exists(path)) { return
+     * ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); }
+     * 
+     * Resource resource = new UrlResource(path.toUri());
+     * 
+     * String contentType = Files.probeContentType(path); if (contentType == null) {
+     * contentType = "application/octet-stream"; }
+     * 
+     * String originalFilename = path.getFileName().toString();
+     * 
+     * String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
+     * 
+     * String encodedFilename = URLEncoder.encode(safeFilename,
+     * "UTF-8").replace("+", "%20");
+     * 
+     * return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+     * .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" +
+     * encodedFilename) .body(resource);
+     * 
+     * } catch (Exception e) {
+     * logger.error("Error while downloading training resource", e); return
+     * ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build(); } }
+     */
+
     @GetMapping("/downloadProjectReport")
-    public ResponseEntity<Resource> downloadProjectReport(@RequestParam(name = "fileType") String fileTypeString,
-            @RequestParam(name = "token") String token) {
+    public String downloadProjectReport(@RequestParam(name = "fileType") String fileTypeString,
+            @RequestParam(name = "token") String token, HttpServletResponse response,
+            RedirectAttributes redirectAttributes, HttpServletRequest req) {
+
+        String referer = req.getHeader("Referer");
+        if (referer == null || referer.trim().isEmpty()) {
+            referer = "/Project-Reports";
+        }
 
         try {
 
@@ -2698,7 +2781,8 @@ public class AjaxController {
             }
 
             if (pr == null) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+                redirectAttributes.addFlashAttribute("error_msg", "No Project Report Found");
+                return "redirect:" + referer;
             }
 
             String filePath = null;
@@ -2714,7 +2798,8 @@ public class AjaxController {
             }
 
             if (filePath == null || filePath.trim().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+                redirectAttributes.addFlashAttribute("error_msg", "No Project Report File Found");
+                return "redirect:" + referer;
             }
 
             String finalUrl = ServiceUtility.convertFilePathToUrl(filePath);
@@ -2722,29 +2807,33 @@ public class AjaxController {
             Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), finalUrl);
 
             if (!Files.exists(path)) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+                redirectAttributes.addFlashAttribute("error_msg", "No Project Report File Found");
+                return "redirect:" + referer;
             }
 
-            Resource resource = new UrlResource(path.toUri());
+            if (!ServiceUtility.isFileLargerThan100Mb(finalUrl, env)) {
+                String msg = ServiceUtility.downloadFileUpTo100MB(finalUrl, env, response);
+                if (msg != null) {
+                    redirectAttributes.addFlashAttribute("error_msg", "Please Try Again");
+                    return "redirect:" + referer;
+                }
 
-            String contentType = Files.probeContentType(path);
-            if (contentType == null) {
-                contentType = "application/octet-stream";
+            } else {
+
+                String message = ServiceUtility.downloadManager(finalUrl, downloadCount, downloadLimit, downloadTimeOut,
+                        env, response);
+
+                if (message != null) {
+                    redirectAttributes.addFlashAttribute("error_msg", message);
+                    return "redirect:" + referer;
+                }
             }
-
-            String originalFilename = path.getFileName().toString();
-
-            String safeFilename = originalFilename.replaceAll("[\\\\/:*?\"<>|]", "_");
-
-            String encodedFilename = URLEncoder.encode(safeFilename, "UTF-8").replace("+", "%20");
-
-            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
-                    .body(resource);
+            return null;
 
         } catch (Exception e) {
             logger.error("Error while downloading training resource", e);
-            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+            redirectAttributes.addFlashAttribute("error_msg", "Something went wrong");
+            return "redirect:" + referer;
         }
     }
 

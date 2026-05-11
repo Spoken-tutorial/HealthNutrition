@@ -7624,7 +7624,7 @@ public class HomeController {
         if (state == null || district == null || inputFileType == 0) {
             getModelProjectReport(model);
 
-            model.addAttribute("error_msg", "Please select all fields");
+            // model.addAttribute("error_msg", "Please select all fields");
             return "projectReports";
 
         }
@@ -7837,7 +7837,10 @@ public class HomeController {
         String fileSize = ServiceUtility.getZipSizeInKB_OR_MB(filePath, env);
         model.addAttribute("fileName", fileName);
         model.addAttribute("fileSizeInMb", fileSize);
-        if (filePath.toLowerCase().endsWith(".zip")) {
+
+        boolean maxFileSize = ServiceUtility.isFileLargerThan50Mb(filePath, env);
+
+        if (filePath.toLowerCase().endsWith(".zip") || maxFileSize) {
 
             isZipFile = true;
 

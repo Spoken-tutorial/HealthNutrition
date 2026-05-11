@@ -1260,6 +1260,34 @@ public class ServiceUtility {
 
     }
 
+    public static boolean isFileLargerThan100Mb(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            long sizeLimit = 100L * 1024 * 1024;
+            return fileSizeInBytes > sizeLimit;
+
+        }
+        return false;
+
+    }
+
+    public static boolean isFileLargerThan50Mb(String zipUrl, Environment env) {
+        Path zipFilePath = Paths.get(env.getProperty("spring.applicationexternalPath.name"), zipUrl);
+        File zipFile = zipFilePath.toFile();
+
+        if (zipFile.exists() && zipFile.isFile()) {
+            long fileSizeInBytes = zipFile.length();
+            long sizeLimit = 50L * 1024 * 1024;
+            return fileSizeInBytes > sizeLimit;
+
+        }
+        return false;
+
+    }
+
     public static String getVideoResolutionPath(String VideoPath, String resolution) {
         int dotIndex = VideoPath.lastIndexOf('.');
 
@@ -1318,6 +1346,38 @@ public class ServiceUtility {
 
         return hasData;
 
+    }
+
+    public static String downloadFileUpTo100MB(String filePath, Environment env, HttpServletResponse response) {
+
+        Path path = Paths.get(env.getProperty("spring.applicationexternalPath.name"), filePath);
+        File file = path.toFile();
+
+        if (!file.exists()) {
+            throw new RuntimeException("File not found");
+        }
+
+        try (OutputStream os = response.getOutputStream();
+                InputStream is = new BufferedInputStream(new FileInputStream(path.toFile()));) {
+
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader("Content-Disposition", "attachment; filename=" + ServiceUtility.getZipfileName(path));
+            response.setContentLengthLong(Files.size(path));
+
+            byte[] buffer = new byte[16384];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+
+                os.write(buffer, 0, length);
+
+            }
+            os.flush();
+
+        } catch (Exception e) {
+            logger.info("Exception:{}", e.getMessage());
+        }
+        return null;
     }
 
     public static boolean hasAnyResourceFile(TrainingResource tr) {
@@ -1459,6 +1519,11 @@ public class ServiceUtility {
         default:
             return false;
         }
+    }
+
+    public static boolean isProjectReportFilePresentforAnyFile(ProjectReport pr) {
+        return pr != null && (isNotBlank(pr.getDocPath()) || isNotBlank(pr.getExcelPath())
+                || isNotBlank(pr.getImgPath()) || isNotBlank(pr.getPdfPath()));
     }
 
     public static String getTrainingResourceFilePath(TrainingResource tr, int fileId) {
