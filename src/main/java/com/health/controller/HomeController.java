@@ -901,6 +901,33 @@ public class HomeController {
         getPackageAndLanguageData(model, "", "");
     }
 
+    private void getNewPackageAndLanguageData(Model model, int weekId, int lanId) {
+        List<PackageContainer> packageList = packLanService.findAllDistinctEnabledPackageContainers();
+        model.addAttribute("packageList", packageList);
+
+        ArrayList<Map<String, Integer>> arlist = ajaxController.getNewLanguageByWeek(weekId, lanId, null);
+        ArrayList<Map<String, Integer>> arlist1 = ajaxController.getNewWeekByLanguage(weekId, lanId, null);
+        Map<String, Integer> languages = arlist.get(0);
+        Map<String, Integer> weeks = arlist1.get(0);
+
+        model.addAttribute("weekListNew", weeks);
+        model.addAttribute("languagesNew", languages);
+        model.addAttribute("localWeekNew", weekId);
+
+        model.addAttribute("localLanguageNew", lanId);
+
+        model.addAttribute("languageCount", languages.size());
+
+        boolean downloadPackageFlag = !packageList.isEmpty();
+
+        model.addAttribute("downloadPackageFlag", downloadPackageFlag);
+
+    }
+
+    private void getNewPackageAndLanguageData(Model model) {
+        getNewPackageAndLanguageData(model, 0, 0);
+    }
+
     private void getModelTrainingResource(Model model, int topicId, int lanId, int fileTypeId) {
 
         ArrayList<Map<String, Integer>> arlist = ajaxController.getLanAndFileTypeByTopic(topicId, lanId, fileTypeId);
@@ -7975,6 +8002,93 @@ public class HomeController {
 
     /************************ Project Report End ********************************/
 
+    /**********************
+     * New Training Module Start
+     ******************************/
+
+    @GetMapping("/Training-Modules")
+    public String newHstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "0") int week,
+            @RequestParam(name = "lang", required = false, defaultValue = "0") int lang, HttpServletRequest req,
+            @RequestParam(name = "page", defaultValue = "0") int page, Model model, Principal principal) {
+
+        User usr = getUser(principal);
+        logger.info("{} {} {}", usr.getUsername(), req.getMethod(), req.getRequestURI());
+        model.addAttribute("userInfo", usr);
+
+        model.addAttribute("week", week);
+        model.addAttribute("language", lang);
+        Week localWeek = null;
+        Language localLan = null;
+
+        Pageable pageable = PageRequest.of(page, 10);
+
+        getNewPackageAndLanguageData(model, week, lang);
+
+        if (week != 0) {
+            localWeek = weekService.findByWeekId(week);
+
+            model.addAttribute("weekforQuery", localWeek);
+        }
+        if (lang != 0) {
+            localLan = lanService.getById(lang);
+            model.addAttribute("lanforQuery", localLan);
+        }
+
+        List<WeekTitleVideo> weekTitleList = localWeek != null ? new ArrayList<>(localWeek.getWeekTitles())
+                : weekTitleVideoService.findAll();
+        List<PackageLanguage> packlan_list = localLan != null ? new ArrayList<>(localLan.getPackageLanguages())
+                : packLanService.findAll();
+
+        List<TutorialWithWeekAndPackage> tutorialswithWeekAndPackage = tutorialWithWeekAndPackageService
+                .findByWeekTitlesAndPackageLanguages(weekTitleList, packlan_list);
+
+        List<WeekTitleVideo> weekTitleVideoList = tutorialswithWeekAndPackage.stream()
+                .map(TutorialWithWeekAndPackage::getWeekTitle).distinct().collect(Collectors.toList());
+
+        List<WeekTitleVideo> finalWeekTitleVideoList = getEnglishTrainingMouduleFirst(weekTitleVideoList);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), finalWeekTitleVideoList.size());
+
+        List<WeekTitleVideo> sublist = finalWeekTitleVideoList.subList(start, end);
+
+        List<WeekTitleVideo> weekTitleVideoView = new ArrayList<WeekTitleVideo>();
+
+        Page<WeekTitleVideo> weekTitleVidePage = new PageImpl<>(sublist, pageable, finalWeekTitleVideoList.size());
+        for (WeekTitleVideo temp : weekTitleVidePage) {
+            {
+                weekTitleVideoView.add(temp);
+            }
+        }
+
+        int totalPages = 0;
+
+        if (weekTitleVidePage != null) {
+            totalPages = weekTitleVidePage.getTotalPages();
+        } else {
+            totalPages = 1;
+        }
+
+        int firstPage = page + 1 > 2 ? page + 1 - 2 : 1;
+        int lastPage = page + 1 < totalPages - 5 ? page + 1 + 5 : totalPages;
+
+        model.addAttribute("weekTitleVideoView", weekTitleVideoView);
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("firstPage", firstPage);
+        model.addAttribute("lastPage", lastPage);
+        model.addAttribute("totalPages", totalPages);
+
+        model.addAttribute("userInfo", usr);
+
+        // model.addAttribute("weekTitleVideoList", finalWeekTitleVideoList);
+
+        return "hstTrainingModuleList";
+
+    }
+
+    /********************* New Training Module End ********************************/
+
     @GetMapping("/trainingModules")
     public String hstTrainingModules(@RequestParam(name = "week", required = false, defaultValue = "") String weekName,
             @RequestParam(name = "lan", required = false, defaultValue = "") String langName, HttpServletRequest req,
@@ -8030,8 +8144,17 @@ public class HomeController {
         if (weekTitleVideo == null) {
             foundVideo = false;
         } else {
+            model.addAttribute("currentwtvId", weekTitleVideoId);
             Week week = weekTitleVideo.getWeek();
             Language lan = weekTitleVideo.getVideoResource().getLan();
+            model.addAttribute("week", week.getWeekId());
+            model.addAttribute("language", lan.getLanId());
+
+            getNewPackageAndLanguageData(model, week.getWeekId(), lan.getLanId());
+
+            model.addAttribute("weekforQuery", week);
+
+            model.addAttribute("lanforQuery", lan);
 
             List<WeekTitleVideo> relatedweekTitleVideoList = weekTitleVideoService.findByWeekAndLan(week, lan);
             relatedweekTitleVideoList.remove(weekTitleVideo);

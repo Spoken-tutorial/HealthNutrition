@@ -2844,6 +2844,162 @@ $(".deleteTrainingModuleTutorial-btn").click(function(){
     
 /************************************Assign Video End ********************************************** */
 
+
+
+/*********** Trianing Module New Page Code Start******************************************************/
+
+ function loadLanguageByWeek(weekId, languageId){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"load_lan_by_week",
+					data : {
+						"weekId":weekId,
+						"languageId":languageId,
+						
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Language</option>';
+						$.each(result , function( value ,key ) {
+							var selected=(languageId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#lang_new").prop('disabled',false);
+						$('#lang_new').html(html);
+						
+						
+						if (weekId !=0) {
+							$("#weekresetdivnew").show();
+						} else {
+						$("#weekresetdivnew").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#week_new').change(function() {
+				var weekId = $(this).val();
+				var languageId = $("#lang_new").val();
+				
+				loadLanguageByWeek(weekId, languageId);
+				
+				
+			});
+			
+			 $( "#weekresetnew" ).click(function() {
+			
+				var weekId = 0;
+				$("#week_new").val("0");
+				var languageId = $("#lang_new").val();
+				
+				loadLanguageByWeek(weekId, languageId);
+				
+				return false;
+				
+			});
+			
+			
+			 
+     function loadWeekByLanguage(weekId, languageId){
+			
+			$.ajax({
+					type : "GET",
+					url : projectPath+"load_week_by_language",
+					data : {
+						"weekId":weekId,
+						"languageId":languageId,
+						
+						
+					},
+					contentType : "application/json",
+					success : function(resultarlist) {
+						var result= resultarlist[0];
+						
+						console.log(result);
+						var html = '';
+						html += '<option value="0">Select Week</option>';
+						$.each(result , function( value ,key ) {
+							var selected=(weekId==key)?"selected":"";
+			  	  			        html += `<option value="${key}" ${selected}> ${value} </option>`;
+			  	  			     })
+						$("#week_new").prop('disabled',false);
+						$('#week_new').html(html);
+						
+						
+						if (languageId !=0) {
+							$("#languageresetdivnew").show();
+						} else {
+						$("#languageresetdivnew").hide();
+						}
+
+					},
+					error : function(err) {
+						console.log("not working. ERROR: "+ JSON.stringify(err));
+					}
+				});
+	
+ 			}
+    	 
+    	  $('#lang_new').change(function() {
+				var languageId = $(this).val();
+				var weekId = $("#week_new").val();
+				
+				loadWeekByLanguage(weekId, languageId);
+				
+				
+			});
+			
+			 $( "#languageresetnew" ).click(function() {
+			
+				var languageId = 0;
+				$("#lang_new").val("0");
+				var weekId = $("#week_new").val();
+				
+				loadWeekByLanguage(weekId, languageId);
+				
+				return false;
+				
+			});
+			
+
+			
+			
+			
+			
+			$( "#btnClearFormnew" ).click(function() {
+				
+				
+				var languageId = 0;
+				$("#lang_new").val("0");
+				var weekId =0; 
+				$("#week_new").val("0");
+				
+				loadLanguageByWeek(weekId, languageId);
+				loadWeekByLanguage(weekId, languageId);
+				
+				return false;
+				
+			});
+			
+			
+
+
+
+
+/***************Trainig Module New Page Code End******************************************************/
+
+
 /******************************** Trainig Resource Start ***************************************/
 
   $("#catIdTR").change(function() {
@@ -4071,8 +4227,7 @@ $(document).ready(function () {
 		                
 		            }
 		            
-		            console.log("Search bar div found?", $('#searchbarDivofTutorialContainer').length);
-					console.log("Autoplay checkbox state:", $('#autoPlayCheckbox').is(':checked'));
+		            
 		        }
 		    });
 			

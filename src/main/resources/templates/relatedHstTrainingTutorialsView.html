@@ -11,7 +11,11 @@
 <section th:replace="hstTrainingModule.html :: header-bar" ></section>
 <nav th:replace="hstTrainingModule.html :: navbar"></nav>
 
-	<main id="tutorialPage" class=" p-4">
+<div class="container">
+	 <div th:replace="common/commonItemsHSTTrainingModule :: new_search_bar"></div>
+</div>
+
+	<main id="tutorialPage" class=" px-4 pt-2 pb-4">
 		<section id="t-video">
 			<div class="my-2 title">
 				<h1 th:if="${foundVideo }">

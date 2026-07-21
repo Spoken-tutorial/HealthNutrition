@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/check-deployment", "/training-resources/view-share/**", "/loadDistrictAndFileTypeByState/**",
             "/loadStateAndFileTypeByDistrict/**", "/loadStateAndDistrictByFileType/**", "/Project-Reports/**",
             "/downloadProjectReport/**", "/project-reports/view-share/**", "/shared-Project-Report/**",
-            "/shared-project-report-file/**", };
+            "/shared-project-report-file/**", "/Training-Modules/**", "/load_lan_by_week", "/load_week_by_language", };
 
     /**
      * url matcher for SUPERADMIN

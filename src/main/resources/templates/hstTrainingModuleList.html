@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head >
+<link rel="icon" th:href="@{/image/favicon.ico}" />
+<title >HST Training Modules</title>
+
+	<meta charset="utf-8"/> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+	integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+	crossorigin="anonymous" />
+	<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+	<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+	<link rel="stylesheet" th:href="@{/css/main.css}"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
+	<link rel="stylesheet" th:href="@{/css/new-training-module.css}">	
+</head>
+<body>
+ <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+ 
+  <section th:replace="index.html :: header-bar"></section>
+<nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="navbar">
+   
+        <span style="margin-top:8px; padding-top:8px;"><a th:href="@{/}"> <img th:src="@{/image/logo.png}" href="www.google." alt="Spoken Tutorial" height="50" width="50"> </img></a>
+								<span style="color: rgba(0,0,0,0.9);font-size: 1.6rem; margin-top:8px;" class="ml-3">HST Training Modules  </span> </span>
+
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavBar">
+            <div class="navbar-nav ml-auto">
+                <a class="nav-item nav-link active" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
+                <div th:replace="common/commonItemsHSTTrainingModule :: download_package"></div>
+            </div>
+        </div>
+  
+</nav>
+<div class="container">
+
+    <div th:replace="common/commonItemsHSTTrainingModule :: new_search_bar"></div>
+
+    <main>
+
+        <div class="row">
+
+            <div class="col-lg-6 mb-4"
+                 th:each="temp : ${weekTitleVideoView}">
+
+                <a th:href="@{'/hstTrainingModuleView/' + ${temp.getWeekTitleVideoId()} + '/'}"
+                   class="text-decoration-none text-dark">
+
+                    <div class="card tutorial-card">
+
+                        <div class="row g-0 h-100 align-items-center">
+
+                            <!-- Thumbnail -->
+                            <div class="col-6">
+
+                                <div class="thumbnail-wrapper">
+
+							        <img th:src="@{/files/}+@{${temp.getVideoResource().getThumbnailPath()}}"
+							             class="tutorial-thumbnail"
+							             alt="Thumbnail">
+							
+							        <div class="play-button">
+							            <i class="fa fa-play"></i>
+							        </div>
+							
+							    </div>
+
+                            </div>
+
+                            <!-- Details -->
+                            <div class="col-6">
+
+                                <div class="card-body tutorial-body">
+
+                                    <div class="week-name">
+
+                                        <span th:text="${temp.getWeek().getWeekName()}"></span>
+
+                                        <span th:if="${temp.getVideoResource().getSessionName()!=null}">
+                                            :
+                                            <span th:text="${temp.getVideoResource().getSessionName()}"></span>
+                                        </span>
+
+                                    </div>
+
+                                    <div class="tutorial-title"
+                                         th:text="${temp.getTitle()}">
+                                    </div>
+
+                                    <div class="language mt-auto">
+
+                                        <strong>Language :</strong>
+
+                                        <i><span th:text="${temp.getVideoResource().getLan().getLangName()}"></span></i>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    <div th:unless="${weekTitleVideoView.size()>0}" ><h4>No Content found for  query:</h4>
+	<br><h5 th:if="${weekforQuery!=null}"><b>Week:</b> <span th:text="${weekforQuery.getWeekName()}"></span></h5>
+	
+	<h5 th:if="${lanforQuery!=null}"><b>Language:</b> <span th:text="${lanforQuery.getLangName()}"></span></h5>
+	<br><br></div>
+	
+	
+	
+</main>
+
+
+</div>
+
+
+
+
+	<nav th:if="${weekTitleVideoView.size()>0}"  aria-label="Page navigation example" class="navbar fixed-bottom navbar-brand" style="left: auto; right: 5px">
+		  <ul class="pagination pagination-sm ">
+		  
+		  
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="First"><a class="page-link"   th:href="@{'/Training-Modules?week='+${week}+'&lang='+${language} +'&page='+${0}}"> &laquo</a></li>
+		    <li th:if ="${currentPage != 0}" class="page-item" aria-label="Previous"><a class="page-link"   th:href="@{'/Training-Modules?week='+${week}+'&lang='+${language}+'&page='+${currentPage -1}}"> &lt</a></li>
+		    <li th:classappend = "${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(firstPage,lastPage)}" class="page-item"><a class="page-link" th:href="@{'/Training-Modules?week='+${week}+'&lang='+${language}+'&page='+${i-1}}"><span th:text="${i}"/></a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Next"><a class="page-link" th:href="@{'/Training-Modules?week='+${week}+'&lang='+${language}+ '&page='+${currentPage +1 }}">&gt</a></li>
+		    <li th:if ="${currentPage+1 != totalPages}" class="page-item" aria-label="Last"><a class="page-link"   th:href="@{'/Training-Modules?week='+${week}+'&lang='+${language}+'&page='+${totalPages-1}}"> &raquo</a></li>
+		  </ul>
+		</nav>
+		
+	
+		
+<div th:replace="common/trail :: body-bottom-scripts"></div>
+  <br><br>
+	 
+	  <footer class="footer" style="margin-bottom:0px;">
+	  <div class="container" >
+	  
+	  <div class="row"  height="50%" >
+	   <div class="col text-center justify-content" style=" padding-top:12px; height:50%;"> <p> <i class="fas fa-map-marker-alt contact-icon" ></i> Spoken Tutorial Project,<br>
+			TCS Lab,Behind CAD Centre,<br>
+			IIT Bombay, Powai,<br>
+			Mumbai - 400076
+   			</p> 
+   	 </div>
+	  
+	  <div class="col text-center" style=" padding-top:12px; height:50%;"> 
+	
+	  		<p><a href="mailto:health@spoken-tutorial.org"><i class="fas fa-envelope contact-icon mr-2"></i><span style="color:white;"> health@spoken-tutorial.org</span> </a></p>
+		    <p><a href="tel:02225764229"><i class="fas fa-phone-alt contact-icon mr-2"></i><span style="color:white;">022 2576 4229 </span> </a></p>
+	  
+	   </div>
+	   
+	  <div class="col  text-center " style="padding-top:10px; height:50%;">
+		  <a href="https://www.iitb.ac.in/" target="_blank"> <img th:src="@{/image/iitb-logo.png}" width="50%" height="50%"  alt="IITB" > </img>	
+    	  <p class="text-centre"><span  style="color:white;">Developed at IIT-Bombay</span></p></a>
+	  
+	  </div>
+	  
+	  <div class="col   justify-content " style="padding-top:5px; height:30%; ">
+		   	
+		    <p><a href="https://www.youtube.com/channel/UCmyV3lKT1Gs1AfgtV8pp__Q" class="fab fa-youtube fa-1x" style="color: #ed302f;"  target="_blank"> <span  style="color:white; font-size: 14px;">ST Health YouTube Channel</span></a></p>
+		    <p><a href="https://www.youtube.com/user/SpokenTutorialIITB" class="fab fa-youtube fa-1x" style="color: #ed302f;" target="_blank"> <span  style="color: white; font-size: 14px;">ST YouTube Channel</span>  </a> </p>
+		    <p><a href="https://www.facebook.com/SpokenTutorial.org" class="fab fa-facebook-f fa-1x" style="color: #3b5998;" target="_blank"> <span  style="color: white; font-size: 14px;"> ST Facebook Page</span> </a></p>
+    		<p><a href="https://www.linkedin.com/company/spokentutorial?original_referer=" class="fab fa-linkedin-in fa-1x" style="color: #0082ca;" target="_blank">  <span  style="color:white; font-size: 14px;">ST LinkedIn Page</span> </a>  </p>
+    		
+    		
+   			
+	  </div>
+	 
+	  </div>
+	  
+	  </div>
+	
+    </footer>
+ 
+
+
+<script>
+	var projectPath='[(@{/})]';
+
+</script>
+<!--script>
+				
+		
+  		
+		 
+var isPlaying = [];
+		
+		var videos = document.querySelectorAll('video');
+		
+		document.addEventListener('DOMContentLoaded', function() {
+		      // Get the first video element
+		      const firstVideo = document.querySelector('video');
+
+		      // Mute the first video
+		      firstVideo.muted = true;
+		      firstVideo.play();
+		    });
+		
+		for(var i=0; i<videos.length; i++){
+			if(i==0){
+				//videos[i].muted=true;
+				//videos[i].play();
+				//videos[i].muted=true;
+				
+			}
+			
+		  	videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+		    videos[i].addEventListener('mouseover', playMutedVideoMouseOver);
+		    videos[i].addEventListener('click', playUnmutedVideoOnClick);
+		    videos[i].addEventListener('mouseout', pauseWithMutedVideoMouseOut);
+		    
+		    
+		    isPlaying.push(false);
+		    
+		    videos[i].addEventListener("touchstart", function() {
+		      var index = Array.from(videos).indexOf(this);
+		      var flagCheck=0;
+			 	for (var j = 0; j < videos.length; j++){
+					 if(!videos[j].paused && !videos[j].muted)
+						 flagCheck=flagCheck+1;
+				 }
+			 	
+			 	if(flagCheck==0){
+			 		if (!isPlaying[index]) {
+			 			videos[index].muted=true;
+				        videos[index].play();
+				        videos[index].muted=true;
+				        isPlaying[index] = true;
+				      }
+			 		}
+		   		 });
+
+		     videos[i].addEventListener("touchend", function() {
+		      	var index = Array.from(videos).indexOf(this);
+		      	if (isPlaying[index]) {
+		        	videos[index].pause();
+		        	isPlaying[index] = false;
+		     		 }
+		   		 });
+		   
+			}
+		
+		
+
+		function pauseAll(elem){
+		        
+			for(var i=0; i<videos.length; i++){
+		                if(videos[i] == elem) continue;
+		                if(videos[i].played.length > 0 && !videos[i].paused){
+		                  videos[i].pause();
+		                }
+		        }
+		  }
+		
+		
+		
+		
+		   // Functions to play the video with/without sound
+			function playMutedVideoMouseOver(event) {
+				var video = event.target;
+			 	var flag=0;
+			 	for (var j = 0; j < videos.length; j++){
+					 if(!videos[j].paused && !videos[j].muted)
+			 			flag=flag+1;
+				 }
+			 	if(flag==0){
+			 	video.play();
+			 	video.muted = true;
+				}
+			 
+			}
+		   
+
+			function playUnmutedVideoOnClick(event) {
+			 var video = event.target;
+			 video.muted = true;
+			 video.play();
+			}
+			
+			function pauseWithMutedVideoMouseOut(event) {
+				 var video = event.target;
+					if(video.muted){
+						video.pause();
+						//video.muted=!video.muted;
+					}
+				 
+				}
+				
+			
+		
+			 
+			
+			
+		
+			
+		
+		 var controls =
+			 [
+			     //'play-large', // The large play button in the center
+			    // 'restart', // Restart playback
+			    // 'rewind', // Rewind by the seek time (default 10 seconds)
+			    // 'play', // Play/pause playback
+			    
+			    // 'progress', // The progress bar and scrubber for playback and buffering
+			    // 'current-time', // The current time of playback
+			    
+			     //'mute', // Toggle mute
+			    //'volume', // Volume control
+			    
+			     //'settings', // Settings menu
+			    // 'pip', // Picture-in-picture (currently Safari only)
+			    // 'airplay', // Airplay (currently Safari only)
+			    // 'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+			    // 'fullscreen' // Toggle fullscreen
+			 ];
+
+		for(var i=0; i<videos.length; i++){
+		
+			const player = new Plyr(videos[i],{controls});	
+			
+			
+			   
+		}
+</script-->
+</body>
+</html>
